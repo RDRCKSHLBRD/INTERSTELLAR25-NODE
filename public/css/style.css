@@ -330,35 +330,35 @@ footer {
 
 /* Replace the paths below with your actual icon paths */
 .custom-audio-controls button.play {
-  background-image: url('assets/CASS-PLAY-v2.svg');
+  background-image: url('/images/CASS-PLAY-v2.svg');
 }
 
 .custom-audio-controls button.pause {
-  background-image: url('assets/CASS-PAUSE.svg');
+  background-image: url('/images/CASS-PAUSE.svg');
 }
 
 .custom-audio-controls button.stop {
-  background-image: url('assets/CASS-STOP.svg');
+  background-image: url('/images/CASS-STOP.svg');
 }
 
 .custom-audio-controls button.forward30 {
-  background-image: url('assets/CASS-fwd30_BLUE.svg');
+  background-image: url('/images/CASS-fwd30_BLUE.svg');
 }
 
 .custom-audio-controls button.back30 {
-  background-image: url('assets/CASS-bkwd30_BLUE.svg');
+  background-image: url('/images/CASS-bkwd30_BLUE.svg');
 }
 
 .custom-audio-controls button.next {
-  background-image: url('assets/CASS-FWD_BLUE-5.svg');
+  background-image: url('/images/CASS-FWD_BLUE-5.svg');
 }
 
 .custom-audio-controls button.back {
-  background-image: url('assets/CASS-BACK_BLUE-5.svg');
+  background-image: url('/images/CASS-BACK_BLUE-5.svg');
 }
 
 .custom-audio-controls button.loop {
-  background-image: url('assets/CASS-REPEAT_BLUE.svg');
+  background-image: url('/images/CASS-REPEAT_BLUE.svg');
 }
 
 .custom-audio-controls button.loop.active {
