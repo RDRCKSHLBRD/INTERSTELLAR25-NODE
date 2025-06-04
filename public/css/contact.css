@@ -1,0 +1,116 @@
+/* Page Layout */
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+}
+
+/* Main Content */
+main.contact-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 50px 20px;
+}
+
+/* Contact Card - Full Background Image */
+.contact-card {
+  background: url('https://storage.googleapis.com/ip-public-bucket1/RESOURCES/EPK/RODERICK_SHOOLBRAID-PROMO1_2022.jpg') center/cover no-repeat;
+  width: 100%;
+  max-width: 850px;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start; /* Aligns the small card to the left */
+  overflow: hidden;
+}
+
+/* Contact Info - Small Card on Left */
+.contact-info {
+  width: 25%;
+  background: rgba(8, 61, 94, 0.85);
+  padding: 15px;
+  border-radius: 6px;
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  text-align: left;
+}
+
+/* Text Styling - Smaller and Left-Aligned */
+.contact-text-title {
+padding-bottom: .3em;
+  border-bottom: 1px solid #859E98;
+}
+
+.contact-text {
+  font-size: 0.8rem;
+  font-weight: normal;
+  color: #a9d2d6;
+  margin-bottom: 5px;
+}
+
+.contact-card h2 {
+  font-size: 1rem;
+  color: #a9d2d6;
+  margin-bottom: 5px;
+}
+
+.contact-card p {
+  font-size: 0.8em;
+  margin-bottom: 3px;
+}
+
+/* Hide the footer */
+footer {
+  display: none;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .contact-card {
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+
+  .contact-info {
+    width: 50%; /* Increase width for readability */
+    bottom: 15px;
+    left: 10px;
+    padding: 12px;
+    font-size: 0.75rem;
+  }
+
+  .contact-text-title {
+    font-size: 0.85rem; /* Reduce size slightly */
+    border-bottom: 1px solid #859E98;
+  }
+
+  .contact-text,
+  .contact-card p {
+    font-size: 0.7rem; /* Scale text down */
+    line-height: 1.2em; /* Improve spacing */
+  }
+}
+
+/* Ultra-Small Screens (Phones < 400px) */
+@media (max-width: 400px) {
+  .contact-info {
+    width: 60%;
+    bottom: 10px;
+    left: 5px;
+    padding: 10px;
+  }
+
+  .contact-text,
+  .contact-card p {
+    font-size: 0.65rem;
+  }
+}
+

@@ -1,0 +1,122 @@
+/* === Base Reset === */
+body {
+  background-color: #0597A1;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+/* === Full-width Hero Image === */
+.domes-hero {
+  width: 100vw;
+  height: 100vh;
+  background-image: url('https://storage.googleapis.com/ip-public-bucket1/New-Domes-of-Earth/NEWDOMES-x.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* === Sidebar Container === */
+.domes-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin: 0;
+  background-color: #00756F;
+}
+
+/* === Sidebar Content === */
+.domes-sidebar {
+  background-color: #00756F;
+  color: #151211;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* === Text Styling === */
+.title {
+  font-size: 1.4em;
+  margin-bottom: 10px;
+  color: #151211;
+}
+
+.file-description {
+  font-size: 0.85em;
+  color: #A2C098;
+  margin-top: 15px;
+  line-height: 1.4;
+}
+
+.file-description span {
+  color: #00082B;
+}
+
+/* === Download Button === */
+.download-btn {
+  display: inline-block;
+  margin-top: 1em;
+  padding: 10px 15px;
+  background-color: #0C525F;
+  color: #5EAB9A;
+  text-decoration: none;
+  border-radius: 2px;
+  font-weight: bold;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.download-btn:hover {
+  background-color: #062A4B;
+  color: #5EAB9A;
+}
+
+/* === Footer === */
+footer {
+  background-color: #0C525F;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+
+footer .Logo img {
+  width: 110px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+
+#domes-logo-link {
+  cursor: pointer;
+  display: inline-block;
+  transition: background-color 0.3s ease-in-out, padding 0.3s ease-in-out;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+#domes-logo-link:hover {
+  background-color: #127A92;
+}
+
+
+
+
+/* === Responsive (Tablet and Up) === */
+@media (min-width: 768px) {
+  .domes-container {
+    flex-direction: row;
+    height: 100vh;
+  }
+
+  .domes-hero {
+    width: 60vw;
+    height: 100vh;
+  }
+
+    
+  .domes-sidebar {
+    width: 40vw;
+    height: 100vh;
+    overflow-y: auto;
+  }
+}

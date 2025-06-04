@@ -1,0 +1,56 @@
+/* Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Grid Layout */
+  .film-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+  
+  /* Film Container */
+  .film-container {
+    background-color: #083D5E;
+    padding: 20px;
+    border: 1px solid #144654;
+    color: #cadbda;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  
+  /* Vimeo iframe */
+  .film-container iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: none;
+  }
+  
+  /* Description text */
+  .filmDescription {
+    font-size: 1rem;
+    color: #a6cbd3;
+    padding-top: 10px;
+    text-align: center;
+  }
+  
+  /* Responsive - no padding shrink, just adapt layout */
+  @media (max-width: 768px) {
+    .film-container {
+      padding: 10px;
+    }
+  
+    .filmDescription {
+      font-size: 0.95rem;
+    }
+  }
+  

@@ -1,0 +1,527 @@
+/* Reset some default browser styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body Styles */
+body {
+  font-family: Helvetica, sans-serif;
+  background-color: #083D5E;
+  color: #cadbda;
+  font-size: 1em;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding-bottom: 150px; /* Adjust based on footer height */
+}
+
+/* Header Styles */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #083D5E;
+  color: #cadbda;
+  padding: 10px;
+  margin: 5px;
+}
+
+header .Logo {
+  padding: 5px;
+  margin: 5px;
+}
+
+header .Logo img {
+  width: 200px; /* Set the desired width */
+  height: auto;
+  display: block;
+}
+
+header .Nav ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #cadbda;
+  padding: 10px;
+}
+
+header .Nav ul li {
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-bottom: 10px;
+}
+
+header .Nav ul li a {
+  padding: 5px;
+  color: #cadbda;
+  text-decoration: none;
+  font-size: 1em;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+header .Nav ul li a:hover {
+  background-color: #2b7f8c;
+  color: #cadbda;
+}
+
+/* Main Content Styles */
+main {
+  display: flex;
+  flex: 1;
+  padding: 20px;
+}
+
+.album-art {
+  flex: 0 0 75%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-auto-rows: auto;
+  gap: 10px;
+  position: relative;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Album Art Images */
+.album-art img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  cursor: pointer;
+  transition: all 0.6s ease-in-out;
+}
+
+/* Enlarged Image */
+.album-art img.enlarged {
+  grid-column: 1 / -1; /* Span all columns */
+  width: 100%;
+  height: auto;
+  justify-self: center;
+}
+
+.album-info {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 10px 0;
+  padding: 5px;
+  border-top: 1px solid #2b7f8c;
+  justify-content: space-between;
+}
+
+.catalogue-number,
+.release-date,
+.production-date {
+  font-size: 1em;
+  color: #0AAAC3;
+  margin-bottom: 5px;
+}
+
+.production-date {
+  color: #7E8D9B;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  display: none;            /* Initially hidden */
+  flex: 0 0 0%;            /* Start with 0% width */
+  transition: width 0.5s ease-in-out; /* Smooth transition */
+  background-color: #083D5E;
+  border-left: 1px solid #cadbda;
+  padding: 3px;
+  font-size: 0.8em;
+  position: sticky;
+  top: 0;
+  height: fit-content;
+  overflow: hidden;
+  margin: 5px;
+}
+
+/* Styles for details and summary in the sidebar */
+.sidebar-details {
+  margin-bottom: 10px;
+}
+
+.sidebar-details summary {
+  font-size: .9em;
+  font-weight: lighter;
+  cursor: pointer;
+  padding: 5px;
+  background-color: #2b7f8c;
+  color: #cadbda;
+}
+
+.sidebar-details summary::-webkit-details-marker,
+.sidebar-details summary::marker {
+  /* Keep default disclosure triangle */
+}
+
+/* Sidebar Content */
+.sidebar .sidebar-content {
+  /* This will contain dynamic content */
+}
+
+/* Sidebar Inner Content Styles */
+.sidebar .albumDetails {
+  margin-left: 5px;
+  margin-bottom: 20px;
+}
+
+.sidebar .albumName {
+  font-size: 24px;
+  border-bottom: 1px solid #2b7f8c;
+  margin-bottom: 3px;
+  padding: 2px;
+  color: #2b7f8c;
+}
+
+.sidebar .albumDescription {
+  color: #8ab7ce;
+  margin-bottom: 0.8em;
+}
+
+.sidebar .albumCredit {
+  border-top: 1px solid #184551;
+  padding-top: 10px;
+  color: #829D9E;
+  margin-bottom: 0.6em;
+}
+
+.sidebar .songListContainer {
+  margin-top: 10px;
+}
+
+.sidebar .songList {
+  list-style-type: none;
+}
+
+.sidebar .songList li {
+  margin: 3px;
+  padding: 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.2s;
+}
+
+.sidebar .songList li:hover {
+  background-color: #2b7f8c;
+}
+
+.sidebar .songList li:last-child {
+  border-bottom: none;
+}
+
+.song-duration {
+  color: #8ab7ce;
+  margin-left: 10px;
+}
+
+/* Purchase Link */
+.sidebar .purchaseLink {
+  margin: 8px 0;
+  text-align: left;
+}
+.sidebar .purchaseLink a {
+  color: #fff;
+  background-color: #2b7f8c;
+  padding: 5px 10px;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.9em;
+  transition: background-color 0.2s;
+}
+.sidebar .purchaseLink a:hover {
+  background-color: #19606b;
+}
+
+/* Footer Styles */
+footer {
+  background-color: #2b7f8c;
+  color: #cadbda;
+  padding: 10px 20px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+/* Styles for details and summary in the footer */
+.footer-details {
+  margin-bottom: 0;
+}
+
+.footer-details summary {
+  font-size: .9em;
+  font-weight: lighter;
+  cursor: pointer;
+  padding: 5px;
+  background-color: #083D5E;
+  color: #cadbda;
+}
+
+.footer-details summary::-webkit-details-marker,
+.footer-details summary::marker {
+  /* Keep default disclosure triangle */
+}
+
+.foot-cont {
+  display: flex;
+  justify-content: space-between;
+  align-items: last baseline;
+}
+
+.footTag {
+  padding: 10px;
+  font-size: 0.8em;
+}
+
+/* Custom Audio Player Styles */
+.player {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: last baseline;
+}
+
+/* Now Playing Title */
+.player p {
+  margin-bottom: 5px;
+  font-weight: lighter;
+  font-size: 1.2em;
+  text-align: left;
+  color: #333333;
+}
+
+.PlayerSong {
+  text-align: left;
+}
+
+/* Custom Audio Controls */
+.custom-audio-controls {
+  display: flex;
+  align-items: center;
+  background-color: #cadbda;
+  padding: 10px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.custom-audio-controls button {
+  background: none;
+  border: 1px solid #083D5E;
+  outline: none;
+  cursor: pointer;
+  margin-right: 15px;
+  width: 30px;
+  height: 30px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: opacity 0.2s;
+}
+
+.custom-audio-controls button:hover {
+  opacity: 0.7;
+}
+
+/* Replace the paths below with your actual icon paths */
+.custom-audio-controls button.play {
+  background-image: url('assets/CASS-PLAY-v2.svg');
+}
+
+.custom-audio-controls button.pause {
+  background-image: url('assets/CASS-PAUSE.svg');
+}
+
+.custom-audio-controls button.stop {
+  background-image: url('assets/CASS-STOP.svg');
+}
+
+.custom-audio-controls button.forward30 {
+  background-image: url('assets/CASS-fwd30_BLUE.svg');
+}
+
+.custom-audio-controls button.back30 {
+  background-image: url('assets/CASS-bkwd30_BLUE.svg');
+}
+
+.custom-audio-controls button.next {
+  background-image: url('assets/CASS-FWD_BLUE-5.svg');
+}
+
+.custom-audio-controls button.back {
+  background-image: url('assets/CASS-BACK_BLUE-5.svg');
+}
+
+.custom-audio-controls button.loop {
+  background-image: url('assets/CASS-REPEAT_BLUE.svg');
+}
+
+.custom-audio-controls button.loop.active {
+  background-color: #14423A;
+  border: 2px solid #2b7f8c;
+  
+}
+
+
+.custom-audio-controls .progress-container {
+  flex: 1;
+  height: 15px;
+  background-color: #E0ECED;
+  border-radius: 2px;
+  margin-right: 10px;
+  position: relative;
+  cursor: pointer;
+}
+
+.custom-audio-controls .progress-bar {
+  width: 0%;
+  height: 100%;
+  background-color: #1D4450;
+  border-radius: 2px;
+}
+
+.custom-audio-controls .time-display {
+  font-size: 0.9em;
+  margin-right: 10px;
+  color: #1D4450;
+  min-width: 60px;
+}
+
+.custom-audio-controls .volume-control {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.custom-audio-controls .volume-control input[type="range"] {
+  width: 120px;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.custom-audio-controls .volume-control input[type="range"]:focus {
+  outline: none;
+}
+
+/* Slider Track */
+.custom-audio-controls .volume-control input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  background: #1D4450;
+  border-radius: 2px;
+}
+.custom-audio-controls .volume-control input[type="range"]::-moz-range-track {
+  height: 4px;
+  background: #1D4450;
+  border-radius: 2px;
+}
+
+/* Slider Thumb */
+.custom-audio-controls .volume-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  background: #1D4450;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-top: -4px;
+}
+.custom-audio-controls .volume-control input[type="range"]::-moz-range-thumb {
+  background: #1D4450;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  /* Layout Containers */
+  main {
+    flex-direction: column;
+    padding: 10px; /* Reduced padding for mobile */
+  }
+
+  .album-art {
+    flex: none;
+    width: 100%;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .album-art img {
+    width: 100%;
+    height: auto;
+    margin: 5px;
+  }
+
+  .sidebar {
+    flex: none;
+    width: 100%;
+    margin-left: 0;
+    margin-top: 20px;
+    padding: 15px;
+    position: static; /* Remove sticky positioning on mobile */
+  }
+
+  /* Footer Adjustments */
+  footer {
+    position: static; /* Remove fixed positioning on mobile */
+  }
+
+  .foot-cont {
+    flex-direction: column;
+    gap: 10px; /* Add space between stacked items */
+    padding: 15px;
+  }
+
+  /* Audio Player Grid Styles */
+  .custom-audio-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+    gap: 10px; /* Spacing between grid items */
+    padding: 15px;
+    align-items: center;
+    justify-items: center; /* Centers each item within its cell */
+  }
+
+  /* Button Styles */
+  .custom-audio-controls button {
+    width: 50px; /* Square dimensions for icons */
+    height: 50px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    background-color: transparent; /* Optional: for no background color */
+  }
+
+  .custom-audio-controls .progress-container {
+    width: 100%;
+    margin: 0;
+    height: 20px; /* Slightly larger touch target */
+  }
+
+  .custom-audio-controls .time-display {
+    margin: 0;
+    text-align: left;
+    font-size: 1em; /* Slightly larger for better readability */
+  }
+
+  /* Volume Controls */
+  .custom-audio-controls .volume-control {
+    width: 100%;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .custom-audio-controls .volume-control input[type="range"] {
+    width: 80%; /* Take up most of the width */
+    margin: 10px 0;
+  }
+}

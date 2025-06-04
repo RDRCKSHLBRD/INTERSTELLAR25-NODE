@@ -1,0 +1,122 @@
+/* === Base Reset === */
+body {
+  background-color: #3D392F;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+/* === Full-width Hero Image === */
+.object-hero {
+  width: 100vw;
+  height: 100vh;
+  background-image: url('https://storage.googleapis.com/ip-public-bucket1/Objects-and-Particles/OBJECTS_PARTICLES-ALL.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* === Sidebar Container === */
+.object-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin: 0;
+  background-color: #3D392F;
+}
+
+/* === Sidebar Content === */
+.object-sidebar {
+  background-color: #3D392F;
+  color: #cadbda;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* === Text Styling === */
+.title {
+  font-size: 1.4em;
+  margin-bottom: 10px;
+  color: #3D392F;
+}
+
+.file-description {
+  font-size: 0.85em;
+  color: #b8c1c8;
+  margin-top: 15px;
+  line-height: 1.4;
+}
+
+.file-description span {
+  color: #D1CAAE;
+}
+
+/* === Download Button === */
+.download-btn {
+  display: inline-block;
+  margin-top: 1em;
+  padding: 10px 15px;
+  background-color: #0C0101;
+  color: #D1CAAE;
+  text-decoration: none;
+  border-radius: 2px;
+  font-weight: bold;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.download-btn:hover {
+  background-color: #FEF8E0;
+  color: #35332d;
+}
+
+/* === Footer === */
+footer {
+  background-color: #35332d;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+
+footer .Logo img {
+  width: 110px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+
+#object-logo-link {
+  cursor: pointer;
+  display: inline-block;
+  transition: background-color 0.3s ease-in-out, padding 0.3s ease-in-out;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+#object-logo-link:hover {
+  background-color: #0C0101; 
+}
+
+
+
+
+/* === Responsive (Tablet and Up) === */
+@media (min-width: 768px) {
+  .object-container {
+    flex-direction: row;
+    height: 100vh;
+  }
+
+  .object-hero {
+    width: 60vw;
+    height: 100vh;
+  }
+
+    
+  .object-sidebar {
+    width: 40vw;
+    height: 100vh;
+    overflow-y: auto;
+  }
+}

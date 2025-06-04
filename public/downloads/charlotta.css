@@ -1,0 +1,122 @@
+/* === Base Reset === */
+body {
+  background-color: #620b1f;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+/* === Full-width Hero Image === */
+.charlotta-hero {
+  width: 100vw;
+  height: 100vh;
+  background-image: url('https://storage.googleapis.com/ip-public-bucket1/Charlotta/CHARLOTTA_noTEXT.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* === Sidebar Container === */
+.charlotta-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin: 0;
+  background-color: #620b1f;
+}
+
+/* === Sidebar Content === */
+.charlotta-sidebar {
+  background-color: #330404;
+  color: #cadbda;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* === Text Styling === */
+.title {
+  font-size: 1.4em;
+  margin-bottom: 10px;
+  color: #ffc0d7;
+}
+
+.file-description {
+  font-size: 0.85em;
+  color: #b8c1c8;
+  margin-top: 15px;
+  line-height: 1.4;
+}
+
+.file-description span {
+  color: #e2547c;
+}
+
+/* === Download Button === */
+.download-btn {
+  display: inline-block;
+  margin-top: 1em;
+  padding: 10px 15px;
+  background-color: #0C0101;
+  color: #e2547c;
+  text-decoration: none;
+  border-radius: 2px;
+  font-weight: bold;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.download-btn:hover {
+  background-color: #FFFFE5;
+  color: #0C0101;
+}
+
+/* === Footer === */
+footer {
+  background-color: #4a0e1a;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+
+footer .Logo img {
+  width: 110px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+
+#charlotta-logo-link {
+  cursor: pointer;
+  display: inline-block;
+  transition: background-color 0.3s ease-in-out, padding 0.3s ease-in-out;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+#charlotta-logo-link:hover {
+  background-color: #D12466; /* CHARLOTTA pink */
+}
+
+
+
+
+/* === Responsive (Tablet and Up) === */
+@media (min-width: 768px) {
+  .charlotta-container {
+    flex-direction: row;
+    height: 100vh;
+  }
+
+  .charlotta-hero {
+    width: 60vw;
+    height: 100vh;
+  }
+
+    
+  .charlotta-sidebar {
+    width: 40vw;
+    height: 100vh;
+    overflow-y: auto;
+  }
+}
