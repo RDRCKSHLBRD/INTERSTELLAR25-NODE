@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INTERSTELLAR PACKAGES</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/loading-styles.css">
 </head>
 <body>
     <header>
@@ -22,13 +23,13 @@
 
     <main>
         <div class="album-art">
-            <!-- Album art will be displayed here by script.js -->
+            <!-- Album art will be loaded dynamically from database -->
         </div>
         <aside class="sidebar">
             <details class="sidebar-details" open>
                 <summary>Album Details</summary>
                 <div class="sidebar-content">
-                    <!-- This content will be dynamically injected by script.js -->
+                    <!-- This content will be dynamically injected from API -->
                 </div>
             </details>
         </aside>
@@ -39,13 +40,17 @@
             <summary>Player</summary>
             <div class="foot-cont">
                 <div class="player">
-                    <!-- Custom audio player will be injected here by script.js -->
+                    <!-- Custom audio player will be injected here -->
                 </div>
                 <p class="footTag">&copy; 2024/25 RDXENV</p>
             </div>
         </details>
     </footer>
 
-    <script src="/js/script.js"></script>
+    <!-- Modular JavaScript Architecture -->
+    <script src="/js/api-client.js"></script>
+    <script src="/js/player.js"></script>
+    <script src="/js/ui-manager.js"></script>
+    <script src="/js/main.js"></script>
 </body>
 </html>

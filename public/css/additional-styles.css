@@ -1,0 +1,321 @@
+/**
+ * Additional CSS classes needed for the modular architecture
+ * Add these to your existing style.css or create as a separate file
+ */
+
+/* Album Art Enhanced States */
+.album-art img.enlarged {
+  transform: scale(1.1);
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.album-art img.loaded {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.album-art img.error {
+  opacity: 0.6;
+  filter: grayscale(100%);
+}
+
+/* Album Details Components */
+.albumDetails {
+  margin-bottom: 20px;
+}
+
+.albumName {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.albumDescription {
+  line-height: 1.4;
+  margin-bottom: 15px;
+  color: #666;
+}
+
+.albumCredit {
+  font-size: 0.9em;
+  color: #888;
+  font-style: italic;
+  margin-bottom: 15px;
+}
+
+/* Album Info Section */
+.album-info {
+  background: rgba(0,0,0,0.05);
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.catalogue-number,
+.production-date,
+.release-date {
+  font-size: 0.85em;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.catalogue-number {
+  font-weight: bold;
+}
+
+/* Song List Components */
+.songListContainer {
+  margin-bottom: 20px;
+}
+
+.songList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.songList li {
+  cursor: pointer;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  transition: background-color 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.songList li:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.songList li.playing {
+  background: rgba(0,123,255,0.1);
+  border-left: 3px solid #007bff;
+}
+
+.songList li.no-songs {
+  font-style: italic;
+  color: #888;
+  cursor: default;
+}
+
+.song-duration {
+  font-size: 0.85em;
+  color: #888;
+  font-family: monospace;
+}
+
+/* Purchase Link */
+.purchaseLink {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.purchaseLink a {
+  display: inline-block;
+  padding: 12px 24px;
+  background: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.purchaseLink a:hover {
+  background: #0056b3;
+}
+
+/* Audio Player Components */
+.PlayerSong {
+  font-weight: bold;
+  margin-bottom: 15px;
+  font-size: 1.1em;
+  text-align: center;
+  color: #333;
+}
+
+.custom-audio-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.custom-audio-controls button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-audio-controls button:hover {
+  background: rgba(0,0,0,0.1);
+}
+
+.custom-audio-controls button.active {
+  background: #007bff;
+  color: white;
+}
+
+/* Volume Control */
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.volume-label {
+  font-size: 0.8em;
+  color: #666;
+}
+
+#volume-slider {
+  width: 80px;
+}
+
+/* Progress Bar */
+.progress-container {
+  width: 100%;
+  height: 6px;
+  background: rgba(0,0,0,0.2);
+  cursor: pointer;
+  border-radius: 3px;
+  margin: 10px 0;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #007bff;
+  border-radius: 3px;
+  transition: width 0.1s;
+  min-width: 0;
+}
+
+/* Time Display */
+.time-display {
+  font-size: 0.85em;
+  color: #666;
+  text-align: center;
+  font-family: monospace;
+}
+
+/* Error and Loading States */
+.no-albums,
+.no-results,
+.error {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.retry-container {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.retry-button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px;
+  transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+  background: #0056b3;
+}
+
+/* Success Notifications */
+.success-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #28a745;
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+  animation: slideIn 0.3s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* API Status Indicator */
+.api-status {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.api-status.connected {
+  background: #28a745;
+  color: white;
+}
+
+.api-status.disconnected {
+  background: #dc3545;
+  color: white;
+}
+
+.api-status.show {
+  opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .custom-audio-controls {
+    gap: 4px;
+  }
+  
+  .custom-audio-controls button {
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+  }
+  
+  .volume-control {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  #volume-slider {
+    width: 60px;
+  }
+  
+  .songList li {
+    padding: 6px 8px;
+    font-size: 0.9em;
+  }
+  
+  .purchaseLink a {
+    padding: 10px 20px;
+    font-size: 0.9em;
+  }
+}
