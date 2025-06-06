@@ -3,12 +3,21 @@
  * Add these to your existing style.css or create as a separate file
  */
 
-/* Album Art Enhanced States */
+
+/* Album Art Enhanced States - FIXED VERSION */
 .album-art img.enlarged {
-  transform: scale(1.1);
+  /* Keep the grid spanning from style.css */
+  grid-column: 1 / -1;
+  width: 100%;
+  height: auto;
+  justify-self: center;
+  
+  /* Add the visual enhancements */
   z-index: 10;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   transition: all 0.3s ease;
+  
+  /* Remove the transform: scale(1.1) - this was causing the issue */
 }
 
 .album-art img.loaded {
