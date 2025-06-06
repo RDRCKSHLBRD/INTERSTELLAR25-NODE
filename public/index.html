@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="/css/additional-styles.css">
 </head>
 <body>
-    <header>
+<header>
     <div class="Logo">
         <img src="/images/IP_TAG24.svg" alt="Interstellar Packages Logo">
     </div>
@@ -24,6 +24,13 @@
             <li id="userInfo" class="user-info" style="display: none;">
                 <span id="userName"></span>
                 <button id="logoutBtn" class="logout-button">Logout</button>
+            </li>
+            <!-- Cart Icon -->
+            <li class="cartSquare">
+                <button id="cartBtn" class="cart-button">
+                    <img src="/images/IP-CART25-m1.svg" alt="Shopping Cart" class="cart-icon">
+                    <span id="cartCount" class="cart-count" style="display: none;">0</span>
+                </button>
             </li>
         </ul>
     </nav>
@@ -61,6 +68,7 @@
     <script src="/js/ui-manager.js"></script>
     <script src="/js/main.js"></script>
     <script src="/js/auth.js"></script>
+    <script src="/js/cart.js"></script>
 
 
 <!-- Auth Modal -->
@@ -74,7 +82,10 @@
             <div id="loginError" class="auth-error" style="display: none;"></div>
             <form class="auth-form" id="loginFormElement">
                 <input type="email" id="loginEmail" placeholder="Email" required>
-                <input type="password" id="loginPassword" placeholder="Password" required>
+                <div class="password-input-container">
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                    <div class="password-toggle-icon" data-target="loginPassword"></div>
+                </div>
                 <button type="submit" id="loginSubmit">Log In</button>
             </form>
             <div class="form-toggle">
@@ -92,7 +103,10 @@
                 <input type="text" id="registerFirstName" placeholder="First Name">
                 <input type="text" id="registerLastName" placeholder="Last Name">
                 <input type="email" id="registerEmail" placeholder="Email" required>
-                <input type="password" id="registerPassword" placeholder="Password (min 6 characters)" required>
+                <div class="password-input-container">
+                    <input type="password" id="registerPassword" placeholder="Password (min 6 characters)" required>
+                    <div class="password-toggle-icon" data-target="registerPassword"></div>
+                </div>
                 <button type="submit" id="registerSubmit">Create Account</button>
             </form>
             <div class="form-toggle">

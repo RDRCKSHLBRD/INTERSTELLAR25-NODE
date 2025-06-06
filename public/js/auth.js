@@ -71,6 +71,35 @@ class AuthManager {
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => this.handleLogout());
     }
+
+    // Password toggle functionality
+    this.setupPasswordToggles();
+  }
+
+  setupPasswordToggles() {
+    const toggleIcons = document.querySelectorAll('.password-toggle-icon');
+    
+    toggleIcons.forEach(icon => {
+      icon.addEventListener('click', (e) => {
+        const targetId = e.target.dataset.target;
+        const passwordInput = document.getElementById(targetId);
+        
+        if (passwordInput) {
+          if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.add('password-visible');
+            icon.setAttribute('title', 'Hide password');
+          } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('password-visible');
+            icon.setAttribute('title', 'Show password');
+          }
+        }
+      });
+
+      // Set initial title
+      icon.setAttribute('title', 'Show password');
+    });
   }
 
   async checkAuthStatus() {
@@ -95,6 +124,7 @@ class AuthManager {
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('registerForm').style.display = 'none';
     this.clearErrors();
+    this.resetPasswordToggles();
     this.modal.style.display = 'block';
   }
 
@@ -102,6 +132,7 @@ class AuthManager {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('registerForm').style.display = 'block';
     this.clearErrors();
+    this.resetPasswordToggles();
     this.modal.style.display = 'block';
   }
 
@@ -109,6 +140,7 @@ class AuthManager {
     this.modal.style.display = 'none';
     this.clearForms();
     this.clearErrors();
+    this.resetPasswordToggles();
   }
 
   clearForms() {
@@ -121,6 +153,21 @@ class AuthManager {
     errorElements.forEach(el => {
       el.style.display = 'none';
       el.textContent = '';
+    });
+  }
+
+  resetPasswordToggles() {
+    // Reset all password inputs to type="password" and icon states
+    const passwordInputs = document.querySelectorAll('#loginPassword, #registerPassword');
+    const toggleIcons = document.querySelectorAll('.password-toggle-icon');
+    
+    passwordInputs.forEach(input => {
+      input.type = 'password';
+    });
+    
+    toggleIcons.forEach(icon => {
+      icon.classList.remove('password-visible');
+      icon.setAttribute('title', 'Show password');
     });
   }
 

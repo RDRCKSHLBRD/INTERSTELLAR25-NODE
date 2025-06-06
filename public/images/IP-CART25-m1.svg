@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 378.7 245.8">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #91b7b5;
+      }
+    </style>
+  </defs>
+  <g id="_1" data-name="1">
+    <g>
+      <path class="cls-1" d="M314.58,153.52H90.68c-7.39,0-13.97-4.67-16.4-11.65L24.82,0h353.88l-41.37,136.64c-3.04,10.03-12.28,16.88-22.75,16.88Z"/>
+      <circle class="cls-1" cx="123.71" cy="225.79" r="20.01"/>
+      <circle class="cls-1" cx="274.37" cy="225.79" r="20.01"/>
+      <g>
+        <rect class="cls-1" x="288.27" y="134.88" width="20.08" height="45.12"/>
+        <path class="cls-1" d="M192.62,82.14h0c10.39,0,18.83,8.44,18.83,18.83v193.79h-8.46c-5.72,0-10.37-4.65-10.37-10.37V82.14h0Z" transform="translate(13.59 390.49) rotate(-90)"/>
+      </g>
+      <path class="cls-1" d="M2.77,47.6h0c7.47,0,13.53,6.06,13.53,13.53h0c0,.31-.25.57-.57.57H.57C.25,61.69,0,61.44,0,61.12v-10.76C0,48.84,1.24,47.6,2.77,47.6Z" transform="translate(16.3 109.29) rotate(-180)"/>
+      <path class="cls-1" d="M96.89-67.17h18.83v212.62h-8.46c-5.72,0-10.37-4.65-10.37-10.37V-67.17h0Z" transform="translate(145.45 -67.17) rotate(90)"/>
+    </g>
+  </g>
+</svg>
