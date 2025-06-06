@@ -44,7 +44,7 @@ header .Nav ul {
   list-style: none;
   display: flex;
   flex-direction: column;
-  border-left: 1px solid #cadbda;
+  border-left: 1px solid #2a6377;
   padding: 10px;
 }
 
@@ -56,16 +56,17 @@ header .Nav ul li {
 
 header .Nav ul li a {
   padding: 5px;
-  color: #cadbda;
+  color: #0e9bcc;
   text-decoration: none;
   font-size: 1em;
+  font-weight: 200;
   cursor: pointer;
   transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
 }
 
 header .Nav ul li a:hover {
   background-color: #2b7f8c;
-  color: #cadbda;
+  color: #bfd4d6;
 }
 
 /* Main Content Styles */
