@@ -60,7 +60,9 @@ async function initializeApp() {
     await uiManager.initialize();
     
     hideLoadingState();
-    showSuccessMessage(`Loaded ${albumCount} albums successfully!`);
+    
+    // REMOVED: showSuccessMessage(`Loaded ${albumCount} albums successfully!`);
+    // Albums loaded silently now - better UX
     
   } catch (error) {
     hideLoadingState();
@@ -90,7 +92,7 @@ function hideLoadingState() {
 }
 
 /**
- * Success message
+ * Success message (kept for potential future use)
  */
 function showSuccessMessage(message) {
   const successElement = document.createElement('div');

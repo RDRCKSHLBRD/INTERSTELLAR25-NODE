@@ -252,23 +252,6 @@
   background: #0056b3;
 }
 
-/* Success Notifications */
-.success-notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #28a745;
-  color: white;
-  padding: 5px;
-  border-radius: 2px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 10000;
-  animation: slideIn 0.3s ease-out;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
 /* API Status Indicator */
 .api-status {
   position: fixed;
@@ -341,14 +324,14 @@
 }
 
 .logout-button {
-  background-color: transparent;
+  background-color: #335D7E;
   color: #cadbda;
-  border: 1px solid #cadbda;
+  border: 1px solid #0597A1;
   padding: 4px 8px;
   font-size: 0.8em;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  border-radius: 2px;
+  
 }
 
 .logout-button:hover {
