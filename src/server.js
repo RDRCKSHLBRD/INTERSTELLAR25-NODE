@@ -1,48 +1,77 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const path = require('path');
-const config = require('./config/environment');
-const { testConnection, closePool } = require('./config/database');
+// server.mjs – ESM version of Express server for Interstellar Packages
+
+import express from 'express';
+import session from 'express-session';
+import cors from 'cors';
+import helmet from 'helmet';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import config from './config/environment.js';
+import { testConnection, closePool } from './config/database.js';
 
 // Import route modules
-const artistRoutes = require('./routes/api/artists');
-const albumRoutes = require('./routes/api/albums');
-const songRoutes = require('./routes/api/songs');
-const authRoutes = require('./routes/api/auth');
-const purchaseRoutes = require('./routes/api/purchase');
-const pageRoutes = require('./routes/pages');
-const downloadRoutes = require('./routes/downloads');
+import artistRoutes from './routes/api/artists.js';
+import albumRoutes from './routes/api/albums.js';
+import songRoutes from './routes/api/songs.js';
+import authRoutes from './routes/api/auth.js';
+import purchaseRoutes from './routes/api/purchase.js';
+import pageRoutes from './routes/pages.js';
+import downloadRoutes from './routes/downloads.js';
+import healthRoutes from './routes/api/health.js';
 
 // Import middleware
-const errorHandler = require('./middleware/errorHandler');
+import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
 
-// Security middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "https://storage.googleapis.com", "data:"],
-      mediaSrc: ["'self'", "https://storage.googleapis.com"],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'"],
-      objectSrc: ["'none'"],
-      frameSrc: ["'self'", "https://player.vimeo.com"]
-    }
-  }
-}));
+// Directory fix for __dirname in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// CORS configuration
-app.use(cors({
-  origin: config.cors.origins,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// Security middleware
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", "https://storage.googleapis.com", "data:"],
+        mediaSrc: ["'self'", "https://storage.googleapis.com"],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        frameSrc: ["'self'", "https://player.vimeo.com"]
+      }
+    }
+  })
+);
+
+// Session configuration (must be before CORS and routes)
+app.use(
+  session({
+    secret: config.session.secret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: config.nodeEnv === 'production', // HTTPS only in production
+      httpOnly: true, // Prevent XSS attacks
+      maxAge: config.session.maxAge, // 7 days from config
+      sameSite: 'lax' // CSRF protection
+    },
+    name: 'interstellar.sid' // Custom session cookie name
+  })
+);
+
+// CORS configuration (must be after session for credentials)
+app.use(
+  cors({
+    origin: config.cors.origins,
+    credentials: true, // Important for sessions!
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  })
+);
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -55,29 +84,12 @@ app.use(express.static(path.join(__dirname, '../public')));
 if (config.nodeEnv === 'development') {
   app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+    if (req.session?.userId) {
+      console.log(`👤 User: ${req.session.userId} (${req.session.user?.user_name})`);
+    }
     next();
   });
 }
-
-// Health check endpoint
-app.get('/health', async (req, res) => {
-  try {
-    const dbConnected = await testConnection();
-    res.json({
-      status: 'OK',
-      timestamp: new Date().toISOString(),
-      database: dbConnected ? 'connected' : 'disconnected',
-      environment: config.nodeEnv
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'ERROR',
-      timestamp: new Date().toISOString(),
-      database: 'disconnected',
-      error: error.message
-    });
-  }
-});
 
 // API Routes
 app.use('/api/artists', artistRoutes);
@@ -85,6 +97,7 @@ app.use('/api/albums', albumRoutes);
 app.use('/api/songs', songRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/purchase', purchaseRoutes);
+app.use('/api/health', healthRoutes);
 
 // Page routes (serve HTML pages)
 app.use('/', pageRoutes);
@@ -104,17 +117,14 @@ if (config.enableApiDocs) {
         songs: '/api/songs',
         auth: '/api/auth',
         purchase: '/api/purchase',
-        health: '/health'
+        health: '/api/health'
       },
-      documentation: {
-        'GET /api/artists': 'Get all artists',
-        'GET /api/albums': 'Get all albums',
-        'GET /api/albums/:id': 'Get specific album with songs',
-        'GET /api/songs': 'Get all songs',
-        'GET /api/songs/:id': 'Get specific song',
-        'POST /api/auth/register': 'Register new user',
-        'POST /api/auth/login': 'Login user',
-        'GET /health': 'Health check'
+      authentication: {
+        register: 'POST /api/auth/register',
+        login: 'POST /api/auth/login',
+        logout: 'POST /api/auth/logout',
+        me: 'GET /api/auth/me',
+        status: 'GET /api/auth/status'
       }
     });
   });
@@ -122,12 +132,9 @@ if (config.enableApiDocs) {
 
 // Simple fallback for any unmatched routes
 app.use((req, res) => {
-  // Handle API 404s
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
-  
-  // Serve index.html for all other routes (SPA behavior)
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
@@ -137,35 +144,34 @@ app.use(errorHandler);
 // Start server
 const startServer = async () => {
   try {
-    // Test database connection
     console.log('🔗 Testing database connection...');
     const dbConnected = await testConnection();
-    
+
     if (!dbConnected) {
       console.error('❌ Database connection failed. Please check your configuration.');
       process.exit(1);
     }
 
-    // Start the server
     const server = app.listen(config.port, () => {
       console.log(`🚀 Server running on port ${config.port}`);
-      console.log(`📊 Health check: http://localhost:${config.port}/health`);
+      console.log(`📊 Health check: http://localhost:${config.port}/api/health`);
       console.log(`🎵 Main app: http://localhost:${config.port}`);
-      
+      console.log(`🔐 Auth endpoints: http://localhost:${config.port}/api/auth`);
+
       if (config.enableApiDocs) {
         console.log(`📖 API docs: http://localhost:${config.port}/api`);
       }
-      
+
       console.log(`🌍 Environment: ${config.nodeEnv}`);
+      console.log(`🍪 Session settings: ${config.nodeEnv === 'production' ? 'Secure cookies' : 'Development cookies'}`);
     });
 
-    // Graceful shutdown
     const gracefulShutdown = () => {
       console.log('\n🛑 Received shutdown signal. Gracefully shutting down...');
-      
+
       server.close(async () => {
         console.log('✅ HTTP server closed');
-        
+
         try {
           await closePool();
           console.log('✅ Database connections closed');
@@ -177,7 +183,6 @@ const startServer = async () => {
       });
     };
 
-    // Handle shutdown signals
     process.on('SIGTERM', gracefulShutdown);
     process.on('SIGINT', gracefulShutdown);
 
@@ -187,9 +192,6 @@ const startServer = async () => {
   }
 };
 
-// Start the application
-if (require.main === module) {
-  startServer();
-}
+startServer();
 
-module.exports = app;
+export default app;

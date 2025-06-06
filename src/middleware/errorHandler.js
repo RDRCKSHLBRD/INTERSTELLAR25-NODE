@@ -1,4 +1,4 @@
-const config = require('../config/environment');
+import config from '../config/environment.js';
 
 const errorHandler = (err, req, res, next) => {
   console.error('Error occurred:', {
@@ -48,4 +48,4 @@ const errorHandler = (err, req, res, next) => {
   res.status(error.status).json(error);
 };
 
-module.exports = errorHandler;
+export default errorHandler;

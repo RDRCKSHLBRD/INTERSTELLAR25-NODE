@@ -1,4 +1,5 @@
-const express = require('express');
+import express from 'express';
+
 const router = express.Router();
 
 // Placeholder purchase/Stripe routes - we'll implement these later
@@ -10,4 +11,4 @@ router.post('/webhook', (req, res) => {
   res.json({ message: 'Stripe webhook - coming soon' });
 });
 
-module.exports = router;
+export default router;

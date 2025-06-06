@@ -1,5 +1,6 @@
-const express = require('express');
-const { query } = require('../../config/database');
+import express from 'express';
+import { query } from '../../config/database.js';
+
 const router = express.Router();
 
 // GET /api/albums - Get all albums
@@ -108,4 +109,4 @@ router.get('/catalogue/:catalogue', async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;

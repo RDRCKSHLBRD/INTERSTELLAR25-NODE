@@ -1,4 +1,6 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Validate required environment variables
 const requiredEnvVars = [
@@ -91,4 +93,4 @@ if (config.nodeEnv === 'production') {
   };
 }
 
-module.exports = config;
+export default config;
