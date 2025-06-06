@@ -80,7 +80,7 @@ class CartManager {
     this.cartSidebar.innerHTML = `
       <div class="cart-header">
         <h3>Shopping Cart</h3>
-        <button class="cart-close" id="cartClose">&times;</button>
+        <button class="cart-close" id="cartClose"></button>
       </div>
       <div class="cart-content">
         <div class="cart-items" id="cartItems">

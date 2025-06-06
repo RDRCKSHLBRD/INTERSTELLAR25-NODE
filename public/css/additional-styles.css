@@ -598,22 +598,26 @@
 }
 
 .cart-close {
-  background: none;
+  background-color: transparent;
   border: none;
-  color: #cadbda;
-  font-size: 24px;
   cursor: pointer;
   padding: 0;
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
+ 
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s;
+  transition: all 0.2s;
+  background-image: url('/images/IP25-CLOSEv2.svg');
+  background-size: 25px 25px;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .cart-close:hover {
-  color: #3AA0A0;
+  background-color: #CA381C;
+  
 }
 
 .cart-content {
