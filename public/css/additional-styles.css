@@ -316,12 +316,11 @@
 .cart-button {
   background-color: transparent;
   color: #3AA0A0;
-  border: 1px solid #3AA0A0;
+  border: none;
   padding: 8px 10px;
   font-size: 1em;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  border-radius: 2px;
   position: relative;
   display: flex;
   align-items: center;
@@ -338,10 +337,11 @@
 }
 
 .cart-icon {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   transition: filter 0.2s ease-in-out;
-  filter: brightness(0) saturate(100%) invert(71%) sepia(77%) saturate(6088%) hue-rotate(153deg) brightness(96%) contrast(80%);
+  /* Custom color: #91b7b5 */
+  filter: brightness(0) saturate(100%) invert(71%) sepia(8%) saturate(1055%) hue-rotate(139deg) brightness(99%) contrast(88%);
 }
 
 .cart-count {
@@ -354,7 +354,7 @@
   width: 18px;
   height: 18px;
   font-size: 0.7em;
-  font-weight: bold;
+  font-weight: 200;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -584,7 +584,7 @@
 }
 
 .cart-header {
-  padding: 20px;
+  padding: 10px;
   border-bottom: 1px solid #2b7f8c;
   display: flex;
   justify-content: space-between;
@@ -594,7 +594,7 @@
 .cart-header h3 {
   margin: 0;
   color: #3AA0A0;
-  font-size: 1.2em;
+  font-size: .9em;
 }
 
 .cart-close {
@@ -852,8 +852,8 @@
   }
   
   .cart-icon {
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
   }
   
   .cart-count {
