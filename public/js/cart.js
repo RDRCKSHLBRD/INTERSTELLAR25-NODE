@@ -305,7 +305,6 @@ class CartManager {
     const notification = document.createElement('div');
     notification.className = 'cart-notification';
     notification.innerHTML = `
-      <span>🛒</span>
       <span>${message}</span>
     `;
     
