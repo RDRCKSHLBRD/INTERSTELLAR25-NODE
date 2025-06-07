@@ -48,11 +48,7 @@ class CartManager {
     this.createCartSidebar();
     this.isVisible = true;
     
-    // Hide album sidebar if it's open
-    const albumSidebar = document.querySelector('.sidebar');
-    if (albumSidebar && albumSidebar.style.display !== 'none') {
-      uiManager.hideSidebar();
-    }
+    
   }
 
   hideCartSidebar() {

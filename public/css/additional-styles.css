@@ -567,6 +567,38 @@
   font-size: 0.9em;
 }
 
+
+
+
+
+
+/* ===== add to cart ===== */
+
+
+
+.add-to-cart-btn {
+  background-color: #3AA0A0;
+  color: #083D5E;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #2b7f8c;
+  color: #cadbda;
+}
+
+
+
+
+
+
+
 /* Cart Sidebar Styles */
 .cart-sidebar {
   position: fixed;

@@ -80,7 +80,7 @@ class UIManager {
     if (clickedImg.classList.contains('enlarged')) {
       // Remove enlarged state
       clickedImg.classList.remove('enlarged');
-      this.hideSidebar();
+     
     } else {
       // Remove 'enlarged' from all other images
       document.querySelectorAll('.album-art img').forEach(image => {
@@ -226,6 +226,22 @@ class UIManager {
         purchaseDiv.appendChild(purchaseAnchor);
         sidebarContent.appendChild(purchaseDiv);
       }
+
+      // ADD TO CART BUTTON (NEW)
+      const addToCartDiv = document.createElement('div');
+      addToCartDiv.classList.add('addToCartLink');
+      addToCartDiv.style.textAlign = 'center';
+      addToCartDiv.style.marginTop = '10px';
+
+      const addToCartBtn = document.createElement('button');
+      addToCartBtn.textContent = 'Add to Cart';
+      addToCartBtn.classList.add('add-to-cart-btn');
+      addToCartBtn.addEventListener('click', () => {
+        cartManager.addAlbumToCart(album.id);
+      });
+
+      addToCartDiv.appendChild(addToCartBtn);
+      sidebarContent.appendChild(addToCartDiv);
 
     } catch (error) {
       console.error('Failed to display album details:', error);
