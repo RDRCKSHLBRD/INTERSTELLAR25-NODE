@@ -47,8 +47,6 @@ class CartManager {
   showCartSidebar() {
     this.createCartSidebar();
     this.isVisible = true;
-    
-    
   }
 
   hideCartSidebar() {
@@ -99,6 +97,10 @@ class CartManager {
     document.getElementById('cartClose').addEventListener('click', () => this.hideCartSidebar());
     document.getElementById('checkoutBtn').addEventListener('click', () => this.handleCheckout());
 
+    // Attach cart item event listeners (NO MORE INLINE HANDLERS)
+    const cartItems = document.getElementById('cartItems');
+    this.attachCartItemEventListeners(cartItems);
+
     // Animate in
     setTimeout(() => {
       this.cartSidebar.style.right = '0';
@@ -117,14 +119,44 @@ class CartManager {
           <h4>${item.albumName}</h4>
           <p class="cart-item-price">$${item.price.toFixed(2)}</p>
           <div class="cart-item-controls">
-            <button class="quantity-btn" onclick="cartManager.updateQuantity(${item.albumId}, ${item.quantity - 1})">-</button>
+            <button class="quantity-btn decrease-btn" data-album-id="${item.albumId}" data-action="decrease">-</button>
             <span class="quantity">${item.quantity}</span>
-            <button class="quantity-btn" onclick="cartManager.updateQuantity(${item.albumId}, ${item.quantity + 1})">+</button>
-            <button class="remove-btn" onclick="cartManager.removeFromCart(${item.albumId})">Remove</button>
+            <button class="quantity-btn increase-btn" data-album-id="${item.albumId}" data-action="increase">+</button>
+            <button class="remove-btn" data-album-id="${item.albumId}" data-action="remove">Remove</button>
           </div>
         </div>
       </div>
     `).join('');
+  }
+
+  attachCartItemEventListeners(cartItems) {
+    // Handle all cart item buttons with event delegation
+    cartItems.addEventListener('click', (e) => {
+      const albumId = parseInt(e.target.dataset.albumId);
+      const action = e.target.dataset.action;
+      
+      if (!albumId || !action) return;
+      
+      switch(action) {
+        case 'decrease':
+          const currentItem = this.cart.find(item => item.albumId === albumId);
+          if (currentItem) {
+            this.updateQuantity(albumId, currentItem.quantity - 1);
+          }
+          break;
+          
+        case 'increase':
+          const existingItem = this.cart.find(item => item.albumId === albumId);
+          if (existingItem) {
+            this.updateQuantity(albumId, existingItem.quantity + 1);
+          }
+          break;
+          
+        case 'remove':
+          this.removeFromCart(albumId);
+          break;
+      }
+    });
   }
 
   addToCart(albumId, albumName, coverUrl, price = 15.00) {
@@ -191,6 +223,9 @@ class CartManager {
     
     if (cartItems) {
       cartItems.innerHTML = this.renderCartItems();
+      
+      // Re-attach event listeners after updating content
+      this.attachCartItemEventListeners(cartItems);
     }
     
     if (cartTotal) {
@@ -284,13 +319,18 @@ class CartManager {
   }
 
   // Public method to add album to cart from purchase links
-  addAlbumToCart(albumId) {
-    // Get album data from global data object
-    const album = window.data?.albums?.[albumId];
-    if (album) {
-      this.addToCart(albumId, album.name, album.cover_url);
-    } else {
-      console.error('Album not found:', albumId);
+  async addAlbumToCart(albumId) {
+    try {
+      // Get album data from API instead of global data object
+      const album = await apiClient.getAlbum(albumId);
+      if (album) {
+        this.addToCart(albumId, album.name, album.cover_url);
+      } else {
+        console.error('Album not found:', albumId);
+      }
+    } catch (error) {
+      console.error('Failed to add album to cart:', error);
+      this.showCartNotification('Failed to add album to cart. Please try again.');
     }
   }
 }
