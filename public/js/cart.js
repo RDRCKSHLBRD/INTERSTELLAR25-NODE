@@ -1,13 +1,29 @@
-// cart.js - Shopping Cart Manager
+// cart.js - Database-Driven Shopping Cart Manager
+// Keeps your existing great UI, but uses database instead of localStorage
+
 class CartManager {
   constructor() {
-    this.cart = [];
+    this.cart = {
+      items: [],
+      itemCount: 0,
+      totalAmount: 0,
+      cartId: null
+    };
     this.isVisible = false;
     this.cartSidebar = null;
+    this.isLoggedIn = false;
+    this.userId = null;
+    this.sessionId = this.generateSessionId();
+    
+    console.log('🛒 Database-driven CartManager initialized');
     this.init();
   }
 
-  init() {
+  generateSessionId() {
+    return 'session_' + Math.random().toString(36).substr(2, 9) + Date.now();
+  }
+
+  async init() {
     // Wait for DOM to be ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.setupEventListeners());
@@ -15,8 +31,42 @@ class CartManager {
       this.setupEventListeners();
     }
     
-    // Load cart from storage if user is logged in
-    this.loadCartFromStorage();
+    // Check auth status and load cart
+    await this.checkAuthStatus();
+    await this.loadCartFromDatabase();
+    this.updateCartCount();
+  }
+
+  async checkAuthStatus() {
+    try {
+      // Check if authManager is available
+      if (window.authManager && window.authManager.isLoggedIn()) {
+        this.isLoggedIn = true;
+        this.userId = window.authManager.getCurrentUser()?.id;
+        console.log('👤 User logged in:', window.authManager.getCurrentUser()?.user_name);
+      } else {
+        // Fallback - check auth directly
+        const response = await fetch('/api/auth/me', {
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const userData = await response.json();
+          if (userData.success && userData.user) {
+            this.isLoggedIn = true;
+            this.userId = userData.user.id;
+            console.log('👤 User logged in:', userData.user.user_name);
+          }
+        } else {
+          this.isLoggedIn = false;
+          this.userId = null;
+          console.log('👤 Anonymous user');
+        }
+      }
+    } catch (error) {
+      console.log('👤 Auth check failed, using anonymous mode');
+      this.isLoggedIn = false;
+    }
   }
 
   setupEventListeners() {
@@ -27,13 +77,65 @@ class CartManager {
     }
 
     // Listen for user login/logout events
-    window.addEventListener('userLoggedIn', (e) => {
-      this.loadUserCart(e.detail.user);
+    window.addEventListener('userLoggedIn', async (e) => {
+      this.isLoggedIn = true;
+      this.userId = e.detail.user.id;
+      await this.loadCartFromDatabase();
+      this.updateCartCount();
     });
 
-    window.addEventListener('userLoggedOut', () => {
-      this.clearCart();
+    window.addEventListener('userLoggedOut', async () => {
+      this.isLoggedIn = false;
+      this.userId = null;
+      this.sessionId = this.generateSessionId();
+      await this.loadCartFromDatabase();
+      this.updateCartCount();
     });
+  }
+
+  async loadCartFromDatabase() {
+    try {
+      let url, headers = {};
+      
+      if (this.isLoggedIn && this.userId) {
+        url = `/api/cart/${this.userId}`;
+        console.log('🔐 Loading cart for user:', this.userId);
+      } else {
+        url = '/api/cart/session';
+        headers['x-session-id'] = this.sessionId;
+        console.log('🔗 Loading cart for session:', this.sessionId);
+      }
+
+      console.log('📡 Making cart request to:', url);
+      console.log('📝 With headers:', headers);
+
+      const response = await fetch(url, {
+        headers,
+        credentials: 'include'
+      });
+
+      console.log('📊 Cart response status:', response.status);
+
+      if (response.ok) {
+        this.cart = await response.json();
+        console.log('🛒 Cart loaded from database:', this.cart);
+        console.log('📊 Cart structure check:', {
+          hasItems: !!this.cart.items,
+          itemsIsArray: Array.isArray(this.cart.items),
+          itemCount: this.cart.itemCount,
+          totalAmount: this.cart.totalAmount,
+          rawItems: this.cart.items
+        });
+      } else {
+        const errorText = await response.text();
+        console.log('⚠️ Cart load failed:', response.status, errorText);
+        console.log('🛒 No existing cart found, starting fresh');
+        this.cart = { items: [], itemCount: 0, totalAmount: 0, cartId: null };
+      }
+    } catch (error) {
+      console.error('❌ Failed to load cart from database:', error);
+      this.cart = { items: [], itemCount: 0, totalAmount: 0, cartId: null };
+    }
   }
 
   toggleCartSidebar() {
@@ -44,7 +146,9 @@ class CartManager {
     }
   }
 
-  showCartSidebar() {
+  async showCartSidebar() {
+    // Refresh cart data before showing
+    await this.loadCartFromDatabase();
     this.createCartSidebar();
     this.isVisible = true;
   }
@@ -68,7 +172,7 @@ class CartManager {
       this.cartSidebar.remove();
     }
 
-    // Create cart sidebar
+    // Create cart sidebar with your existing great design
     this.cartSidebar = document.createElement('div');
     this.cartSidebar.className = 'cart-sidebar';
     this.cartSidebar.innerHTML = `
@@ -82,9 +186,9 @@ class CartManager {
         </div>
         <div class="cart-footer">
           <div class="cart-total">
-            <strong>Total: $${this.getCartTotal().toFixed(2)}</strong>
+            <strong>Total: $${(this.cart.totalAmount || 0).toFixed(2)}</strong>
           </div>
-          <button class="checkout-btn" id="checkoutBtn" ${this.cart.length === 0 ? 'disabled' : ''}>
+          <button class="checkout-btn" id="checkoutBtn" ${!this.cart.items || this.cart.items.length === 0 ? 'disabled' : ''}>
             Checkout
           </button>
         </div>
@@ -97,7 +201,7 @@ class CartManager {
     document.getElementById('cartClose').addEventListener('click', () => this.hideCartSidebar());
     document.getElementById('checkoutBtn').addEventListener('click', () => this.handleCheckout());
 
-    // Attach cart item event listeners (NO MORE INLINE HANDLERS)
+    // Attach cart item event listeners
     const cartItems = document.getElementById('cartItems');
     this.attachCartItemEventListeners(cartItems);
 
@@ -108,111 +212,231 @@ class CartManager {
   }
 
   renderCartItems() {
-    if (this.cart.length === 0) {
+    console.log('🔍 Rendering cart items. Cart data:', this.cart);
+    
+    // Handle different possible cart structures
+    let items = [];
+    if (this.cart.items && Array.isArray(this.cart.items)) {
+      items = this.cart.items;
+    } else if (Array.isArray(this.cart)) {
+      items = this.cart;
+    } else if (this.cart.data && Array.isArray(this.cart.data)) {
+      items = this.cart.data;
+    }
+    
+    console.log('📦 Cart items to render:', items);
+    
+    if (!items || items.length === 0) {
       return '<div class="cart-empty">Your cart is empty</div>';
     }
 
-    return this.cart.map(item => `
-      <div class="cart-item" data-album-id="${item.albumId}">
-        <img src="${item.coverUrl}" alt="${item.albumName}" class="cart-item-image">
-        <div class="cart-item-details">
-          <h4>${item.albumName}</h4>
-          <p class="cart-item-price">$${item.price.toFixed(2)}</p>
-          <div class="cart-item-controls">
-            <button class="quantity-btn decrease-btn" data-album-id="${item.albumId}" data-action="decrease">-</button>
-            <span class="quantity">${item.quantity}</span>
-            <button class="quantity-btn increase-btn" data-album-id="${item.albumId}" data-action="increase">+</button>
-            <button class="remove-btn" data-album-id="${item.albumId}" data-action="remove">Remove</button>
+    return items.map(item => {
+      console.log('🛍️ Rendering item:', item);
+      
+      // Handle different item structures
+      const albumName = item.album?.name || item.product?.name || item.name || 'Unknown Album';
+      const coverUrl = item.album?.cover_url || item.product?.cover_url || '/images/default-album-cover.png';
+      const price = item.price || item.product?.price || 15.00;
+      const quantity = item.quantity || 1;
+      const itemId = item.id || item.cart_item_id;
+      
+      return `
+        <div class="cart-item" data-item-id="${itemId}">
+          <img src="${coverUrl}" 
+               alt="${albumName}" 
+               class="cart-item-image">
+          <div class="cart-item-details">
+            <h4>${albumName}</h4>
+            <p class="cart-item-price">${parseFloat(price).toFixed(2)}</p>
+            <div class="cart-item-controls">
+              <button class="quantity-btn decrease-btn" data-item-id="${itemId}" data-action="decrease">-</button>
+              <span class="quantity">${quantity}</span>
+              <button class="quantity-btn increase-btn" data-item-id="${itemId}" data-action="increase">+</button>
+              <button class="remove-btn" data-item-id="${itemId}" data-action="remove">Remove</button>
+            </div>
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   attachCartItemEventListeners(cartItems) {
-    // Handle all cart item buttons with event delegation
-    cartItems.addEventListener('click', (e) => {
-      const albumId = parseInt(e.target.dataset.albumId);
+    // Handle all cart item buttons with event delegation (keeping your existing pattern)
+    cartItems.addEventListener('click', async (e) => {
+      const itemId = parseInt(e.target.dataset.itemId);
       const action = e.target.dataset.action;
       
-      if (!albumId || !action) return;
+      if (!itemId || !action) return;
       
-      switch(action) {
-        case 'decrease':
-          const currentItem = this.cart.find(item => item.albumId === albumId);
-          if (currentItem) {
-            this.updateQuantity(albumId, currentItem.quantity - 1);
-          }
-          break;
-          
-        case 'increase':
-          const existingItem = this.cart.find(item => item.albumId === albumId);
-          if (existingItem) {
-            this.updateQuantity(albumId, existingItem.quantity + 1);
-          }
-          break;
-          
-        case 'remove':
-          this.removeFromCart(albumId);
-          break;
+      // Disable button during operation
+      e.target.disabled = true;
+      
+      try {
+        switch(action) {
+          case 'decrease':
+            const currentItem = this.cart.items.find(item => item.id === itemId);
+            if (currentItem) {
+              await this.updateQuantityInDatabase(itemId, currentItem.quantity - 1);
+            }
+            break;
+            
+          case 'increase':
+            const existingItem = this.cart.items.find(item => item.id === itemId);
+            if (existingItem) {
+              await this.updateQuantityInDatabase(itemId, existingItem.quantity + 1);
+            }
+            break;
+            
+          case 'remove':
+            await this.removeFromCartDatabase(itemId);
+            break;
+        }
+      } finally {
+        e.target.disabled = false;
       }
     });
   }
 
-  addToCart(albumId, albumName, coverUrl, price = 15.00) {
-    const existingItem = this.cart.find(item => item.albumId === albumId);
-    
-    if (existingItem) {
-      existingItem.quantity += 1;
-    } else {
-      this.cart.push({
-        albumId,
-        albumName,
-        coverUrl,
-        price,
+  async addToCart(albumId, albumName, coverUrl, price = 15.00) {
+    try {
+      console.log('🛒 Adding album to cart:', albumId);
+      console.log('🔑 Session ID:', this.sessionId);
+      console.log('👤 User ID:', this.userId);
+      
+      // Get product info for this album from API
+      const productResponse = await fetch(`/api/cart/product/album/${albumId}`);
+      
+      if (!productResponse.ok) {
+        throw new Error('Product not found for this album');
+      }
+      
+      const productData = await productResponse.json();
+      console.log('📦 Product data:', productData);
+      
+      // Add to cart via API
+      const cartData = {
+        productId: productData.product_id,
         quantity: 1
+      };
+      
+      if (this.isLoggedIn && this.userId) {
+        cartData.userId = this.userId;
+        console.log('🔐 Adding with userId:', this.userId);
+      } else {
+        cartData.sessionId = this.sessionId;
+        console.log('🔗 Adding with sessionId:', this.sessionId);
+      }
+
+      const response = await fetch('/api/cart/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-session-id': this.sessionId
+        },
+        credentials: 'include',
+        body: JSON.stringify(cartData)
       });
-    }
 
-    this.updateCartCount();
-    this.saveCartToStorage();
-    
-    // Show success message
-    this.showCartNotification(`${albumName} added to cart!`);
-    
-    // Update sidebar if open
-    if (this.isVisible) {
-      this.updateCartSidebarContent();
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Added to cart:', result.message);
+        console.log('📋 Add response data:', result);
+        
+        // Show success message
+        this.showCartNotification(`${albumName} added to cart!`);
+        
+        // Wait a moment then reload cart to get updated data
+        setTimeout(async () => {
+          console.log('🔄 Reloading cart after add...');
+          await this.loadCartFromDatabase();
+          this.updateCartCount();
+          
+          // Update sidebar if open
+          if (this.isVisible) {
+            this.updateCartSidebarContent();
+          }
+        }, 500);
+        
+        return true;
+      } else {
+        const error = await response.json();
+        console.error('❌ Add to cart API error:', error);
+        throw new Error(error.error || 'Failed to add to cart');
+      }
+    } catch (error) {
+      console.error('❌ Add to cart failed:', error);
+      this.showCartNotification(error.message, 'error');
+      return false;
     }
   }
 
-  removeFromCart(albumId) {
-    this.cart = this.cart.filter(item => item.albumId !== albumId);
-    this.updateCartCount();
-    this.saveCartToStorage();
-    
-    // Update sidebar if open
-    if (this.isVisible) {
-      this.updateCartSidebarContent();
+  async removeFromCartDatabase(cartItemId) {
+    try {
+      const response = await fetch(`/api/cart/remove/${cartItemId}`, {
+        method: 'DELETE',
+        headers: {
+          'x-session-id': this.sessionId
+        },
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        console.log('✅ Item removed from cart');
+        await this.loadCartFromDatabase();
+        this.updateCartCount();
+        
+        // Update sidebar if open
+        if (this.isVisible) {
+          this.updateCartSidebarContent();
+        }
+        return true;
+      } else {
+        throw new Error('Failed to remove item');
+      }
+    } catch (error) {
+      console.error('❌ Remove from cart failed:', error);
+      this.showCartNotification('Failed to remove item', 'error');
+      return false;
     }
   }
 
-  updateQuantity(albumId, newQuantity) {
+  async updateQuantityInDatabase(cartItemId, newQuantity) {
     if (newQuantity <= 0) {
-      this.removeFromCart(albumId);
+      await this.removeFromCartDatabase(cartItemId);
       return;
     }
 
-    const item = this.cart.find(item => item.albumId === albumId);
-    if (item) {
-      item.quantity = newQuantity;
-      this.updateCartCount();
-      this.saveCartToStorage();
-      
-      // Update sidebar if open
-      if (this.isVisible) {
-        this.updateCartSidebarContent();
+    try {
+      const response = await fetch('/api/cart/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-session-id': this.sessionId
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          cartItemId,
+          quantity: newQuantity
+        })
+      });
+
+      if (response.ok) {
+        console.log('✅ Cart quantity updated');
+        await this.loadCartFromDatabase();
+        this.updateCartCount();
+        
+        // Update sidebar if open
+        if (this.isVisible) {
+          this.updateCartSidebarContent();
+        }
+        return true;
+      } else {
+        throw new Error('Failed to update quantity');
       }
+    } catch (error) {
+      console.error('❌ Update quantity failed:', error);
+      this.showCartNotification('Failed to update quantity', 'error');
+      return false;
     }
   }
 
@@ -229,20 +453,20 @@ class CartManager {
     }
     
     if (cartTotal) {
-      cartTotal.innerHTML = `<strong>Total: $${this.getCartTotal().toFixed(2)}</strong>`;
+      cartTotal.innerHTML = `<strong>Total: $${(this.cart.totalAmount || 0).toFixed(2)}</strong>`;
     }
     
     if (checkoutBtn) {
-      checkoutBtn.disabled = this.cart.length === 0;
+      checkoutBtn.disabled = !this.cart.items || this.cart.items.length === 0;
     }
   }
 
   getCartTotal() {
-    return this.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return this.cart.totalAmount || 0;
   }
 
   getCartItemCount() {
-    return this.cart.reduce((total, item) => total + item.quantity, 0);
+    return this.cart.itemCount || 0;
   }
 
   updateCartCount() {
@@ -255,58 +479,44 @@ class CartManager {
     }
   }
 
-  clearCart() {
-    this.cart = [];
-    this.updateCartCount();
-    this.saveCartToStorage();
-    
-    if (this.isVisible) {
-      this.updateCartSidebarContent();
-    }
-  }
-
-  loadCartFromStorage() {
-    try {
-      const savedCart = localStorage.getItem('interstellar_cart');
-      if (savedCart) {
-        this.cart = JSON.parse(savedCart);
-        this.updateCartCount();
+  async clearCart() {
+    // This would need a clear cart API endpoint
+    // For now, remove items one by one
+    if (this.cart.items) {
+      for (const item of this.cart.items) {
+        await this.removeFromCartDatabase(item.id);
       }
-    } catch (error) {
-      console.error('Failed to load cart from storage:', error);
     }
-  }
-
-  saveCartToStorage() {
-    try {
-      localStorage.setItem('interstellar_cart', JSON.stringify(this.cart));
-    } catch (error) {
-      console.error('Failed to save cart to storage:', error);
-    }
-  }
-
-  async loadUserCart(user) {
-    // When user logs in, you might want to sync with server cart
-    // For now, just keep the local cart
-    console.log('User logged in, cart preserved:', user);
   }
 
   async handleCheckout() {
-    if (this.cart.length === 0) return;
+    if (!this.cart.items || this.cart.items.length === 0) return;
     
-    // Here you would integrate with your payment system
+    // Here you would integrate with your payment system (Stripe)
     console.log('Proceeding to checkout with items:', this.cart);
     
     // For now, just show a message
-    alert('Checkout functionality coming soon! Your cart has been saved.');
+    this.showCartNotification('Checkout functionality coming soon!');
+    
+    // You could redirect to checkout page or open Stripe here
+    // Example: window.location.href = `/checkout?cartId=${this.cart.cartId}`;
   }
 
-  showCartNotification(message) {
+  showCartNotification(message, type = 'success') {
     const notification = document.createElement('div');
     notification.className = 'cart-notification';
-    notification.innerHTML = `
-      <span>${message}</span>
-    `;
+    notification.innerHTML = `<span>${message}</span>`;
+    
+    // Style based on type
+    notification.style.backgroundColor = type === 'error' ? '#dc3545' : '#28a745';
+    notification.style.color = 'white';
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.padding = '12px 16px';
+    notification.style.borderRadius = '4px';
+    notification.style.zIndex = '10000';
+    notification.style.fontWeight = 'bold';
     
     document.body.appendChild(notification);
     
@@ -317,22 +527,31 @@ class CartManager {
     }, 3000);
   }
 
-  // Public method to add album to cart from purchase links
+  // Public method to add album to cart from UI
   async addAlbumToCart(albumId) {
     try {
-      // Get album data from API instead of global data object
-      const album = await apiClient.getAlbum(albumId);
+      // Get album data from API
+      const album = await window.apiClient.getAlbum(albumId);
       if (album) {
-        this.addToCart(albumId, album.name, album.cover_url);
+        await this.addToCart(albumId, album.name, album.cover_url);
       } else {
         console.error('Album not found:', albumId);
+        this.showCartNotification('Album not found', 'error');
       }
     } catch (error) {
       console.error('Failed to add album to cart:', error);
-      this.showCartNotification('Failed to add album to cart. Please try again.');
+      this.showCartNotification('Failed to add album to cart. Please try again.', 'error');
     }
+  }
+
+  // Get cart data for other components
+  getCartData() {
+    return this.cart;
   }
 }
 
 // Initialize cart manager
 const cartManager = new CartManager();
+
+// Make available globally
+window.cartManager = cartManager;

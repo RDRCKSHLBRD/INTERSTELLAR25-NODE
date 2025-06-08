@@ -14,6 +14,7 @@ import artistRoutes from './routes/api/artists.js';
 import albumRoutes from './routes/api/albums.js';
 import songRoutes from './routes/api/songs.js';
 import authRoutes from './routes/api/auth.js';
+import cartRoutes from './routes/api/cartRoute.js';
 import purchaseRoutes from './routes/api/purchase.js';
 import pageRoutes from './routes/pages.js';
 import downloadRoutes from './routes/downloads.js';
@@ -97,6 +98,7 @@ app.use('/api/albums', albumRoutes);
 app.use('/api/songs', songRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/purchase', purchaseRoutes);
+app.use('/api/cart', cartRoutes);
 app.use('/api/health', healthRoutes);
 
 // Page routes (serve HTML pages)

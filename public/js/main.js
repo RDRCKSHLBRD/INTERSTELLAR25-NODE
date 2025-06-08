@@ -3,6 +3,9 @@
  * API-driven version that replaces hardcoded data
  */
 
+import apiClient, { loadingManager, showError } from './api-client.js';
+import uiManager from './ui-manager.js';
+
 // Global data object (populated from API)
 let data = {
   artists: {},
@@ -61,7 +64,6 @@ async function initializeApp() {
     
     hideLoadingState();
     
-    // REMOVED: showSuccessMessage(`Loaded ${albumCount} albums successfully!`);
     // Albums loaded silently now - better UX
     
   } catch (error) {

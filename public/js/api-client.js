@@ -13,10 +13,6 @@ class APIClient {
     };
   }
 
-
-
-
-  
   /**
    * Generic fetch wrapper with error handling
    */
@@ -403,12 +399,16 @@ function showError(message, duration = 5000) {
 const apiClient = new APIClient();
 const loadingManager = new LoadingManager();
 
+// Make available globally for non-ESM scripts
+window.apiClient = apiClient;
+window.loadingManager = loadingManager;
+window.showError = showError;
+
 // Test API on load
 document.addEventListener('DOMContentLoaded', async () => {
   await apiClient.testConnection();
 });
 
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { APIClient, LoadingManager, showError };
-}
+// ESM exports
+export default apiClient;
+export { APIClient, LoadingManager, showError, loadingManager };

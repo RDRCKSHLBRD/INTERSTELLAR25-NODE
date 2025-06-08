@@ -1,4 +1,5 @@
 // auth.js - Authentication Handler
+
 class AuthManager {
   constructor() {
     this.currentUser = null;
@@ -323,3 +324,6 @@ class AuthManager {
 
 // Initialize auth manager when script loads
 const authManager = new AuthManager();
+
+// Make available globally
+window.authManager = authManager;

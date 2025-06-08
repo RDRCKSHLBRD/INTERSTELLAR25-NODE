@@ -1,8 +1,10 @@
+// public/js/player.js
+// Browser-compatible Audio Player
+
 /**
  * Fixed Audio Player for Current Data Structure
  * Handles the actual API response format
  */
-
 class AudioPlayer {
   constructor() {
     this.currentAudio = null;
@@ -12,11 +14,6 @@ class AudioPlayer {
     this.playerContainer = null;
   }
 
-  // Get API client safely
-  get apiClient() {
-    return window.apiClient || apiClient;
-  }
-
   /**
    * Initialize the player with song and album data
    */
@@ -24,15 +21,19 @@ class AudioPlayer {
     try {
       console.log(`🎵 Playing song ${songId} from album ${albumId}`);
       
-      // Check if we have API client
-      if (!this.apiClient) {
-        console.error('API client not available');
-        throw new Error('API client not available');
+      // Get album data first (which should include songs)
+      let album = null;
+      
+      // Try to get album from API if apiClient is available
+      if (window.apiClient) {
+        album = await window.apiClient.getAlbum(albumId);
       }
       
-      // Get album data first (which should include songs)
-      const album = await this.apiClient.getAlbum(albumId);
-      
+      // Fallback to global data if no API client
+      if (!album && window.data && window.data.albums) {
+        album = window.data.albums[albumId];
+      }
+
       if (!album) {
         throw new Error('Album not found');
       }
@@ -49,9 +50,9 @@ class AudioPlayer {
       }
 
       // If still not found, try direct API call
-      if (!song) {
+      if (!song && window.apiClient) {
         try {
-          song = await this.apiClient.getSong(songId);
+          song = await window.apiClient.getSong(songId);
         } catch (error) {
           console.warn('Direct song API call failed:', error);
         }
@@ -72,7 +73,7 @@ class AudioPlayer {
       
     } catch (error) {
       console.error('Failed to play song:', error);
-      showError(`Failed to load song: ${error.message}`);
+      this.showError(`Failed to load song: ${error.message}`);
     }
   }
 
@@ -256,7 +257,7 @@ class AudioPlayer {
       this.updatePlayButton(false);
     } catch (error) {
       console.error('Playback failed:', error);
-      showError('Playback failed. Please try again.');
+      this.showError('Playback failed. Please try again.');
     }
   }
 
@@ -437,7 +438,7 @@ class AudioPlayer {
 
   onError(event) {
     console.error('Audio error:', event);
-    showError('Audio playback error. Please try again.');
+    this.showError('Audio playback error. Please try again.');
   }
 
   onLoadStart() {
@@ -457,6 +458,24 @@ class AudioPlayer {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  }
+
+  /**
+   * Show error message
+   */
+  showError(message) {
+    // Use global showError if available, otherwise create simple alert
+    if (window.showError) {
+      window.showError(message);
+    } else {
+      console.error(message);
+      // Create simple error display
+      const errorDiv = document.createElement('div');
+      errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#f44336;color:white;padding:10px;border-radius:4px;z-index:10000;';
+      errorDiv.textContent = message;
+      document.body.appendChild(errorDiv);
+      setTimeout(() => errorDiv.remove(), 3000);
+    }
   }
 
   /**
@@ -490,11 +509,9 @@ class AudioPlayer {
 const audioPlayer = new AudioPlayer();
 
 // Global function for compatibility with existing code
-function playSong(songId, albumId) {
+window.playSong = function(songId, albumId) {
   audioPlayer.playSong(songId, albumId);
-}
+};
 
-// Export for module use
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = AudioPlayer;
-}
+// Make available globally
+window.audioPlayer = audioPlayer;

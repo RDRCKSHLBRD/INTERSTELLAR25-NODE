@@ -1,8 +1,12 @@
+// public/js/ui-manager.js
+// ESM UI Manager
+
+import apiClient, { showError } from './api-client.js';
+
 /**
  * Complete UI Manager for Interstellar Packages
  * Ports all original DOM manipulation and event handling from script.js
  */
-
 class UIManager {
   constructor() {
     this.currentAlbumId = null;
@@ -192,7 +196,12 @@ class UIManager {
 
           // Click => playSong (EXACT port from original)
           songItem.addEventListener('click', () => {
-            audioPlayer.playSong(song.id, albumId);
+            // Use global audioPlayer
+            if (window.audioPlayer) {
+              window.audioPlayer.playSong(song.id, albumId);
+            } else {
+              window.playSong(song.id, albumId);
+            }
             
             // Update visual state
             document.querySelectorAll('.song-item.playing').forEach(item => {
@@ -237,7 +246,10 @@ class UIManager {
       addToCartBtn.textContent = 'Add to Cart';
       addToCartBtn.classList.add('add-to-cart-btn');
       addToCartBtn.addEventListener('click', () => {
-        cartManager.addAlbumToCart(album.id);
+        // Use global cartManager
+        if (window.cartManager) {
+          window.cartManager.addAlbumToCart(album.id);
+        }
       });
 
       addToCartDiv.appendChild(addToCartBtn);
@@ -304,23 +316,27 @@ class UIManager {
       switch(e.key) {
         case ' ': // Spacebar - play/pause
           e.preventDefault();
-          if (audioPlayer.currentAudio) {
-            if (audioPlayer.currentAudio.paused) {
-              audioPlayer.play();
+          if (window.audioPlayer && window.audioPlayer.currentAudio) {
+            if (window.audioPlayer.currentAudio.paused) {
+              window.audioPlayer.play();
             } else {
-              audioPlayer.pause();
+              window.audioPlayer.pause();
             }
           }
           break;
           
         case 'ArrowRight': // Next track
           e.preventDefault();
-          audioPlayer.nextTrack();
+          if (window.audioPlayer) {
+            window.audioPlayer.nextTrack();
+          }
           break;
           
         case 'ArrowLeft': // Previous track
           e.preventDefault();
-          audioPlayer.previousTrack();
+          if (window.audioPlayer) {
+            window.audioPlayer.previousTrack();
+          }
           break;
           
         case 'Escape': // Close sidebar
@@ -437,9 +453,10 @@ const uiManager = new UIManager();
 // Make functions globally available for compatibility
 window.loadAlbumArt = () => uiManager.loadAlbumArt();
 window.displayAlbumDetails = (albumId) => uiManager.displayAlbumDetails(albumId);
+
+// Make available globally
 window.uiManager = uiManager;
 
-// Export for module use
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = UIManager;
-}
+// ESM exports
+export default uiManager;
+export { UIManager };
