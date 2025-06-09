@@ -1,0 +1,11 @@
+[
+  {
+    "origin": ["http://localhost:3000", "https://storage.googleapis.com"],
+    "responseHeader": ["Content-Type", "Cache-Control"],
+    "method": ["GET", "HEAD"],
+    "maxAgeSeconds": 3600
+  }
+]
+
+
+

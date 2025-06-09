@@ -30,7 +30,7 @@ class UIManager {
     try {
       // Get albums from API
       const albums = await apiClient.getAlbums();
-      
+
       if (albums.length === 0) {
         albumArtContainer.innerHTML = '<p class="no-albums">No albums found.</p>';
         return;
@@ -46,19 +46,25 @@ class UIManager {
         img.alt = `${album.name} Cover Art`;
         img.dataset.albumId = album.id;
         img.className = 'album-cover';
-        
+
         // Loading state
         img.addEventListener('load', () => {
           img.classList.add('loaded');
         });
-        
+
         // Error handling
         img.addEventListener('error', () => {
-          img.src = '/images/default-album-cover.png';
-          img.alt = 'Album cover not available';
-          img.classList.add('error');
+          if (!img.dataset.errorFallback) {
+            img.dataset.errorFallback = 'true';
+            img.src = '/images/default-album-cover.png';
+            img.alt = 'Album cover not available';
+            img.classList.add('error');
+          } else {
+            console.warn('Skipping repeated error for album cover:', img.src);
+          }
         });
-        
+
+
         albumArtContainer.appendChild(img);
 
         // Click handler - EXACT port from original
@@ -68,7 +74,7 @@ class UIManager {
       });
 
       console.log(`✅ Loaded ${albums.length} album covers`);
-      
+
     } catch (error) {
       console.error('Failed to load album art:', error);
       albumArtContainer.innerHTML = '<p class="error">Failed to load albums. Please try again.</p>';
@@ -80,21 +86,21 @@ class UIManager {
    */
   handleAlbumClick(event, album) {
     const clickedImg = event.currentTarget;
-    
+
     if (clickedImg.classList.contains('enlarged')) {
       // Remove enlarged state
       clickedImg.classList.remove('enlarged');
-     
+
     } else {
       // Remove 'enlarged' from all other images
       document.querySelectorAll('.album-art img').forEach(image => {
         image.classList.remove('enlarged');
       });
-      
+
       // Add to the clicked one
       clickedImg.classList.add('enlarged');
       this.enlargedImage = clickedImg;
-      
+
       // Display album details
       this.displayAlbumDetails(album.id);
     }
@@ -120,7 +126,7 @@ class UIManager {
 
       // Get album data
       const album = await apiClient.getAlbum(albumId);
-      
+
       if (!album) {
         sidebarContent.innerHTML = '<p class="error">Album not found.</p>';
         return;
@@ -185,13 +191,13 @@ class UIManager {
         album.songs.forEach(song => {
           const songItem = document.createElement('li');
           songItem.textContent = `${song.track_id}. ${song.name} `;
-          
+
           // Duration span
           const durationSpan = document.createElement('span');
           durationSpan.textContent = song.duration;
           durationSpan.classList.add('song-duration');
           songItem.appendChild(durationSpan);
-          
+
           songList.appendChild(songItem);
 
           // Click => playSong (EXACT port from original)
@@ -202,7 +208,7 @@ class UIManager {
             } else {
               window.playSong(song.id, albumId);
             }
-            
+
             // Update visual state
             document.querySelectorAll('.song-item.playing').forEach(item => {
               item.classList.remove('playing');
@@ -296,7 +302,7 @@ class UIManager {
   handleSidebarToggle() {
     const sidebar = document.querySelector('.sidebar');
     const enlargedImages = document.querySelectorAll('.album-art img.enlarged');
-    
+
     if (this.sidebarVisible && enlargedImages.length > 0) {
       // If sidebar is visible and image is enlarged, hide both
       this.hideSidebar();
@@ -313,7 +319,7 @@ class UIManager {
       // Only handle shortcuts when not typing in input fields
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-      switch(e.key) {
+      switch (e.key) {
         case ' ': // Spacebar - play/pause
           e.preventDefault();
           if (window.audioPlayer && window.audioPlayer.currentAudio) {
@@ -324,21 +330,21 @@ class UIManager {
             }
           }
           break;
-          
+
         case 'ArrowRight': // Next track
           e.preventDefault();
           if (window.audioPlayer) {
             window.audioPlayer.nextTrack();
           }
           break;
-          
+
         case 'ArrowLeft': // Previous track
           e.preventDefault();
           if (window.audioPlayer) {
             window.audioPlayer.previousTrack();
           }
           break;
-          
+
         case 'Escape': // Close sidebar
           e.preventDefault();
           if (this.sidebarVisible) {
@@ -349,7 +355,7 @@ class UIManager {
             }
           }
           break;
-          
+
         case 'Enter': // Open/close album details
           e.preventDefault();
           if (this.enlargedImage && !this.sidebarVisible) {
@@ -369,7 +375,7 @@ class UIManager {
     if (!searchInput) return;
 
     let searchTimeout;
-    
+
     searchInput.addEventListener('input', (e) => {
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(() => {
@@ -414,7 +420,7 @@ class UIManager {
       img.alt = `${album.name} Cover Art`;
       img.dataset.albumId = album.id;
       img.className = 'album-cover';
-      
+
       albumArtContainer.appendChild(img);
 
       // Add click handler
@@ -430,16 +436,16 @@ class UIManager {
   async initialize() {
     try {
       console.log('🎨 Initializing UI Manager...');
-      
+
       // Load album art
       await this.loadAlbumArt();
-      
+
       // Setup interactions
       this.setupKeyboardShortcuts();
       this.setupSearchFunctionality();
-      
+
       console.log('✅ UI Manager initialized successfully');
-      
+
     } catch (error) {
       console.error('❌ UI Manager initialization failed:', error);
       throw error;

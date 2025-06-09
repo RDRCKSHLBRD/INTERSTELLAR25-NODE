@@ -75,3 +75,6 @@ export const closePool = async () => {
     console.error('✗ Error closing database pool:', err);
   }
 };
+
+
+export default pool;

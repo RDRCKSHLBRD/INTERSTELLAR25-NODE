@@ -78,48 +78,48 @@ class APIClient {
    * Get all albums with their songs
    */
   async getAlbums() {
-    if (this.cache.albums) {
-      return this.cache.albums;
-    }
-
-    try {
-      const response = await this.fetchAPI('/albums');
-      
-      // Handle different response formats
-      let albums;
-      if (Array.isArray(response)) {
-        albums = response;
-      } else if (response.albums && Array.isArray(response.albums)) {
-        albums = response.albums;
-      } else if (response.data && Array.isArray(response.data)) {
-        albums = response.data;
-      } else {
-        console.warn('Unexpected albums response format:', response);
-        albums = [];
-      }
-
-      // Transform API response to match frontend data structure
-      const transformedAlbums = albums.map(album => ({
-        id: album.id,
-        catalogue: album.catalogue,
-        name: album.name,
-        cover_url: album.cover_url,
-        production_date: album.production_date,
-        release_date: album.release_date,
-        artist_id: album.artist_id,
-        credit: album.credit,
-        description: album.description,
-        tracks: album.tracks,
-        songs: album.songs || []
-      }));
-
-      this.cache.albums = transformedAlbums;
-      return transformedAlbums;
-    } catch (error) {
-      console.error('Failed to fetch albums:', error);
-      return [];
-    }
+  if (this.cache.albums && Array.isArray(this.cache.albums)) {
+    return this.cache.albums;
   }
+
+  try {
+    const response = await this.fetchAPI('/albums');
+    
+    let albums;
+    if (Array.isArray(response)) {
+      albums = response;
+    } else if (response.albums && Array.isArray(response.albums)) {
+      albums = response.albums;
+    } else if (response.data && Array.isArray(response.data)) {
+      albums = response.data;
+    } else {
+      console.warn('Unexpected albums response format:', response);
+      albums = [];
+    }
+
+    const transformedAlbums = albums.map(album => ({
+      id: album.id,
+      catalogue: album.catalogue,
+      name: album.name,
+      cover_url: album.cover_url,
+      production_date: album.production_date,
+      release_date: album.release_date,
+      artist_id: album.artist_id,
+      credit: album.credit,
+      description: album.description,
+      tracks: album.tracks,
+      songs: album.songs || []
+    }));
+
+    // 💥 Only cache the **array**, not the whole response object
+    this.cache.albums = transformedAlbums;
+    return transformedAlbums;
+  } catch (error) {
+    console.error('Failed to fetch albums:', error);
+    return [];
+  }
+}
+
 
   /**
    * Get specific album with songs
