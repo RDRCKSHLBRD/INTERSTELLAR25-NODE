@@ -560,6 +560,142 @@ class CartManager {
     }
   }
 
+
+ /**
+ * Add a single song to the cart.
+ *
+ * @param {string|number} songId     – e.g. "0601" or 601
+ * @param {object|null}   songMeta   – optional song object we already have
+ */
+async addSongToCart(songId, songMeta = null) {
+  console.log('🛒 Adding song to cart:', songId);
+  
+  /* ── 1. Resolve the song object ─────────────────────────────────── */
+  let song = songMeta;
+  if (!song) {
+    try {
+      // Accept both "0601" and 601
+      const cleanId = String(songId).replace(/^0+/, '');
+      song = await window.apiClient.getSong(cleanId);
+    } catch (error) {
+      console.error('Failed to fetch song:', error);
+    }
+  }
+
+  if (!song) {
+    console.error('[Cart] Song not found:', songId);
+    this.showCartNotification('Song not found', 'error');
+    return;
+  }
+
+  console.log('🎵 Song found:', song);
+
+  /* ── 2. Get (or invent) a product for this song ─────────────────── */
+  let productId = null;
+  let productPrice = song.price ?? 1.29;
+
+  try {
+    // THIS WAS THE BUG - use song.id, not song as albumId
+    const res = await fetch(`/api/cart/product/song/${song.id}`);
+    if (res.ok) {
+      const data = await res.json();
+      productId = data.product?.id ?? null;
+      productPrice = data.product?.price ?? productPrice;
+      console.log('✅ Found product for song:', data.product);
+    } else {
+      console.log('⚠️ No product found for song, will use virtual product');
+    }
+  } catch (error) {
+    console.error('❌ Error fetching song product:', error);
+  }
+
+  if (!productId) {
+    // Backend song-product route not ready yet → skip cart for now
+    console.warn('[Cart] No product found for song', song.id);
+    this.showCartNotification('Song purchases not available yet', 'error');
+    return;
+  }
+
+  /* ── 3. Call addToCart with SONG data, not album data ──────────── */
+  try {
+    console.log('🛒 Adding song to cart via addToCart...');
+    
+    // Create a simplified addToCart call specifically for songs
+    await this.addSongToCartDatabase(song, productId, productPrice);
+    
+  } catch (error) {
+    console.error('❌ Failed to add song to cart:', error);
+    this.showCartNotification('Failed to add song to cart', 'error');
+  }
+}
+
+/**
+ * Add song directly to cart database (bypassing the album-focused addToCart method)
+ */
+async addSongToCartDatabase(song, productId, price) {
+  try {
+    console.log('🛒 Adding song to cart database:', song.name);
+    console.log('🔑 Session ID:', this.sessionId);
+    console.log('👤 User ID:', this.userId);
+    console.log('📦 Product ID:', productId);
+
+    const cartData = {
+      productId: productId,
+      quantity: 1
+    };
+
+    if (this.isLoggedIn && this.userId) {
+      cartData.userId = this.userId;
+      console.log('🔐 Adding with userId:', this.userId);
+    } else {
+      cartData.sessionId = this.sessionId;
+      console.log('🔗 Adding with sessionId:', this.sessionId);
+    }
+
+    const response = await fetch('/api/cart/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-session-id': this.sessionId
+      },
+      credentials: 'include',
+      body: JSON.stringify(cartData)
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log('✅ Song added to cart:', result.message);
+      
+      // Show success message
+      this.showCartNotification(`${song.name} added to cart.`);
+
+      // Reload cart to get updated data
+      setTimeout(async () => {
+        console.log('🔄 Reloading cart after song add...');
+        await this.loadCartFromDatabase();
+        this.updateCartCount();
+
+        // Update sidebar if open
+        if (this.isVisible) {
+          this.updateCartSidebarContent();
+        }
+      }, 500);
+
+      return true;
+    } else {
+      const error = await response.json();
+      console.error('❌ Add song to cart API error:', error);
+      throw new Error(error.error || 'Failed to add song to cart');
+    }
+  } catch (error) {
+    console.error('❌ Add song to cart database failed:', error);
+    this.showCartNotification(error.message, 'error');
+    return false;
+  }
+}
+
+
+
   // Get cart data for other components
   getCartData() {
     return this.cart;

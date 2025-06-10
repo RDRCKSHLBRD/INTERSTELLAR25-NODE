@@ -130,4 +130,18 @@ router.get('/product/album/:albumId', async (req, res) => {
   }
 });
 
+// GET /api/cart/product/song/:songId
+router.get('/product/song/:songId', async (req, res) => {
+  try {
+    const product = await CartModel.getProductBySong(req.params.songId);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found for this song' });
+    }
+    res.json({ product });
+  } catch (err) {
+    console.error('❌ product-by-song route error:', err);
+    res.status(500).json({ error: 'Failed to fetch product' });
+  }
+});
+
 export default router;  // ✅ ESM compatible

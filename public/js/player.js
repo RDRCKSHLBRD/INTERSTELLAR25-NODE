@@ -20,15 +20,15 @@ class AudioPlayer {
   async playSong(songId, albumId) {
     try {
       console.log(`🎵 Playing song ${songId} from album ${albumId}`);
-      
+
       // Get album data first (which should include songs)
       let album = null;
-      
+
       // Try to get album from API if apiClient is available
       if (window.apiClient) {
         album = await window.apiClient.getAlbum(albumId);
       }
-      
+
       // Fallback to global data if no API client
       if (!album && window.data && window.data.albums) {
         album = window.data.albums[albumId];
@@ -70,7 +70,7 @@ class AudioPlayer {
 
       this.setupPlayer();
       this.loadAudio();
-      
+
     } catch (error) {
       console.error('Failed to play song:', error);
       this.showError(`Failed to load song: ${error.message}`);
@@ -119,11 +119,13 @@ class AudioPlayer {
       { id: 'play', class: 'play', title: 'Play', },
       { id: 'pause', class: 'pause', title: 'Pause', },
       { id: 'stop', class: 'stop', title: 'Stop', },
-      { id: 'back-30', class: 'back30', title: 'Back 30s',},
-      { id: 'forward-30', class: 'forward30', title: 'Forward 30s',},
-      { id: 'prev-track', class: 'back', title: 'Previous Track',},
-      { id: 'next-track', class: 'next', title: 'Next Track',},
-      { id: 'loop', class: 'loop', title: 'Loop', }
+      { id: 'back-30', class: 'back30', title: 'Back 30s', },
+      { id: 'forward-30', class: 'forward30', title: 'Forward 30s', },
+      { id: 'prev-track', class: 'back', title: 'Previous Track', },
+      { id: 'next-track', class: 'next', title: 'Next Track', },
+      { id: 'loop', class: 'loop', title: 'Loop', },
+
+
     ];
 
     buttons.forEach(btn => {
@@ -139,12 +141,12 @@ class AudioPlayer {
     // Volume control
     const volumeControl = document.createElement('div');
     volumeControl.classList.add('volume-control');
-    
+
     const volumeLabel = document.createElement('label');
-   
+
     volumeLabel.className = 'volume-label';
     volumeControl.appendChild(volumeLabel);
-    
+
     const volumeSlider = document.createElement('input');
     volumeSlider.type = 'range';
     volumeSlider.id = 'volume-slider';
@@ -154,7 +156,7 @@ class AudioPlayer {
     volumeSlider.value = 1;
     volumeSlider.setAttribute('aria-label', 'Volume control');
     volumeControl.appendChild(volumeSlider);
-    
+
     controls.appendChild(volumeControl);
 
     // Progress container
@@ -162,17 +164,17 @@ class AudioPlayer {
     progressContainer.classList.add('progress-container');
     progressContainer.setAttribute('role', 'progressbar');
     progressContainer.setAttribute('aria-label', 'Song progress');
-    
+
     const progressBar = document.createElement('div');
     progressBar.classList.add('progress-bar');
     progressContainer.appendChild(progressBar);
-    
+
     controls.appendChild(progressContainer);
 
     // Time display
     const timeDisplay = document.createElement('div');
     timeDisplay.classList.add('time-display');
-    
+
     const currentTime = document.createElement('span');
     currentTime.id = 'current-time';
     currentTime.textContent = '0:00';
@@ -189,6 +191,22 @@ class AudioPlayer {
 
     controls.appendChild(timeDisplay);
 
+    // ── Add-to-cart (one-off, after the time read-out) ──────────────────────
+    const addCartBtn = document.createElement('button');
+    addCartBtn.id = 'add-song-cart';
+    addCartBtn.className = 'addCart';
+    addCartBtn.title = 'Add Track to Cart';
+    addCartBtn.setAttribute('aria-label', addCartBtn.title);
+
+    addCartBtn.addEventListener('click', () => {
+      if (window.cartManager && this.currentSong) {
+        window.cartManager.addSongToCart(this.currentSong.id, this.currentSong);
+      }
+    });
+
+    controls.appendChild(addCartBtn);
+
+
     // Append controls to player
     this.playerContainer.appendChild(controls);
   }
@@ -198,7 +216,7 @@ class AudioPlayer {
    */
   attachEventListeners() {
     const audio = this.currentAudio;
-    
+
     // Control button events
     document.getElementById('play').addEventListener('click', () => this.play());
     document.getElementById('pause').addEventListener('click', () => this.pause());
@@ -208,6 +226,8 @@ class AudioPlayer {
     document.getElementById('next-track').addEventListener('click', () => this.nextTrack());
     document.getElementById('prev-track').addEventListener('click', () => this.previousTrack());
     document.getElementById('loop').addEventListener('click', () => this.toggleLoop());
+    
+
 
     // Volume control
     const volumeSlider = document.getElementById('volume-slider');
@@ -234,7 +254,7 @@ class AudioPlayer {
   async loadAudio() {
     if (this.currentAudio) {
       this.currentAudio.load();
-      
+
       // Try autoplay, handle if blocked
       try {
         await this.play();
@@ -251,7 +271,7 @@ class AudioPlayer {
    */
   async play() {
     if (!this.currentAudio) return;
-    
+
     try {
       await this.currentAudio.play();
       this.updatePlayButton(false);
@@ -288,7 +308,7 @@ class AudioPlayer {
   seekForward(seconds) {
     if (this.currentAudio) {
       this.currentAudio.currentTime = Math.min(
-        this.currentAudio.currentTime + seconds, 
+        this.currentAudio.currentTime + seconds,
         this.currentAudio.duration
       );
     }
@@ -300,7 +320,7 @@ class AudioPlayer {
   seekBackward(seconds) {
     if (this.currentAudio) {
       this.currentAudio.currentTime = Math.max(
-        this.currentAudio.currentTime - seconds, 
+        this.currentAudio.currentTime - seconds,
         0
       );
     }
@@ -333,7 +353,7 @@ class AudioPlayer {
     }
 
     const currentIndex = songs.findIndex(song => song.id === this.currentSong.id);
-    
+
     if (currentIndex !== -1 && currentIndex + 1 < songs.length) {
       const nextSong = songs[currentIndex + 1];
       console.log(`⏭️ Playing next track: ${nextSong.name}`);
@@ -379,7 +399,7 @@ class AudioPlayer {
     const rect = progressContainer.getBoundingClientRect();
     const offsetX = event.clientX - rect.left;
     const clickRatio = offsetX / rect.width;
-    
+
     this.currentAudio.currentTime = clickRatio * this.currentAudio.duration;
   }
 
@@ -389,7 +409,7 @@ class AudioPlayer {
   updatePlayButton(showPlay) {
     const playButton = document.getElementById('play');
     const pauseButton = document.getElementById('pause');
-    
+
     if (playButton && pauseButton) {
       if (showPlay) {
         playButton.style.display = 'inline-block';
@@ -454,7 +474,7 @@ class AudioPlayer {
    */
   formatTime(seconds) {
     if (isNaN(seconds)) return '0:00';
-    
+
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
@@ -509,7 +529,7 @@ class AudioPlayer {
 const audioPlayer = new AudioPlayer();
 
 // Global function for compatibility with existing code
-window.playSong = function(songId, albumId) {
+window.playSong = function (songId, albumId) {
   audioPlayer.playSong(songId, albumId);
 };
 

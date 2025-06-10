@@ -151,34 +151,40 @@ class APIClient {
   /**
    * Get all songs
    */
-  async getSongs() {
-    if (this.cache.songs) {
-      return this.cache.songs;
-    }
+  /**
+ * Fetch all songs (with simple in-memory cache).
+ * Accepts any of the known response shapes:
+ *   •  [ { … } ]                          – plain array
+ *   •  { songs:  [ { … } ] }              – songs key
+ *   •  { data:   [ { … } ] }              – data key (e.g. REST wrapper)
+ */
+async getSongs() {
+  // ── 1. Return cached copy if we already fetched once ────────────────
+  if (this.cache.songs) return this.cache.songs;
 
-    try {
-      const response = await this.fetchAPI('/songs');
-      
-      // Handle different response formats
-      let songs;
-      if (Array.isArray(response)) {
-        songs = response;
-      } else if (response.songs && Array.isArray(response.songs)) {
-        songs = response.songs;
-      } else if (response.data && Array.isArray(response.data)) {
-        songs = response.data;
-      } else {
-        console.warn('Unexpected songs response format:', response);
-        songs = [];
-      }
+  try {
+    // ── 2. Hit the API ────────────────────────────────────────────────
+    const response = await this.fetchAPI('/songs');
 
-      this.cache.songs = songs;
-      return songs;
-    } catch (error) {
-      console.error('Failed to fetch songs:', error);
-      return [];
-    }
+    // ── 3. Normalise payload to a flat array ──────────────────────────
+    const songs =
+      Array.isArray(response)
+        ? response
+        : Array.isArray(response?.songs)
+          ? response.songs
+          : Array.isArray(response?.data)
+            ? response.data
+            : (console.warn('[API] Unexpected /songs payload', response), []);
+
+    // ── 4. Cache and return ───────────────────────────────────────────
+    this.cache.songs = songs;
+    return songs;
+  } catch (err) {
+    console.error('Failed to fetch songs:', err);
+    return [];
   }
+}
+
 
   /**
    * Get specific song

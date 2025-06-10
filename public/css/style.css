@@ -440,6 +440,28 @@ footer {
   border: none;
 }
 
+/* Add-to-cart button in audio controls */
+.custom-audio-controls button.addCart {
+  background-image: url('/images/IP-CART-add-v1.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 24px 24px;   /* or whatever fits */
+}
+
+
+/* Optional: subtle hover tint to match the other icons */
+.custom-audio-controls button.addCart:hover {
+  opacity: 0.7;
+}
+
+
+
+
+
+
+
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
   /* Layout Containers */
