@@ -170,9 +170,7 @@
   justify-content: center;
 }
 
-.custom-audio-controls button:hover {
-  background: rgba(0,0,0,0.1);
-}
+
 
 .custom-audio-controls button.active {
   background: #007bff;
