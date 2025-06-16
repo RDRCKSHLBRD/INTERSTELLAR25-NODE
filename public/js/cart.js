@@ -505,18 +505,32 @@ class CartManager {
     }
   }
 
-  async handleCheckout() {
-    if (!this.cart.items || this.cart.items.length === 0) return;
+async handleCheckout() {
+  if (!this.cart.items || this.cart.items.length === 0) return;
 
-    // Here you would integrate with your payment system (Stripe)
-    console.log('Proceeding to checkout with items:', this.cart);
+  try {
+    const response = await fetch('/api/purchase/create-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include'
+    });
 
-    // For now, just show a message
-    this.showCartNotification('Checkout functionality coming soon!');
+    const data = await response.json();
 
-    // You could redirect to checkout page or open Stripe here
-    // Example: window.location.href = `/checkout?cartId=${this.cart.cartId}`;
+    if (data.id) {
+      const stripe = Stripe('pk_test_51KdJ4iC7g8sqmaXgpX4MP3pGmU7GSnwT4UNBhSXcENXcKriTCSHuvBBc9GbJg24FN7Vx9zh9sQuuYwxoQy3v58vT00evpFqn47'); 
+      await stripe.redirectToCheckout({ sessionId: data.id });
+    } else {
+      this.showCartNotification('Could not start checkout.', 'error');
+    }
+  } catch (error) {
+    console.error('❌ Checkout error:', error);
+    this.showCartNotification('Checkout failed. Try again.', 'error');
   }
+}
+
 
   showCartNotification(message, type = 'success') {
     const notification = document.createElement('div');
