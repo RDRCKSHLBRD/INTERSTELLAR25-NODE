@@ -4,10 +4,14 @@ import Stripe from 'stripe';
 import dotenv from 'dotenv';
 import CartModel from '../../models/CartModel.js';
 import { resolveSessionId } from '../../utils/helpers.js';
+import { recordPurchase } from '../../utils/purchaseHelpers.js'; // we'll create this
+
 
 dotenv.config();
 const router = express.Router();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 // POST /api/purchase/create-session
 router.post('/create-session', async (req, res) => {
@@ -36,16 +40,18 @@ router.post('/create-session', async (req, res) => {
     }));
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      mode: 'payment',
-      line_items,
-      success_url: `${process.env.CLIENT_URL}/success`,
-      cancel_url: `${process.env.CLIENT_URL}/cancel`,
-      metadata: {
-        userId: userId || '',
-        sessionId: sessionId
-      }
-    });
+  payment_method_types: ['card'],
+  mode: 'payment',
+  line_items,
+  success_url: `${process.env.CLIENT_URL}/success`,
+  cancel_url: `${process.env.CLIENT_URL}/cancel`,
+  customer_email: req.user?.email || undefined, // <- if you already have their email
+  metadata: {
+    userId: userId || '',
+    sessionId: sessionId
+  }
+});
+
 
     res.json({ id: session.id });
   } catch (error) {
@@ -54,9 +60,6 @@ router.post('/create-session', async (req, res) => {
   }
 });
 
-// Optional: POST /api/purchase/webhook (Stripe event hook)
-router.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  res.json({ message: 'Webhook not yet implemented' });
-});
+
 
 export default router;

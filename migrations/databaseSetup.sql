@@ -85,3 +85,11 @@ WHERE album_id = 15
 ORDER BY track_id;
 
 SELECT 'Setup verification complete!' AS status;
+
+
+
+
+------------------------------------------------------------
+-- Step 7  ▸  Add purchase metadata (email, name, metadata)
+------------------------------------------------------------
+\i migrations/004_add_purchase_metadata.sql

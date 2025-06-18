@@ -15,6 +15,7 @@ import albumRoutes from './routes/api/albums.js';
 import songRoutes from './routes/api/songs.js';
 import authRoutes from './routes/api/auth.js';
 import cartRoutes from './routes/api/cartRoute.js';
+import purchaseWebhook from './routes/api/purchaseWebhook.js';
 import purchaseRoutes from './routes/api/purchase.js';
 import pageRoutes from './routes/pages.js';
 import downloadRoutes from './routes/downloads.js';
@@ -73,6 +74,9 @@ app.use(
     allowedHeaders: ['Content-Type', 'Authorization']
   })
 );
+
+app.use('/api/purchase/webhook', purchaseWebhook);
+
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
