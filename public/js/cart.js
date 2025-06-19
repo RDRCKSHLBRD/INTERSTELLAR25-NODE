@@ -226,55 +226,77 @@ class CartManager {
     }, 10);
   }
 
-  renderCartItems() {
-    console.log('🔍 Rendering cart items. Cart data:', this.cart);
 
-    // Handle different possible cart structures
-    let items = [];
-    if (this.cart.items && Array.isArray(this.cart.items)) {
-      items = this.cart.items;
-    } else if (Array.isArray(this.cart)) {
-      items = this.cart;
-    } else if (this.cart.data && Array.isArray(this.cart.data)) {
-      items = this.cart.data;
+
+// Updated renderCartItems method for cart.js
+// Shows song name + album name with proper styling
+
+renderCartItems() {
+  console.log('🔍 Rendering cart items. Cart data:', this.cart);
+
+  // Handle different possible cart structures
+  let items = [];
+  if (this.cart.items && Array.isArray(this.cart.items)) {
+    items = this.cart.items;
+  } else if (Array.isArray(this.cart)) {
+    items = this.cart;
+  } else if (this.cart.data && Array.isArray(this.cart.data)) {
+    items = this.cart.data;
+  }
+
+  console.log('📦 Cart items to render:', items);
+
+  if (!items || items.length === 0) {
+    return '<div class="cart-empty">Your cart is empty</div>';
+  }
+
+  return items.map(item => {
+    console.log('🛍️ Rendering item:', item);
+
+    // ✅ NEW: Handle both song and album products
+    const productType = item.product_type || (item.song_id ? 'song' : 'album');
+    const primaryName = item.product_name || item.name || 'Unknown Item';
+    const albumName = item.album_name;
+    const coverUrl = item.cover_url || '/images/default-album-cover.png';
+
+    const price = item.price || item.product?.price || 15.00;
+    const quantity = item.quantity || 1;
+    const itemId = item.id || item.cart_item_id;
+
+    // ✅ NEW: Create display title with styling
+    let displayTitle;
+    if (productType === 'song' && albumName && albumName !== primaryName) {
+      displayTitle = `
+        <h4 class="cart-item-title">
+          <span class="song-name">${primaryName}</span>
+          <span class="album-subtitle">from ${albumName}</span>
+        </h4>
+      `;
+    } else {
+      displayTitle = `<h4 class="cart-item-title">${primaryName}</h4>`;
     }
 
-    console.log('📦 Cart items to render:', items);
-
-    if (!items || items.length === 0) {
-      return '<div class="cart-empty">Your cart is empty</div>';
-    }
-
-    return items.map(item => {
-      console.log('🛍️ Rendering item:', item);
-
-      // Handle different item structures
-      const albumName = item.album_name || item.product_name || item.name || 'Unknown Album';
-      const coverUrl = item.cover_url || '/images/default-album-cover.png';
-
-      const price = item.price || item.product?.price || 15.00;
-      const quantity = item.quantity || 1;
-      const itemId = item.id || item.cart_item_id;
-
-      return `
-        <div class="cart-item" data-item-id="${itemId}">
-          <img src="${coverUrl}" 
-               alt="${albumName}" 
-               class="cart-item-image">
-          <div class="cart-item-details">
-            <h4>${albumName}</h4>
-            <p class="cart-item-price">${parseFloat(price).toFixed(2)}</p>
-            <div class="cart-item-controls">
-              <button class="quantity-btn decrease-btn" data-item-id="${itemId}" data-action="decrease">-</button>
-              <span class="quantity">${quantity}</span>
-              <button class="quantity-btn increase-btn" data-item-id="${itemId}" data-action="increase">+</button>
-              <button class="remove-btn" data-item-id="${itemId}" data-action="remove">Remove</button>
-            </div>
+    return `
+      <div class="cart-item" data-item-id="${itemId}" data-product-type="${productType}">
+        <img src="${coverUrl}" 
+             alt="${primaryName}" 
+             class="cart-item-image">
+        <div class="cart-item-details">
+          ${displayTitle}
+          <p class="cart-item-price">$${parseFloat(price).toFixed(2)}</p>
+          <div class="cart-item-controls">
+            <button class="quantity-btn decrease-btn" data-item-id="${itemId}" data-action="decrease">-</button>
+            <span class="quantity">${quantity}</span>
+            <button class="quantity-btn increase-btn" data-item-id="${itemId}" data-action="increase">+</button>
+            <button class="remove-btn" data-item-id="${itemId}" data-action="remove">Remove</button>
           </div>
         </div>
-      `;
-    }).join('');
-  }
+      </div>
+    `;
+  }).join('');
+}
+
+
 
   attachCartItemEventListeners(cartItems) {
     // Handle all cart item buttons with event delegation (keeping your existing pattern)

@@ -693,8 +693,8 @@
 }
 
 .cart-item-image {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   object-fit: cover;
   
 }
@@ -724,6 +724,30 @@
   gap: 8px;
   flex-wrap: wrap;
 }
+
+
+/* Song Name (Primary) - for song products */
+.cart-item-title .song-name {
+  display: block;
+  font-size: 1em;
+  font-weight: 300;
+  color: #bfd4d6;
+  margin-bottom: 3px;
+  line-height: 1.2;
+}
+
+/* Album Subtitle (Secondary) - smaller, lighter */
+.cart-item-title .album-subtitle {
+  display: block;
+  font-size: 0.75em;
+  font-weight: 200;
+  color: #7a9ca0;
+  font-style: italic;
+  opacity: 0.9;
+  line-height: 1.1;
+}
+
+
 
 .quantity-btn {
   background-color: #2b7f8c;
@@ -911,5 +935,15 @@
     font-size: 0.6em;
     top: -3px;
     right: -3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cart-item-title .song-name {
+    font-size: 0.9em;
+  }
+  
+  .cart-item-title .album-subtitle {
+    font-size: 0.7em;
   }
 }

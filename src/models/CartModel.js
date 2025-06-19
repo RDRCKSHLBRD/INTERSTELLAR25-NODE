@@ -1,21 +1,41 @@
-// src/models/CartModel.js — v3-a — Full CRUD CartModel — ESM compatible — 2025-06-09
+// src/models/CartModel.js — FIXED VERSION — Displays correct names for songs vs albums
+
 import pool from '../config/database.js';
 
 const CartModel = {
   /*─────────────────────────────────────────────────────────
-    GET Cart by Session
+    GET Cart by Session - FIXED to show song names correctly
   ─────────────────────────────────────────────────────────*/
   async getCartBySession(sessionId) {
     try {
       const result = await pool.query(
         `
         SELECT ci.id, ci.quantity, ci.added_at,
-               p.id   AS product_id, p.cat_id, p.name AS product_name,
+               p.id AS product_id, p.cat_id, 
+               -- ✅ FIX: Use song name if it's a song product, otherwise use product name
+               CASE 
+                 WHEN p.song_id IS NOT NULL THEN s.name 
+                 ELSE p.name 
+               END AS product_name,
                p.price, p.description,
-               a.name AS album_name, a.cover_url
+               a.name AS album_name, 
+               a.cover_url,
+               p.song_id,
+               s.name AS song_name,
+               -- ✅ NEW: Add product type for frontend styling
+               CASE 
+                 WHEN p.song_id IS NOT NULL THEN 'song'
+                 ELSE 'album'
+               END AS product_type,
+               -- ✅ NEW: Add product type and display info for frontend styling
+               CASE 
+                 WHEN p.song_id IS NOT NULL THEN 'song'
+                 ELSE 'album'
+               END AS product_type
         FROM cart_items ci
         JOIN products p ON ci.product_id = p.id
-        LEFT JOIN albums a ON p.catalogue_id = a.catalogue
+        LEFT JOIN songs s ON p.song_id = s.id
+        LEFT JOIN albums a ON (p.catalogue_id = a.catalogue OR s.album_id = a.id)
         WHERE ci.cart_id = (
           SELECT id FROM carts
           WHERE session_id = $1
@@ -33,19 +53,28 @@ const CartModel = {
   },
 
   /*─────────────────────────────────────────────────────────
-    GET Cart by UserId
+    GET Cart by UserId - FIXED to show song names correctly
   ─────────────────────────────────────────────────────────*/
   async getCartByUserId(userId) {
     try {
       const result = await pool.query(
         `
         SELECT ci.id, ci.quantity, ci.added_at,
-               p.id   AS product_id, p.cat_id, p.name AS product_name,
+               p.id AS product_id, p.cat_id, 
+               -- ✅ FIX: Use song name if it's a song product, otherwise use product name
+               CASE 
+                 WHEN p.song_id IS NOT NULL THEN s.name 
+                 ELSE p.name 
+               END AS product_name,
                p.price, p.description,
-               a.name AS album_name, a.cover_url
+               a.name AS album_name, 
+               a.cover_url,
+               p.song_id,
+               s.name AS song_name
         FROM cart_items ci
         JOIN products p ON ci.product_id = p.id
-        LEFT JOIN albums a ON p.catalogue_id = a.catalogue
+        LEFT JOIN songs s ON p.song_id = s.id
+        LEFT JOIN albums a ON (p.catalogue_id = a.catalogue OR s.album_id = a.id)
         WHERE ci.cart_id = (
           SELECT id FROM carts
           WHERE user_id = $1
@@ -62,9 +91,7 @@ const CartModel = {
     }
   },
 
-  /*─────────────────────────────────────────────────────────
-    ADD Item to Cart
-  ─────────────────────────────────────────────────────────*/
+  // ... rest of the methods stay the same
   async addToCart(productId, quantity, userId, sessionId) {
     try {
       /* ensure cart exists */
@@ -105,9 +132,6 @@ const CartModel = {
     }
   },
 
-  /*─────────────────────────────────────────────────────────
-    UPDATE Cart Item Quantity
-  ─────────────────────────────────────────────────────────*/
   async updateCartItem(cartItemId, quantity, userId, sessionId) {
     try {
       const res = await pool.query(
@@ -130,9 +154,6 @@ const CartModel = {
     }
   },
 
-  /*─────────────────────────────────────────────────────────
-    REMOVE Cart Item
-  ─────────────────────────────────────────────────────────*/
   async removeCartItem(cartItemId, userId, sessionId) {
     try {
       const res = await pool.query(
@@ -154,9 +175,6 @@ const CartModel = {
     }
   },
 
-  /*─────────────────────────────────────────────────────────
-    GET Product by Album
-  ─────────────────────────────────────────────────────────*/
   async getProductByAlbum(albumId) {
     try {
       const { rows } = await pool.query(
@@ -175,9 +193,6 @@ const CartModel = {
     }
   },
 
-  /*─────────────────────────────────────────────────────────
-    GET Product by Song   ← NEW
-  ─────────────────────────────────────────────────────────*/
   async getProductBySong(songId) {
     try {
       const { rows } = await pool.query(
@@ -196,9 +211,6 @@ const CartModel = {
     }
   },
 
-  /*─────────────────────────────────────────────────────────
-    CLEAR Cart by UserId
-  ─────────────────────────────────────────────────────────*/
   async clearCartByUserId(userId) {
     try {
       const result = await pool.query(
@@ -218,9 +230,6 @@ const CartModel = {
     }
   },
 
-  /*─────────────────────────────────────────────────────────
-    CLEAR Cart by Session
-  ─────────────────────────────────────────────────────────*/
   async clearCartBySession(sessionId) {
     try {
       const result = await pool.query(
