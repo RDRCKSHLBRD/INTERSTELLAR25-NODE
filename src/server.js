@@ -31,19 +31,23 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Security middleware
+// REPLACE THIS SECTION IN src/server.js:
+
+
+
 app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'"],
+        scriptSrc: ["'self'", "https://js.stripe.com"],
         imgSrc: ["'self'", "https://storage.googleapis.com", "data:"],
         mediaSrc: ["'self'", "https://storage.googleapis.com"],
-        connectSrc: ["'self'"],
+        connectSrc: ["'self'", "https://api.stripe.com", "https://checkout.stripe.com"],
         fontSrc: ["'self'"],
         objectSrc: ["'none'"],
-        frameSrc: ["'self'", "https://player.vimeo.com"]
+        frameSrc: ["'self'", "https://player.vimeo.com", "https://js.stripe.com", "https://hooks.stripe.com"]
       }
     }
   })

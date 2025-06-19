@@ -194,6 +194,50 @@ const CartModel = {
       console.error('❌ Error getting product by song:', err);
       throw err;
     }
+  },
+
+  /*─────────────────────────────────────────────────────────
+    CLEAR Cart by UserId
+  ─────────────────────────────────────────────────────────*/
+  async clearCartByUserId(userId) {
+    try {
+      const result = await pool.query(
+        `
+        DELETE FROM cart_items 
+        WHERE cart_id IN (
+          SELECT id FROM carts WHERE user_id = $1
+        )
+        `,
+        [userId]
+      );
+      console.log(`🗑️ Cleared ${result.rowCount} items from user ${userId} cart`);
+      return result.rowCount;
+    } catch (err) {
+      console.error('❌ Error clearing cart by userId:', err);
+      throw err;
+    }
+  },
+
+  /*─────────────────────────────────────────────────────────
+    CLEAR Cart by Session
+  ─────────────────────────────────────────────────────────*/
+  async clearCartBySession(sessionId) {
+    try {
+      const result = await pool.query(
+        `
+        DELETE FROM cart_items 
+        WHERE cart_id IN (
+          SELECT id FROM carts WHERE session_id = $1
+        )
+        `,
+        [sessionId]
+      );
+      console.log(`🗑️ Cleared ${result.rowCount} items from session ${sessionId} cart`);
+      return result.rowCount;
+    } catch (err) {
+      console.error('❌ Error clearing cart by session:', err);
+      throw err;
+    }
   }
 };
 

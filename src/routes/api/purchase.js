@@ -16,16 +16,26 @@ const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 // POST /api/purchase/create-session
 router.post('/create-session', async (req, res) => {
   const sessionId = resolveSessionId(req);
+
+  console.log('🧠 server received sessionId:', sessionId);
+  console.log('🧠 server received req.body:', req.body);
+
   const userId = req.user?.id || null;
 
   try {
-    const cartItems = userId
-      ? await CartModel.getCartByUserId(userId)
-      : await CartModel.getCartBySession(sessionId);
+    let cartItems = userId
+  ? await CartModel.getCartByUserId(userId)
+  : await CartModel.getCartBySession(sessionId);
 
-    if (!cartItems || cartItems.length === 0) {
-      return res.status(400).json({ error: 'Cart is empty' });
-    }
+if ((!cartItems || cartItems.length === 0) && req.body.cartItems?.length > 0) {
+  console.warn('⚠️ DB cartItems empty — falling back to req.body.cartItems');
+  cartItems = req.body.cartItems;
+}
+
+
+
+
+    console.log('🛒 cartItems:', cartItems);
 
     const line_items = cartItems.map(item => ({
       price_data: {
@@ -39,19 +49,28 @@ router.post('/create-session', async (req, res) => {
       quantity: item.quantity
     }));
 
-    const session = await stripe.checkout.sessions.create({
-  payment_method_types: ['card'],
-  mode: 'payment',
-  line_items,
-  success_url: `${process.env.CLIENT_URL}/success`,
-  cancel_url: `${process.env.CLIENT_URL}/cancel`,
-  customer_email: req.user?.email || undefined, // <- if you already have their email
-  metadata: {
-    userId: userId || '',
-    sessionId: sessionId
-  }
-});
+    console.log('🧾 line_items:', line_items);
 
+
+    console.log('📦 Resolved cartItems:', cartItems);
+    console.log('🧾 Prepared line_items:', line_items);
+    console.log('🧑 userId:', userId);
+    console.log('🧮 sessionId:', sessionId);
+    console.log('📤 Sending to Stripe...');
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items,
+      success_url: `${process.env.CLIENT_URL}/success`,
+      cancel_url: `${process.env.CLIENT_URL}/cancel`,
+      customer_email: req.user?.email || undefined,
+      client_reference_id: sessionId,  // ✅ Top-level field
+      metadata: {
+        userId: userId || '',
+        sessionId: sessionId            // ✅ Still useful if you want redundancy
+      }
+    });
 
     res.json({ id: session.id });
   } catch (error) {

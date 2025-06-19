@@ -76,5 +76,6 @@ export const closePool = async () => {
   }
 };
 
+export { pool };
 
 export default pool;

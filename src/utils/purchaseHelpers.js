@@ -1,7 +1,7 @@
 //purchaseHelpers.js
 // src/utils/purchaseHelpers.js
 
-import db from '../db/index.js';
+import { pool } from '../config/database.js';
 import CartModel from '../models/CartModel.js';
 
 /**
@@ -27,7 +27,8 @@ export async function recordPurchase({ sessionId, userId, email }) {
   }, 0);
 
   // Step 3: Insert into purchases table
-  const purchaseResult = await db.query(
+  // FIX: Changed from db.query to pool.query
+  const purchaseResult = await pool.query(
     `INSERT INTO purchases (user_id, stripe_session_id, total_amount, currency, email, status)
      VALUES ($1, $2, $3, $4, $5, 'completed')
      RETURNING id`,
@@ -38,7 +39,8 @@ export async function recordPurchase({ sessionId, userId, email }) {
 
   // Step 4: Insert each item into purchase_items
   const insertItems = cartItems.map(item => {
-    return db.query(
+    // FIX: Changed from db.query to pool.query
+    return pool.query(
       `INSERT INTO purchase_items (purchase_id, product_id, quantity, price)
        VALUES ($1, $2, $3, $4)`,
       [purchaseId, item.product_id, item.quantity, item.price]

@@ -423,16 +423,16 @@ class CartManager {
     }
 
     try {
-      const response = await fetch('/api/cart/update', {
-        method: 'PUT',
+      // FIX: Changed URL to include cartItemId and method to PATCH
+      const response = await fetch(`/api/cart/update/${cartItemId}`, {
+        method: 'PATCH',  // Changed from PUT to PATCH
         headers: {
           'Content-Type': 'application/json',
           'x-session-id': this.sessionId
         },
         credentials: 'include',
         body: JSON.stringify({
-          cartItemId,
-          quantity: newQuantity
+          quantity: newQuantity  // Removed cartItemId from body since it's in URL
         })
       });
 
@@ -505,31 +505,46 @@ class CartManager {
     }
   }
 
-async handleCheckout() {
-  if (!this.cart.items || this.cart.items.length === 0) return;
+  async handleCheckout() {
+    if (!this.cart.items || this.cart.items.length === 0) return;
 
-  try {
-    const response = await fetch('/api/purchase/create-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include'
-    });
+    try {
 
-    const data = await response.json();
+      console.log('🛒 Checkout cart payload preview:', {
+        isLoggedIn: this.isLoggedIn,
+        userId: this.userId,
+        sessionId: this.sessionId,
+        cartItems: this.cart.items
+      });
 
-    if (data.id) {
-      const stripe = Stripe('pk_test_51KdJ4iC7g8sqmaXgpX4MP3pGmU7GSnwT4UNBhSXcENXcKriTCSHuvBBc9GbJg24FN7Vx9zh9sQuuYwxoQy3v58vT00evpFqn47'); 
-      await stripe.redirectToCheckout({ sessionId: data.id });
-    } else {
-      this.showCartNotification('Could not start checkout.', 'error');
+      const response = await fetch('/api/purchase/create-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          isLoggedIn: this.isLoggedIn,
+          userId: this.userId,
+          sessionId: this.sessionId,
+          cartItems: this.cart.items
+        })
+      });
+
+
+      const data = await response.json();
+
+      if (data.id) {
+        const stripe = Stripe('pk_test_51KdJ4iC7g8sqmaXgpX4MP3pGmU7GSnwT4UNBhSXcENXcKriTCSHuvBBc9GbJg24FN7Vx9zh9sQuuYwxoQy3v58vT00evpFqn47');
+        await stripe.redirectToCheckout({ sessionId: data.id });
+      } else {
+        this.showCartNotification('Could not start checkout.', 'error');
+      }
+    } catch (error) {
+      console.error('❌ Checkout error:', error);
+      this.showCartNotification('Checkout failed. Try again.', 'error');
     }
-  } catch (error) {
-    console.error('❌ Checkout error:', error);
-    this.showCartNotification('Checkout failed. Try again.', 'error');
   }
-}
 
 
   showCartNotification(message, type = 'success') {
@@ -544,7 +559,7 @@ async handleCheckout() {
     notification.style.top = '20px';
     notification.style.right = '20px';
     notification.style.padding = '12px 16px';
-    
+
     notification.style.zIndex = '10000';
     notification.style.fontWeight = '200';
 
@@ -575,138 +590,138 @@ async handleCheckout() {
   }
 
 
- /**
- * Add a single song to the cart.
- *
- * @param {string|number} songId     – e.g. "0601" or 601
- * @param {object|null}   songMeta   – optional song object we already have
- */
-async addSongToCart(songId, songMeta = null) {
-  console.log('🛒 Adding song to cart:', songId);
-  
-  /* ── 1. Resolve the song object ─────────────────────────────────── */
-  let song = songMeta;
-  if (!song) {
+  /**
+  * Add a single song to the cart.
+  *
+  * @param {string|number} songId     – e.g. "0601" or 601
+  * @param {object|null}   songMeta   – optional song object we already have
+  */
+  async addSongToCart(songId, songMeta = null) {
+    console.log('🛒 Adding song to cart:', songId);
+
+    /* ── 1. Resolve the song object ─────────────────────────────────── */
+    let song = songMeta;
+    if (!song) {
+      try {
+        // Accept both "0601" and 601
+        const cleanId = String(songId).replace(/^0+/, '');
+        song = await window.apiClient.getSong(cleanId);
+      } catch (error) {
+        console.error('Failed to fetch song:', error);
+      }
+    }
+
+    if (!song) {
+      console.error('[Cart] Song not found:', songId);
+      this.showCartNotification('Song not found', 'error');
+      return;
+    }
+
+    console.log('🎵 Song found:', song);
+
+    /* ── 2. Get (or invent) a product for this song ─────────────────── */
+    let productId = null;
+    let productPrice = song.price ?? 1.29;
+
     try {
-      // Accept both "0601" and 601
-      const cleanId = String(songId).replace(/^0+/, '');
-      song = await window.apiClient.getSong(cleanId);
+      // THIS WAS THE BUG - use song.id, not song as albumId
+      const res = await fetch(`/api/cart/product/song/${song.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        productId = data.product?.id ?? null;
+        productPrice = data.product?.price ?? productPrice;
+        console.log('✅ Found product for song:', data.product);
+      } else {
+        console.log('⚠️ No product found for song, will use virtual product');
+      }
     } catch (error) {
-      console.error('Failed to fetch song:', error);
+      console.error('❌ Error fetching song product:', error);
+    }
+
+    if (!productId) {
+      // Backend song-product route not ready yet → skip cart for now
+      console.warn('[Cart] No product found for song', song.id);
+      this.showCartNotification('Song purchases not available yet', 'error');
+      return;
+    }
+
+    /* ── 3. Call addToCart with SONG data, not album data ──────────── */
+    try {
+      console.log('🛒 Adding song to cart via addToCart...');
+
+      // Create a simplified addToCart call specifically for songs
+      await this.addSongToCartDatabase(song, productId, productPrice);
+
+    } catch (error) {
+      console.error('❌ Failed to add song to cart:', error);
+      this.showCartNotification('Failed to add song to cart', 'error');
     }
   }
 
-  if (!song) {
-    console.error('[Cart] Song not found:', songId);
-    this.showCartNotification('Song not found', 'error');
-    return;
-  }
+  /**
+   * Add song directly to cart database (bypassing the album-focused addToCart method)
+   */
+  async addSongToCartDatabase(song, productId, price) {
+    try {
+      console.log('🛒 Adding song to cart database:', song.name);
+      console.log('🔑 Session ID:', this.sessionId);
+      console.log('👤 User ID:', this.userId);
+      console.log('📦 Product ID:', productId);
 
-  console.log('🎵 Song found:', song);
+      const cartData = {
+        productId: productId,
+        quantity: 1
+      };
 
-  /* ── 2. Get (or invent) a product for this song ─────────────────── */
-  let productId = null;
-  let productPrice = song.price ?? 1.29;
+      if (this.isLoggedIn && this.userId) {
+        cartData.userId = this.userId;
+        console.log('🔐 Adding with userId:', this.userId);
+      } else {
+        cartData.sessionId = this.sessionId;
+        console.log('🔗 Adding with sessionId:', this.sessionId);
+      }
 
-  try {
-    // THIS WAS THE BUG - use song.id, not song as albumId
-    const res = await fetch(`/api/cart/product/song/${song.id}`);
-    if (res.ok) {
-      const data = await res.json();
-      productId = data.product?.id ?? null;
-      productPrice = data.product?.price ?? productPrice;
-      console.log('✅ Found product for song:', data.product);
-    } else {
-      console.log('⚠️ No product found for song, will use virtual product');
+      const response = await fetch('/api/cart/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-session-id': this.sessionId
+        },
+        credentials: 'include',
+        body: JSON.stringify(cartData)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Song added to cart:', result.message);
+
+        // Show success message
+        this.showCartNotification(`${song.name} added to cart.`);
+
+        // Reload cart to get updated data
+        setTimeout(async () => {
+          console.log('🔄 Reloading cart after song add...');
+          await this.loadCartFromDatabase();
+          this.updateCartCount();
+
+          // Update sidebar if open
+          if (this.isVisible) {
+            this.updateCartSidebarContent();
+          }
+        }, 500);
+
+        return true;
+      } else {
+        const error = await response.json();
+        console.error('❌ Add song to cart API error:', error);
+        throw new Error(error.error || 'Failed to add song to cart');
+      }
+    } catch (error) {
+      console.error('❌ Add song to cart database failed:', error);
+      this.showCartNotification(error.message, 'error');
+      return false;
     }
-  } catch (error) {
-    console.error('❌ Error fetching song product:', error);
   }
-
-  if (!productId) {
-    // Backend song-product route not ready yet → skip cart for now
-    console.warn('[Cart] No product found for song', song.id);
-    this.showCartNotification('Song purchases not available yet', 'error');
-    return;
-  }
-
-  /* ── 3. Call addToCart with SONG data, not album data ──────────── */
-  try {
-    console.log('🛒 Adding song to cart via addToCart...');
-    
-    // Create a simplified addToCart call specifically for songs
-    await this.addSongToCartDatabase(song, productId, productPrice);
-    
-  } catch (error) {
-    console.error('❌ Failed to add song to cart:', error);
-    this.showCartNotification('Failed to add song to cart', 'error');
-  }
-}
-
-/**
- * Add song directly to cart database (bypassing the album-focused addToCart method)
- */
-async addSongToCartDatabase(song, productId, price) {
-  try {
-    console.log('🛒 Adding song to cart database:', song.name);
-    console.log('🔑 Session ID:', this.sessionId);
-    console.log('👤 User ID:', this.userId);
-    console.log('📦 Product ID:', productId);
-
-    const cartData = {
-      productId: productId,
-      quantity: 1
-    };
-
-    if (this.isLoggedIn && this.userId) {
-      cartData.userId = this.userId;
-      console.log('🔐 Adding with userId:', this.userId);
-    } else {
-      cartData.sessionId = this.sessionId;
-      console.log('🔗 Adding with sessionId:', this.sessionId);
-    }
-
-    const response = await fetch('/api/cart/add', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-session-id': this.sessionId
-      },
-      credentials: 'include',
-      body: JSON.stringify(cartData)
-    });
-
-    if (response.ok) {
-      const result = await response.json();
-      console.log('✅ Song added to cart:', result.message);
-      
-      // Show success message
-      this.showCartNotification(`${song.name} added to cart.`);
-
-      // Reload cart to get updated data
-      setTimeout(async () => {
-        console.log('🔄 Reloading cart after song add...');
-        await this.loadCartFromDatabase();
-        this.updateCartCount();
-
-        // Update sidebar if open
-        if (this.isVisible) {
-          this.updateCartSidebarContent();
-        }
-      }, 500);
-
-      return true;
-    } else {
-      const error = await response.json();
-      console.error('❌ Add song to cart API error:', error);
-      throw new Error(error.error || 'Failed to add song to cart');
-    }
-  } catch (error) {
-    console.error('❌ Add song to cart database failed:', error);
-    this.showCartNotification(error.message, 'error');
-    return false;
-  }
-}
 
 
 
