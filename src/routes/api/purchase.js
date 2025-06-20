@@ -1,39 +1,32 @@
-// src/routes/api/purchase.js
+// src/routes/api/purchase.js - FIXED to pass correct session ID
 import express from 'express';
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
 import CartModel from '../../models/CartModel.js';
 import { resolveSessionId } from '../../utils/helpers.js';
-import { recordPurchase } from '../../utils/purchaseHelpers.js'; // we'll create this
-
+import { recordPurchase } from '../../utils/purchaseHelpers.js';
 
 dotenv.config();
 const router = express.Router();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
 // POST /api/purchase/create-session
 router.post('/create-session', async (req, res) => {
-  const sessionId = resolveSessionId(req);
-
-  console.log('🧠 server received sessionId:', sessionId);
-  console.log('🧠 server received req.body:', req.body);
-
+  const currentSessionId = resolveSessionId(req);
   const userId = req.user?.id || null;
+
+  console.log('🧠 server received sessionId:', currentSessionId);
+  console.log('🧠 server received req.body:', req.body);
 
   try {
     let cartItems = userId
-  ? await CartModel.getCartByUserId(userId)
-  : await CartModel.getCartBySession(sessionId);
+      ? await CartModel.getCartByUserId(userId)
+      : await CartModel.getCartBySession(currentSessionId);
 
-if ((!cartItems || cartItems.length === 0) && req.body.cartItems?.length > 0) {
-  console.warn('⚠️ DB cartItems empty — falling back to req.body.cartItems');
-  cartItems = req.body.cartItems;
-}
-
-
-
+    if ((!cartItems || cartItems.length === 0) && req.body.cartItems?.length > 0) {
+      console.warn('⚠️ DB cartItems empty — falling back to req.body.cartItems');
+      cartItems = req.body.cartItems;
+    }
 
     console.log('🛒 cartItems:', cartItems);
 
@@ -50,12 +43,15 @@ if ((!cartItems || cartItems.length === 0) && req.body.cartItems?.length > 0) {
     }));
 
     console.log('🧾 line_items:', line_items);
-
-
     console.log('📦 Resolved cartItems:', cartItems);
     console.log('🧾 Prepared line_items:', line_items);
     console.log('🧑 userId:', userId);
-    console.log('🧮 sessionId:', sessionId);
+    console.log('🧮 currentSessionId:', currentSessionId);
+
+    // ✅ FIX: Use the ORIGINAL cart session ID from the request body
+    const originalCartSessionId = req.body.sessionId || currentSessionId;
+    console.log('🛒 originalCartSessionId:', originalCartSessionId);
+
     console.log('📤 Sending to Stripe...');
 
     const session = await stripe.checkout.sessions.create({
@@ -65,10 +61,10 @@ if ((!cartItems || cartItems.length === 0) && req.body.cartItems?.length > 0) {
       success_url: `${process.env.CLIENT_URL}/success`,
       cancel_url: `${process.env.CLIENT_URL}/cancel`,
       customer_email: req.user?.email || undefined,
-      client_reference_id: sessionId,  // ✅ Top-level field
+      client_reference_id: originalCartSessionId,  // ✅ Use original cart session ID
       metadata: {
         userId: userId || '',
-        sessionId: sessionId            // ✅ Still useful if you want redundancy
+        sessionId: originalCartSessionId           // ✅ Use original cart session ID
       }
     });
 
@@ -78,7 +74,5 @@ if ((!cartItems || cartItems.length === 0) && req.body.cartItems?.length > 0) {
     res.status(500).json({ error: 'Internal server error during checkout' });
   }
 });
-
-
 
 export default router;
