@@ -1,7 +1,9 @@
 -- migrations/products.sql
--- Insert all products data (album products)
--- CLEANED: Removed old hardcoded stripe_product_id URLs
+-- Insert all products data (album products + physical items)
+-- FIXED: Removed ON CONFLICT since cat_id doesn't have unique constraint
 
+-- Option 1: Simple INSERT (will fail if data already exists)
+-- Use this if running on fresh database
 INSERT INTO products (cat_id, price, name, catalogue_id, description, active) VALUES 
 ('00040101', 12.00, 'Charlotta', '00040101', 'Digital download of Charlotta', true),
 ('00040102', 12.00, 'Objects & Particles', '00040102', 'Digital download of Objects & Particles', true),
@@ -26,11 +28,7 @@ INSERT INTO products (cat_id, price, name, catalogue_id, description, active) VA
 ('01040121', 12.00, 'JIKAN | Original Soundtrack', '01040121', 'Digital download of JIKAN | Original Soundtrack', true),
 ('01040122', 12.00, 'Apocrypha', '01040122', 'Digital download of Apocrypha', true),
 ('01040123', 12.00, 'Ambient Garden Two', '01040123', 'Digital download of Ambient Garden Two', true),
-('01040124', 12.00, 'Utopian', '01040124', 'Digital download of Utopian', true)
-ON CONFLICT (cat_id) DO UPDATE SET
-  price = EXCLUDED.price,
-  name = EXCLUDED.name,
-  catalogue_id = EXCLUDED.catalogue_id,
-  description = EXCLUDED.description,
-  active = EXCLUDED.active,
-  updated_at = CURRENT_TIMESTAMP;
+('01040124', 12.00, 'Utopian', '01040124', 'Digital download of Utopian', true),
+
+-- Physical Products  
+('01020105', 25.00, 'Natura (Cassette)', '01040105', 'Physical cassette tape of Natura album', true);
