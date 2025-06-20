@@ -1,11 +1,12 @@
 // public/js/ui-manager.js
-// ESM UI Manager
+// ESM UI Manager - CLEANED VERSION (no hardcoded purchase links)
 
 import apiClient, { showError } from './api-client.js';
 
 /**
  * Complete UI Manager for Interstellar Packages
  * Ports all original DOM manipulation and event handling from script.js
+ * CLEANED: Removed hardcoded Stripe purchase links
  */
 class UIManager {
   constructor() {
@@ -64,7 +65,6 @@ class UIManager {
           }
         });
 
-
         albumArtContainer.appendChild(img);
 
         // Click handler - EXACT port from original
@@ -108,6 +108,7 @@ class UIManager {
 
   /**
    * Display album details in sidebar (ported from original)
+   * CLEANED: Removed hardcoded purchase links
    */
   async displayAlbumDetails(albumId) {
     const sidebar = document.querySelector('.sidebar');
@@ -226,23 +227,10 @@ class UIManager {
       songListContainer.appendChild(songList);
       sidebarContent.appendChild(songListContainer);
 
-      // Purchase link (ported from original)
-      const purchaseLinks = window.purchaseLinks || {};
-      if (purchaseLinks[album.id]) {
-        const purchaseDiv = document.createElement('div');
-        purchaseDiv.classList.add('purchaseLink');
+      // REMOVED: Hardcoded purchase links section
+      // The old code that checked window.purchaseLinks[album.id] is now gone
 
-        const purchaseAnchor = document.createElement('a');
-        purchaseAnchor.href = purchaseLinks[album.id];
-        purchaseAnchor.target = '_blank';
-        purchaseAnchor.rel = 'noopener noreferrer';
-        purchaseAnchor.textContent = 'Buy this Album';
-
-        purchaseDiv.appendChild(purchaseAnchor);
-        sidebarContent.appendChild(purchaseDiv);
-      }
-
-      // ADD TO CART BUTTON (NEW)
+      // ADD TO CART BUTTON (Modern cart system)
       const addToCartDiv = document.createElement('div');
       addToCartDiv.classList.add('addToCartLink');
       addToCartDiv.style.textAlign = 'center';
@@ -251,10 +239,32 @@ class UIManager {
       const addToCartBtn = document.createElement('button');
       addToCartBtn.textContent = 'Add to Cart';
       addToCartBtn.classList.add('add-to-cart-btn');
+      addToCartBtn.style.cssText = `
+        background-color: #2b7f8c;
+        color: #fff;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 2px;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: background-color 0.2s;
+      `;
+      
+      // Hover effect
+      addToCartBtn.addEventListener('mouseenter', () => {
+        addToCartBtn.style.backgroundColor = '#19606b';
+      });
+      addToCartBtn.addEventListener('mouseleave', () => {
+        addToCartBtn.style.backgroundColor = '#2b7f8c';
+      });
+
       addToCartBtn.addEventListener('click', () => {
         // Use global cartManager
         if (window.cartManager) {
           window.cartManager.addAlbumToCart(album.id);
+        } else {
+          console.warn('Cart manager not available');
+          showError('Cart functionality not available. Please refresh the page.');
         }
       });
 

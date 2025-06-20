@@ -1,6 +1,6 @@
 /**
  * Main Application Script for Interstellar Packages
- * API-driven version that replaces hardcoded data
+ * API-driven version - CLEANED VERSION (no hardcoded Stripe links)
  */
 
 import apiClient, { loadingManager, showError } from './api-client.js';
@@ -13,33 +13,7 @@ let data = {
   songs: {}
 };
 
-// Global purchase links (matches original script.js)
-window.purchaseLinks = {
-  1:  "https://buy.stripe.com/aEUdRWfih6hz0QU6oo",
-  2:  "https://buy.stripe.com/5kA016gml49r7fibIJ",
-  3:  "https://buy.stripe.com/28o016da90XfgPS5km",
-  4:  "https://buy.stripe.com/5kAdRW5HH9tLfLO7sv",
-  5:  "https://buy.stripe.com/example_Album5",
-  6:  "https://buy.stripe.com/example_Album6",
-  7:  "https://buy.stripe.com/example_Album7",
-  8:  "https://buy.stripe.com/example_Album8",
-  9:  "https://buy.stripe.com/example_Album9",
-  10: "https://buy.stripe.com/example_Album10",
-  11: "https://buy.stripe.com/example_Album11",
-  12: "https://buy.stripe.com/example_Album12",
-  13: "https://buy.stripe.com/example_Album13",
-  14: "https://buy.stripe.com/example_Album14",
-  15: "https://buy.stripe.com/example_Album15",
-  16: "https://buy.stripe.com/example_Album16",
-  17: "https://buy.stripe.com/example_Album17",
-  18: "https://buy.stripe.com/example_Album18",
-  19: "https://buy.stripe.com/example_Album19",
-  20: "https://buy.stripe.com/example_Album20",
-  21: "https://buy.stripe.com/example_Album21",
-  22: "https://buy.stripe.com/example_Album22",
-  23: "https://buy.stripe.com/example_Album23",
-  24: "https://buy.stripe.com/example_Album24"
-};
+// REMOVED: Global purchase links object - now handled by cart system
 
 /**
  * Application Initialization
