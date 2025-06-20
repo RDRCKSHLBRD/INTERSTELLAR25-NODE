@@ -188,41 +188,103 @@ class UIManager {
       const songList = document.createElement('ul');
       songList.classList.add('songList');
 
-      if (album.songs && album.songs.length > 0) {
-        album.songs.forEach(song => {
-          const songItem = document.createElement('li');
-          songItem.textContent = `${song.track_id}. ${song.name} `;
+      // REPLACE the song list section in ui-manager.js displayAlbumDetails method
+// Find this section and replace it:
 
-          // Duration span
-          const durationSpan = document.createElement('span');
-          durationSpan.textContent = song.duration;
-          durationSpan.classList.add('song-duration');
-          songItem.appendChild(durationSpan);
+if (album.songs && album.songs.length > 0) {
+  album.songs.forEach(song => {
+    const songItem = document.createElement('li');
+    
+    // Create song info container (clickable to play)
+    const songInfo = document.createElement('div');
+    songInfo.classList.add('song-info');
+    songInfo.innerHTML = `
+      <span class="song-text">${song.track_id}. ${song.name}</span>
+      <span class="song-duration">${song.duration}</span>
+    `;
+    
+    // Create action buttons container
+    const songActions = document.createElement('div');
+    songActions.classList.add('song-actions');
+    
+    // Add to Cart button
+    const addCartBtn = document.createElement('button');
+    addCartBtn.classList.add('song-action-btn', 'add-cart-btn');
+    addCartBtn.title = 'Add to Cart';
+    addCartBtn.setAttribute('aria-label', 'Add song to cart');
+    addCartBtn.innerHTML = '<img src="/images/IP-CART-add-v1.svg" alt="Cart">';
+    
+    // Add to Playlist button  
+    const addPlaylistBtn = document.createElement('button');
+    addPlaylistBtn.classList.add('song-action-btn', 'add-playlist-btn');
+    addPlaylistBtn.title = 'Add to Playlist';
+    addPlaylistBtn.setAttribute('aria-label', 'Add song to playlist');
+    addPlaylistBtn.innerHTML = '<img src="/images/IP-MUSIC-1.svg" alt="Playlist">';
+    
+    // Add to Favorites button
+    const addFavoriteBtn = document.createElement('button');
+    addFavoriteBtn.classList.add('song-action-btn', 'add-favorite-btn');
+    addFavoriteBtn.title = 'Add to Favorites';
+    addFavoriteBtn.setAttribute('aria-label', 'Add song to favorites');
+    addFavoriteBtn.innerHTML = '<img src="/images/STAR-yellow.svg" alt="Favorite">';
 
-          songList.appendChild(songItem);
 
-          // Click => playSong (EXACT port from original)
-          songItem.addEventListener('click', () => {
-            // Use global audioPlayer
-            if (window.audioPlayer) {
-              window.audioPlayer.playSong(song.id, albumId);
-            } else {
-              window.playSong(song.id, albumId);
-            }
+    
+    // Append action buttons
+    songActions.appendChild(addCartBtn);
+    songActions.appendChild(addPlaylistBtn);
+    songActions.appendChild(addFavoriteBtn);
+    
+    // Append everything to song item
+    songItem.appendChild(songInfo);
+    songItem.appendChild(songActions);
+    songList.appendChild(songItem);
 
-            // Update visual state
-            document.querySelectorAll('.song-item.playing').forEach(item => {
-              item.classList.remove('playing');
-            });
-            songItem.classList.add('playing');
-          });
-        });
+    // EVENT LISTENERS
+    
+    // Click song info to play (existing behavior)
+    songInfo.addEventListener('click', () => {
+      if (window.audioPlayer) {
+        window.audioPlayer.playSong(song.id, albumId);
       } else {
-        const noSongs = document.createElement('li');
-        noSongs.textContent = 'No songs found for this album.';
-        noSongs.classList.add('no-songs');
-        songList.appendChild(noSongs);
+        window.playSong(song.id, albumId);
       }
+      
+      // Update visual state
+      document.querySelectorAll('.sidebar .songList li.playing').forEach(item => {
+        item.classList.remove('playing');
+      });
+      songItem.classList.add('playing');
+    });
+    
+    // Add to Cart action
+    addCartBtn.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent song from playing
+      if (window.cartManager) {
+        window.cartManager.addSongToCart(song.id, song);
+      } else {
+        console.warn('Cart manager not available');
+        showError('Cart functionality not available. Please refresh the page.');
+      }
+    });
+    
+    // Add to Playlist action (placeholder for now)
+    addPlaylistBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      console.log('Add to playlist:', song.name);
+      // TODO: Implement playlist functionality
+      alert(`Adding "${song.name}" to playlist (feature coming soon!)`);
+    });
+    
+    // Add to Favorites action (placeholder for now)
+    addFavoriteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      console.log('Add to favorites:', song.name);
+      // TODO: Implement favorites functionality  
+      alert(`Adding "${song.name}" to favorites (feature coming soon!)`);
+    });
+  });
+}
 
       songListContainer.appendChild(songList);
       sidebarContent.appendChild(songListContainer);

@@ -14,9 +14,9 @@
   z-index: 5;
   /* Add the visual enhancements */
 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
-  
+
   /* Remove the transform: scale(1.1) - this was causing the issue */
 }
 
@@ -57,7 +57,7 @@
 
 /* Album Info Section */
 .album-info {
-  background: rgba(0,0,0,0.05);
+  background: rgba(0, 0, 0, 0.05);
   padding: 10px;
   border-radius: 4px;
   margin-bottom: 20px;
@@ -89,7 +89,7 @@
 .songList li {
   cursor: pointer;
   padding: 8px 10px;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   transition: background-color 0.2s;
   display: flex;
   justify-content: space-between;
@@ -97,11 +97,11 @@
 }
 
 .songList li:hover {
-  background: rgba(0,0,0,0.05);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .songList li.playing {
-  background: rgba(0,123,255,0.1);
+  background: rgba(0, 123, 255, 0.1);
   border-left: 3px solid #007bff;
 }
 
@@ -117,832 +117,925 @@
   font-family: monospace;
 }
 
-/* Purchase Link */
-.purchaseLink {
-  text-align: center;
-  margin-top: 20px;
-}
 
-.purchaseLink a {
-  display: inline-block;
-  padding: 12px 24px;
-  background: #007bff;
-  color: white;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: 500;
-  transition: background-color 0.2s;
-}
 
-.purchaseLink a:hover {
-  background: #0056b3;
-}
 
-/* Audio Player Components */
-.PlayerSong {
-  font-weight: bold;
-  margin-bottom: 15px;
-  font-size: 1.1em;
-  text-align: center;
-  color: #333;
-}
+/* Add to additional-styles.css - Enhanced Song List Actions */
 
-.custom-audio-controls {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 15px;
-}
-
-.custom-audio-controls button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
-
-.custom-audio-controls button.active {
-  background: #007bff;
-  color: white;
-}
-
-/* Volume Control */
-.volume-control {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.volume-label {
-  font-size: 0.8em;
-  color: #666;
-}
-
-#volume-slider {
-  width: 80px;
-}
-
-/* Progress Bar */
-.progress-container {
-  width: 100%;
-  height: 6px;
-  background: rgba(0,0,0,0.2);
-  cursor: pointer;
-  border-radius: 3px;
-  margin: 10px 0;
-}
-
-.progress-bar {
-  height: 100%;
-  background: #007bff;
-  border-radius: 3px;
-  transition: width 0.1s;
-  min-width: 0;
-}
-
-/* Time Display */
-.time-display {
-  font-size: 0.85em;
-  color: #666;
-  text-align: center;
-  font-family: monospace;
-}
-
-/* Error and Loading States */
-.no-albums,
-.no-results,
-.error {
-  text-align: center;
-  padding: 40px 20px;
-  color: #666;
-  font-style: italic;
-}
-
-.retry-container {
-  text-align: center;
-  padding: 40px 20px;
-}
-
-.retry-button {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  margin-top: 10px;
-  transition: background-color 0.2s;
-}
-
-.retry-button:hover {
-  background: #0056b3;
-}
-
-/* API Status Indicator */
-.api-status {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  z-index: 1000;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.api-status.connected {
-  background: #28a745;
-  color: white;
-}
-
-.api-status.disconnected {
-  background: #dc3545;
-  color: white;
-}
-
-.api-status.show {
-  opacity: 1;
-}
-
-
-/* Authentication Styles */
-
-/* Login Square Button */
-.loginSquare {
-  margin-left: 5px;
-  margin-right: 5px;
-  margin-bottom: 10px;
-}
-
-.login-button {
-  background-color: transparent;
-  color: #3AA0A0;
-  border: 1px solid #3AA0A0;
-  padding: 5px 10px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  border-radius: 2px;
-}
-
-.login-button:hover {
-  background-color: #3AA0A0;
-  color: #cadbda;
-}
-
-/* Cart Button Styles */
-.cartSquare {
-  margin-left: 5px;
-  margin-right: 5px;
-  margin-bottom: 10px;
-}
-
-.cart-button {
-  background-color: transparent;
-  color: #3AA0A0;
-  border: none;
-  padding: 8px 10px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.cart-button:hover {
-  background-color: #3AA0A0;
-  border-color: #3AA0A0;
-}
-
-.cart-button:hover .cart-icon {
-  filter: brightness(0) saturate(100%) invert(89%) sepia(12%) saturate(200%) hue-rotate(139deg) brightness(95%) contrast(88%);
-}
-
-.cart-icon {
-  width: 30px;
-  height: 30px;
-  transition: filter 0.2s ease-in-out;
-  /* Custom color: #91b7b5 */
-  filter: brightness(0) saturate(100%) invert(71%) sepia(8%) saturate(1055%) hue-rotate(139deg) brightness(99%) contrast(88%);
-}
-
-.cart-count {
-  position: absolute;
-  top: -1px;
-  right: -1px;
-  background-color: #8D2016;
-  color: #EAE9DF;
-  
-  width: 18px;
-  height: 18px;
-  font-size: 0.7em;
-  font-weight: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-
-/* User Info Display */
-.user-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 5px;
-  padding: 5px;
-  border-top: 1px solid #3AA0A0;
-  margin-top: 10px;
-}
-
-.user-info span {
-  color: #3AA0A0;
-  font-size: 0.9em;
-  font-weight: bold;
-}
-
-.logout-button {
-  background-color: #335D7E;
-  color: #cadbda;
-  border: 1px solid #0597A1;
-  padding: 4px 8px;
-  font-size: 0.8em;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-.logout-button:hover {
-  background-color: #cadbda;
-  color: #083D5E;
-}
-
-/* Auth Modal Styles */
-.auth-modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(8, 61, 94, 0.8);
-  backdrop-filter: blur(4px);
-}
-
-.auth-modal-content {
-  background-color: #083D5E;
-  margin: 5% auto;
-  padding: 30px;
-  border: 1px solid #3AA0A0;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 400px;
-  color: #cadbda;
-  position: relative;
-}
-
-.auth-modal-content h2 {
-  color: #3AA0A0;
-  margin-bottom: 20px;
-  text-align: center;
-  font-size: 1.5em;
-}
-
-.auth-modal .close {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  width: 25px;
-  height: 25px;
- 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  background-image: url('/images/IP25-CLOSEv2.svg');
-  background-size: 25px 25px;
-  background-repeat: no-repeat;
-  background-position: center;
-  position: absolute;
-  right: 15px;
-  top: 10px;
-  font-size: 0; /* Hide the × text */
-}
-
-.auth-modal .close:hover {
-  background-color: #CA381C;
-}
-
-/* Auth Form Styles */
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.auth-form input {
-  background-color: #2b7f8c;
-  border: 1px solid #3AA0A0;
-  color: #cadbda;
-  padding: 12px;
-  border-radius: 4px;
-  font-size: 1em;
-}
-
-/* Password Input Container */
-.password-input-container {
-  position: relative;
-  width: 100%;
-}
-
-.password-input-container input {
-  width: 100%;
-  padding-right: 50px; /* Make room for the bigger icon */
-}
-
-.password-toggle-icon {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  opacity: 0.6;
-  transition: opacity 0.2s, filter 0.2s;
-  background-image: url('/images/VIEW-ICON.svg');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  /* Filter to make the icon lighter/match your theme */
-  filter: brightness(0) saturate(100%) invert(69%) sepia(15%) saturate(332%) hue-rotate(139deg) brightness(96%) contrast(89%);
-}
-
-.password-toggle-icon:hover {
-  opacity: 1;
-  filter: brightness(0) saturate(100%) invert(100%);
-}
-
-.password-toggle-icon.password-visible {
-  opacity: 1;
-  filter: brightness(0) saturate(100%) invert(71%) sepia(77%) saturate(6088%) hue-rotate(153deg) brightness(96%) contrast(80%);
-}
-
-.auth-form input::placeholder {
-  color: #8ab7ce;
-}
-
-.auth-form input:focus {
-  outline: none;
-  border-color: #3AA0A0;
-  background-color: #184551;
-}
-
-.auth-form button {
-  background-color: #3AA0A0;
-  color: #083D5E;
-  border: none;
-  padding: 12px;
-  border-radius: 4px;
-  font-size: 1em;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.auth-form button:hover {
-  background-color: #2b7f8c;
-  color: #cadbda;
-}
-
-.auth-form button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Form Toggle */
-.form-toggle {
-  text-align: center;
-  margin-top: 20px;
-  color: #8ab7ce;
-}
-
-.form-toggle a {
-  color: #3AA0A0;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.form-toggle a:hover {
-  text-decoration: underline;
-}
-
-/* Error Messages */
-.auth-error {
-  background-color: rgba(220, 53, 69, 0.2);
-  border: 1px solid #dc3545;
-  color: #dc3545;
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 15px;
-  font-size: 0.9em;
-}
-
-/* Success Messages */
-.auth-success {
-  background-color: rgba(40, 167, 69, 0.2);
-  border: 1px solid #28a745;
-  color: #28a745;
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 15px;
-  font-size: 0.9em;
-}
-
-
-
-
-
-
-/* ===== add to cart ===== */
-
-
-
-.add-to-cart-btn {
-  background-color: #3AA0A0;
-  color: #083D5E;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9em;
-  font-weight: 500;
-  transition: background-color 0.2s;
-}
-
-.add-to-cart-btn:hover {
-  background-color: #2b7f8c;
-  color: #cadbda;
-}
-
-
-
-
-
-
-
-/* Cart Sidebar Styles */
-.cart-sidebar {
-  position: fixed;
-  top: 0;
-  right: -100%;
-  width: 400px;
-  height: 100vh;
-  background-color: #083D5E;
-  color: #cadbda;
-  z-index: 2000;
-  transition: right 0.3s ease-in-out;
-  border-left: 1px solid #3AA0A0;
-  display: flex;
-  flex-direction: column;
-}
-
-.cart-header {
-  padding: 10px;
-  border-bottom: 1px solid #2b7f8c;
+/* Extend existing song list items with action buttons */
+.sidebar .songList li {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  /* Keep existing margin, padding, cursor, border, transition from style.css */
 }
 
-.cart-header h3 {
-  margin: 0;
-  color: #3AA0A0;
-  font-size: 1em;
-  font-weight: 200;
-}
-
-.cart-close {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  width: 25px;
-  height: 25px;
- 
+/* Song info container */
+.song-info {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  background-image: url('/images/IP25-CLOSEv2.svg');
-  background-size: 25px 25px;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.cart-close:hover {
-  background-color: #CA381C;
-  
-}
-
-.cart-content {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  cursor: pointer;
 }
 
-.cart-items {
+.song-text {
   flex: 1;
-  overflow-y: auto;
-  padding: 10px 20px;
 }
 
-.cart-empty {
-  text-align: center;
+.song-duration {
   color: #8ab7ce;
-  font-style: italic;
-  padding: 40px 20px;
+  margin-left: 10px;
+  font-size: 0.9em;
+  margin-right: 1em;
 }
 
-.cart-item {
-  display: flex;
-  gap: 15px;
-  padding: 15px 0;
-  border-bottom: 1px solid rgba(43, 127, 140, 0.3);
+.song-actions {
+  
+  display: flex !important;
+  flex-shrink: 0;
+  gap: 6px;
+  min-width: 60px;
 }
 
-.cart-item:last-child {
-  border-bottom: none;
-}
+.song-action-btn {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 30px !important;
+  height: 30px !important;
+  border: none;
+  background: transparent;
 
-.cart-item-image {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
+  
   
 }
 
-.cart-item-details {
-  flex: 1;
+.song-action-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-.cart-item-details h4 {
-  margin: 0 0 5px 0;
-  font-size: 1em;
-  font-weight: 300;
-  color: #bfd4d6;
-  line-height: 1.2;
-}
-
-.cart-item-price {
-  margin: 0 0 10px 0;
-  font-weight: 250;
-  color: #bfd4d6;
-  font-size: 1em;
-}
-
-.cart-item-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-
-/* Song Name (Primary) - for song products */
-.cart-item-title .song-name {
-  display: block;
-  font-size: 1em;
-  font-weight: 300;
-  color: #bfd4d6;
-  margin-bottom: 3px;
-  line-height: 1.2;
-}
-
-/* Album Subtitle (Secondary) - smaller, lighter */
-.cart-item-title .album-subtitle {
-  display: block;
-  font-size: 0.75em;
-  font-weight: 200;
-  color: #7a9ca0;
-  font-style: italic;
-  opacity: 0.9;
-  line-height: 1.1;
+.song-action-btn img, .song-action-btn svg {
+  width: 20px !important;
+  height: 20px !important;
+  display: block !important;
 }
 
 
 
-.quantity-btn {
-  background-color: #2b7f8c;
-  color: #cadbda;
-  border: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 1px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  transition: background-color 0.2s;
+.song-action-btn:hover img {
+  filter: brightness(1);
 }
 
-.quantity-btn:hover {
-  background-color: #3AA0A0;
+/* Playing state */
+.song-item.playing {
+  background-color: #19606b;
+  font-weight: bold;
 }
 
-.quantity {
-  margin: 0 5px;
-  font-weight: 300;
-  min-width: 20px;
-  text-align: center;
-  font-size: 1em;
+.song-item.playing .song-actions {
+  opacity: 1;
+  /* Always show actions for currently playing song */
 }
 
-.remove-btn {
-  background-color: #9e0505;
-  color: #cadbda;
-  border: 1px solid #9e0505;
-  padding: 4px 8px;
-  border-radius: 2px;
-  cursor: pointer;
-  font-size: 0.8em;
-  transition: all 0.2s;
-}
 
-.remove-btn:hover {
-  background-color: #A5302F;
-  border: 1px solid #3A2319;
-  color: white;
-}
-
-.cart-footer {
-  padding: 20px;
-  border-top: 1px solid #2b7f8c;
-}
-
-.cart-total {
-  margin-bottom: 15px;
-  text-align: right;
-  font-size: 1.1em;
-  font-weight: 200;
-  color: #A1DCF0;
-}
-
-.checkout-btn {
-  width: 100%;
-  padding: 12px;
-  background-color: #bfd4d6;
-  color: #083644;
-  border: none;
-  border-radius:1px;
-  font-size: 1em;
-  font-weight: 200;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.checkout-btn:hover:not(:disabled) {
-  background-color: #2b7f8c;
-  color: #cadbda;
-}
-
-.checkout-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Cart Notification */
-.cart-notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #083644;
-  color: #F1F8FF;
-  padding: 12px 16px;
-  font-weight: 200;
-
- 
-  z-index: 10000;
-  animation: slideInFromRight 0.3s ease-out;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 300px;
-}
-
-@keyframes slideInFromRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
+  /* Purchase Link */
+  .purchaseLink {
+    text-align: center;
+    margin-top: 20px;
   }
-  to {
-    transform: translateX(0);
+
+  .purchaseLink a {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+
+  .purchaseLink a:hover {
+    background: #0056b3;
+  }
+
+  /* Audio Player Components */
+  .PlayerSong {
+    font-weight: bold;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    text-align: center;
+    color: #333;
+  }
+
+  .custom-audio-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+
+  .custom-audio-controls button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+
+
+  .custom-audio-controls button.active {
+    background: #007bff;
+    color: white;
+  }
+
+  /* Volume Control */
+  .volume-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .volume-label {
+    font-size: 0.8em;
+    color: #666;
+  }
+
+  #volume-slider {
+    width: 80px;
+  }
+
+  /* Progress Bar */
+  .progress-container {
+    width: 100%;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    border-radius: 3px;
+    margin: 10px 0;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: #007bff;
+    border-radius: 3px;
+    transition: width 0.1s;
+    min-width: 0;
+  }
+
+  /* Time Display */
+  .time-display {
+    font-size: 0.85em;
+    color: #666;
+    text-align: center;
+    font-family: monospace;
+  }
+
+  /* Error and Loading States */
+  .no-albums,
+  .no-results,
+  .error {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+    font-style: italic;
+  }
+
+  .retry-container {
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .retry-button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+    transition: background-color 0.2s;
+  }
+
+  .retry-button:hover {
+    background: #0056b3;
+  }
+
+  /* API Status Indicator */
+  .api-status {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .api-status.connected {
+    background: #28a745;
+    color: white;
+  }
+
+  .api-status.disconnected {
+    background: #dc3545;
+    color: white;
+  }
+
+  .api-status.show {
     opacity: 1;
   }
-}
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .custom-audio-controls {
-    gap: 4px;
-  }
-  
-  .custom-audio-controls button {
-    width: 32px;
-    height: 32px;
-    padding: 6px;
-  }
-  
-  .volume-control {
-    flex-direction: column;
-    gap: 4px;
-  }
-  
-  #volume-slider {
-    width: 60px;
-  }
-  
-  .songList li {
-    padding: 6px 8px;
-    font-size: 0.9em;
-  }
-  
-  .purchaseLink a {
-    padding: 10px 20px;
-    font-size: 0.9em;
-  }
 
-   .auth-modal-content {
-    margin: 10% auto;
-    padding: 20px;
-    width: 95%;
-  }
-  
+  /* Authentication Styles */
+
+  /* Login Square Button */
   .loginSquare {
-    margin-bottom: 5px;
-  }
-  
-  .login-button {
-    padding: 6px 12px;
-    font-size: 0.9em;
-  }
-  
-  .user-info {
-    margin-top: 5px;
-    padding: 3px;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-bottom: 10px;
   }
 
-  /* Cart responsive styles */
-  .cart-sidebar {
-    width: 100%;
-    right: -100%;
+  .login-button {
+    background-color: transparent;
+    color: #3AA0A0;
+    border: 1px solid #3AA0A0;
+    padding: 5px 10px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-radius: 2px;
   }
-  
+
+  .login-button:hover {
+    background-color: #3AA0A0;
+    color: #cadbda;
+  }
+
+  /* Cart Button Styles */
   .cartSquare {
-    margin-bottom: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-bottom: 10px;
   }
-  
+
   .cart-button {
-    padding: 2px 4px;
+    background-color: transparent;
+    color: #3AA0A0;
+    border: none;
+    padding: 8px 10px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  
+
+  .cart-button:hover {
+    background-color: #3AA0A0;
+    border-color: #3AA0A0;
+  }
+
+  .cart-button:hover .cart-icon {
+    filter: brightness(0) saturate(100%) invert(89%) sepia(12%) saturate(200%) hue-rotate(139deg) brightness(95%) contrast(88%);
+  }
+
   .cart-icon {
-    width: 22px;
-    height: 22px;
+    width: 30px;
+    height: 30px;
+    transition: filter 0.2s ease-in-out;
+    /* Custom color: #91b7b5 */
+    filter: brightness(0) saturate(100%) invert(71%) sepia(8%) saturate(1055%) hue-rotate(139deg) brightness(99%) contrast(88%);
   }
-  
+
   .cart-count {
-    width: 16px;
-    height: 16px;
-    font-size: 0.6em;
-    top: -3px;
-    right: -3px;
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    background-color: #8D2016;
+    color: #EAE9DF;
+
+    width: 18px;
+    height: 18px;
+    font-size: 0.7em;
+    font-weight: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
   }
-}
+
+  /* User Info Display */
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    padding: 5px;
+    border-top: 1px solid #3AA0A0;
+    margin-top: 10px;
+  }
+
+  .user-info span {
+    color: #3AA0A0;
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+
+  .logout-button {
+    background-color: #335D7E;
+    color: #cadbda;
+    border: 1px solid #0597A1;
+    padding: 4px 8px;
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .logout-button:hover {
+    background-color: #cadbda;
+    color: #083D5E;
+  }
+
+  /* Auth Modal Styles */
+  .auth-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(8, 61, 94, 0.8);
+    backdrop-filter: blur(4px);
+  }
+
+  .auth-modal-content {
+    background-color: #083D5E;
+    margin: 5% auto;
+    padding: 30px;
+    border: 1px solid #3AA0A0;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    color: #cadbda;
+    position: relative;
+  }
+
+  .auth-modal-content h2 {
+    color: #3AA0A0;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.5em;
+  }
+
+  .auth-modal .close {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    width: 25px;
+    height: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background-image: url('/images/IP25-CLOSEv2.svg');
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 0;
+    /* Hide the × text */
+  }
+
+  .auth-modal .close:hover {
+    background-color: #CA381C;
+  }
+
+  /* Auth Form Styles */
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .auth-form input {
+    background-color: #2b7f8c;
+    border: 1px solid #3AA0A0;
+    color: #cadbda;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 1em;
+  }
+
+  /* Password Input Container */
+  .password-input-container {
+    position: relative;
+    width: 100%;
+  }
+
+  .password-input-container input {
+    width: 100%;
+    padding-right: 50px;
+    /* Make room for the bigger icon */
+  }
+
+  .password-toggle-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s, filter 0.2s;
+    background-image: url('/images/VIEW-ICON.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    /* Filter to make the icon lighter/match your theme */
+    filter: brightness(0) saturate(100%) invert(69%) sepia(15%) saturate(332%) hue-rotate(139deg) brightness(96%) contrast(89%);
+  }
+
+  .password-toggle-icon:hover {
+    opacity: 1;
+    filter: brightness(0) saturate(100%) invert(100%);
+  }
+
+  .password-toggle-icon.password-visible {
+    opacity: 1;
+    filter: brightness(0) saturate(100%) invert(71%) sepia(77%) saturate(6088%) hue-rotate(153deg) brightness(96%) contrast(80%);
+  }
+
+  .auth-form input::placeholder {
+    color: #8ab7ce;
+  }
+
+  .auth-form input:focus {
+    outline: none;
+    border-color: #3AA0A0;
+    background-color: #184551;
+  }
+
+  .auth-form button {
+    background-color: #3AA0A0;
+    color: #083D5E;
+    border: none;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .auth-form button:hover {
+    background-color: #2b7f8c;
+    color: #cadbda;
+  }
+
+  .auth-form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Form Toggle */
+  .form-toggle {
+    text-align: center;
+    margin-top: 20px;
+    color: #8ab7ce;
+  }
+
+  .form-toggle a {
+    color: #3AA0A0;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .form-toggle a:hover {
+    text-decoration: underline;
+  }
+
+  /* Error Messages */
+  .auth-error {
+    background-color: rgba(220, 53, 69, 0.2);
+    border: 1px solid #dc3545;
+    color: #dc3545;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+  }
+
+  /* Success Messages */
+  .auth-success {
+    background-color: rgba(40, 167, 69, 0.2);
+    border: 1px solid #28a745;
+    color: #28a745;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+  }
+
+
+
+
+
+
+  /* ===== add to cart ===== */
+
+  .add-to-cart-btn {
+    background-color: #3AA0A0;
+    color: #083D5E;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+
+  .add-to-cart-btn:hover {
+    background-color: #2b7f8c;
+    color: #cadbda;
+  }
+
+  /* Cart Sidebar Styles */
+  .cart-sidebar {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 400px;
+    height: 100vh;
+    background-color: #083D5E;
+    color: #cadbda;
+    z-index: 2000;
+    transition: right 0.3s ease-in-out;
+    border-left: 1px solid #3AA0A0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cart-header {
+    padding: 10px;
+    border-bottom: 1px solid #2b7f8c;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .cart-header h3 {
+    margin: 0;
+    color: #3AA0A0;
+    font-size: 1em;
+    font-weight: 200;
+  }
+
+  .cart-close {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    width: 25px;
+    height: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background-image: url('/images/IP25-CLOSEv2.svg');
+    background-size: 25px 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  .cart-close:hover {
+    background-color: #CA381C;
+
+  }
+
+  .cart-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 20px;
+  }
+
+  .cart-empty {
+    text-align: center;
+    color: #8ab7ce;
+    font-style: italic;
+    padding: 40px 20px;
+  }
+
+  .cart-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(43, 127, 140, 0.3);
+  }
+
+  .cart-item:last-child {
+    border-bottom: none;
+  }
+
+  .cart-item-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+
+  }
+
+  .cart-item-details {
+    flex: 1;
+  }
+
+  .cart-item-details h4 {
+    margin: 0 0 5px 0;
+    font-size: 1em;
+    font-weight: 300;
+    color: #bfd4d6;
+    line-height: 1.2;
+  }
+
+  .cart-item-price {
+    margin: 0 0 10px 0;
+    font-weight: 250;
+    color: #bfd4d6;
+    font-size: 1em;
+  }
+
+  .cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+
+  /* Song Name (Primary) - for song products */
+  .cart-item-title .song-name {
+    display: block;
+    font-size: 1em;
+    font-weight: 300;
+    color: #bfd4d6;
+    margin-bottom: 3px;
+    line-height: 1.2;
+  }
+
+  /* Album Subtitle (Secondary) - smaller, lighter */
+  .cart-item-title .album-subtitle {
+    display: block;
+    font-size: 0.75em;
+    font-weight: 200;
+    color: #7a9ca0;
+    font-style: italic;
+    opacity: 0.9;
+    line-height: 1.1;
+  }
+
+
+
+  .quantity-btn {
+    background-color: #2b7f8c;
+    color: #cadbda;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 1px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: background-color 0.2s;
+  }
+
+  .quantity-btn:hover {
+    background-color: #3AA0A0;
+  }
+
+  .quantity {
+    margin: 0 5px;
+    font-weight: 300;
+    min-width: 20px;
+    text-align: center;
+    font-size: 1em;
+  }
+
+  .remove-btn {
+    background-color: #9e0505;
+    color: #cadbda;
+    border: 1px solid #9e0505;
+    padding: 4px 8px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: all 0.2s;
+  }
+
+  .remove-btn:hover {
+    background-color: #A5302F;
+    border: 1px solid #3A2319;
+    color: white;
+  }
+
+  .cart-footer {
+    padding: 20px;
+    border-top: 1px solid #2b7f8c;
+  }
+
+  .cart-total {
+    margin-bottom: 15px;
+    text-align: right;
+    font-size: 1.1em;
+    font-weight: 200;
+    color: #A1DCF0;
+  }
+
+  .checkout-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #bfd4d6;
+    color: #083644;
+    border: none;
+    border-radius: 1px;
+    font-size: 1em;
+    font-weight: 200;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .checkout-btn:hover:not(:disabled) {
+    background-color: #2b7f8c;
+    color: #cadbda;
+  }
+
+  .checkout-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Cart Notification */
+  .cart-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #083644;
+    color: #F1F8FF;
+    padding: 12px 16px;
+    font-weight: 200;
+
+
+    z-index: 10000;
+    animation: slideInFromRight 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 300px;
+  }
+
+  @keyframes slideInFromRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .custom-audio-controls {
+      gap: 4px;
+    }
+
+    .custom-audio-controls button {
+      width: 32px;
+      height: 32px;
+      padding: 6px;
+    }
+
+    .volume-control {
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #volume-slider {
+      width: 60px;
+    }
+
+    .songList li {
+      padding: 6px 8px;
+      font-size: 0.9em;
+    }
+
+    .purchaseLink a {
+      padding: 10px 20px;
+      font-size: 0.9em;
+    }
+
+    .auth-modal-content {
+      margin: 10% auto;
+      padding: 20px;
+      width: 95%;
+    }
+
+    .loginSquare {
+      margin-bottom: 5px;
+    }
+
+    .login-button {
+      padding: 6px 12px;
+      font-size: 0.9em;
+    }
+
+    .user-info {
+      margin-top: 5px;
+      padding: 3px;
+    }
+
+    /* Cart responsive styles */
+    .cart-sidebar {
+      width: 100%;
+      right: -100%;
+    }
+
+    .cartSquare {
+      margin-bottom: 5px;
+    }
+
+    .cart-button {
+      padding: 2px 4px;
+    }
+
+    .cart-icon {
+      width: 22px;
+      height: 22px;
+    }
+
+    .cart-count {
+      width: 16px;
+      height: 16px;
+      font-size: 0.6em;
+      top: -3px;
+      right: -3px;
+    }
+
+
+    .song-actions {
+      opacity: 1;
+      /* Always show on mobile (no hover) */
+    }
+
+    .song-action-btn {
+      width: 28px;
+      height: 28px;
+    }
+
+    .song-action-btn img {
+      width: 18px;
+      height: 18px;
+    }
+  }
 
 @media (max-width: 480px) {
   .cart-item-title .song-name {
     font-size: 0.9em;
   }
-  
+
   .cart-item-title .album-subtitle {
     font-size: 0.7em;
   }
