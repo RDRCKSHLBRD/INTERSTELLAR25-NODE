@@ -219,14 +219,14 @@ if (album.songs && album.songs.length > 0) {
     addPlaylistBtn.classList.add('song-action-btn', 'add-playlist-btn');
     addPlaylistBtn.title = 'Add to Playlist';
     addPlaylistBtn.setAttribute('aria-label', 'Add song to playlist');
-    addPlaylistBtn.innerHTML = '<img src="/images/IP-MUSIC-1.svg" alt="Playlist">';
+    addPlaylistBtn.innerHTML = '<img src="/images/IP-MUSIC-2teal.svg" alt="Playlist">';
     
     // Add to Favorites button
     const addFavoriteBtn = document.createElement('button');
     addFavoriteBtn.classList.add('song-action-btn', 'add-favorite-btn');
     addFavoriteBtn.title = 'Add to Favorites';
     addFavoriteBtn.setAttribute('aria-label', 'Add song to favorites');
-    addFavoriteBtn.innerHTML = '<img src="/images/STAR-yellow.svg" alt="Favorite">';
+    addFavoriteBtn.innerHTML = '<img src="/images/STAR-lightTeal.svg" alt="Favorite">';
 
 
     
