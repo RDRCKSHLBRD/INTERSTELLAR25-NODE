@@ -55,12 +55,12 @@ class APIClient {
       
       // Handle different response formats
       let artists;
-      if (Array.isArray(response)) {
+      if (response.success && response.data && Array.isArray(response.data)) {
+        artists = response.data;
+      } else if (Array.isArray(response)) {
         artists = response;
       } else if (response.artists && Array.isArray(response.artists)) {
         artists = response.artists;
-      } else if (response.data && Array.isArray(response.data)) {
-        artists = response.data;
       } else {
         console.warn('Unexpected artists response format:', response);
         artists = [];
@@ -75,70 +75,86 @@ class APIClient {
   }
 
   /**
-   * Get all albums with their songs
+   * Get all albums with their songs - FIXED VERSION
    */
   async getAlbums() {
-  if (this.cache.albums && Array.isArray(this.cache.albums)) {
-    return this.cache.albums;
-  }
-
-  try {
-    const response = await this.fetchAPI('/albums');
-    
-    let albums;
-    if (Array.isArray(response)) {
-      albums = response;
-    } else if (response.albums && Array.isArray(response.albums)) {
-      albums = response.albums;
-    } else if (response.data && Array.isArray(response.data)) {
-      albums = response.data;
-    } else {
-      console.warn('Unexpected albums response format:', response);
-      albums = [];
+    if (this.cache.albums && Array.isArray(this.cache.albums)) {
+      return this.cache.albums;
     }
 
-    const transformedAlbums = albums.map(album => ({
-      id: album.id,
-      catalogue: album.catalogue,
-      name: album.name,
-      cover_url: album.cover_url,
-      production_date: album.production_date,
-      release_date: album.release_date,
-      artist_id: album.artist_id,
-      credit: album.credit,
-      description: album.description,
-      tracks: album.tracks,
-      songs: album.songs || []
-    }));
+    try {
+      const response = await this.fetchAPI('/albums');
+      
+      let albums;
+      // Handle the API response structure correctly
+      if (response.success && response.data && Array.isArray(response.data)) {
+        // This is the correct path for your API response
+        albums = response.data;
+      } else if (Array.isArray(response)) {
+        // Fallback for direct array
+        albums = response;
+      } else if (response.albums && Array.isArray(response.albums)) {
+        // Another possible structure
+        albums = response.albums;
+      } else {
+        console.warn('Unexpected albums response format:', response);
+        albums = [];
+      }
 
-    // 💥 Only cache the **array**, not the whole response object
-    this.cache.albums = transformedAlbums;
-    return transformedAlbums;
-  } catch (error) {
-    console.error('Failed to fetch albums:', error);
-    return [];
+      console.log('📚 Albums loaded:', albums.length);
+
+      const transformedAlbums = albums.map(album => ({
+        id: album.id,
+        catalogue: album.catalogue,
+        name: album.name,
+        cover_url: album.cover_url,
+        production_date: album.production_date,
+        release_date: album.release_date,
+        artist_id: album.artist_id,
+        credit: album.credit,
+        description: album.description,
+        tracks: album.tracks,
+        songs: album.songs || [] // This should be empty for the albums list
+      }));
+
+      // Cache the array
+      this.cache.albums = transformedAlbums;
+      return transformedAlbums;
+    } catch (error) {
+      console.error('Failed to fetch albums:', error);
+      return [];
+    }
   }
-}
-
 
   /**
-   * Get specific album with songs
+   * Get specific album with songs - FIXED VERSION
    */
   async getAlbum(albumId) {
     try {
       const response = await this.fetchAPI(`/albums/${albumId}`);
       
-      // Handle single album response
+      // Handle the API response structure correctly
       let album;
-      if (response && response.id) {
+      if (response.success && response.data) {
+        // This is the correct path for your API response
+        album = response.data;
+      } else if (response && response.id) {
+        // Fallback for direct album object
         album = response;
       } else if (response.album) {
+        // Another possible structure
         album = response.album;
-      } else if (response.data) {
-        album = response.data;
       } else {
         console.warn('Unexpected album response format:', response);
         return null;
+      }
+
+      console.log('📀 Album loaded with songs:', album);
+      console.log('🎵 Song count:', album.songs?.length || 0);
+      
+      // Log the track_ids to debug the numbering issue
+      if (album.songs) {
+        console.log('🔢 Track IDs:', album.songs.map(s => s.track_id));
       }
 
       return album;
@@ -149,42 +165,34 @@ class APIClient {
   }
 
   /**
-   * Get all songs
+   * Get all songs - FIXED VERSION
    */
-  /**
- * Fetch all songs (with simple in-memory cache).
- * Accepts any of the known response shapes:
- *   •  [ { … } ]                          – plain array
- *   •  { songs:  [ { … } ] }              – songs key
- *   •  { data:   [ { … } ] }              – data key (e.g. REST wrapper)
- */
-async getSongs() {
-  // ── 1. Return cached copy if we already fetched once ────────────────
-  if (this.cache.songs) return this.cache.songs;
+  async getSongs() {
+    // Return cached copy if we already fetched once
+    if (this.cache.songs) return this.cache.songs;
 
-  try {
-    // ── 2. Hit the API ────────────────────────────────────────────────
-    const response = await this.fetchAPI('/songs');
+    try {
+      // Hit the API
+      const response = await this.fetchAPI('/songs');
 
-    // ── 3. Normalise payload to a flat array ──────────────────────────
-    const songs =
-      Array.isArray(response)
-        ? response
-        : Array.isArray(response?.songs)
-          ? response.songs
-          : Array.isArray(response?.data)
-            ? response.data
-            : (console.warn('[API] Unexpected /songs payload', response), []);
+      // Normalize payload to a flat array
+      const songs =
+        response.success && Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response)
+            ? response
+            : Array.isArray(response?.songs)
+              ? response.songs
+              : (console.warn('[API] Unexpected /songs payload', response), []);
 
-    // ── 4. Cache and return ───────────────────────────────────────────
-    this.cache.songs = songs;
-    return songs;
-  } catch (err) {
-    console.error('Failed to fetch songs:', err);
-    return [];
+      // Cache and return
+      this.cache.songs = songs;
+      return songs;
+    } catch (err) {
+      console.error('Failed to fetch songs:', err);
+      return [];
+    }
   }
-}
-
 
   /**
    * Get specific song
@@ -195,12 +203,12 @@ async getSongs() {
       
       // Handle single song response
       let song;
-      if (response && response.id) {
+      if (response.success && response.data) {
+        song = response.data;
+      } else if (response && response.id) {
         song = response;
       } else if (response.song) {
         song = response.song;
-      } else if (response.data) {
-        song = response.data;
       } else {
         console.warn('Unexpected song response format:', response);
         return null;

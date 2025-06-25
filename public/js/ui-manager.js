@@ -110,28 +110,56 @@ class UIManager {
    * Display album details in sidebar (ported from original)
    * CLEANED: Removed hardcoded purchase links
    */
-  async displayAlbumDetails(albumId) {
-    const sidebar = document.querySelector('.sidebar');
-    if (!sidebar) return;
+async displayAlbumDetails(albumId) {
+  const sidebar = document.querySelector('.sidebar');
+  if (!sidebar) return;
 
-    try {
-      // Show sidebar
-      this.showSidebar();
-      this.currentAlbumId = albumId;
+  try {
+    // Show sidebar
+    this.showSidebar();
+    this.currentAlbumId = albumId;
 
-      const sidebarContent = document.querySelector('.sidebar .sidebar-content');
-      if (!sidebarContent) return;
+    const sidebarContent = document.querySelector('.sidebar .sidebar-content');
+    if (!sidebarContent) return;
 
-      // Show loading state
-      sidebarContent.innerHTML = '<div class="loading-content"><div class="spinner"></div><p>Loading album details...</p></div>';
+    // Show loading state
+    sidebarContent.innerHTML = '<div class="loading-content"><div class="spinner"></div><p>Loading album details...</p></div>';
 
-      // Get album data
-      const album = await apiClient.getAlbum(albumId);
+    // Get album data
+    const album = await apiClient.getAlbum(albumId);
 
-      if (!album) {
-        sidebarContent.innerHTML = '<p class="error">Album not found.</p>';
-        return;
-      }
+    if (!album) {
+      sidebarContent.innerHTML = '<p class="error">Album not found.</p>';
+      return;
+    }
+
+    // 🔍 ADD THE DEBUG CODE RIGHT HERE 🔍
+    console.log('🔍 DEBUG: Full album object:', album);
+    console.log('🔍 DEBUG: Album ID:', albumId);
+    console.log('🔍 DEBUG: Album songs array:', album.songs);
+
+    if (album.songs && Array.isArray(album.songs)) {
+      console.log('🔍 DEBUG: Song count:', album.songs.length);
+      console.log('🔍 DEBUG: Track IDs found:', album.songs.map(s => s.track_id));
+      console.log('🔍 DEBUG: Song names:', album.songs.map(s => s.name));
+      
+      // Check for duplicates or weird data
+      album.songs.forEach((song, index) => {
+        console.log(`🔍 DEBUG: Song ${index + 1}:`, {
+          id: song.id,
+          name: song.name,
+          track_id: song.track_id,
+          album_id: song.album_id
+        });
+      });
+    } else {
+      console.log('🔍 DEBUG: No songs array or not an array!');
+    }
+
+
+
+
+
 
       // Clear and rebuild content
       sidebarContent.innerHTML = '';
