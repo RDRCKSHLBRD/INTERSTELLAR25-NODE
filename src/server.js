@@ -9,6 +9,10 @@ import { fileURLToPath } from 'url';
 import config from './config/environment.js';
 import { testConnection, closePool } from './config/database.js';
 
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Import route modules
 import artistRoutes from './routes/api/artists.js';
 import albumRoutes from './routes/api/albums.js';
@@ -26,14 +30,22 @@ import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
 
-// Directory fix for __dirname in ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+
+// EJS ::
+
+// EJS Configuration
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+// Make session data available to all templates
+app.use((req, res, next) => {
+  res.locals.user = req.session?.user || null;
+  res.locals.authenticated = !!req.session?.userId;
+  next();
+});
 
 // Security middleware
 // REPLACE THIS SECTION IN src/server.js:
-
-
 
 app.use(
   helmet({
@@ -113,7 +125,7 @@ app.use('/api/health', healthRoutes);
 app.use('/', pageRoutes);
 
 // Download routes (individual album pages)
-app.use('/dl', downloadRoutes);
+app.use('/downloads', downloadRoutes);
 
 // API documentation (development only)
 if (config.enableApiDocs) {

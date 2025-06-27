@@ -1,6 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import { query } from '../../config/database.js';
+import CartModel from '../../models/CartModel.js';
 
 const router = express.Router();
 
@@ -60,6 +61,18 @@ router.post('/register', async (req, res, next) => {
       name_last: user.name_last,
       email: user.email
     };
+
+
+
+if (req.session.sessionId) {
+  try {
+    await CartModel.migrateSessionCartToUser(req.session.sessionId, user.id);
+  } catch (err) {
+    console.error('Cart migration failed:', err);
+    // Don't fail login if cart migration fails
+  }
+}
+
 
     res.status(201).json({
       success: true,
@@ -125,6 +138,23 @@ router.post('/login', async (req, res, next) => {
       name_last: user.name_last,
       email: user.email
     };
+
+
+ // ✅ ADD CART MIGRATION HERE
+    if (req.session.sessionId) {
+      try {
+        await CartModel.migrateSessionCartToUser(req.session.sessionId, user.id);
+        console.log(`🔄 Cart migration completed for user ${user.id}`);
+      } catch (err) {
+        console.error('Cart migration failed:', err);
+        // Don't fail login if cart migration fails
+      }
+    }
+
+
+
+
+
 
     res.json({
       success: true,

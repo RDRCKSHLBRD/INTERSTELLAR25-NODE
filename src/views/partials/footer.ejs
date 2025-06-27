@@ -1,0 +1,17 @@
+<!-- views/partials/footer.ejs -->
+<footer>
+  <details class="footer-details" open>
+    <summary>Downloads</summary>
+    <div class="foot-cont">
+      <div class="download-info">
+        <% if (user) { %>
+          <p>Welcome back, <%= user.user_name || user.name_first || 'User' %>!</p>
+          <p><a href="/downloads/my-downloads" style="color: #0e9bcc;">Access your downloads</a></p>
+        <% } else { %>
+          <p>Purchase music to access high-quality downloads</p>
+        <% } %>
+      </div>
+      <p class="footTag">&copy; <%= new Date().getFullYear() %> RDXENV</p>
+    </div>
+  </details>
+</footer>

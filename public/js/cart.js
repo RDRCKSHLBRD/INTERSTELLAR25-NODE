@@ -95,61 +95,82 @@ class CartManager {
     });
   }
 
-  async loadCartFromDatabase() {
+async loadCartFromDatabase() {
+  try {
+    console.log('🔗 Loading cart...');
+    
+    // Check if user is logged in first
+    let cartUrl = '/api/cart/session'; // default to session cart
+    let logContext = '👤 Anonymous user';
+    
     try {
-      let url, headers = {};
-
-      if (this.isLoggedIn && this.userId) {
-        url = `/api/cart/${this.userId}`;
-        console.log('🔐 Loading cart for user:', this.userId);
-      } else {
-        url = '/api/cart/session';
-        headers['x-session-id'] = this.sessionId;
-        console.log('🔗 Loading cart for session:', this.sessionId);
-      }
-
-      console.log('📡 Making cart request to:', url);
-      console.log('📝 With headers:', headers);
-
-      const response = await fetch(url, {
-        headers,
+      const authResponse = await fetch('/api/auth/me', {
         credentials: 'include'
       });
-
-      console.log('📊 Cart response status:', response.status);
-
-      if (response.ok) {
-        const data = await response.json();
-
-        // 🚀 Manually map the server response into this.cart structure
-        this.cart = {
-          items: data.cart || [],
-          itemCount: data.cart ? data.cart.length : 0,
-          totalAmount: data.cart
-            ? data.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-            : 0,
-          cartId: null // We can enhance this later if needed
-        };
-
-        console.log('🛒 Cart loaded from database:', this.cart);
-        console.log('📊 Cart structure check:', {
-          hasItems: !!this.cart.items,
-          itemsIsArray: Array.isArray(this.cart.items),
-          itemCount: this.cart.itemCount,
-          totalAmount: this.cart.totalAmount,
-          rawItems: this.cart.items
-        });
-      } else {
-        const errorText = await response.text();
-        console.log('⚠️ Cart load failed:', response.status, errorText);
-        console.log('🛒 No existing cart found, starting fresh');
-        this.cart = { items: [], itemCount: 0, totalAmount: 0, cartId: null };
+      
+      if (authResponse.ok) {
+        const userData = await authResponse.json();
+        if (userData.success && userData.user && userData.user.id) {
+          // User is logged in - use user cart
+          cartUrl = `/api/cart/${userData.user.id}`;
+          logContext = `👤 User: ${userData.user.id} (${userData.user.user_name})`;
+          this.isLoggedIn = true;
+          this.userId = userData.user.id;
+        }
       }
-    } catch (error) {
-      console.error('❌ Failed to load cart from database:', error);
+    } catch (authError) {
+      console.log('🔍 Auth check failed, using session cart');
+    }
+    
+    console.log(`${logContext} - loading cart from: ${cartUrl}`);
+    
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    
+    // Add session ID header for session-based requests
+    if (!this.isLoggedIn) {
+      headers['x-session-id'] = this.sessionId;
+    }
+    
+    console.log('📡 Making cart request to:', cartUrl);
+    console.log('📝 With headers:', headers);
+
+    const response = await fetch(cartUrl, {
+      headers,
+      credentials: 'include'
+    });
+
+    console.log('📊 Cart response status:', response.status);
+
+    if (response.ok) {
+      const data = await response.json();
+
+      // Handle the server response - it returns an array directly
+      const cartItems = Array.isArray(data) ? data : (data.cart || data.items || []);
+
+      this.cart = {
+        items: cartItems,
+        itemCount: cartItems.length,
+        totalAmount: cartItems.reduce((sum, item) => sum + (parseFloat(item.price || 0) * (item.quantity || 1)), 0),
+        cartId: null
+      };
+
+      console.log('🛒 Cart loaded from database:', this.cart);
+      console.log('📊 Cart structure check:', this.cart);
+      
+    } else {
+      const errorText = await response.text();
+      console.log('⚠️ Cart load failed:', response.status, errorText);
+      console.log('🛒 No existing cart found, starting fresh');
       this.cart = { items: [], itemCount: 0, totalAmount: 0, cartId: null };
     }
+  } catch (error) {
+    console.error('❌ Failed to load cart from database:', error);
+    this.cart = { items: [], itemCount: 0, totalAmount: 0, cartId: null };
   }
+}
+
 
 
 
@@ -744,6 +765,21 @@ renderCartItems() {
       return false;
     }
   }
+
+
+// ALSO ADD this method to refresh cart after login:
+async refreshCartAfterLogin() {
+  console.log('🔄 Refreshing cart after login...');
+  await this.checkAuthStatus();
+  await this.loadCartFromDatabase();
+  this.updateCartCount();
+  
+  // Update sidebar if open
+  if (this.isVisible) {
+    this.updateCartSidebarContent();
+  }
+}
+
 
 
 

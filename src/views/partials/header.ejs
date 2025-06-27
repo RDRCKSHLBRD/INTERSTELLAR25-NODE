@@ -1,0 +1,57 @@
+<!-- views/partials/header.ejs -->
+<header>
+  <div class="Logo">
+    <a href="/">
+      <img src="/images/IP_TAG24.svg" alt="Interstellar Packages Logo">
+    </a>
+  </div>
+  <nav class="Nav">
+    <ul>
+      <li><a href="/filmography">Film</a></li>
+      <li><a href="/contact">Contact</a></li>
+      
+      <% if (user) { %>
+        <!-- Show downloads link for authenticated users -->
+        <li><a href="/downloads/my-downloads">My Downloads</a></li>
+        
+        <!-- User info display -->
+        <li class="user-info">
+          <span>Hi, <%= user.user_name || user.name_first || 'User' %>!</span>
+          <form action="/api/auth/logout" method="POST" style="display: inline;">
+            <button type="submit" class="logout-button">Logout</button>
+          </form>
+        </li>
+      <% } else { %>
+        <!-- Login button for non-authenticated users -->
+        <li class="loginSquare">
+          <a href="/" class="login-button">Log In</a>
+        </li>
+      <% } %>
+      
+      <!-- Cart Icon - always visible -->
+      <li class="cartSquare">
+        <button class="cart-button" onclick="window.cart?.toggleSidebar()">
+          <img src="/images/IP-CART25-m1.svg" alt="Shopping Cart" class="cart-icon">
+          <span class="cart-count" style="display: none;">0</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<script>
+  // Simple logout handler for EJS pages
+  function handleLogout(event) {
+    event.preventDefault();
+    fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    }).then(response => {
+      if (response.ok) {
+        window.location.href = '/';
+      }
+    }).catch(error => {
+      console.error('Logout error:', error);
+    });
+  }
+</script>

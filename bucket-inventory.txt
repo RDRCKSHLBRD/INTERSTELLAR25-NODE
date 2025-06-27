@@ -1,242 +1,533 @@
 gs://ip-public-bucket1/Ambient-Garden-One/:
          0  2024-04-12T04:21:31Z  gs://ip-public-bucket1/Ambient-Garden-One/
    4711910  2024-04-13T16:59:49Z  gs://ip-public-bucket1/Ambient-Garden-One/8_AMBIENTGARDENONE.png
-  21320640  2024-04-12T04:22:13Z  gs://ip-public-bucket1/Ambient-Garden-One/ARC.mp3
-   9520320  2024-04-12T04:22:09Z  gs://ip-public-bucket1/Ambient-Garden-One/BEACHES.mp3
-  16140682  2024-04-12T04:22:12Z  gs://ip-public-bucket1/Ambient-Garden-One/CATERPILLAR.mp3
-  19980480  2024-04-12T04:22:16Z  gs://ip-public-bucket1/Ambient-Garden-One/CHARLOTTA.mp3
-  10760640  2024-04-12T04:24:44Z  gs://ip-public-bucket1/Ambient-Garden-One/DAWN-FOR-CHILDREN.mp3
-   9030848  2024-04-12T04:22:16Z  gs://ip-public-bucket1/Ambient-Garden-One/FLOWER.mp3
-  14995200  2024-04-12T04:25:53Z  gs://ip-public-bucket1/Ambient-Garden-One/JADE-FLOWER-MEMORY-INDEX.mp3
-  10128000  2024-04-12T04:22:19Z  gs://ip-public-bucket1/Ambient-Garden-One/NONAGON.mp3
-  18564690  2024-04-12T04:25:05Z  gs://ip-public-bucket1/Ambient-Garden-One/OPTICAL-RECORD-PIPE.mp3
-  11520000  2024-04-12T04:24:08Z  gs://ip-public-bucket1/Ambient-Garden-One/PERFUMED-LETTER.mp3
-  15348608  2024-04-12T04:22:25Z  gs://ip-public-bucket1/Ambient-Garden-One/STARS.mp3
-  13537088  2024-04-12T04:22:27Z  gs://ip-public-bucket1/Ambient-Garden-One/STELLAR.mp3
-  16560000  2024-04-12T04:22:28Z  gs://ip-public-bucket1/Ambient-Garden-One/V.mp3
-  13870208  2024-04-12T04:22:28Z  gs://ip-public-bucket1/Ambient-Garden-One/WATERS.mp3
+   1975097  2025-06-23T04:50:11Z  gs://ip-public-bucket1/Ambient-Garden-One/AMBIENT-GARDEN-ONEcover-1000.png
+  14406733  2025-06-23T04:50:14Z  gs://ip-public-bucket1/Ambient-Garden-One/AMBIENT-GARDEN-ONEcover.png
+   2761145  2025-06-23T04:50:12Z  gs://ip-public-bucket1/Ambient-Garden-One/AMBIENTGARDENONE.JPG
+  23297109  2025-06-23T04:47:51Z  gs://ip-public-bucket1/Ambient-Garden-One/ARC.mp3
+  11496789  2025-06-23T04:47:45Z  gs://ip-public-bucket1/Ambient-Garden-One/BEACHES.mp3
+  18115353  2025-06-23T04:47:46Z  gs://ip-public-bucket1/Ambient-Garden-One/CATERPILLAR.mp3
+  21956949  2025-06-23T04:47:47Z  gs://ip-public-bucket1/Ambient-Garden-One/CHARLOTTA.mp3
+  12737109  2025-06-23T04:47:37Z  gs://ip-public-bucket1/Ambient-Garden-One/DAWN-FOR-CHILDREN.mp3
+  11007189  2025-06-23T04:47:36Z  gs://ip-public-bucket1/Ambient-Garden-One/FLOWER.mp3
+  16971669  2025-06-23T04:47:36Z  gs://ip-public-bucket1/Ambient-Garden-One/JADE-FLOWER-MEMORY-INDEX.mp3
+   1475266  2025-06-25T22:52:38Z  gs://ip-public-bucket1/Ambient-Garden-One/LINER NOTES_AMBIENT-GARDEN-ONE-2025.pdf
+  12104469  2025-06-23T04:47:32Z  gs://ip-public-bucket1/Ambient-Garden-One/NONAGON.mp3
+  20539361  2025-06-23T04:47:30Z  gs://ip-public-bucket1/Ambient-Garden-One/OPTICAL-RECORD-PIPE.mp3
+  13496469  2025-06-23T04:47:25Z  gs://ip-public-bucket1/Ambient-Garden-One/PERFUMED-LETTER.mp3
+  17324949  2025-06-23T04:47:28Z  gs://ip-public-bucket1/Ambient-Garden-One/STARS.mp3
+  15513429  2025-06-23T04:47:18Z  gs://ip-public-bucket1/Ambient-Garden-One/STELLAR.mp3
+  18536469  2025-06-23T04:47:18Z  gs://ip-public-bucket1/Ambient-Garden-One/V.mp3
+  15846549  2025-06-23T04:47:18Z  gs://ip-public-bucket1/Ambient-Garden-One/WATERS.mp3
+
+gs://ip-public-bucket1/Ambient-Garden-One/WAV/:
+      6148  2025-06-23T04:41:44Z  gs://ip-public-bucket1/Ambient-Garden-One/WAV/.DS_Store
+ 111080106  2025-06-23T04:43:20Z  gs://ip-public-bucket1/Ambient-Garden-One/WAV/1.STARS.wav
+  72920114  2025-06-23T04:43:40Z  gs://ip-public-bucket1/Ambient-Garden-One/WAV/10.NONAGON.wav
+ 119232044  2025-06-23T04:45:17Z  gs://ip-public-bucket1/Ambient-Garden-One/WAV/11.V.wav
+ 153504044  2025-06-23T04:43:02Z  gs://ip-public-bucket1/Ambient-Garden-One/WAV/12.ARC.wav
+ 107966168  2025-06-23T17:51:44Z  gs://ip-public-bucket1/Ambient-Garden-One/WAV/13.JADE-FLOWER-MEMORY-INDEX.wav
+ 143856044  2025-06-23T04:45:44Z  gs://ip-public-bucket1/Ambient-Garden-One/WAV/14.CHARLOTTA.wav
+ 100375850  2025-06-23T04:44:15Z  gs://ip-public-bucket1/Ambient-Garden-One/WAV/2.WATERS.wav
+  71162568  2025-06-23T04:44:54Z  gs://ip-public-bucket1/Ambient-Garden-One/WAV/3.CATERPILLAR.aif
+  65353170  2025-06-23T04:44:15Z  gs://ip-public-bucket1/Ambient-Garden-One/WAV/4.FLOWER.wav
+  68544044  2025-06-23T04:45:26Z  gs://ip-public-bucket1/Ambient-Garden-One/WAV/5.BEACHES.wav
+  82944044  2025-06-23T17:51:58Z  gs://ip-public-bucket1/Ambient-Garden-One/WAV/6.PERFUMED-LETTER.wav
+  97967506  2025-06-23T04:44:14Z  gs://ip-public-bucket1/Ambient-Garden-One/WAV/7.STELLAR.wav
+  77472044  2025-06-23T04:42:20Z  gs://ip-public-bucket1/Ambient-Garden-One/WAV/8.DAWN FOR CHILDREN.wav
+ 133632044  2025-06-23T17:54:53Z  gs://ip-public-bucket1/Ambient-Garden-One/WAV/9.OPTICAL-RECORD-PIPE.wav
 
 gs://ip-public-bucket1/Ambient-Garden-Two/:
          0  2025-02-13T23:06:59Z  gs://ip-public-bucket1/Ambient-Garden-Two/
+   8332698  2025-06-26T18:44:26Z  gs://ip-public-bucket1/Ambient-Garden-Two/A-COLOUDS-VISIT-TO-THE-ARTIST.mp3
+  16075098  2025-06-26T18:44:31Z  gs://ip-public-bucket1/Ambient-Garden-Two/ABZU.mp3
+   6142866  2025-06-26T18:44:58Z  gs://ip-public-bucket1/Ambient-Garden-Two/AMBIENT-GARDEN-TWO-cover-1500.png
+  21444695  2025-06-26T18:45:03Z  gs://ip-public-bucket1/Ambient-Garden-Two/AMBIENT-GARDEN-TWO-cover-3000.png
+   1611481  2025-06-26T18:44:55Z  gs://ip-public-bucket1/Ambient-Garden-Two/AMBIENT-GARDEN-TWO-cover-750.png
    6142866  2025-02-13T23:08:06Z  gs://ip-public-bucket1/Ambient-Garden-Two/AMBIENTGARDENTWOsm-v2.png
+  16840218  2025-06-26T18:44:31Z  gs://ip-public-bucket1/Ambient-Garden-Two/ARTWORK-OF-CHILDREN.mp3
+  20373018  2025-06-26T18:44:35Z  gs://ip-public-bucket1/Ambient-Garden-Two/ASA-NO-TORI.mp3
+  18762138  2025-06-26T18:44:39Z  gs://ip-public-bucket1/Ambient-Garden-Two/BEYOND-THE-VEILS.mp3
+  10893018  2025-06-26T18:44:36Z  gs://ip-public-bucket1/Ambient-Garden-Two/BOUQUET-AGAINST-THE-BLACKNESS-OF-SPACE.mp3
+  24652698  2025-06-26T18:44:47Z  gs://ip-public-bucket1/Ambient-Garden-Two/CELESTIAL-DRUM.mp3
+  14722458  2025-06-26T18:44:43Z  gs://ip-public-bucket1/Ambient-Garden-Two/EXHIBIT-C3.mp3
+  19149018  2025-06-26T18:44:48Z  gs://ip-public-bucket1/Ambient-Garden-Two/III-AXONS-TO-THE-VOID.mp3
+  32381161  2025-06-26T18:45:06Z  gs://ip-public-bucket1/Ambient-Garden-Two/LINER NOTES_AMBIENT-GARDEN-TWO-2025.pdf
+  12592218  2025-06-26T18:44:49Z  gs://ip-public-bucket1/Ambient-Garden-Two/MOMENT-OF-LIGHT.mp3
+  20812698  2025-06-26T18:44:56Z  gs://ip-public-bucket1/Ambient-Garden-Two/OPEN-CONCEPT.mp3
+   8056218  2025-06-26T18:44:52Z  gs://ip-public-bucket1/Ambient-Garden-Two/STRUCTURE-4.mp3
+  11293338  2025-06-26T18:44:54Z  gs://ip-public-bucket1/Ambient-Garden-Two/SUNRISE-IN-PRIMARY-COLOURS.mp3
+  14223258  2025-06-26T18:44:58Z  gs://ip-public-bucket1/Ambient-Garden-Two/VI-THE-SLUMBER-OF-SNOW.mp3
+
+gs://ip-public-bucket1/Ambient-Garden-Two/WAV/:
+  46394336  2025-06-26T18:47:50Z  gs://ip-public-bucket1/Ambient-Garden-Two/WAV/1.STRUCTURE-4.wav
+  66816044  2025-06-26T18:47:11Z  gs://ip-public-bucket1/Ambient-Garden-Two/WAV/10.BOUQUET-AGAINST-THE-BLACKNESS-OF-SPACE.wav
+  69696044  2025-06-26T18:48:56Z  gs://ip-public-bucket1/Ambient-Garden-Two/WAV/11.SUNRISE-IN-PRIMARY-COLOURS.wav
+  48384044  2025-06-26T18:48:24Z  gs://ip-public-bucket1/Ambient-Garden-Two/WAV/12.A-COLOUDS-VISIT-TO-THE-ARTIST.wav
+  90793532  2025-06-26T18:47:22Z  gs://ip-public-bucket1/Ambient-Garden-Two/WAV/13.VI-THE-SLUMBER-OF-SNOW.wav
+ 104125586  2025-06-26T18:47:28Z  gs://ip-public-bucket1/Ambient-Garden-Two/WAV/14.ABZU.wav
+  79047830  2025-06-26T18:47:58Z  gs://ip-public-bucket1/Ambient-Garden-Two/WAV/2.MOMENT-OF-LIGHT.wav
+ 123476558  2025-06-26T18:49:53Z  gs://ip-public-bucket1/Ambient-Garden-Two/WAV/3.BEYOND-THE-VEILS.wav
+ 138240044  2025-06-26T18:49:01Z  gs://ip-public-bucket1/Ambient-Garden-Two/WAV/4.OPEN-CONCEPT.wav
+ 126261812  2025-06-26T18:49:59Z  gs://ip-public-bucket1/Ambient-Garden-Two/WAV/5.III-AXONS-TO-THE-VOID.wav
+  94389752  2025-06-26T18:50:15Z  gs://ip-public-bucket1/Ambient-Garden-Two/WAV/6.EXHIBIT-C3.wav
+ 109634450  2025-06-26T18:48:01Z  gs://ip-public-bucket1/Ambient-Garden-Two/WAV/7.ARTWORK-OF-CHILDREN.wav
+ 165888044  2025-06-26T18:49:05Z  gs://ip-public-bucket1/Ambient-Garden-Two/WAV/8.CELESTIAL-DRUM.wav
+ 135072044  2025-06-26T18:50:05Z  gs://ip-public-bucket1/Ambient-Garden-Two/WAV/9.ASA-NO-TORI.wav
 
 gs://ip-public-bucket1/Amsterdam-Concreet/:
          0  2024-04-12T15:17:50Z  gs://ip-public-bucket1/Amsterdam-Concreet/
    3388715  2024-04-13T17:16:47Z  gs://ip-public-bucket1/Amsterdam-Concreet/14_AMSTERDAM-CONCREET.png
-  16000320  2024-04-12T15:30:37Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-A.mp3
-  25680000  2024-04-12T15:30:47Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-B.mp3
-  20791680  2024-04-12T15:30:56Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-C1.mp3
-   7989120  2024-04-12T15:31:08Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-C2.mp3
-  13109760  2024-04-12T15:31:17Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-C3.mp3
-  17760000  2024-04-12T15:31:26Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-D.mp3
-  20640000  2024-04-12T15:31:35Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-E.mp3
-  20560320  2024-04-12T15:31:45Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-F.mp3
-  22727040  2024-04-12T15:31:53Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-G.mp3
+   3015911  2025-06-24T18:18:35Z  gs://ip-public-bucket1/Amsterdam-Concreet/AMSTERDAM-CONCREET-cover-1500.png
+   9188087  2025-06-24T18:18:36Z  gs://ip-public-bucket1/Amsterdam-Concreet/AMSTERDAM-CONCREET-cover-3000.png
+    860864  2025-06-24T18:18:36Z  gs://ip-public-bucket1/Amsterdam-Concreet/AMSTERDAM-CONCREET-cover-750.png
+  16862401  2025-06-24T18:18:33Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-A.mp3
+  26542081  2025-06-24T18:18:35Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-B.mp3
+  21653761  2025-06-24T18:18:32Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-C1.mp3
+   8851201  2025-06-24T18:18:22Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-C2.mp3
+  13971841  2025-06-24T18:18:23Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-C3.mp3
+  18622081  2025-06-24T18:18:25Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-D.mp3
+  21502081  2025-06-24T18:18:17Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-E.mp3
+  21422401  2025-06-24T18:18:17Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-F.mp3
+  23589121  2025-06-24T18:18:17Z  gs://ip-public-bucket1/Amsterdam-Concreet/EXHIBIT-G.mp3
+    426725  2025-06-25T23:08:01Z  gs://ip-public-bucket1/Amsterdam-Concreet/LINER NOTES_AMSTERDAM-CONCREET-2025.pdf
+
+gs://ip-public-bucket1/Amsterdam-Concreet/WAV/:
+ 115200044  2025-06-24T18:20:39Z  gs://ip-public-bucket1/Amsterdam-Concreet/WAV/1.EXHIBIT-A.wav
+ 184896044  2025-06-24T18:21:11Z  gs://ip-public-bucket1/Amsterdam-Concreet/WAV/2.EXHIBIT-B.wav
+ 149696216  2025-06-24T18:22:21Z  gs://ip-public-bucket1/Amsterdam-Concreet/WAV/3.EXHIBIT-C1.wav
+  57518774  2025-06-24T18:22:16Z  gs://ip-public-bucket1/Amsterdam-Concreet/WAV/4.EXHIBIT-C2.wav
+  94389752  2025-06-24T18:22:38Z  gs://ip-public-bucket1/Amsterdam-Concreet/WAV/5.EXHIBIT-C3.wav
+ 127872044  2025-06-24T18:20:45Z  gs://ip-public-bucket1/Amsterdam-Concreet/WAV/6.EXHIBIT-D.wav
+ 148608044  2025-06-24T18:22:53Z  gs://ip-public-bucket1/Amsterdam-Concreet/WAV/7.EXHIBIT-E.wav
+ 148032044  2025-06-24T18:21:49Z  gs://ip-public-bucket1/Amsterdam-Concreet/WAV/8.EXHIBIT-F.wav
+ 163635500  2025-06-24T18:22:01Z  gs://ip-public-bucket1/Amsterdam-Concreet/WAV/9.EXHIBIT-G.wav
 
 gs://ip-public-bucket1/Apocrypha/:
          0  2025-01-18T20:32:22Z  gs://ip-public-bucket1/Apocrypha/
-      5431  2025-01-18T20:34:16Z  gs://ip-public-bucket1/Apocrypha/ALBUM NOTES.rtf
-   9251519  2025-01-18T20:32:47Z  gs://ip-public-bucket1/Apocrypha/APOCRYPHA_Resize.png
-  14462400  2025-01-18T20:33:39Z  gs://ip-public-bucket1/Apocrypha/Abzu.mp3
-  27560640  2025-01-18T20:33:51Z  gs://ip-public-bucket1/Apocrypha/Apocrypha.mp3
-  12800640  2025-01-18T20:35:07Z  gs://ip-public-bucket1/Apocrypha/Behold-the-Eyes-that-see-though-you.mp3
-  18560640  2025-01-18T20:35:27Z  gs://ip-public-bucket1/Apocrypha/Black-Box.mp3
-   4989120  2025-01-18T20:33:47Z  gs://ip-public-bucket1/Apocrypha/Compute.mp3
-  10320000  2025-01-18T20:35:42Z  gs://ip-public-bucket1/Apocrypha/Data-Tree.mp3
-   7388160  2025-01-18T20:35:58Z  gs://ip-public-bucket1/Apocrypha/Decision-Weight.mp3
-  13434240  2025-01-18T20:33:49Z  gs://ip-public-bucket1/Apocrypha/Hermitage.mp3
-  14000640  2025-01-18T20:33:46Z  gs://ip-public-bucket1/Apocrypha/Jacquard.mp3
-  15920640  2025-01-18T20:36:46Z  gs://ip-public-bucket1/Apocrypha/Post-Singularities.mp3
-  20764800  2025-01-18T20:33:46Z  gs://ip-public-bucket1/Apocrypha/Sigma.mp3
-  11120640  2025-01-18T20:33:39Z  gs://ip-public-bucket1/Apocrypha/Task.mp3
-  10400640  2025-01-18T20:37:18Z  gs://ip-public-bucket1/Apocrypha/The-City-Beyond!.mp3
-   9194880  2025-01-19T03:07:22Z  gs://ip-public-bucket1/Apocrypha/The-Poems-of-Integers.mp3
-  16803840  2025-01-18T20:37:44Z  gs://ip-public-bucket1/Apocrypha/To-be-watched-amongst-the-Random-Forest.mp3
+   2843734  2025-06-26T04:53:57Z  gs://ip-public-bucket1/Apocrypha/APOCRYPHA-cover-1500.png
+   9251939  2025-06-26T04:53:58Z  gs://ip-public-bucket1/Apocrypha/APOCRYPHA-cover-3000.png
+    825206  2025-06-26T04:53:56Z  gs://ip-public-bucket1/Apocrypha/APOCRYPHA-cover-750.png
+   9251519  2025-06-26T04:53:08Z  gs://ip-public-bucket1/Apocrypha/APOCRYPHA_Resize.png
+  15288814  2025-06-26T05:02:18Z  gs://ip-public-bucket1/Apocrypha/Abzu.mp3
+  28387054  2025-06-26T05:02:23Z  gs://ip-public-bucket1/Apocrypha/Apocrypha.mp3
+  13627054  2025-06-26T05:02:16Z  gs://ip-public-bucket1/Apocrypha/Behold-the-Eyes-that-see-though-you.mp3
+  19387054  2025-06-26T05:02:25Z  gs://ip-public-bucket1/Apocrypha/Black-Box.mp3
+   5815534  2025-06-26T05:02:21Z  gs://ip-public-bucket1/Apocrypha/Compute.mp3
+  11146414  2025-06-26T05:02:26Z  gs://ip-public-bucket1/Apocrypha/Data-Tree.mp3
+   8214574  2025-06-26T05:02:27Z  gs://ip-public-bucket1/Apocrypha/Decision-Weight.mp3
+  14260654  2025-06-26T05:02:31Z  gs://ip-public-bucket1/Apocrypha/Hermitage.mp3
+  14827054  2025-06-26T05:02:33Z  gs://ip-public-bucket1/Apocrypha/Jacquard.mp3
+    285105  2025-06-26T20:25:56Z  gs://ip-public-bucket1/Apocrypha/LINER NOTES_APOCRYPHA-2025.pdf
+  16747054  2025-06-26T05:02:35Z  gs://ip-public-bucket1/Apocrypha/Post-Singularities.mp3
+  21591214  2025-06-26T05:02:41Z  gs://ip-public-bucket1/Apocrypha/Sigma.mp3
+  11947054  2025-06-26T05:02:39Z  gs://ip-public-bucket1/Apocrypha/Task.mp3
+  11227054  2025-06-26T05:02:40Z  gs://ip-public-bucket1/Apocrypha/The-City-Beyond!.mp3
+  10021294  2025-06-26T05:02:43Z  gs://ip-public-bucket1/Apocrypha/The-Poems-of-Integers.mp3
+  17630254  2025-06-26T05:02:44Z  gs://ip-public-bucket1/Apocrypha/To-be-watched-amongst-the-Random-Forest.mp3
+
+gs://ip-public-bucket1/Apocrypha/WAV/:
+ 198432044  2025-06-26T04:10:01Z  gs://ip-public-bucket1/Apocrypha/WAV/1.Apocrypha.wav
+ 114624044  2025-06-26T04:10:53Z  gs://ip-public-bucket1/Apocrypha/WAV/10.Post-Singularities.wav
+  74880044  2025-06-26T04:11:54Z  gs://ip-public-bucket1/Apocrypha/WAV/11.The-City-Beyond!.wav
+  92160044  2025-06-26T04:11:18Z  gs://ip-public-bucket1/Apocrypha/WAV/12.Behold-the-Eyes-that-see-though-you.wav
+  66204044  2025-06-26T04:12:20Z  gs://ip-public-bucket1/Apocrypha/WAV/13.The-Poems-of-Integers.wav
+  80064044  2025-06-26T04:11:29Z  gs://ip-public-bucket1/Apocrypha/WAV/14.Task.wav
+ 104125586  2025-06-26T04:09:18Z  gs://ip-public-bucket1/Apocrypha/WAV/15.Abzu.wav
+  96721178  2025-06-26T04:12:13Z  gs://ip-public-bucket1/Apocrypha/WAV/2.Hermitage.wav
+  53190044  2025-06-26T04:10:35Z  gs://ip-public-bucket1/Apocrypha/WAV/3.Decision Weight.wav
+ 133632044  2025-06-26T04:12:18Z  gs://ip-public-bucket1/Apocrypha/WAV/4.Black-Box.wav
+  35917874  2025-06-26T04:10:11Z  gs://ip-public-bucket1/Apocrypha/WAV/5.Compute.wav
+  74304044  2025-06-26T04:09:54Z  gs://ip-public-bucket1/Apocrypha/WAV/6.Data-Tree.wav
+ 100800044  2025-06-26T04:11:19Z  gs://ip-public-bucket1/Apocrypha/WAV/7.Jacquard.wav
+ 120988226  2025-06-26T04:09:24Z  gs://ip-public-bucket1/Apocrypha/WAV/8.To-be-watched-amongst-the-Random-Forest.wav
+ 149504048  2025-06-26T04:10:33Z  gs://ip-public-bucket1/Apocrypha/WAV/9.Sigma.wav
 
 gs://ip-public-bucket1/Charlotta/:
          0  2024-04-11T19:19:39Z  gs://ip-public-bucket1/Charlotta/
    3302269  2024-04-12T19:10:06Z  gs://ip-public-bucket1/Charlotta/1_CHARLOTTA.png
-  20673489  2025-03-26T01:42:07Z  gs://ip-public-bucket1/Charlotta/BEAUTIFUL-WATERS.mp3
-  21598929  2025-03-26T01:40:01Z  gs://ip-public-bucket1/Charlotta/CHARLOTTA.mp3
+  20673489  2025-06-22T02:08:57Z  gs://ip-public-bucket1/Charlotta/BEAUTIFUL-WATERS.mp3
+  13354731  2025-06-22T02:12:01Z  gs://ip-public-bucket1/Charlotta/CHARLOTTA-cover-3000lg.png
+   1246608  2025-06-22T02:12:22Z  gs://ip-public-bucket1/Charlotta/CHARLOTTA-cover-800sm.png
+  21598929  2025-06-22T02:08:56Z  gs://ip-public-bucket1/Charlotta/CHARLOTTA.mp3
    3628660  2025-03-26T22:01:38Z  gs://ip-public-bucket1/Charlotta/CHARLOTTA_noTEXT.png
-       495  2024-04-11T19:26:41Z  gs://ip-public-bucket1/Charlotta/Charlotta-TRACK LISTING.rtf
-   9568209  2025-03-26T01:40:16Z  gs://ip-public-bucket1/Charlotta/GARDEN-MIX.mp3
-  10498449  2025-03-26T01:40:35Z  gs://ip-public-bucket1/Charlotta/NEW-ORNITHOLOGIES.mp3
-   9769809  2025-03-26T01:40:55Z  gs://ip-public-bucket1/Charlotta/OLD-FLOWERS.mp3
-  12808209  2025-03-27T05:55:41Z  gs://ip-public-bucket1/Charlotta/PERFUMED-LETTER.mp3
-  23338449  2025-03-26T01:41:52Z  gs://ip-public-bucket1/Charlotta/WINDOWS.mp3
-  12418449  2025-03-26T01:42:22Z  gs://ip-public-bucket1/Charlotta/YELLOW-TRANSPORTS.mp3
+   9568209  2025-06-22T02:08:55Z  gs://ip-public-bucket1/Charlotta/GARDEN-MIX.mp3
+    244352  2025-06-25T22:47:50Z  gs://ip-public-bucket1/Charlotta/LINER NOTES_CHARLOTTA-1-2025.pdf
+  10498449  2025-06-22T02:08:55Z  gs://ip-public-bucket1/Charlotta/NEW-ORNITHOLOGIES.mp3
+   9769809  2025-06-22T02:08:54Z  gs://ip-public-bucket1/Charlotta/OLD-FLOWERS.mp3
+  12808209  2025-06-22T02:08:53Z  gs://ip-public-bucket1/Charlotta/PERFUMED-LETTER.mp3
+  23338449  2025-06-22T02:08:53Z  gs://ip-public-bucket1/Charlotta/WINDOWS.mp3
+  12418449  2025-06-22T02:08:53Z  gs://ip-public-bucket1/Charlotta/YELLOW-TRANSPORTS.mp3
+
+gs://ip-public-bucket1/Charlotta/WAV/:
+ 146522384  2025-06-22T21:48:59Z  gs://ip-public-bucket1/Charlotta/WAV/1.CHARLOTTA.wav
+  59904044  2025-06-23T17:36:47Z  gs://ip-public-bucket1/Charlotta/WAV/2.GARDEN-MIX.wav
+  66602624  2025-06-23T17:36:34Z  gs://ip-public-bucket1/Charlotta/WAV/3.NEW-ORNITHOLOGIES.wav
+  61358672  2025-06-23T17:36:20Z  gs://ip-public-bucket1/Charlotta/WAV/4.OLD-FLOWERS.wav
+ 159048044  2025-06-22T21:48:53Z  gs://ip-public-bucket1/Charlotta/WAV/5.WINDOWS.wav
+ 139860050  2025-06-23T17:36:59Z  gs://ip-public-bucket1/Charlotta/WAV/6.BEAUTIFUL-WATERS.wav
+  80426720  2025-06-23T17:37:12Z  gs://ip-public-bucket1/Charlotta/WAV/7.YELLOW-TRANSPORTS.wav
+  83232044  2025-06-23T17:37:22Z  gs://ip-public-bucket1/Charlotta/WAV/8.PERFUMED-LETTER.wav
 
 gs://ip-public-bucket1/Glass-City-of-Us/:
          0  2024-04-12T02:44:33Z  gs://ip-public-bucket1/Glass-City-of-Us/
    3531072  2024-04-13T16:52:30Z  gs://ip-public-bucket1/Glass-City-of-Us/3_GLASS-CITY-OF-US.png
-  17665447  2025-04-08T23:36:40Z  gs://ip-public-bucket1/Glass-City-of-Us/CATERPILLAR.mp3
-  16292647  2025-04-08T23:36:39Z  gs://ip-public-bucket1/Glass-City-of-Us/FILMS-OF-NATURE.mp3
-  32409127  2025-04-08T23:36:41Z  gs://ip-public-bucket1/Glass-City-of-Us/GLASS-CITY-OF-US.mp3
-   2950515  2025-04-09T19:34:34Z  gs://ip-public-bucket1/Glass-City-of-Us/GLASSCITY-plain.png
-  18328807  2025-04-08T23:36:37Z  gs://ip-public-bucket1/Glass-City-of-Us/NICE.mp3
-  20089447  2025-04-08T23:36:37Z  gs://ip-public-bucket1/Glass-City-of-Us/OPTICAL-RECORD-PIPE.mp3
-  22051687  2025-04-08T23:36:37Z  gs://ip-public-bucket1/Glass-City-of-Us/SUN-THROUGH-CLOUDS-ONTO-FLOWERS.mp3
+  17665447  2025-06-22T17:49:57Z  gs://ip-public-bucket1/Glass-City-of-Us/CATERPILLAR.mp3
+  16292647  2025-06-22T17:49:57Z  gs://ip-public-bucket1/Glass-City-of-Us/FILMS-OF-NATURE.mp3
+  32409127  2025-06-22T17:49:57Z  gs://ip-public-bucket1/Glass-City-of-Us/GLASS-CITY-OF-US.mp3
+  10672915  2025-06-22T17:49:51Z  gs://ip-public-bucket1/Glass-City-of-Us/Glass City of Us- CoverLG.png
+   4570629  2025-06-22T17:49:51Z  gs://ip-public-bucket1/Glass-City-of-Us/Glass City of Us-CoverSM.png
+    137474  2025-06-25T22:49:03Z  gs://ip-public-bucket1/Glass-City-of-Us/LINER NOTES_GLASS-CITY-OF-US-2025.pdf
+  18328807  2025-06-22T17:49:54Z  gs://ip-public-bucket1/Glass-City-of-Us/NICE.mp3
+  20089447  2025-06-22T17:49:54Z  gs://ip-public-bucket1/Glass-City-of-Us/OPTICAL-RECORD-PIPE.mp3
+  22051687  2025-06-22T17:49:54Z  gs://ip-public-bucket1/Glass-City-of-Us/SUN-THROUGH-CLOUDS-ONTO-FLOWERS.mp3
+
+gs://ip-public-bucket1/Glass-City-of-Us/WAV/:
+      6148  2025-06-22T21:53:15Z  gs://ip-public-bucket1/Glass-City-of-Us/WAV/.DS_Store
+ 116182994  2025-06-22T21:53:33Z  gs://ip-public-bucket1/Glass-City-of-Us/WAV/1.CATERPILLAR.wav
+ 106296338  2025-06-23T17:41:23Z  gs://ip-public-bucket1/Glass-City-of-Us/WAV/2.FILMS-OF-NATURE.wav
+ 222336044  2025-06-23T17:41:37Z  gs://ip-public-bucket1/Glass-City-of-Us/WAV/3.GLASS-CITY-OF-US.wav
+ 120960044  2025-06-22T21:53:47Z  gs://ip-public-bucket1/Glass-City-of-Us/WAV/4.NICE.wav
+ 133632044  2025-06-23T17:41:52Z  gs://ip-public-bucket1/Glass-City-of-Us/WAV/5.OPTICAL-RECORD-PIPE.wav
+ 147763538  2025-06-23T17:42:12Z  gs://ip-public-bucket1/Glass-City-of-Us/WAV/6.SUN-THROUGH-CLOUDS-ONTO-FLOWERS.wav
+
+gs://ip-public-bucket1/IP-VISUAL-ASSETS/:
+         0  2025-06-22T16:06:50Z  gs://ip-public-bucket1/IP-VISUAL-ASSETS/
+   2950515  2025-06-22T17:47:07Z  gs://ip-public-bucket1/IP-VISUAL-ASSETS/GLASSCITY-plain.png
+   1114329  2025-06-22T17:54:12Z  gs://ip-public-bucket1/IP-VISUAL-ASSETS/NEWDOMES-x.png
+   1098605  2025-06-22T16:08:36Z  gs://ip-public-bucket1/IP-VISUAL-ASSETS/OBJECTS_PARTICLES-ALL.png
+   1037779  2025-06-22T16:09:58Z  gs://ip-public-bucket1/IP-VISUAL-ASSETS/OBJECTS_PARTICLES-L1-2.png
+    293945  2025-06-22T16:10:15Z  gs://ip-public-bucket1/IP-VISUAL-ASSETS/OBJECTS_PARTICLES-L1.png
+   1108762  2025-06-22T16:10:31Z  gs://ip-public-bucket1/IP-VISUAL-ASSETS/OBJECTS_PARTICLES-L2.png
+     52604  2025-06-22T16:09:37Z  gs://ip-public-bucket1/IP-VISUAL-ASSETS/OBJECTS_PARTICLES-L3.png
+    952286  2025-06-22T17:54:54Z  gs://ip-public-bucket1/IP-VISUAL-ASSETS/RS-DOMES-plain.png
 
 gs://ip-public-bucket1/Inner-Moment-of-Light/:
          0  2024-04-12T04:32:12Z  gs://ip-public-bucket1/Inner-Moment-of-Light/
    3969936  2024-04-13T17:02:38Z  gs://ip-public-bucket1/Inner-Moment-of-Light/10_INNER-MOMENTS.png
-  10139520  2024-04-12T04:47:25Z  gs://ip-public-bucket1/Inner-Moment-of-Light/BEAUTY-OF-THE-HEART.mp3
-  15613440  2024-04-12T04:32:44Z  gs://ip-public-bucket1/Inner-Moment-of-Light/BEGININGS.mp3
-   7978560  2024-04-12T04:47:55Z  gs://ip-public-bucket1/Inner-Moment-of-Light/LANDCSCAPE-I.mp3
-   7218240  2024-04-12T04:46:46Z  gs://ip-public-bucket1/Inner-Moment-of-Light/LANDSCAPE-II.mp3
-  10680000  2024-04-12T04:48:45Z  gs://ip-public-bucket1/Inner-Moment-of-Light/LOVE-IS-THE-UNIVERSE.mp3
-  10979520  2024-04-12T04:46:21Z  gs://ip-public-bucket1/Inner-Moment-of-Light/MOMENT-OF-LIGHT.mp3
-  19539840  2024-04-12T04:32:50Z  gs://ip-public-bucket1/Inner-Moment-of-Light/PRISMS.mp3
-  30571200  2024-04-12T04:32:52Z  gs://ip-public-bucket1/Inner-Moment-of-Light/SPHERE.mp3
-  10611840  2024-04-12T04:48:19Z  gs://ip-public-bucket1/Inner-Moment-of-Light/UNIVERSAL-KNOWLEDGE.mp3
+  11838582  2025-06-23T18:16:54Z  gs://ip-public-bucket1/Inner-Moment-of-Light/BEAUTY-OF-THE-HEART.mp3
+  17312502  2025-06-23T18:16:57Z  gs://ip-public-bucket1/Inner-Moment-of-Light/BEGININGS.mp3
+   1697841  2025-06-23T18:08:31Z  gs://ip-public-bucket1/Inner-Moment-of-Light/INNER-MOMENTS-OF-LIGHT-cover1000.png
+   9825703  2025-06-23T18:08:32Z  gs://ip-public-bucket1/Inner-Moment-of-Light/INNER-MOMENTS-OF-LIGHT-cover3000.png
+   9677622  2025-06-23T18:16:53Z  gs://ip-public-bucket1/Inner-Moment-of-Light/LANDCSCAPE-I.mp3
+   8917302  2025-06-23T18:16:57Z  gs://ip-public-bucket1/Inner-Moment-of-Light/LANDSCAPE-II.mp3
+    166606  2025-06-25T23:00:25Z  gs://ip-public-bucket1/Inner-Moment-of-Light/LINER NOTES_INNER-MOMENTS-OF-LIGHT-2025.pdf
+  12379062  2025-06-23T18:17:00Z  gs://ip-public-bucket1/Inner-Moment-of-Light/LOVE-IS-THE-UNIVERSE.mp3
+  12678582  2025-06-23T18:17:02Z  gs://ip-public-bucket1/Inner-Moment-of-Light/MOMENT-OF-LIGHT.mp3
+  21238902  2025-06-23T18:17:07Z  gs://ip-public-bucket1/Inner-Moment-of-Light/PRISMS.mp3
+  32270262  2025-06-23T18:17:10Z  gs://ip-public-bucket1/Inner-Moment-of-Light/SPHERE.mp3
+  12310902  2025-06-23T18:17:08Z  gs://ip-public-bucket1/Inner-Moment-of-Light/UNIVERSAL-KNOWLEDGE.mp3
+
+gs://ip-public-bucket1/Inner-Moment-of-Light/WAV/:
+  79047830  2025-06-23T18:10:51Z  gs://ip-public-bucket1/Inner-Moment-of-Light/WAV/1.MOMENT-OF-LIGHT.wav
+  51969644  2025-06-23T18:10:39Z  gs://ip-public-bucket1/Inner-Moment-of-Light/WAV/2.LANDSCAPE-II.wav
+ 140683166  2025-06-23T18:12:48Z  gs://ip-public-bucket1/Inner-Moment-of-Light/WAV/3.PRISMS.wav
+ 220108850  2025-06-23T18:12:06Z  gs://ip-public-bucket1/Inner-Moment-of-Light/WAV/4.SPHERE.wav
+  73001672  2025-06-23T18:12:12Z  gs://ip-public-bucket1/Inner-Moment-of-Light/WAV/5.BEAUTY-OF-THE-HEART.wav
+ 112417712  2025-06-23T18:12:12Z  gs://ip-public-bucket1/Inner-Moment-of-Light/WAV/6.BEGININGS.wav
+  57446450  2025-06-23T18:11:13Z  gs://ip-public-bucket1/Inner-Moment-of-Light/WAV/7.LANDCSCAPE I.wav
+  76402676  2025-06-23T18:12:34Z  gs://ip-public-bucket1/Inner-Moment-of-Light/WAV/8.UNIVERSAL-KNOWLEDGE.wav
+  76896044  2025-06-23T18:11:36Z  gs://ip-public-bucket1/Inner-Moment-of-Light/WAV/9.LOVE-IS THE-UNIVERSE.wav
 
 gs://ip-public-bucket1/Jikan/:
          0  2024-11-14T01:04:30Z  gs://ip-public-bucket1/Jikan/
    9808579  2024-11-14T01:05:54Z  gs://ip-public-bucket1/Jikan/21_JIKAN.png
-  15929280  2024-11-14T01:17:18Z  gs://ip-public-bucket1/Jikan/I-Abstraction-and-Landscape.mp3
-  15042240  2024-11-14T01:17:56Z  gs://ip-public-bucket1/Jikan/II-The-Colour-of-Life.mp3
-   9891840  2024-11-14T01:18:20Z  gs://ip-public-bucket1/Jikan/III-The-Sun-of-The-Day.mp3
-  20954880  2024-11-14T01:19:01Z  gs://ip-public-bucket1/Jikan/IV-The-Rain-of-the-Fall.mp3
-  86880000  2024-11-14T01:20:35Z  gs://ip-public-bucket1/Jikan/JIKAN-Continuous-Movements1-6.mp3
-  12532800  2024-11-14T01:19:27Z  gs://ip-public-bucket1/Jikan/V-The-Fire-of-Autumn.mp3
-  12610560  2024-11-14T01:20:05Z  gs://ip-public-bucket1/Jikan/VI-The-Slumber-of-Snow.mp3
+  16949256  2025-06-26T03:05:41Z  gs://ip-public-bucket1/Jikan/I-Abstraction-and-Landscape.mp3
+  16062216  2025-06-26T03:05:41Z  gs://ip-public-bucket1/Jikan/II-The-Colour-of-Life.mp3
+  10911816  2025-06-26T03:19:29Z  gs://ip-public-bucket1/Jikan/III-The-Sun-of-The-Day.mp3
+  21974856  2025-06-26T03:05:48Z  gs://ip-public-bucket1/Jikan/IV-Rain-of-the-Fall.mp3
+  87899976  2025-06-26T03:06:05Z  gs://ip-public-bucket1/Jikan/JIKAN-Continuous-Movements1-6.mp3
+   3468252  2025-06-26T03:05:51Z  gs://ip-public-bucket1/Jikan/JIKAN-OST-cover-1500.png
+  10806561  2025-06-26T03:05:56Z  gs://ip-public-bucket1/Jikan/JIKAN-OST-cover-3000.png
+   1018768  2025-06-26T03:05:49Z  gs://ip-public-bucket1/Jikan/JIKAN-OST-cover-750.png
+     95071  2025-06-26T03:05:55Z  gs://ip-public-bucket1/Jikan/LINER NOTES_JIKAN-ORIGINAL-SOUNDTRACK-2025.pdf
+  13552776  2025-06-26T03:05:48Z  gs://ip-public-bucket1/Jikan/V-The-Fire-of-Autumn.mp3
+  13630536  2025-06-26T03:05:54Z  gs://ip-public-bucket1/Jikan/VI-The-Slumber-of-Snow.mp3
+
+gs://ip-public-bucket1/Jikan/WAV/:
+ 114690092  2025-06-26T02:48:54Z  gs://ip-public-bucket1/Jikan/WAV/1.I-Abstraction-and-Landscape.wav
+ 108299450  2025-06-26T02:49:34Z  gs://ip-public-bucket1/Jikan/WAV/2.II-The-Colour-of-Life.wav
+  71221922  2025-06-26T02:49:28Z  gs://ip-public-bucket1/Jikan/WAV/3.III-The-Sun-of-The-Day.wav
+ 150873734  2025-06-26T02:50:33Z  gs://ip-public-bucket1/Jikan/WAV/4.IV-Rain-of-the-Fall.wav
+  90232844  2025-06-26T02:48:43Z  gs://ip-public-bucket1/Jikan/WAV/5.V-The-Fire-of-Autumn.wav
+  90793532  2025-06-26T02:50:10Z  gs://ip-public-bucket1/Jikan/WAV/6.VI-The-Slumber-of-Snow.wav
+ 625536044  2025-06-26T02:51:19Z  gs://ip-public-bucket1/Jikan/WAV/7.JIKAN-Continuous-Movements1-6.wav
 
 gs://ip-public-bucket1/Music-For-Seven-Structures/:
          0  2024-04-12T04:27:18Z  gs://ip-public-bucket1/Music-For-Seven-Structures/
+   1169655  2025-06-23T16:29:39Z  gs://ip-public-bucket1/Music-For-Seven-Structures/7STRUCTURES-cover1000.png
+   6183555  2025-06-23T16:29:40Z  gs://ip-public-bucket1/Music-For-Seven-Structures/7STRUCTURES-cover3000.png
    2604819  2024-04-13T17:00:41Z  gs://ip-public-bucket1/Music-For-Seven-Structures/9_7STRUCTURES.png
-  16440000  2024-04-12T04:29:15Z  gs://ip-public-bucket1/Music-For-Seven-Structures/STRUCTURE-1.mp3
-  10905600  2024-04-12T04:29:27Z  gs://ip-public-bucket1/Music-For-Seven-Structures/STRUCTURE-2.mp3
-  11519040  2024-04-12T04:29:36Z  gs://ip-public-bucket1/Music-For-Seven-Structures/STRUCTURE-3.mp3
-   6443520  2024-04-12T04:29:45Z  gs://ip-public-bucket1/Music-For-Seven-Structures/STRUCTURE-4.mp3
-  13592640  2024-04-12T04:29:54Z  gs://ip-public-bucket1/Music-For-Seven-Structures/STRUCTURE-5.mp3
-  16549440  2024-04-12T04:30:03Z  gs://ip-public-bucket1/Music-For-Seven-Structures/STRUCTURE-6.mp3
-  16730880  2024-04-12T04:30:14Z  gs://ip-public-bucket1/Music-For-Seven-Structures/STRUCTURE-7.mp3
+   1475266  2025-06-25T22:58:09Z  gs://ip-public-bucket1/Music-For-Seven-Structures/LINER NOTES_AMBIENT-GARDEN-ONE-2025.pdf
+  17610865  2025-06-23T17:58:10Z  gs://ip-public-bucket1/Music-For-Seven-Structures/STRUCTURE-1.mp3
+  12076465  2025-06-23T17:58:38Z  gs://ip-public-bucket1/Music-For-Seven-Structures/STRUCTURE-2.mp3
+  12689905  2025-06-23T17:58:47Z  gs://ip-public-bucket1/Music-For-Seven-Structures/STRUCTURE-3.mp3
+   7614385  2025-06-23T17:58:56Z  gs://ip-public-bucket1/Music-For-Seven-Structures/STRUCTURE-4.mp3
+  14763505  2025-06-23T17:59:06Z  gs://ip-public-bucket1/Music-For-Seven-Structures/STRUCTURE-5.mp3
+  17720305  2025-06-23T17:59:15Z  gs://ip-public-bucket1/Music-For-Seven-Structures/STRUCTURE-6.mp3
+  17901745  2025-06-23T17:59:26Z  gs://ip-public-bucket1/Music-For-Seven-Structures/STRUCTURE-7.mp3
+
+gs://ip-public-bucket1/Music-For-Seven-Structures/WAV/:
+ 118368044  2025-06-23T18:01:40Z  gs://ip-public-bucket1/Music-For-Seven-Structures/WAV/1.STRUCTURE-1.wav
+  78516110  2025-06-23T18:02:15Z  gs://ip-public-bucket1/Music-For-Seven-Structures/WAV/2.STRUCTURE-2.wav
+  82933532  2025-06-23T18:02:19Z  gs://ip-public-bucket1/Music-For-Seven-Structures/WAV/3.STRUCTURE-3.wav
+  46394336  2025-06-23T18:02:28Z  gs://ip-public-bucket1/Music-For-Seven-Structures/WAV/4.STRUCTURE-4.wav
+  97865366  2025-06-23T18:02:24Z  gs://ip-public-bucket1/Music-For-Seven-Structures/WAV/5.STRUCTURE-5.wav
+ 119155778  2025-06-23T18:01:39Z  gs://ip-public-bucket1/Music-For-Seven-Structures/WAV/6.STRUCTURE-6.wav
+ 120462626  2025-06-23T18:01:40Z  gs://ip-public-bucket1/Music-For-Seven-Structures/WAV/7.STRUCTURE-7.wav
 
 gs://ip-public-bucket1/Natura/:
          0  2024-04-12T03:34:57Z  gs://ip-public-bucket1/Natura/
    5150045  2024-04-13T16:55:47Z  gs://ip-public-bucket1/Natura/5_NATURA.png
-   7962368  2024-04-12T03:35:44Z  gs://ip-public-bucket1/Natura/BOTANY.mp3
-  12504128  2024-04-12T03:35:45Z  gs://ip-public-bucket1/Natura/CLOUDS.mp3
-  17559488  2024-04-12T03:37:26Z  gs://ip-public-bucket1/Natura/COLOURS-IN-RAIN.mp3
-  11477888  2024-04-12T03:37:51Z  gs://ip-public-bucket1/Natura/EARLY-SUMMER-SKY.mp3
-  13056128  2024-04-12T03:38:12Z  gs://ip-public-bucket1/Natura/FIRST-SPRING.mp3
-   9030848  2024-04-12T03:35:49Z  gs://ip-public-bucket1/Natura/FLOWER.mp3
-  13162688  2024-04-12T03:35:51Z  gs://ip-public-bucket1/Natura/STREAMS.mp3
-  11832128  2024-04-12T03:35:52Z  gs://ip-public-bucket1/Natura/TIDAL.mp3
-  13870208  2024-04-12T03:35:52Z  gs://ip-public-bucket1/Natura/WATERS.mp3
+   9355910  2025-06-22T19:26:47Z  gs://ip-public-bucket1/Natura/BOTANY.mp3
+  13897670  2025-06-22T19:26:47Z  gs://ip-public-bucket1/Natura/CLOUDS.mp3
+  18953030  2025-06-23T17:33:52Z  gs://ip-public-bucket1/Natura/COLOURS-IN-RAIN.mp3
+  12871430  2025-06-23T17:34:16Z  gs://ip-public-bucket1/Natura/EARLY-SUMMER-SKY.mp3
+  14449670  2025-06-23T17:34:29Z  gs://ip-public-bucket1/Natura/FIRST-SPRING.mp3
+  10424390  2025-06-22T19:26:45Z  gs://ip-public-bucket1/Natura/FLOWER.mp3
+    214537  2025-06-25T22:49:52Z  gs://ip-public-bucket1/Natura/LINER NOTES_NATURA-2025.pdf
+  15817717  2025-06-22T19:26:48Z  gs://ip-public-bucket1/Natura/NATURA-cover3000.png
+   1392466  2025-06-22T19:26:48Z  gs://ip-public-bucket1/Natura/NATURA-cover800.png
+  14556230  2025-06-22T19:26:42Z  gs://ip-public-bucket1/Natura/STREAMS.mp3
+  13225670  2025-06-22T19:26:42Z  gs://ip-public-bucket1/Natura/TIDAL.mp3
+  15263750  2025-06-22T19:26:42Z  gs://ip-public-bucket1/Natura/WATERS.mp3
+
+gs://ip-public-bucket1/Natura/WAV/:
+  57617894  2025-06-22T22:56:27Z  gs://ip-public-bucket1/Natura/WAV/1.BOTANY.wav
+  90487658  2025-06-22T22:56:41Z  gs://ip-public-bucket1/Natura/WAV/2.CLOUDS.wav
+ 127082458  2025-06-22T22:56:35Z  gs://ip-public-bucket1/Natura/WAV/3.COLOURS IN RAIN.wav
+  83060966  2025-06-22T22:56:20Z  gs://ip-public-bucket1/Natura/WAV/4.EARLY SUMMER SKY.wav
+  94485018  2025-06-22T22:56:20Z  gs://ip-public-bucket1/Natura/WAV/5.FIRST SPRING.wav
+  65353170  2025-06-22T22:56:43Z  gs://ip-public-bucket1/Natura/WAV/6.FLOWER.wav
+  95255146  2025-06-22T22:56:40Z  gs://ip-public-bucket1/Natura/WAV/7.STREAMS.wav
+  85623666  2025-06-22T22:56:30Z  gs://ip-public-bucket1/Natura/WAV/8.TIDAL.wav
+ 100375850  2025-06-22T22:56:21Z  gs://ip-public-bucket1/Natura/WAV/9.WATERS.wav
 
 gs://ip-public-bucket1/New-Domes-of-Earth/:
          0  2024-04-12T03:30:14Z  gs://ip-public-bucket1/New-Domes-of-Earth/
    3583947  2024-04-13T16:53:23Z  gs://ip-public-bucket1/New-Domes-of-Earth/4_NEW-DOMES.png
-   9520320  2024-04-12T03:31:06Z  gs://ip-public-bucket1/New-Domes-of-Earth/BEACHES.mp3
-  10760640  2024-04-12T03:33:32Z  gs://ip-public-bucket1/New-Domes-of-Earth/DAWN-FOR-CHILDREN.mp3
-   1114329  2025-04-09T22:23:52Z  gs://ip-public-bucket1/New-Domes-of-Earth/NEWDOMES-x.png
-  20160000  2024-04-12T03:31:40Z  gs://ip-public-bucket1/New-Domes-of-Earth/PROJECTED-MOUNTAINS.mp3
-   7360320  2024-04-12T03:32:10Z  gs://ip-public-bucket1/New-Domes-of-Earth/REPEATED-FIRES.mp3
-    952286  2025-04-09T19:36:48Z  gs://ip-public-bucket1/New-Domes-of-Earth/RS-DOMES-plain.png
-   6960000  2024-04-12T03:33:08Z  gs://ip-public-bucket1/New-Domes-of-Earth/SPHERES-OF-LIFE.mp3
-  11120640  2024-04-12T03:32:44Z  gs://ip-public-bucket1/New-Domes-of-Earth/THE-TASTE-OF-TRUTH.mp3
+  10473681  2025-06-22T17:56:00Z  gs://ip-public-bucket1/New-Domes-of-Earth/BEACHES.mp3
+  11714001  2025-06-22T18:02:26Z  gs://ip-public-bucket1/New-Domes-of-Earth/DAWN-FOR-CHILDREN.mp3
+    227661  2025-06-25T22:49:26Z  gs://ip-public-bucket1/New-Domes-of-Earth/LINER NOTES_NEW-DOMES-OF-EARTH-2025.pdf
+  10971445  2025-06-22T17:56:02Z  gs://ip-public-bucket1/New-Domes-of-Earth/New Domes of Earth- CoverLG.png
+    952286  2025-06-22T17:56:01Z  gs://ip-public-bucket1/New-Domes-of-Earth/New Domes of Earth- CoverSM.png
+  21113361  2025-06-22T18:03:35Z  gs://ip-public-bucket1/New-Domes-of-Earth/PROJECTED-MOUNTAINS.mp3
+   8313681  2025-06-22T18:03:23Z  gs://ip-public-bucket1/New-Domes-of-Earth/REPEATED-FIRES.mp3
+   7913361  2025-06-22T18:03:11Z  gs://ip-public-bucket1/New-Domes-of-Earth/SPHERES-OF-LIFE.mp3
+  12074001  2025-06-22T18:02:57Z  gs://ip-public-bucket1/New-Domes-of-Earth/THE-TASTE-OF-TRUTH.mp3
+
+gs://ip-public-bucket1/New-Domes-of-Earth/WAV/:
+  68544044  2025-06-22T21:55:07Z  gs://ip-public-bucket1/New-Domes-of-Earth/WAV/1.BEACHES.wav
+ 145152044  2025-06-22T21:55:19Z  gs://ip-public-bucket1/New-Domes-of-Earth/WAV/2.PROJECTED MOUNTAINS.wav
+  52992044  2025-06-22T21:55:13Z  gs://ip-public-bucket1/New-Domes-of-Earth/WAV/3.REPEATED FIRES.wav
+  80064044  2025-06-22T21:55:16Z  gs://ip-public-bucket1/New-Domes-of-Earth/WAV/4.THE TASTE OF TRUTH.wav
+  50112044  2025-06-22T21:55:06Z  gs://ip-public-bucket1/New-Domes-of-Earth/WAV/5.SPHERES OF LIFE.wav
+  77472044  2025-06-22T21:55:07Z  gs://ip-public-bucket1/New-Domes-of-Earth/WAV/6.DAWN FOR CHILDREN.wav
 
 gs://ip-public-bucket1/Nocturnes-and-Reveries/:
          0  2024-04-12T04:50:07Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/
    6835938  2024-04-13T17:14:33Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/11_NOCTURNES-REVERIES.png
-  14791680  2024-04-12T05:04:07Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Animals-of-the-Night.mp3
-  17071680  2024-04-12T04:50:44Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Bardo.mp3
-  17149440  2024-04-12T05:07:07Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Beyond-the-Veils.mp3
-  14720640  2024-04-12T04:50:47Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Charon.mp3
-  13440000  2024-04-12T05:05:20Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Eyes-open-at-the-Cusp-of-Dawn.mp3
-  10879680  2024-04-12T04:50:47Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Garden.mp3
-  11386560  2024-04-12T05:06:14Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Lunar-Eclipse.mp3
-  16397760  2024-04-12T05:04:26Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Moon-Gate.mp3
-  16245120  2024-04-12T05:03:04Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Moon-above-the-Sea.mp3
-  15551040  2024-04-12T05:07:33Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Morning-Light.mp3
-  17088000  2024-04-12T05:05:52Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Night-Music.mp3
-  22429440  2024-04-12T05:06:43Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Nocturnes-and-Reveries.mp3
-  20880960  2024-04-12T04:51:03Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Obelisk.mp3
-  11760960  2024-04-12T04:51:02Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Selene.mp3
-  23214720  2024-04-12T05:03:35Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Starlight-through-Trees.mp3
+  16344688  2025-06-24T00:17:49Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Animals-of-the-Night.mp3
+  18624688  2025-06-24T00:17:49Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Bardo.mp3
+  18702448  2025-06-24T00:17:47Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Beyond-the-Veils.mp3
+  16273648  2025-06-24T00:17:43Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Charon.mp3
+  14993008  2025-06-24T00:17:40Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Eyes-open-at-the-Cusp-of-Dawn.mp3
+  12432688  2025-06-24T00:17:38Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Garden.mp3
+   1475266  2025-06-25T23:03:12Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/LINER NOTES_AMBIENT-GARDEN-ONE-2025.pdf
+  12939568  2025-06-24T00:17:34Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Lunar-Eclipse.mp3
+  17950768  2025-06-24T00:17:33Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Moon-Gate.mp3
+  17798128  2025-06-24T00:17:35Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Moon-above-the-Sea.mp3
+  17104048  2025-06-24T00:17:27Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Morning-Light.mp3
+  21404117  2025-06-25T23:03:15Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/NOCTURNES-AND-REVERIES-cover-3000.png
+   1551769  2025-06-25T23:03:11Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/NOCTURNES-AND-REVERIES-cover-750.png
+   2736117  2025-06-25T23:03:13Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/NOCTURNESa-AND-REVERIES-cover-1000.png
+  18641008  2025-06-24T00:17:27Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Night-Music.mp3
+  23982448  2025-06-24T00:17:25Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Nocturnes-and-Reveries.mp3
+  22433968  2025-06-24T00:17:18Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Obelisk.mp3
+  13313968  2025-06-24T00:17:14Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Selene.mp3
+  24767728  2025-06-24T00:17:19Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/Starlight-through-Trees.mp3
+
+gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/:
+ 116965790  2025-06-24T01:02:02Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/1.Moon-above-the-Sea.wav
+ 105984044  2025-06-24T01:00:57Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/10.Charon.wav
+ 123033644  2025-06-24T01:03:38Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/11.Night-Music.wav
+  81979076  2025-06-24T01:04:21Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/12.Lunar-Eclipse.wav
+ 161490812  2025-06-24T01:02:16Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/13.Nocturnes-and-Reveries.wav
+ 123476558  2025-06-24T01:01:07Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/14.Beyond-the-Veils.wav
+ 111964370  2025-06-24T01:02:41Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/15.Morning-Light.wav
+ 167141534  2025-06-24T01:04:43Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/2.Starlight-through-Trees.WAV
+  78333272  2025-06-24T01:02:53Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/3.Garden.wav
+ 106495316  2025-06-24T01:03:42Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/4.Animals-of-the-Night.wav
+ 118065176  2025-06-24T01:01:51Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/5.Moon-Gate.wav
+ 150338732  2025-06-24T01:04:40Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/6.Obelisk.wav
+ 122914268  2025-06-24T01:03:00Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/7.Bardo.wav
+  96768044  2025-06-24T01:00:49Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/8.Eyes-open-at-the-Cusp-of-Dawn.wav
+  84675878  2025-06-24T01:03:39Z  gs://ip-public-bucket1/Nocturnes-and-Reveries/WAV/9.Selene.wav
 
 gs://ip-public-bucket1/Nonagon/:
          0  2024-04-12T03:48:50Z  gs://ip-public-bucket1/Nonagon/
     500088  2024-04-13T16:58:19Z  gs://ip-public-bucket1/Nonagon/7_NONAGON.png
-  21320640  2024-04-12T03:49:18Z  gs://ip-public-bucket1/Nonagon/ARC.mp3
-  10240320  2024-04-12T03:49:16Z  gs://ip-public-bucket1/Nonagon/CURVATURE.mp3
-  14600640  2024-04-12T03:49:17Z  gs://ip-public-bucket1/Nonagon/DODECAHEDRON.mp3
-  10128000  2024-04-12T03:49:18Z  gs://ip-public-bucket1/Nonagon/NONAGON.mp3
-  17489280  2024-04-12T03:49:21Z  gs://ip-public-bucket1/Nonagon/QUADRANTS.mp3
-  13030080  2024-04-12T03:49:22Z  gs://ip-public-bucket1/Nonagon/RHOMBUS.mp3
-  12000000  2024-04-12T03:49:22Z  gs://ip-public-bucket1/Nonagon/SPHERICAL.mp3
-   9558720  2024-04-12T03:49:23Z  gs://ip-public-bucket1/Nonagon/TRIANGULAR.mp3
-  19914240  2024-04-12T03:49:25Z  gs://ip-public-bucket1/Nonagon/VERTICES.mp3
+  22594477  2025-06-22T23:12:24Z  gs://ip-public-bucket1/Nonagon/ARC.mp3
+  11514157  2025-06-22T23:12:23Z  gs://ip-public-bucket1/Nonagon/CURVATURE.mp3
+  15874477  2025-06-22T23:12:23Z  gs://ip-public-bucket1/Nonagon/DODECAHEDRON.mp3
+     74868  2025-06-25T22:51:45Z  gs://ip-public-bucket1/Nonagon/LINER NOTES_OUTER-CORNERS-2025.pdf
+   1272635  2025-06-25T22:52:07Z  gs://ip-public-bucket1/Nonagon/NONAGON-COVER.png
+  11401837  2025-06-22T23:12:21Z  gs://ip-public-bucket1/Nonagon/NONAGON.mp3
+  18763117  2025-06-22T23:12:21Z  gs://ip-public-bucket1/Nonagon/QUADRANTS.mp3
+  14303917  2025-06-22T23:12:20Z  gs://ip-public-bucket1/Nonagon/RHOMBUS.mp3
+  13273837  2025-06-22T23:12:19Z  gs://ip-public-bucket1/Nonagon/SPHERICAL.mp3
+  10832557  2025-06-22T23:12:18Z  gs://ip-public-bucket1/Nonagon/TRIANGULAR.mp3
+  21188077  2025-06-22T23:12:19Z  gs://ip-public-bucket1/Nonagon/VERTICES.mp3
+
+gs://ip-public-bucket1/Nonagon/WAV/:
+         0  2025-06-22T21:42:52Z  gs://ip-public-bucket1/Nonagon/WAV/
+  86400044  2025-06-22T21:43:13Z  gs://ip-public-bucket1/Nonagon/WAV/1.SPHERICAL.wav
+  93816044  2025-06-22T21:43:57Z  gs://ip-public-bucket1/Nonagon/WAV/2.RHOMBUS.wav
+  68817644  2025-06-22T21:44:23Z  gs://ip-public-bucket1/Nonagon/WAV/3.TRIANGULAR.wav
+  73728044  2025-06-22T21:44:35Z  gs://ip-public-bucket1/Nonagon/WAV/4.CURVATURE.wav
+  72920114  2025-06-22T21:44:59Z  gs://ip-public-bucket1/Nonagon/WAV/5.NONAGON.wav
+ 125918618  2025-06-22T21:45:15Z  gs://ip-public-bucket1/Nonagon/WAV/6.QUADRANTS.wav
+ 105120044  2025-06-22T21:45:31Z  gs://ip-public-bucket1/Nonagon/WAV/7.DODECAHEDRON.wav
+ 153504044  2025-06-22T21:45:45Z  gs://ip-public-bucket1/Nonagon/WAV/8.ARC.wav
+ 143380844  2025-06-22T21:46:02Z  gs://ip-public-bucket1/Nonagon/WAV/9.VERTICES.wav
 
 gs://ip-public-bucket1/Objects-and-Particles/:
          0  2024-04-12T02:38:22Z  gs://ip-public-bucket1/Objects-and-Particles/
    3253780  2024-04-13T16:51:21Z  gs://ip-public-bucket1/Objects-and-Particles/2_OBJECTS-PARTICLES.png
-  14995200  2024-04-12T02:40:01Z  gs://ip-public-bucket1/Objects-and-Particles/JADE-FLOWER-MEMORY-INDEX.mp3
-   1098605  2025-03-27T18:17:21Z  gs://ip-public-bucket1/Objects-and-Particles/OBJECTS_PARTICLES-ALL.png
-   1037779  2025-03-27T18:17:21Z  gs://ip-public-bucket1/Objects-and-Particles/OBJECTS_PARTICLES-L1-2.png
-    293945  2025-03-27T18:17:21Z  gs://ip-public-bucket1/Objects-and-Particles/OBJECTS_PARTICLES-L1.png
-   1108762  2025-03-27T18:17:21Z  gs://ip-public-bucket1/Objects-and-Particles/OBJECTS_PARTICLES-L2.png
-     52604  2025-03-27T18:17:20Z  gs://ip-public-bucket1/Objects-and-Particles/OBJECTS_PARTICLES-L3.png
-  10967040  2024-04-12T02:39:10Z  gs://ip-public-bucket1/Objects-and-Particles/RAINTUNNELS.mp3
-  19582080  2024-04-12T02:42:38Z  gs://ip-public-bucket1/Objects-and-Particles/SNOW-CRYSTAL.mp3
-  16560000  2024-04-12T02:39:08Z  gs://ip-public-bucket1/Objects-and-Particles/V.mp3
-  14800320  2024-04-12T16:16:47Z  gs://ip-public-bucket1/Objects-and-Particles/X-Y-Z.mp3
-  21547200  2024-04-12T16:16:03Z  gs://ip-public-bucket1/Objects-and-Particles/r-D-T.mp3
+  16543862  2025-06-22T17:45:27Z  gs://ip-public-bucket1/Objects-and-Particles/JADE-FLOWER-MEMORY-INDEX.mp3
+    348828  2025-06-25T22:48:34Z  gs://ip-public-bucket1/Objects-and-Particles/LINER NOTES_OBJECTS-AND-PARTICLES-2025.pdf
+   1547488  2025-06-22T17:45:27Z  gs://ip-public-bucket1/Objects-and-Particles/OBJECTS+PARTICLES-1000sm.png
+  16851284  2025-06-22T17:45:29Z  gs://ip-public-bucket1/Objects-and-Particles/OBJECTS+PARTICLES-coverLG.png
+  12515702  2025-06-22T17:45:25Z  gs://ip-public-bucket1/Objects-and-Particles/RAINTUNNELS.mp3
+  21130742  2025-06-22T17:45:24Z  gs://ip-public-bucket1/Objects-and-Particles/SNOW-CRYSTAL.mp3
+  18108662  2025-06-22T17:45:23Z  gs://ip-public-bucket1/Objects-and-Particles/V.mp3
+  16348982  2025-06-22T17:45:24Z  gs://ip-public-bucket1/Objects-and-Particles/X-Y-Z.mp3
+  23095862  2025-06-22T17:45:27Z  gs://ip-public-bucket1/Objects-and-Particles/r-D-T.mp3
+
+gs://ip-public-bucket1/Objects-and-Particles/WAV/:
+      6148  2025-06-22T21:50:53Z  gs://ip-public-bucket1/Objects-and-Particles/WAV/.DS_Store
+ 107966168  2025-06-23T17:40:15Z  gs://ip-public-bucket1/Objects-and-Particles/WAV/1.JADE-FLOWER-MEMORY-INDEX.wav
+ 155136206  2025-06-23T17:40:29Z  gs://ip-public-bucket1/Objects-and-Particles/WAV/2.r-D-T.wav
+  78960278  2025-06-22T21:51:22Z  gs://ip-public-bucket1/Objects-and-Particles/WAV/3.RAINTUNNELS.wav
+ 140986256  2025-06-23T17:40:42Z  gs://ip-public-bucket1/Objects-and-Particles/WAV/4.SNOW-CRYSTAL.wav
+ 106560044  2025-06-23T17:40:55Z  gs://ip-public-bucket1/Objects-and-Particles/WAV/5.X-Y-Z.wav
+ 119232044  2025-06-22T21:51:11Z  gs://ip-public-bucket1/Objects-and-Particles/WAV/6.V.wav
 
 gs://ip-public-bucket1/Outer-Corners/:
          0  2024-04-12T03:44:59Z  gs://ip-public-bucket1/Outer-Corners/
     320257  2024-04-13T16:57:59Z  gs://ip-public-bucket1/Outer-Corners/6_OUTER-CORNERS.png
-   5821568  2024-04-12T03:46:20Z  gs://ip-public-bucket1/Outer-Corners/DIMENSIONS.mp3
-  18186368  2024-04-12T03:47:18Z  gs://ip-public-bucket1/Outer-Corners/GALACTIC-COSMIC-RAYS.mp3
-  13996928  2024-04-12T03:46:22Z  gs://ip-public-bucket1/Outer-Corners/GALAXIES.mp3
-  11772608  2024-04-12T03:46:23Z  gs://ip-public-bucket1/Outer-Corners/NEBULAE.mp3
-  13613888  2024-04-12T03:46:25Z  gs://ip-public-bucket1/Outer-Corners/QUANTUM.mp3
-  15348608  2024-04-12T03:46:26Z  gs://ip-public-bucket1/Outer-Corners/STARS.mp3
-  13537088  2024-04-12T03:46:26Z  gs://ip-public-bucket1/Outer-Corners/STELLAR.mp3
+   6463501  2025-06-22T20:02:11Z  gs://ip-public-bucket1/Outer-Corners/DIMENSIONS.mp3
+  18828301  2025-06-22T20:12:05Z  gs://ip-public-bucket1/Outer-Corners/GALACTIC-COSMIC-RAYS.mp3
+  14638861  2025-06-22T20:02:11Z  gs://ip-public-bucket1/Outer-Corners/GALAXIES.mp3
+    348828  2025-06-25T22:50:25Z  gs://ip-public-bucket1/Outer-Corners/LINER NOTES_OBJECTS-AND-PARTICLES-2025.pdf
+  12414541  2025-06-22T20:02:09Z  gs://ip-public-bucket1/Outer-Corners/NEBULAE.mp3
+    640845  2025-06-22T20:02:06Z  gs://ip-public-bucket1/Outer-Corners/OUTER-CORNERS-cover-3000MED.png
+   1664465  2025-06-22T20:02:06Z  gs://ip-public-bucket1/Outer-Corners/OUTER-CORNERS-cover-6000LG.png
+     74095  2025-06-22T20:02:06Z  gs://ip-public-bucket1/Outer-Corners/OUTER-CORNERS-cover.png
+    666745  2025-06-22T20:02:06Z  gs://ip-public-bucket1/Outer-Corners/OUTER-CORNERS-coverSM.jpg
+  14255821  2025-06-22T20:02:09Z  gs://ip-public-bucket1/Outer-Corners/QUANTUM.mp3
+  15990541  2025-06-22T20:02:09Z  gs://ip-public-bucket1/Outer-Corners/STARS.mp3
+  14179021  2025-06-22T20:02:07Z  gs://ip-public-bucket1/Outer-Corners/STELLAR.mp3
+
+gs://ip-public-bucket1/Outer-Corners/WAV/:
+ 111080106  2025-06-22T22:57:58Z  gs://ip-public-bucket1/Outer-Corners/WAV/1.STARS.wav
+ 101296530  2025-06-22T22:57:52Z  gs://ip-public-bucket1/Outer-Corners/WAV/2.GALAXIES.wav
+  42117286  2025-06-22T22:57:44Z  gs://ip-public-bucket1/Outer-Corners/WAV/3.DIMENSIONS.wav
+  85196746  2025-06-22T22:58:09Z  gs://ip-public-bucket1/Outer-Corners/WAV/4.NEBULAE.wav
+ 131621278  2025-06-23T17:46:21Z  gs://ip-public-bucket1/Outer-Corners/WAV/5.GALACTIC-COSMIC-RAYS.wav
+  98521030  2025-06-22T22:58:09Z  gs://ip-public-bucket1/Outer-Corners/WAV/6.QUANTUM.wav
+  97967506  2025-06-22T22:58:06Z  gs://ip-public-bucket1/Outer-Corners/WAV/7.STELLAR.wav
 
 gs://ip-public-bucket1/Poem-For-A-Homeworld/:
          0  2024-04-12T15:48:15Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/
    2614370  2024-04-13T17:20:52Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/18_POEM-HOMEWORLD.png
-  12160320  2024-04-12T15:48:54Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Biospheres.mp3
-   9280320  2024-04-12T15:51:34Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Bouquet-against-the-Blackness-of-Space.mp3
-  12320640  2024-04-12T15:50:45Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Code-for-Robots.mp3
-  13939200  2024-04-12T15:48:57Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Cryostasis.mp3
-  12720000  2024-04-12T15:48:58Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Epilogues.mp3
-  11480640  2024-04-12T15:54:45Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Event-Horizon-of-the-Self.mp3
-  17160000  2024-04-12T15:52:25Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Heirlooms-of-1999.mp3
-  15040320  2024-04-12T15:49:58Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Journey-home-to-Base-One.mp3
-  22800000  2024-04-12T15:53:13Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Lone-Galaxies.mp3
-  16055040  2024-04-12T15:49:33Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Ocean-Holiday-Simulation.mp3
-  23080320  2024-04-12T15:51:57Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Poem-for-a-Homeworld.mp3
-  14483520  2024-04-12T15:54:18Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Sailboat-to-the-Sun.mp3
-  12527040  2024-04-12T15:50:24Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Solarium-at-Base-Two.mp3
-  11577600  2024-04-12T15:53:46Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Stars-of-Origin.mp3
-  18560640  2024-04-12T15:52:47Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/The-Colours-of-Beyond.mp3
+  12902425  2025-06-25T04:26:29Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Biospheres.mp3
+  10022425  2025-06-25T04:26:28Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Bouquet-against-the-Blackness-of-Space.mp3
+  13062745  2025-06-25T04:26:27Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Code-for-Robots.mp3
+  14681305  2025-06-25T04:26:24Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Cryostasis.mp3
+  13462105  2025-06-25T04:26:23Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Epilogues.mp3
+  12222745  2025-06-25T04:26:21Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Event-Horizon-of-the-Self.mp3
+  17902105  2025-06-25T04:26:18Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Heirlooms-of-1999.mp3
+  15782425  2025-06-25T04:26:16Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Journey-home-to-Base-One.mp3
+    233828  2025-06-25T23:13:40Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/LINER NOTES_POEM-FOR-A-HOMEWORLD-2025.pdf
+  23542105  2025-06-25T04:26:17Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Lone-Galaxies.mp3
+  16797145  2025-06-25T04:26:08Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Ocean-Holiday-Simulation.mp3
+   2342911  2025-06-25T04:26:29Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/POEM FOR A HOMEWORLD-cover-1500.png
+   7308296  2025-06-25T04:26:31Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/POEM FOR A HOMEWORLD-cover-3000.png
+   7308296  2025-06-25T04:26:31Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/POEM FOR A HOMEWORLD-cover-6000.png
+    740886  2025-06-25T04:26:28Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/POEM FOR A HOMEWORLD-cover-750.png
+  23822425  2025-06-25T04:26:10Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Poem-for-a-Homeworld.mp3
+  15225625  2025-06-25T04:26:06Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Sailboat-to-the-Sun.mp3
+  13269145  2025-06-25T04:25:59Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Solarium-at-Base-Two.mp3
+  12319705  2025-06-25T04:25:59Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/Stars-of-Origin.mp3
+  19302745  2025-06-25T04:26:00Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/The-Colours-of-Beyond.mp3
+
+gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/:
+ 115596344  2025-06-25T04:20:56Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/1.Ocean-Holiday-Simulation.wav
+ 164160236  2025-06-25T04:18:06Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/10.Lone Galaxies.wav
+  83355872  2025-06-25T04:19:31Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/11.Stars-of-Origin .wav
+ 100362284  2025-06-25T04:17:32Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/12.Cryostasis.wav
+ 104278250  2025-06-25T04:20:26Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/13.Sailboat-to-the-Sun.wav
+  82656044  2025-06-25T04:20:24Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/14.Event-Horizon-oft-the-Self.wav
+  91584050  2025-06-25T04:19:37Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/15.Epilogues .wav
+ 108288044  2025-06-25T04:18:55Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/2.Journey-home-to-Base-One.wav
+  90190136  2025-06-25T04:19:45Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/3.Solarium-at-Base-Two.wav
+  88704044  2025-06-25T04:18:52Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/4.Code-for-Robots.wav
+  66816044  2025-06-25T04:20:47Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/5.Bouquet-against-the-Blackness-of-Space.wav
+ 166176044  2025-06-25T04:18:06Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/6.Poem-for-a-Homeworld.wav
+ 123552044  2025-06-25T04:19:03Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/7.Heirlooms-of-1999.wav
+ 133632044  2025-06-25T04:20:32Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/8.The-Colours-of-Beyond.wav
+  87551972  2025-06-25T04:18:10Z  gs://ip-public-bucket1/Poem-For-A-Homeworld/WAV/9.Biospheres.wav
 
 gs://ip-public-bucket1/Postcards-From-Old-Sounds/:
          0  2024-04-12T15:39:27Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/
    2811438  2024-04-13T17:18:46Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/16_POSTACARDS-OLD-SOUNDS.png
-  23040000  2024-04-12T15:40:32Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/CELESTIAL-DRUM.mp3
-  25950720  2024-04-12T15:40:48Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/CRYSTAL-HEART.mp3
-  11832000  2024-04-12T15:41:29Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/OLD-MACHINES.mp3
-  27136320  2024-04-12T15:40:03Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/POLARITY.mp3
-  31440000  2024-04-12T15:42:00Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/POSTCARDS-FROM-OLD-SOUNDS.mp3
+  23624976  2025-06-24T23:17:13Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/CELESTIAL-DRUM.mp3
+  26535696  2025-06-24T23:17:12Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/CRYSTAL-HEART.mp3
+    114129  2025-06-25T23:11:44Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/LINER NOTES_POSTCARDS-FROM-OLD-SOUNDS-2025.pdf
+  12416976  2025-06-24T23:17:01Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/OLD-MACHINES.mp3
+  27721296  2025-06-24T23:17:06Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/POLARITY.mp3
+   2474171  2025-06-24T23:16:53Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/POSTACARDS FROM OLD SOUNDS-cover-1500.png
+   9191147  2025-06-24T23:16:55Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/POSTACARDS FROM OLD SOUNDS-cover-3000.png
+    583751  2025-06-24T23:16:52Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/POSTACARDS FROM OLD SOUNDS-cover-750.png
+  32024976  2025-06-24T23:17:07Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/POSTCARDS-FROM-OLD-SOUNDS.mp3
+
+gs://ip-public-bucket1/Postcards-From-Old-Sounds/WAV/:
+ 195379244  2025-06-24T23:19:36Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/WAV/1.POLARITY.wav
+ 165888044  2025-06-24T23:19:47Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/WAV/2.CELESTIAL-DRUM.wav
+ 186840536  2025-06-24T23:18:58Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/WAV/3.CRYSTAL-HEART.wav
+  85189976  2025-06-24T23:18:14Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/WAV/4.OLD-MACHINES.wav
+ 226368044  2025-06-24T23:19:20Z  gs://ip-public-bucket1/Postcards-From-Old-Sounds/WAV/5.POSTCARDS-FROM-OLD-SOUNDS.wav
 
 gs://ip-public-bucket1/Prefabrication/:
          0  2024-04-12T05:08:44Z  gs://ip-public-bucket1/Prefabrication/
    3754585  2024-04-13T17:15:19Z  gs://ip-public-bucket1/Prefabrication/12_PREFABRICATION.png
-   8080320  2024-04-12T14:49:06Z  gs://ip-public-bucket1/Prefabrication/A-NOBLE-PLAN-FOR-A-GOOD-IDEA.mp3
-  15360000  2024-04-12T05:10:54Z  gs://ip-public-bucket1/Prefabrication/CONSTRUCT.mp3
-  19760640  2024-04-12T05:10:55Z  gs://ip-public-bucket1/Prefabrication/EUCLID.mp3
-  18720000  2024-04-12T05:10:57Z  gs://ip-public-bucket1/Prefabrication/FORMULATIONS.mp3
-  19200000  2024-04-12T14:48:00Z  gs://ip-public-bucket1/Prefabrication/OPEN-CONCEPT.mp3
-  15000000  2024-04-12T05:11:00Z  gs://ip-public-bucket1/Prefabrication/PREFABRICATION.mp3
-  18785280  2024-04-12T05:11:03Z  gs://ip-public-bucket1/Prefabrication/QUADRANGLE.mp3
-   9760320  2024-04-12T05:11:03Z  gs://ip-public-bucket1/Prefabrication/SCHEMATIC.mp3
-  14361600  2024-04-12T05:11:04Z  gs://ip-public-bucket1/Prefabrication/SEQUENCES.mp3
-  21547200  2024-04-12T14:48:20Z  gs://ip-public-bucket1/Prefabrication/THREE-OVER-ONE.mp3
+   9213294  2025-06-24T01:55:27Z  gs://ip-public-bucket1/Prefabrication/A-NOBLE-PLAN-FOR-A-GOOD-IDEA.mp3
+  16492974  2025-06-24T01:55:26Z  gs://ip-public-bucket1/Prefabrication/CONSTRUCT.mp3
+  20893614  2025-06-24T01:55:25Z  gs://ip-public-bucket1/Prefabrication/EUCLID.mp3
+  19852974  2025-06-24T01:55:25Z  gs://ip-public-bucket1/Prefabrication/FORMULATIONS.mp3
+   1475266  2025-06-25T23:03:57Z  gs://ip-public-bucket1/Prefabrication/LINER NOTES_AMBIENT-GARDEN-ONE-2025.pdf
+  20332974  2025-06-24T01:55:18Z  gs://ip-public-bucket1/Prefabrication/OPEN-CONCEPT.mp3
+   1828375  2025-06-24T01:57:01Z  gs://ip-public-bucket1/Prefabrication/PREFABRICATION-cover25-1000.png
+  11347811  2025-06-24T01:57:03Z  gs://ip-public-bucket1/Prefabrication/PREFABRICATION-cover25-3000.png
+   1131759  2025-06-24T01:57:01Z  gs://ip-public-bucket1/Prefabrication/PREFABRICATION-cover25-750.png
+  16132974  2025-06-24T01:55:14Z  gs://ip-public-bucket1/Prefabrication/PREFABRICATION.mp3
+  19918254  2025-06-24T01:55:15Z  gs://ip-public-bucket1/Prefabrication/QUADRANGLE.mp3
+  10893294  2025-06-24T01:55:05Z  gs://ip-public-bucket1/Prefabrication/SCHEMATIC.mp3
+  15494574  2025-06-24T01:55:06Z  gs://ip-public-bucket1/Prefabrication/SEQUENCES.mp3
+  22680174  2025-06-24T01:55:10Z  gs://ip-public-bucket1/Prefabrication/THREE-OVER-ONE.mp3
+
+gs://ip-public-bucket1/Prefabrication/WAV/:
+ 108000044  2025-06-24T01:58:04Z  gs://ip-public-bucket1/Prefabrication/WAV/1.PREFABRICATION.wav
+ 134784056  2025-06-24T01:58:59Z  gs://ip-public-bucket1/Prefabrication/WAV/10.FORMULATIONS.wav
+ 110592044  2025-06-24T01:59:59Z  gs://ip-public-bucket1/Prefabrication/WAV/2.CONSTRUCT.wav
+ 142272044  2025-06-24T02:00:19Z  gs://ip-public-bucket1/Prefabrication/WAV/3.EUCLID.wav
+ 135251294  2025-06-24T01:59:16Z  gs://ip-public-bucket1/Prefabrication/WAV/4.QUADRANGLE.wav
+ 138240044  2025-06-24T02:00:06Z  gs://ip-public-bucket1/Prefabrication/WAV/5.OPEN-CONCEPT.wav
+ 155139236  2025-06-24T01:59:05Z  gs://ip-public-bucket1/Prefabrication/WAV/6.THREE-OVER-ONE.wav
+  70272044  2025-06-24T01:57:47Z  gs://ip-public-bucket1/Prefabrication/WAV/7.SCHEMATIC.wav
+ 103402508  2025-06-24T02:00:28Z  gs://ip-public-bucket1/Prefabrication/WAV/8.SEQUENCES.wav
+  58176044  2025-06-24T01:57:42Z  gs://ip-public-bucket1/Prefabrication/WAV/9.A-NOBLE-PLAN-FOR-A-GOOD IDEA.wav
 
 gs://ip-public-bucket1/RESOURCES/:
          0  2025-03-27T01:49:47Z  gs://ip-public-bucket1/RESOURCES/
@@ -248,77 +539,165 @@ gs://ip-public-bucket1/RESOURCES/EPK/:
 gs://ip-public-bucket1/Rhombus/:
          0  2024-04-12T15:56:29Z  gs://ip-public-bucket1/Rhombus/
    5491804  2024-04-13T17:21:30Z  gs://ip-public-bucket1/Rhombus/19_RHOMBUS.png
-  18560640  2024-04-12T15:58:07Z  gs://ip-public-bucket1/Rhombus/A-Beautiful-Design.mp3
-  12960000  2024-04-12T15:59:02Z  gs://ip-public-bucket1/Rhombus/A-Letter-to-Rhombus-from-a-Square.mp3
-  12063360  2024-04-12T16:03:48Z  gs://ip-public-bucket1/Rhombus/A-Window-is-a-Friend-of-Rain.mp3
-  17015040  2024-04-12T16:05:20Z  gs://ip-public-bucket1/Rhombus/Art-District.mp3
-   9440640  2024-04-12T16:03:16Z  gs://ip-public-bucket1/Rhombus/Of-Conte-and-Shade.mp3
-  13386240  2024-04-12T15:57:00Z  gs://ip-public-bucket1/Rhombus/Origami.mp3
-  16769280  2024-04-12T15:57:03Z  gs://ip-public-bucket1/Rhombus/Penumbra.mp3
-   9680640  2024-04-12T16:04:18Z  gs://ip-public-bucket1/Rhombus/Sunrise-In-Primary-Colors.mp3
-  14880000  2024-04-12T15:58:30Z  gs://ip-public-bucket1/Rhombus/The-Conduit.mp3
-  19421760  2024-04-12T16:04:55Z  gs://ip-public-bucket1/Rhombus/Tree-of-Thought.mp3
+  19955129  2025-06-25T18:37:37Z  gs://ip-public-bucket1/Rhombus/A-Beautiful-Design.mp3
+  14354489  2025-06-25T18:37:30Z  gs://ip-public-bucket1/Rhombus/A-Letter-to-Rhombus-from-a-Square.mp3
+  13457849  2025-06-25T18:37:29Z  gs://ip-public-bucket1/Rhombus/A-Window-is-a-Friend-of-Rain.mp3
+  18409529  2025-06-25T18:37:29Z  gs://ip-public-bucket1/Rhombus/Art-District.mp3
+    859382  2025-06-26T00:18:18Z  gs://ip-public-bucket1/Rhombus/LINER NOTES_RHOMBUS-2025.pdf
+  10835129  2025-06-25T18:37:23Z  gs://ip-public-bucket1/Rhombus/Of-Conte-and-Shade.mp3
+  14780729  2025-06-25T18:37:23Z  gs://ip-public-bucket1/Rhombus/Origami.mp3
+  18163769  2025-06-25T18:37:21Z  gs://ip-public-bucket1/Rhombus/Penumbra.mp3
+   4866543  2025-06-25T18:37:32Z  gs://ip-public-bucket1/Rhombus/RHOMBUS-cover-1500.png
+   8073367  2025-06-25T18:37:34Z  gs://ip-public-bucket1/Rhombus/RHOMBUS-cover-2000.png
+  16299258  2025-06-25T18:37:38Z  gs://ip-public-bucket1/Rhombus/RHOMBUS-cover-3000.png
+   1393283  2025-06-25T18:37:30Z  gs://ip-public-bucket1/Rhombus/RHOMBUS-cover-750.png
+  11075129  2025-06-25T19:46:16Z  gs://ip-public-bucket1/Rhombus/Sunrise-In-Primary-Colors.mp3
+  16274489  2025-06-25T18:37:16Z  gs://ip-public-bucket1/Rhombus/The-Conduit.mp3
+  20816249  2025-06-25T18:37:18Z  gs://ip-public-bucket1/Rhombus/Tree-of-Thought.mp3
+
+gs://ip-public-bucket1/Rhombus/WAV/:
+  96376286  2025-06-25T17:43:23Z  gs://ip-public-bucket1/Rhombus/WAV/1.Origami.wav
+ 122509286  2025-06-25T17:43:36Z  gs://ip-public-bucket1/Rhombus/WAV/10.Art-District.wav
+ 133632044  2025-06-25T17:44:41Z  gs://ip-public-bucket1/Rhombus/WAV/2.A-Beautiful-Design.wav
+ 107136044  2025-06-25T17:45:14Z  gs://ip-public-bucket1/Rhombus/WAV/3.The-Conduit.wav
+  93312044  2025-06-25T17:44:21Z  gs://ip-public-bucket1/Rhombus/WAV/4.A-Letter-to-Rhombus-from-a-Square.wav
+  67968044  2025-06-25T17:43:56Z  gs://ip-public-bucket1/Rhombus/WAV/5.Of-Conte-and-Shade.wav
+  86851784  2025-06-25T17:44:39Z  gs://ip-public-bucket1/Rhombus/WAV/6.A-Window-is-a-Friend-of-Rain.wav
+  69696044  2025-06-25T17:45:14Z  gs://ip-public-bucket1/Rhombus/WAV/7.Sunrise-in-Primary-Colors.wav
+ 120738650  2025-06-25T17:43:35Z  gs://ip-public-bucket1/Rhombus/WAV/8.Penumbra.wav
+ 139835882  2025-06-25T17:45:27Z  gs://ip-public-bucket1/Rhombus/WAV/9.Tree-of-Thought.wav
 
 gs://ip-public-bucket1/Sakura/:
          0  2024-04-12T15:43:17Z  gs://ip-public-bucket1/Sakura/
     896489  2024-04-13T17:19:51Z  gs://ip-public-bucket1/Sakura/17_SAKURA.png
-  12640320  2024-04-12T15:45:21Z  gs://ip-public-bucket1/Sakura/5-Rings.mp3
-  13842240  2024-04-12T15:45:51Z  gs://ip-public-bucket1/Sakura/A-Dream-of-Rain-and-Blossoms.mp3
-  18760320  2024-04-12T15:44:37Z  gs://ip-public-bucket1/Sakura/Asa-no-Tori.mp3
-  11485440  2024-04-12T15:46:22Z  gs://ip-public-bucket1/Sakura/Hanzo-Blues.mp3
-  12596160  2024-04-12T15:43:47Z  gs://ip-public-bucket1/Sakura/Izakaya.mp3
-  18400320  2024-04-12T15:45:02Z  gs://ip-public-bucket1/Sakura/Night-Tunnel-to-Tokyo.mp3
-  19400640  2024-04-12T15:43:50Z  gs://ip-public-bucket1/Sakura/Yamanote.mp3
+  13372827  2025-06-25T00:02:28Z  gs://ip-public-bucket1/Sakura/5-Rings.mp3
+  14574747  2025-06-25T00:02:27Z  gs://ip-public-bucket1/Sakura/A-Dream-of-Rain-and-Blossoms.mp3
+  19492827  2025-06-25T00:02:28Z  gs://ip-public-bucket1/Sakura/Asa-no-tori.mp3
+  12217947  2025-06-25T00:02:23Z  gs://ip-public-bucket1/Sakura/Hanzo-Blues.mp3
+  13328667  2025-06-25T00:02:17Z  gs://ip-public-bucket1/Sakura/Izakaya.mp3
+    288479  2025-06-25T23:12:32Z  gs://ip-public-bucket1/Sakura/LINER NOTES_SAKURA-2025.pdf
+  19132827  2025-06-25T00:02:20Z  gs://ip-public-bucket1/Sakura/Night-Tunnel-to-Tokyo.mp3
+   1826267  2025-06-25T00:02:10Z  gs://ip-public-bucket1/Sakura/RS_SAKURA-COV-3000.png
+    731301  2025-06-25T00:02:10Z  gs://ip-public-bucket1/Sakura/SAKURA-cover-1500.png
+   4392523  2025-06-25T00:02:10Z  gs://ip-public-bucket1/Sakura/SAKURA-cover-6000.png
+  20133147  2025-06-25T00:02:19Z  gs://ip-public-bucket1/Sakura/Yamanote.mp3
+
+gs://ip-public-bucket1/Sakura/WAV/:
+ 135072044  2025-06-25T00:04:28Z  gs://ip-public-bucket1/Sakura/WAV/1.Asa no tori.wav
+ 132480044  2025-06-25T00:05:11Z  gs://ip-public-bucket1/Sakura/WAV/2.Night-Tunnel-to-Tokyo.wav
+  91008044  2025-06-25T00:04:08Z  gs://ip-public-bucket1/Sakura/WAV/3.5-Rings.wav
+  99665210  2025-06-25T00:04:10Z  gs://ip-public-bucket1/Sakura/WAV/4.A-Dream-of-Rain-and-Blossoms.wav
+  90688112  2025-06-25T00:05:11Z  gs://ip-public-bucket1/Sakura/WAV/5.Izakaya.wav
+  82694960  2025-06-25T00:05:25Z  gs://ip-public-bucket1/Sakura/WAV/6.Hanzo-Blues.wav
+ 139680044  2025-06-25T00:05:11Z  gs://ip-public-bucket1/Sakura/WAV/7.Yamanote.wav
 
 gs://ip-public-bucket1/UTOPIA/:
          0  2025-05-30T02:46:12Z  gs://ip-public-bucket1/UTOPIA/
-  14728320  2025-05-30T02:50:02Z  gs://ip-public-bucket1/UTOPIA/A-distant-Cloud-says-Hello.mp3
-  14880000  2025-05-30T02:50:05Z  gs://ip-public-bucket1/UTOPIA/Car-to-a-known-Place.mp3
-  18080640  2025-05-30T02:50:04Z  gs://ip-public-bucket1/UTOPIA/Garden-Light.mp3
-   9307200  2025-05-30T02:50:04Z  gs://ip-public-bucket1/UTOPIA/Lost-Postcard.mp3
-  12500160  2025-05-30T02:50:03Z  gs://ip-public-bucket1/UTOPIA/Mutual-Sunrise.mp3
-  10730880  2025-05-30T02:50:01Z  gs://ip-public-bucket1/UTOPIA/Photographs.mp3
-  12560640  2025-05-30T02:50:04Z  gs://ip-public-bucket1/UTOPIA/Train-of-Memory.mp3
+  15855026  2025-06-26T19:46:26Z  gs://ip-public-bucket1/UTOPIA/A-distant-Cloud-says-Hello.mp3
+  16006706  2025-06-26T19:46:30Z  gs://ip-public-bucket1/UTOPIA/Car-to-a-known-Place.mp3
+  19207346  2025-06-26T19:46:33Z  gs://ip-public-bucket1/UTOPIA/Garden-Light.mp3
+    669020  2025-06-26T19:57:04Z  gs://ip-public-bucket1/UTOPIA/LINER NOTES_UTOPIAN-2025.pdf
+  10433906  2025-06-26T19:46:31Z  gs://ip-public-bucket1/UTOPIA/Lost-Postcard.mp3
+  13626866  2025-06-26T19:46:36Z  gs://ip-public-bucket1/UTOPIA/Mutual-Sunrise.mp3
+  11857586  2025-06-26T19:46:37Z  gs://ip-public-bucket1/UTOPIA/Photographs.mp3
+  13687346  2025-06-26T19:46:39Z  gs://ip-public-bucket1/UTOPIA/Train-of-Memory.mp3
+   6303431  2025-06-26T19:46:22Z  gs://ip-public-bucket1/UTOPIA/UTOPIAN-cover-2000.png
+  13185863  2025-06-26T19:46:24Z  gs://ip-public-bucket1/UTOPIA/UTOPIAN-cover-3000.png
+   1125500  2025-06-26T19:46:19Z  gs://ip-public-bucket1/UTOPIA/UTOPIAN-cover-750.png
    6303431  2025-05-30T02:50:50Z  gs://ip-public-bucket1/UTOPIA/UTOPIAN-coverFINAL.png
-  18360000  2025-05-30T02:50:02Z  gs://ip-public-bucket1/UTOPIA/Utopian.mp3
+  19486706  2025-06-26T19:46:41Z  gs://ip-public-bucket1/UTOPIA/Utopian.mp3
+
+gs://ip-public-bucket1/UTOPIA/WAV/:
+  67010054  2025-06-26T19:59:21Z  gs://ip-public-bucket1/UTOPIA/WAV/1.Lost-Postcard.wav
+ 107136044  2025-06-26T19:59:06Z  gs://ip-public-bucket1/UTOPIA/WAV/2.Car-to-a-known-Place.wav
+  90432044  2025-06-26T19:58:36Z  gs://ip-public-bucket1/UTOPIA/WAV/3.Train-of-Memory.wav
+ 130176044  2025-06-26T19:58:16Z  gs://ip-public-bucket1/UTOPIA/WAV/4.Garden-Light.wav
+  90001178  2025-06-26T19:59:14Z  gs://ip-public-bucket1/UTOPIA/WAV/5.Mutual-Sunrise.wav
+ 106042148  2025-06-26T19:58:08Z  gs://ip-public-bucket1/UTOPIA/WAV/6.A-distant-cloud-says-Hello.wav
+  77257772  2025-06-26T19:57:53Z  gs://ip-public-bucket1/UTOPIA/WAV/7.Photographs.wav
+ 132192044  2025-06-26T19:59:08Z  gs://ip-public-bucket1/UTOPIA/WAV/8.Utopian.wav
 
 gs://ip-public-bucket1/Vagary/:
          0  2024-04-12T14:50:23Z  gs://ip-public-bucket1/Vagary/
    1082626  2024-04-13T17:16:24Z  gs://ip-public-bucket1/Vagary/13_VAGARY.png
-  21840000  2024-04-12T15:08:48Z  gs://ip-public-bucket1/Vagary/I-When-the-Observer-becomes-the-Observed.mp3
-  15702720  2024-04-12T15:09:34Z  gs://ip-public-bucket1/Vagary/II-We-all-look-inward-to-the-Multiverse.mp3
-  17536320  2024-04-12T15:10:17Z  gs://ip-public-bucket1/Vagary/III-Axons-to-the-Void.mp3
-  21950400  2024-04-12T15:11:15Z  gs://ip-public-bucket1/Vagary/IV-The-Embrace-of-Mountains-and-the-Skies.mp3
-  29882880  2024-04-12T15:11:45Z  gs://ip-public-bucket1/Vagary/V-Crucibles.mp3
-  32868480  2024-04-12T18:36:20Z  gs://ip-public-bucket1/Vagary/VI-What-lies-beyond-That-which-you-Think-You-Understand.mp3
-  11042880  2024-04-12T15:14:19Z  gs://ip-public-bucket1/Vagary/VII-Pathologies.mp3
-  39892800  2024-04-12T15:14:51Z  gs://ip-public-bucket1/Vagary/VIII-The-Crescent-of-Ascension.mp3
+  22357089  2025-06-24T05:16:06Z  gs://ip-public-bucket1/Vagary/I-When-the-Observer-becomes-the-Observed.mp3
+  16219809  2025-06-24T05:16:02Z  gs://ip-public-bucket1/Vagary/II-We-all-look-inward-to-the-Multiverse.mp3
+  18053409  2025-06-24T05:16:03Z  gs://ip-public-bucket1/Vagary/III-Axons-to-the-Void.mp3
+  22467489  2025-06-24T05:16:00Z  gs://ip-public-bucket1/Vagary/IV-The-Embrace-of-Mountains-and-the-Skies.mp3
+     99689  2025-06-25T23:06:15Z  gs://ip-public-bucket1/Vagary/LINER NOTES_VAGARY-2025.pdf
+  30399969  2025-06-24T05:15:54Z  gs://ip-public-bucket1/Vagary/V-Crucibles.mp3
+    515883  2025-06-24T05:16:04Z  gs://ip-public-bucket1/Vagary/VAGARY-COVER-1000.png
+   2524840  2025-06-24T05:16:04Z  gs://ip-public-bucket1/Vagary/VAGARY-cover-3000.png
+  33385569  2025-06-24T05:15:51Z  gs://ip-public-bucket1/Vagary/VI-What-lies-beyond-That-which-you-Think-You-Understand.mp3
+  11559969  2025-06-24T05:15:40Z  gs://ip-public-bucket1/Vagary/VII-Pathologies.mp3
+  40409889  2025-06-24T05:15:54Z  gs://ip-public-bucket1/Vagary/VIII-The-Crescent-of-Ascension.mp3
+
+gs://ip-public-bucket1/Vagary/WAV/:
+ 157248044  2025-06-24T05:07:12Z  gs://ip-public-bucket1/Vagary/WAV/1.I-When-the-Observer-becomes-the-observed.wav
+ 113054282  2025-06-24T05:06:38Z  gs://ip-public-bucket1/Vagary/WAV/2.II-We-all-look-inward-to-the-Multiverse.wav
+ 126261812  2025-06-24T05:05:43Z  gs://ip-public-bucket1/Vagary/WAV/3.III-Axons-to-the-Void.wav
+ 158039552  2025-06-24T05:05:18Z  gs://ip-public-bucket1/Vagary/WAV/4.IV-The-embrace-of-Mountains-and-the-Skies.wav
+ 215152022  2025-06-24T05:07:47Z  gs://ip-public-bucket1/Vagary/WAV/5.V-Crucibles.wav
+ 236653436  2025-06-24T05:05:55Z  gs://ip-public-bucket1/Vagary/WAV/6.VI-What-lies-beyond-That-which-you-Think-You-Understand?.wav
+  79510082  2025-06-24T05:04:40Z  gs://ip-public-bucket1/Vagary/WAV/7.VII-Pathologies.wav
+ 287228054  2025-06-24T05:07:31Z  gs://ip-public-bucket1/Vagary/WAV/8.VIII-The-Crescent-of-Ascension.wav
 
 gs://ip-public-bucket1/Vignettes-of-Clouds/:
          0  2024-08-05T16:15:04Z  gs://ip-public-bucket1/Vignettes-of-Clouds/
    2177654  2024-08-05T18:15:36Z  gs://ip-public-bucket1/Vignettes-of-Clouds/20_Vignettes-of-Clouds.png
-  14080320  2024-08-05T17:54:58Z  gs://ip-public-bucket1/Vignettes-of-Clouds/A-Clouds-Poem-to-the-Rain-below.mp3
-   6720000  2024-08-05T17:55:34Z  gs://ip-public-bucket1/Vignettes-of-Clouds/A-Clouds-visit-to-the-Artist.mp3
-   9040320  2024-08-05T17:56:02Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Cloud-Light-above-the-Sea.mp3
-  21760320  2024-08-05T17:18:25Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Clouds-I.mp3
-  10983360  2024-08-05T17:56:18Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Clouds-II.mp3
-  18121920  2024-08-05T18:05:49Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Clouds-and-the-City.mp3
-   8723520  2024-08-05T16:20:30Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Cumulus.mp3
-  13632960  2024-08-05T16:20:32Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Formations.mp3
-  13440000  2024-08-05T16:20:33Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Fractus.mp3
-  18560640  2024-08-05T16:20:35Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Messages.mp3
-  14578560  2024-08-05T18:04:23Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Morning-Clouds.mp3
-   6751680  2024-08-05T17:56:51Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Mountain-Tops-amongst-the-White.mp3
-       828  2024-08-05T16:20:01Z  gs://ip-public-bucket1/Vignettes-of-Clouds/VIGNETTES OF CLOUDS_track listing.rtf
+  14764499  2025-06-25T23:59:02Z  gs://ip-public-bucket1/Vignettes-of-Clouds/A-Clouds-Poem-to-the-Rain-below.mp3
+   7404179  2025-06-25T23:58:59Z  gs://ip-public-bucket1/Vignettes-of-Clouds/A-Clouds-visit-to-the-Artist.mp3
+   9724499  2025-06-25T23:59:00Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Cloud-Light-above-the-Sea.mp3
+  22444499  2025-06-25T23:59:10Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Clouds-I.mp3
+  11667539  2025-06-25T23:59:08Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Clouds-II.mp3
+  18806099  2025-06-25T23:59:07Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Clouds-and-the-City.mp3
+   9407699  2025-06-25T23:59:12Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Cumulus.mp3
+  14317139  2025-06-25T23:59:15Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Formations.mp3
+  14124179  2025-06-25T23:59:17Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Fractus.mp3
+   9177108  2025-06-26T02:00:54Z  gs://ip-public-bucket1/Vignettes-of-Clouds/LINER NOTES_VIGNETTES-OF-CLOUDS-2025.pdf
+  19244819  2025-06-25T23:59:21Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Messages.mp3
+  15262739  2025-06-25T23:59:21Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Morning-Clouds.mp3
+   7435859  2025-06-25T23:59:21Z  gs://ip-public-bucket1/Vignettes-of-Clouds/Mountain-Tops-amongst-the-White.mp3
+   2003642  2025-06-25T23:59:22Z  gs://ip-public-bucket1/Vignettes-of-Clouds/VIGNETTES-OF-CLOUDS-cover-1500.png
+   5283795  2025-06-25T23:59:23Z  gs://ip-public-bucket1/Vignettes-of-Clouds/VIGNETTES-OF-CLOUDS-cover-3000.png
+    682961  2025-06-25T23:59:21Z  gs://ip-public-bucket1/Vignettes-of-Clouds/VIGNETTES-OF-CLOUDS-cover-750.png
+
+gs://ip-public-bucket1/Vignettes-of-Clouds/WAV/:
+      6148  2025-06-26T00:08:40Z  gs://ip-public-bucket1/Vignettes-of-Clouds/WAV/.DS_Store
+ 156672044  2025-06-26T00:10:02Z  gs://ip-public-bucket1/Vignettes-of-Clouds/WAV/1.Clouds-I.wav
+ 130478114  2025-06-26T00:10:36Z  gs://ip-public-bucket1/Vignettes-of-Clouds/WAV/10.Clouds-and-the-City.wav
+  98153858  2025-06-26T00:08:37Z  gs://ip-public-bucket1/Vignettes-of-Clouds/WAV/11.Formations.wav
+  79075430  2025-06-26T00:08:50Z  gs://ip-public-bucket1/Vignettes-of-Clouds/WAV/12.Clouds-II.wav
+ 133632158  2025-06-26T00:09:37Z  gs://ip-public-bucket1/Vignettes-of-Clouds/WAV/2.Messages.wav
+  62810570  2025-06-26T00:09:32Z  gs://ip-public-bucket1/Vignettes-of-Clouds/WAV/3.Cumulus.wav
+  96768044  2025-06-26T00:10:16Z  gs://ip-public-bucket1/Vignettes-of-Clouds/WAV/4.Fractus.wav
+ 101376116  2025-06-26T00:10:44Z  gs://ip-public-bucket1/Vignettes-of-Clouds/WAV/5.A-Clouds-Poem-to-the-Rain-below.wav
+  65088044  2025-06-26T00:10:43Z  gs://ip-public-bucket1/Vignettes-of-Clouds/WAV/6.Cloud-Light-above-the-Sea.wav
+ 104964578  2025-06-26T00:08:39Z  gs://ip-public-bucket1/Vignettes-of-Clouds/WAV/7.Morning-Clouds.wav
+  48609602  2025-06-26T00:09:03Z  gs://ip-public-bucket1/Vignettes-of-Clouds/WAV/9.Mountain-Tops-amongst-the-White.wav
+  48384044  2025-06-26T00:08:13Z  gs://ip-public-bucket1/Vignettes-of-Clouds/WAV/A-Clouds-visit-to-the-Artist.wav
 
 gs://ip-public-bucket1/Watercolours-for-Friends/:
          0  2024-04-12T15:34:20Z  gs://ip-public-bucket1/Watercolours-for-Friends/
    3141359  2024-04-13T17:18:03Z  gs://ip-public-bucket1/Watercolours-for-Friends/15_WATERCOLOURS.png
-  15227520  2024-04-12T15:36:46Z  gs://ip-public-bucket1/Watercolours-for-Friends/ARTWORK-OF-CHILDREN.mp3
-  13600320  2024-04-12T15:36:01Z  gs://ip-public-bucket1/Watercolours-for-Friends/ASTRAL-CONVERSION.mp3
-  25120320  2024-04-12T15:35:13Z  gs://ip-public-bucket1/Watercolours-for-Friends/BREAKFASTS.mp3
-  13220160  2024-04-12T15:36:21Z  gs://ip-public-bucket1/Watercolours-for-Friends/CLOUDS-FOR-TWO.mp3
-  21920640  2024-04-12T15:38:18Z  gs://ip-public-bucket1/Watercolours-for-Friends/MEMORIES-OF-FORGOTTEN-PLACES.mp3
-  18840000  2024-04-12T15:37:37Z  gs://ip-public-bucket1/Watercolours-for-Friends/ROBOTS-DREAM.mp3
-  14247360  2024-04-12T15:37:54Z  gs://ip-public-bucket1/Watercolours-for-Friends/SPATIAL-RECOGNITION.mp3
-TOTAL: 272 objects, 3392731511 bytes (3.16 GiB)
+  16005875  2025-06-24T19:44:41Z  gs://ip-public-bucket1/Watercolours-for-Friends/ARTWORK-OF-CHILDREN.mp3
+  14378675  2025-06-24T19:44:40Z  gs://ip-public-bucket1/Watercolours-for-Friends/ASTRAL-CONVERSION.mp3
+  25898675  2025-06-24T19:44:41Z  gs://ip-public-bucket1/Watercolours-for-Friends/BREAKFASTS.mp3
+  13998515  2025-06-24T19:44:34Z  gs://ip-public-bucket1/Watercolours-for-Friends/CLOUDS-FOR-TWO.mp3
+    711972  2025-06-25T23:11:19Z  gs://ip-public-bucket1/Watercolours-for-Friends/LINER NOTES_WATERCOLOURS-FOR-FRIENDS-2025.pdf
+  22698995  2025-06-24T19:44:33Z  gs://ip-public-bucket1/Watercolours-for-Friends/MEMORIES-OF-FORGOTTEN-PLACES.mp3
+  19618355  2025-06-24T19:44:30Z  gs://ip-public-bucket1/Watercolours-for-Friends/ROBOTS-DREAM.mp3
+  15025715  2025-06-24T19:44:28Z  gs://ip-public-bucket1/Watercolours-for-Friends/SPATIAL-RECOGNITION.mp3
+   2788164  2025-06-24T19:44:21Z  gs://ip-public-bucket1/Watercolours-for-Friends/WATERCOLOURS-FOR-FRIENDS-cover-1500.png
+   9517309  2025-06-24T19:44:23Z  gs://ip-public-bucket1/Watercolours-for-Friends/WATERCOLOURS-FOR-FRIENDS-cover-3000.png
+    777132  2025-06-24T19:44:20Z  gs://ip-public-bucket1/Watercolours-for-Friends/WATERCOLOURS-FOR-FRIENDS-cover-750.png
+
+gs://ip-public-bucket1/Watercolours-for-Friends/WAV/:
+ 180864044  2025-06-24T19:42:04Z  gs://ip-public-bucket1/Watercolours-for-Friends/WAV/1.BREAKFASTS.wav
+  97920044  2025-06-24T19:42:46Z  gs://ip-public-bucket1/Watercolours-for-Friends/WAV/2.ASTRAL-CONVERSION.wav
+  95182952  2025-06-24T19:41:25Z  gs://ip-public-bucket1/Watercolours-for-Friends/WAV/3.CLOUDS-FOR-TWO.wav
+ 109634450  2025-06-24T19:41:28Z  gs://ip-public-bucket1/Watercolours-for-Friends/WAV/4.ARTWORK-OF-CHILDREN.wav
+ 135648044  2025-06-24T19:42:55Z  gs://ip-public-bucket1/Watercolours-for-Friends/WAV/5.ROBOTS-DREAM.wav
+ 102581804  2025-06-24T19:42:12Z  gs://ip-public-bucket1/Watercolours-for-Friends/WAV/7.SPATIAL-RECOGNITION.wav
+ 157824044  2025-06-24T19:42:40Z  gs://ip-public-bucket1/Watercolours-for-Friends/WAV/8.MEMORIES-OF-FORGOTTEN-PLACES.wav
+TOTAL: 601 objects, 29093218012 bytes (27.1 GiB)

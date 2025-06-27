@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/additional-styles.css">
+    <link rel="stylesheet" href="/css/downloads.css">
+</head>
+<body>
+    <%- include('partials/header', { user: user }) %>
+
+    <div class="album-download-container">
+        <div class="album-header">
+            <div>
+                <% if (song.cover_url) { %>
+                    <img src="<%= song.cover_url %>" alt="<%= song.album_name %>" class="album-cover">
+                <% } else { %>
+                    <div class="album-cover" style="background: rgba(24, 69, 81, 0.3); display: flex; align-items: center; justify-content: center; color: #8ab7ce; font-size: 3rem;">
+                        🎵
+                    </div>
+                <% } %>
+            </div>
+            
+            <div class="album-info">
+                <h1><%= song.song_name %></h1>
+                <div class="artist"><%= song.artist_name %></div>
+                <p style="color: #8ab7ce; margin-top: 0.5rem;">from "<%= song.album_name %>"</p>
+                
+                <div class="album-details">
+                    <% if (song.duration) { %>
+                        <div class="detail-item">
+                            <div class="detail-label">Duration</div>
+                            <div class="detail-value"><%= song.duration %></div>
+                        </div>
+                    <% } %>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">Track #</div>
+                        <div class="detail-value"><%= song.track_id %></div>
+                    </div>
+                    
+                    <% if (song.album_catalogue) { %>
+                        <div class="detail-item">
+                            <div class="detail-label">Album</div>
+                            <div class="detail-value"><%= song.album_catalogue %></div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <div class="download-options">
+            <h2>Download Options</h2>
+            
+            <div class="format-grid">
+                <div class="format-option">
+                    <div class="format-icon">🎵</div>
+                    <div class="format-name">MP3 Download</div>
+                    <div class="format-description">High-quality MP3 file, ready for any device</div>
+                    <div class="format-size">~5-8MB estimated</div>
+                    <a href="/downloads/file/song/<%= song.song_id %>/mp3/<%= downloadTokens.mp3 %>" 
+                       class="download-btn">Download MP3</a>
+                </div>
+
+                <div class="format-option">
+                    <div class="format-icon">🎶</div>
+                    <div class="format-name">WAV Download</div>
+                    <div class="format-description">Lossless audio file for audiophiles</div>
+                    <div class="format-size">~25-40MB estimated</div>
+                    <a href="/downloads/file/song/<%= song.song_id %>/wav/<%= downloadTokens.wav %>" 
+                       class="download-btn">Download WAV</a>
+                </div>
+            </div>
+
+            <div class="download-info">
+                <h3>Download Information</h3>
+                <ul>
+                    <li>Downloads are available for 24 hours after purchase</li>
+                    <li>MP3 files are 320kbps quality</li>
+                    <li>WAV files are CD-quality lossless</li>
+                    <li>Files include embedded metadata and artwork</li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 2rem 0;">
+            <a href="/downloads/my-downloads" class="download-btn secondary">← Back to My Downloads</a>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+</body>
+</html>

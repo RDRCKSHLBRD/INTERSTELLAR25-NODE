@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/additional-styles.css">
+    <link rel="stylesheet" href="/css/downloads.css">
+</head>
+<body>
+            font-weight: 500;
+            transition: background 0.2s ease;
+        }
+
+        .browse-btn:hover {
+            background: #0e7490;
+        }
+
+        @media (max-width: 768px) {
+            .downloads-container {
+                padding: 1rem;
+            }
+
+            .items-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            .purchase-header {
+                padding: 1rem;
+            }
+
+            .downloads-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include your navigation header here -->
+    <%- include('partials/header', { user: user }) %>
+
+    <div class="downloads-container">
+        <div class="downloads-header">
+            <h1>My Downloads</h1>
+            <p>Access all your purchased music in high quality formats</p>
+        </div>
+
+        <% if (purchases && purchases.length > 0) { %>
+            <% purchases.forEach(purchase => { %>
+                <div class="purchase-group">
+                    <div class="purchase-header">
+                        <div class="purchase-date">
+                            Purchased on <%= new Date(purchase.date).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                            }) %>
+                        </div>
+                        <div class="purchase-total">$<%= purchase.total %></div>
+                        <% if (purchase.customer_name) { %>
+                            <div class="purchase-details">
+                                Customer: <%= purchase.customer_name %>
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <div class="items-grid">
+                        <% purchase.items.forEach(item => { %>
+                            <div class="download-item">
+                                <div class="item-header">
+                                    <% if (item.cover_url) { %>
+                                        <img src="<%= item.cover_url %>" alt="<%= item.album_name %>" class="item-cover">
+                                    <% } else { %>
+                                        <div class="item-cover" style="background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #64748b;">
+                                            🎵
+                                        </div>
+                                    <% } %>
+                                    
+                                    <div class="item-info">
+                                        <h3>
+                                            <% if (item.type === 'song') { %>
+                                                <%= item.song_name %>
+                                            <% } else { %>
+                                                <%= item.album_name %>
+                                            <% } %>
+                                        </h3>
+                                        <p><%= item.artist_name %></p>
+                                        <% if (item.type === 'song' && item.album_name) { %>
+                                            <p>from "<%= item.album_name %>"</p>
+                                        <% } %>
+                                    </div>
+
+                                    <div class="item-type">
+                                        <%= item.type.toUpperCase() %>
+                                    </div>
+                                </div>
+
+                                <div class="download-actions">
+                                    <% if (item.type === 'album') { %>
+                                        <a href="/downloads/album/<%= item.album_catalogue %>" class="download-btn">
+                                            📁 View Album Downloads
+                                        </a>
+                                    <% } else { %>
+                                        <a href="/downloads/song/<%= item.song_id %>" class="download-btn">
+                                            🎵 Download Song
+                                        </a>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="no-purchases">
+                <h2>No Downloads Yet</h2>
+                <p>You haven't purchased any music yet. Browse our catalog to start building your collection!</p>
+                <a href="/" class="browse-btn">Browse Music</a>
+            </div>
+        <% } %>
+    </div>
+
+    <%- include('partials/footer') %>
+</body>
+</html>
