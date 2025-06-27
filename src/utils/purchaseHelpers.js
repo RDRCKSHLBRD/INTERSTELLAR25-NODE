@@ -1,7 +1,7 @@
 //purchaseHelpers.js - Updated to handle Stripe session ID
 // src/utils/purchaseHelpers.js
 
-import { pool } from '../config/database.js';
+import pool from '../config/database.js';
 import CartModel from '../models/CartModel.js';
 
 /**

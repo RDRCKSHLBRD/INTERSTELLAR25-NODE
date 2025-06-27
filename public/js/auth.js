@@ -189,50 +189,57 @@ class AuthManager {
   }
 
   async handleLogin(e) {
-    e.preventDefault();
+  e.preventDefault();
+  
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  
+  const submitBtn = document.getElementById('loginSubmit');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Logging in...';
+  
+  try {
+    // 🔧 GET SESSION ID from cartManager
+    const sessionId = window.cartManager ? window.cartManager.sessionId : 
+                     localStorage.getItem('interstellar.sessionId');
     
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
+    console.log('🔑 Sending login with sessionId:', sessionId);
     
-    const submitBtn = document.getElementById('loginSubmit');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Logging in...';
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-session-id': sessionId  // 🔧 SEND SESSION ID IN HEADERS
+      },
+      credentials: 'include',
+      body: JSON.stringify({ email, password })
+    });
     
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ email, password })
-      });
+    const data = await response.json();
+    
+    if (data.success) {
+      this.currentUser = data.user;
+      this.updateUIForLoggedInUser();
+      this.closeModal();
       
-      const data = await response.json();
-      
-      if (data.success) {
-        this.currentUser = data.user;
-        this.updateUIForLoggedInUser();
-        this.closeModal();
-        
-        // 🔄 REFRESH CART AFTER LOGIN
-        console.log('🔄 Login successful, refreshing cart...');
-        if (window.cartManager) {
-          await window.cartManager.refreshCartAfterLogin();
-          console.log('✅ Cart refreshed after login');
-        }
-        
-      } else {
-        this.showError('login', data.message || 'Login failed');
+      // 🔄 REFRESH CART AFTER LOGIN
+      console.log('🔄 Login successful, refreshing cart...');
+      if (window.cartManager) {
+        await window.cartManager.refreshCartAfterLogin();
+        console.log('✅ Cart refreshed after login');
       }
-    } catch (error) {
-      console.error('Login error:', error);
-      this.showError('login', 'Network error. Please try again.');
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Log In';
+      
+    } else {
+      this.showError('login', data.message || 'Login failed');
     }
+  } catch (error) {
+    console.error('Login error:', error);
+    this.showError('login', 'Network error. Please try again.');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Log In';
   }
+}
 
   async handleRegister(e) {
     e.preventDefault();

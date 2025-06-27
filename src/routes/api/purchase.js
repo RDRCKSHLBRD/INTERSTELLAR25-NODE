@@ -1,4 +1,4 @@
-// src/routes/api/purchase.js - FIXED to pass correct session ID
+// src/routes/api/purchase.js - FIXED to pass correct session ID AND userId
 import express from 'express';
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
@@ -13,7 +13,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 // POST /api/purchase/create-session
 router.post('/create-session', async (req, res) => {
   const currentSessionId = resolveSessionId(req);
-  const userId = req.user?.id || null;
+  
+  // 🔧 FIX: Get userId from session, not req.user
+  const userId = req.session?.userId || req.body.userId || null;
+  console.log('🧑 userId for Stripe metadata:', userId);  // Debug log
 
   console.log('🧠 server received sessionId:', currentSessionId);
   console.log('🧠 server received req.body:', req.body);
@@ -63,8 +66,8 @@ router.post('/create-session', async (req, res) => {
       customer_email: req.user?.email || undefined,
       client_reference_id: originalCartSessionId,  // ✅ Use original cart session ID
       metadata: {
-        userId: userId || '',
-        sessionId: originalCartSessionId           // ✅ Use original cart session ID
+        userId: userId ? String(userId) : '',  // 🔧 ENSURE STRING AND ACTUAL USER ID
+        sessionId: originalCartSessionId       // ✅ Use original cart session ID
       }
     });
 
