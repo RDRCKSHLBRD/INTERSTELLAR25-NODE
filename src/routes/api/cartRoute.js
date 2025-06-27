@@ -39,27 +39,37 @@ router.get('/:userId', async (req, res) => {
 // ------------------------
 // POST /api/cart/add
 // ------------------------
+// REPLACE the /add route in src/routes/api/cartRoute.js with this:
+
 router.post('/add', async (req, res) => {
   const sessionId = resolveSessionId(req);
-  const userId = req.user ? req.user.id : null;
+  
+  // 🔧 GET USER ID FROM SESSION instead of req.user
+  const userId = req.session?.userId || null;
+  
   const { productId, quantity } = req.body;
+
+  console.log(`🛒 Adding to cart - userId: ${userId}, sessionId: ${sessionId}, productId: ${productId}`);
 
   try {
     const cartItem = await CartModel.addToCart(productId, quantity, userId, sessionId);
-    res.json({ success: true, cartItem });
+    res.json({ 
+      success: true, 
+      cartItem,
+      message: 'Item added to cart successfully'
+    });
   } catch (error) {
     console.error('❌ Error adding to cart:', error);
     res.status(500).json({ error: 'Failed to add item to cart' });
   }
 });
 
-// ------------------------
-// PATCH /api/cart/update/:cartItemId
-// ------------------------
+// ALSO UPDATE the other routes to use session userId:
+
 router.patch('/update/:cartItemId', async (req, res) => {
   const { cartItemId } = req.params;
   const sessionId = resolveSessionId(req);
-  const userId = req.user ? req.user.id : null;
+  const userId = req.session?.userId || null;  // 🔧 FIXED
   const { quantity } = req.body;
 
   console.log(`[PATCH /update/${cartItemId}] sessionId=${sessionId} userId=${userId} quantity=${quantity}`);
@@ -82,13 +92,12 @@ router.patch('/update/:cartItemId', async (req, res) => {
   }
 });
 
-// ------------------------
-// DELETE /api/cart/remove/:cartItemId
-// ------------------------
+//DELETE
+
 router.delete('/remove/:cartItemId', async (req, res) => {
   const { cartItemId } = req.params;
   const sessionId = resolveSessionId(req);
-  const userId = req.user ? req.user.id : null;
+  const userId = req.session?.userId || null;  // 🔧 FIXED
 
   console.log(`[DELETE /remove/${cartItemId}] sessionId=${sessionId} userId=${userId}`);
 

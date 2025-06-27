@@ -86,6 +86,8 @@ if (req.session.sessionId) {
 });
 
 // POST /api/auth/login - User login
+// REPLACE the login route in src/routes/api/auth.js with this:
+
 router.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -129,6 +131,10 @@ router.post('/login', async (req, res, next) => {
       [user.id]
     );
 
+    // 🔧 CAPTURE SESSION ID from headers before setting session
+    const sessionId = req.headers['x-session-id'] || req.session.sessionId;
+    console.log(`🔍 Login attempt - sessionId from headers: ${sessionId}`);
+
     // Set session
     req.session.userId = user.id;
     req.session.user = {
@@ -139,22 +145,19 @@ router.post('/login', async (req, res, next) => {
       email: user.email
     };
 
-
- // ✅ ADD CART MIGRATION HERE
-    if (req.session.sessionId) {
+    // 🔄 CART MIGRATION with captured session ID
+    if (sessionId) {
       try {
-        await CartModel.migrateSessionCartToUser(req.session.sessionId, user.id);
-        console.log(`🔄 Cart migration completed for user ${user.id}`);
+        console.log(`🔄 Attempting cart migration for session: ${sessionId} → user: ${user.id}`);
+        await CartModel.migrateSessionCartToUser(sessionId, user.id);
+        console.log(`✅ Cart migration completed for user ${user.id}`);
       } catch (err) {
-        console.error('Cart migration failed:', err);
+        console.error('❌ Cart migration failed:', err);
         // Don't fail login if cart migration fails
       }
+    } else {
+      console.log('📭 No session ID found for cart migration');
     }
-
-
-
-
-
 
     res.json({
       success: true,
