@@ -1,4 +1,4 @@
-// src/routes/api/purchase.js - FIXED to pass correct session ID AND userId
+// src/routes/api/purchase.js - FIXED email and metadata issues
 import express from 'express';
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
@@ -55,20 +55,54 @@ router.post('/create-session', async (req, res) => {
     const originalCartSessionId = req.body.sessionId || currentSessionId;
     console.log('🛒 originalCartSessionId:', originalCartSessionId);
 
+    // DEBUGGING: Add this log BEFORE creating the session:
+    console.log('🔍 Metadata being sent to Stripe:', {
+      userId: userId?.toString() || '',
+      sessionId: originalCartSessionId || '',
+      client_reference_id: originalCartSessionId || null,
+      email: req.body.email || 'will be collected by Stripe'
+    });
+
     console.log('📤 Sending to Stripe...');
 
-    const session = await stripe.checkout.sessions.create({
+    // ✅ FIXED: Proper email handling and metadata
+    const sessionConfig = {
       payment_method_types: ['card'],
+      line_items: line_items,
       mode: 'payment',
-      line_items,
-      success_url: `${process.env.CLIENT_URL}/success`,
+      success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.CLIENT_URL}/cancel`,
-      customer_email: req.user?.email || undefined,
-      client_reference_id: originalCartSessionId,  // ✅ Use original cart session ID
+      
+      // ✅ CRITICAL: Add metadata for webhook
       metadata: {
-        userId: userId ? String(userId) : '',  // 🔧 ENSURE STRING AND ACTUAL USER ID
-        sessionId: originalCartSessionId       // ✅ Use original cart session ID
-      }
+        userId: userId?.toString() || '',
+        sessionId: originalCartSessionId || '',
+        cartItemsCount: cartItems?.length || 0
+      },
+      
+      // ✅ CRITICAL: Also set client_reference_id as backup
+      client_reference_id: originalCartSessionId || null,
+      
+      // ✅ Force email collection by Stripe
+      customer_creation: 'always', // This ensures we get customer email
+    };
+
+    // ✅ Only add customer_email if we have a valid email
+    const userEmail = req.body.email;
+    if (userEmail && userEmail.includes('@') && userEmail.trim() !== '') {
+      sessionConfig.customer_email = userEmail;
+      console.log('📧 Pre-filling email:', userEmail);
+    } else {
+      console.log('📧 No email provided - Stripe will collect during checkout');
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
+
+    // DEBUGGING: Add this log AFTER creating the session:
+    console.log('✅ Stripe session created with metadata:', {
+      id: session.id,
+      metadata: session.metadata,
+      client_reference_id: session.client_reference_id
     });
 
     res.json({ id: session.id });

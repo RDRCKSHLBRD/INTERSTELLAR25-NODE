@@ -1,9 +1,10 @@
-//purchaseWebhook.js - FIXED to use correct session ID
+//purchaseWebhook.js - FIXED to clear cart after purchase
 // src/routes/api/purchaseWebhook.js
 import express from 'express';
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
 import { recordPurchase } from '../../utils/purchaseHelpers.js';
+import { query } from '../../config/database.js';
 
 dotenv.config();
 
@@ -15,6 +16,49 @@ const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 console.log('🔧 Webhook config check:');
 console.log('- STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY ? 'SET' : 'MISSING');
 console.log('- STRIPE_WEBHOOK_SECRET:', process.env.STRIPE_WEBHOOK_SECRET ? 'SET' : 'MISSING');
+
+// ✅ ADD THESE CART CLEARING FUNCTIONS
+async function clearUserCart(userId) {
+  try {
+    console.log(`🧹 Clearing cart for user ${userId}`);
+    
+    // Delete cart items for this user
+    const deleteItemsQuery = `
+      DELETE FROM cart_items 
+      WHERE cart_id IN (
+        SELECT id FROM carts WHERE user_id = $1
+      )
+    `;
+    const itemsResult = await query(deleteItemsQuery, [userId]);
+    console.log(`✅ Deleted ${itemsResult.rowCount} cart items for user ${userId}`);
+    
+    return itemsResult.rowCount;
+  } catch (error) {
+    console.error(`❌ Error clearing cart for user ${userId}:`, error);
+    throw error;
+  }
+}
+
+async function clearSessionCart(sessionId) {
+  try {
+    console.log(`🧹 Clearing cart for session ${sessionId}`);
+    
+    // Delete cart items for this session
+    const deleteItemsQuery = `
+      DELETE FROM cart_items 
+      WHERE cart_id IN (
+        SELECT id FROM carts WHERE session_id = $1
+      )
+    `;
+    const itemsResult = await query(deleteItemsQuery, [sessionId]);
+    console.log(`✅ Deleted ${itemsResult.rowCount} cart items for session ${sessionId}`);
+    
+    return itemsResult.rowCount;
+  } catch (error) {
+    console.error(`❌ Error clearing cart for session ${sessionId}:`, error);
+    throw error;
+  }
+}
 
 router.post(
   '/',
@@ -72,6 +116,7 @@ router.post(
         }
 
         try {
+          // Record the purchase first
           const purchaseId = await recordPurchase({ 
             stripeSessionId: session.id,
             sessionId: originalSessionId,  // ✅ Use original session ID to find cart
@@ -81,8 +126,30 @@ router.post(
             currency: session.currency
           });
           console.log('📦 Purchase recorded successfully with ID:', purchaseId);
+
+          // ✅ NEW: Clear the cart after successful purchase
+          let clearedItems = 0;
+          
+          if (userId && userId !== 'null' && userId !== null) {
+            // Clear user cart
+            clearedItems = await clearUserCart(userId);
+            console.log(`🧹 Cleared ${clearedItems} items from user ${userId} cart`);
+          } else if (originalSessionId) {
+            // Clear session cart
+            clearedItems = await clearSessionCart(originalSessionId);
+            console.log(`🧹 Cleared ${clearedItems} items from session ${originalSessionId} cart`);
+          } else {
+            console.warn('⚠️ No userId or sessionId found - cannot clear cart');
+          }
+
+          if (clearedItems > 0) {
+            console.log('✅ Cart successfully cleared after purchase');
+          } else {
+            console.log('ℹ️ No cart items found to clear (cart may have been empty)');
+          }
+
         } catch (error) {
-          console.error('❌ Failed to record purchase:', error);
+          console.error('❌ Failed to record purchase or clear cart:', error);
           // Don't return error - let Stripe know we received the webhook
         }
 
