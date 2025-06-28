@@ -549,45 +549,135 @@ renderCartItems() {
   }
 
   async handleCheckout() {
-    if (!this.cart.items || this.cart.items.length === 0) return;
+  if (!this.cart.items || this.cart.items.length === 0) return;
 
-    try {
+  try {
+    // Prepare checkout data
+    const checkoutData = {
+      isLoggedIn: this.isLoggedIn,
+      userId: this.userId,
+      sessionId: this.sessionId,
+      cartItems: this.cart.items
+    };
 
-      console.log('🛒 Checkout cart payload preview:', {
-        isLoggedIn: this.isLoggedIn,
-        userId: this.userId,
-        sessionId: this.sessionId,
-        cartItems: this.cart.items
-      });
-
-      const response = await fetch('/api/purchase/create-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          isLoggedIn: this.isLoggedIn,
-          userId: this.userId,
-          sessionId: this.sessionId,
-          cartItems: this.cart.items
-        })
-      });
-
-
-      const data = await response.json();
-
-      if (data.id) {
-        const stripe = Stripe('pk_test_51KdJ4iC7g8sqmaXgpX4MP3pGmU7GSnwT4UNBhSXcENXcKriTCSHuvBBc9GbJg24FN7Vx9zh9sQuuYwxoQy3v58vT00evpFqn47');
-        await stripe.redirectToCheckout({ sessionId: data.id });
-      } else {
-        this.showCartNotification('Could not start checkout.', 'error');
+    // ✅ For guest purchases, collect email
+    if (!this.isLoggedIn) {
+      // Show email collection modal
+      const guestEmail = await this.collectGuestEmail();
+      
+      if (!guestEmail) {
+        console.log('❌ Guest checkout cancelled - no email provided');
+        return; // User cancelled
       }
-    } catch (error) {
-      console.error('❌ Checkout error:', error);
-      this.showCartNotification('Checkout failed. Try again.', 'error');
+      
+      checkoutData.guestEmail = guestEmail;
+      checkoutData.purchaseType = 'guest';
+      console.log('📧 Guest email collected:', guestEmail);
+    } else {
+      checkoutData.purchaseType = 'user';
     }
+
+    console.log('🛒 Checkout cart payload:', checkoutData);
+
+    const response = await fetch('/api/purchase/create-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(checkoutData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('❌ Checkout failed:', response.status, errorData);
+      this.showCartNotification(`Checkout failed: ${errorData}`, 'error');
+      return;
+    }
+
+    const data = await response.json();
+
+    if (data.id) {
+      const stripe = Stripe('pk_test_51KdJ4iC7g8sqmaXgpX4MP3pGmU7GSnwT4UNBhSXcENXcKriTCSHuvBBc9GbJg24FN7Vx9zh9sQuuYwxoQy3v58vT00evpFqn47');
+      await stripe.redirectToCheckout({ sessionId: data.id });
+    } else {
+      this.showCartNotification('Could not start checkout.', 'error');
+    }
+  } catch (error) {
+    console.error('❌ Checkout error:', error);
+    this.showCartNotification('Checkout failed. Try again.', 'error');
   }
+}
+
+// ✅ NEW: Email collection method for guests (CSS handled by additional-styles.css)
+async collectGuestEmail() {
+  return new Promise((resolve) => {
+    // Create modal for email collection
+    const modal = document.createElement('div');
+    modal.className = 'guest-email-modal';
+    modal.innerHTML = `
+      <div class="modal-overlay">
+        <div class="modal-content">
+          <h3>Complete Your Purchase</h3>
+          <p>Please enter your email address to receive your download links:</p>
+          <input type="email" id="guestEmailInput" placeholder="your@email.com" required>
+          <div class="modal-buttons">
+            <button id="emailSubmitBtn">Continue to Payment</button>
+            <button id="emailCancelBtn">Cancel</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const emailInput = document.getElementById('guestEmailInput');
+    const submitBtn = document.getElementById('emailSubmitBtn');
+    const cancelBtn = document.getElementById('emailCancelBtn');
+
+    // Focus on input
+    emailInput.focus();
+
+    // Handle submit
+    const handleSubmit = () => {
+      const email = emailInput.value.trim();
+      if (!email || !email.includes('@')) {
+        emailInput.classList.add('error');
+        emailInput.placeholder = 'Please enter a valid email';
+        return;
+      }
+      
+      modal.remove();
+      resolve(email);
+    };
+
+    // Handle cancel
+    const handleCancel = () => {
+      modal.remove();
+      resolve(null);
+    };
+
+    // Event listeners
+    submitBtn.addEventListener('click', handleSubmit);
+    cancelBtn.addEventListener('click', handleCancel);
+    emailInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSubmit();
+    });
+
+    // Click outside to cancel
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) handleCancel();
+    });
+
+    // Clear error state when user types
+    emailInput.addEventListener('input', () => {
+      emailInput.classList.remove('error');
+      if (emailInput.placeholder === 'Please enter a valid email') {
+        emailInput.placeholder = 'your@email.com';
+      }
+    });
+  });
+}
 
 
   showCartNotification(message, type = 'success') {

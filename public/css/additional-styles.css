@@ -661,6 +661,168 @@
 
 
 
+/* Add this to your additional-styles.css file */
+
+/* Guest Email Modal - Extends existing auth modal styles */
+.guest-email-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guest-email-modal .modal-overlay {
+  width: 100%;
+  height: 100%;
+  background: rgba(8, 61, 94, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guest-email-modal .modal-content {
+  background-color: #083D5E;
+  color: #cadbda;
+  padding: 30px;
+  border: 1px solid #3AA0A0;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.guest-email-modal .modal-content h3 {
+  color: #3AA0A0;
+  margin: 0 0 1rem 0;
+  font-size: 1.5em;
+  font-weight: 200;
+}
+
+.guest-email-modal .modal-content p {
+  color: #8ab7ce;
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+}
+
+.guest-email-modal .modal-content input {
+  width: 100%;
+  background-color: #2b7f8c;
+  border: 1px solid #3AA0A0;
+  color: #cadbda;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 1em;
+  margin-bottom: 1.5rem;
+  box-sizing: border-box;
+}
+
+.guest-email-modal .modal-content input::placeholder {
+  color: #8ab7ce;
+  opacity: 0.7;
+}
+
+.guest-email-modal .modal-content input:focus {
+  outline: none;
+  border-color: #3AA0A0;
+  background-color: #184551;
+  box-shadow: 0 0 0 2px rgba(58, 160, 160, 0.2);
+}
+
+.guest-email-modal .modal-content input.error {
+  border-color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.guest-email-modal .modal-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.guest-email-modal .modal-buttons button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: all 0.2s ease;
+  font-weight: 200;
+}
+
+.guest-email-modal #emailSubmitBtn {
+  background-color: #3AA0A0;
+  color: #083D5E;
+  font-weight: 500;
+}
+
+.guest-email-modal #emailSubmitBtn:hover {
+  background-color: #2b7f8c;
+  color: #cadbda;
+  transform: translateY(-1px);
+}
+
+.guest-email-modal #emailSubmitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.guest-email-modal #emailCancelBtn {
+  background: transparent;
+  color: #8ab7ce;
+  border: 1px solid #8ab7ce;
+}
+
+.guest-email-modal #emailCancelBtn:hover {
+  background-color: #8ab7ce;
+  color: #083D5E;
+  transform: translateY(-1px);
+}
+
+/* Loading state for submit button */
+.guest-email-modal #emailSubmitBtn.loading {
+  position: relative;
+  color: transparent;
+}
+
+.guest-email-modal #emailSubmitBtn.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top: 2px solid #083D5E;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+
+  
+
+
+
+
+
+
+
+
+
 
 
 
@@ -986,6 +1148,34 @@
       margin-top: 5px;
       padding: 3px;
     }
+
+/* email for guest checkout */
+
+
+.guest-email-modal .modal-content {
+    margin: 10% auto;
+    padding: 20px;
+    width: 95%;
+  }
+  
+  .guest-email-modal .modal-content h3 {
+    font-size: 1.3em;
+  }
+  
+  .guest-email-modal .modal-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .guest-email-modal .modal-buttons button {
+    padding: 14px;
+    font-size: 1.1em;
+  }
+
+
+
+
+
 
     /* Cart responsive styles */
     .cart-sidebar {

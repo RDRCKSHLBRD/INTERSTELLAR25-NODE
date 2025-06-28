@@ -1,8 +1,9 @@
-//purchaseWebhook.js - FIXED to clear cart after purchase
+//purchaseWebhook.js - UPDATED with Guest Checkout Support
 // src/routes/api/purchaseWebhook.js
 import express from 'express';
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
+import crypto from 'crypto';
 import { recordPurchase } from '../../utils/purchaseHelpers.js';
 import { query } from '../../config/database.js';
 
@@ -17,12 +18,11 @@ console.log('🔧 Webhook config check:');
 console.log('- STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY ? 'SET' : 'MISSING');
 console.log('- STRIPE_WEBHOOK_SECRET:', process.env.STRIPE_WEBHOOK_SECRET ? 'SET' : 'MISSING');
 
-// ✅ ADD THESE CART CLEARING FUNCTIONS
+// Cart clearing functions
 async function clearUserCart(userId) {
   try {
     console.log(`🧹 Clearing cart for user ${userId}`);
     
-    // Delete cart items for this user
     const deleteItemsQuery = `
       DELETE FROM cart_items 
       WHERE cart_id IN (
@@ -43,7 +43,6 @@ async function clearSessionCart(sessionId) {
   try {
     console.log(`🧹 Clearing cart for session ${sessionId}`);
     
-    // Delete cart items for this session
     const deleteItemsQuery = `
       DELETE FROM cart_items 
       WHERE cart_id IN (
@@ -60,9 +59,61 @@ async function clearSessionCart(sessionId) {
   }
 }
 
+// ✅ NEW: Guest download token generation
+async function generateGuestDownloadToken(email, purchaseId) {
+  try {
+    console.log(`🎫 Generating guest download token for ${email}, purchase ${purchaseId}`);
+    
+    // Generate secure token
+    const tokenData = `${email}-${purchaseId}-${Date.now()}-${Math.random()}`;
+    const token = crypto.createHash('sha256').update(tokenData).digest('hex');
+    
+    // Set expiration (30 days from now)
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 30);
+    
+    // Insert into guest_downloads table
+    const insertQuery = `
+      INSERT INTO guest_downloads (email, purchase_id, token, expires_at)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id, token
+    `;
+    
+    const result = await query(insertQuery, [email, purchaseId, token, expiresAt]);
+    
+    console.log(`✅ Guest download token created: ${result.rows[0].id}`);
+    return {
+      id: result.rows[0].id,
+      token: result.rows[0].token,
+      expiresAt: expiresAt
+    };
+    
+  } catch (error) {
+    console.error(`❌ Error generating guest download token:`, error);
+    throw error;
+  }
+}
+
+// ✅ NEW: Send guest download email (placeholder for now)
+async function sendGuestDownloadEmail(email, downloadToken, purchaseDetails) {
+  try {
+    console.log(`📧 [PLACEHOLDER] Would send download email to: ${email}`);
+    console.log(`🔗 Download link would be: ${process.env.CLIENT_URL}/guest-downloads/${downloadToken.token}`);
+    console.log(`📦 Purchase details:`, purchaseDetails);
+    
+    // TODO: Implement actual email sending (Nodemailer + Gmail/SendGrid)
+    // For now, just log what we would send
+    
+    return true;
+  } catch (error) {
+    console.error(`❌ Error sending guest download email:`, error);
+    throw error;
+  }
+}
+
 router.post(
   '/',
-  express.raw({ type: 'application/json' }), // ⬅️ must be raw
+  express.raw({ type: 'application/json' }),
   async (req, res) => {
     console.log('🔔 Webhook received!');
     console.log('- Headers:', req.headers);
@@ -93,20 +144,27 @@ router.post(
           id: session.id,
           client_reference_id: session.client_reference_id,
           metadata: session.metadata,
-          customer_email: session.customer_email
+          customer_email: session.customer_email,
+          customer_details: session.customer_details
         });
 
+        // Extract purchase information
         const userId = session.metadata?.userId || null;
-        
-        // ✅ FIX: Use the original session ID from client_reference_id or metadata.sessionId
+        const purchaseType = session.metadata?.purchaseType || 'user';
         const originalSessionId = session.metadata?.sessionId || session.client_reference_id || null;
         
-        const email = session.customer_email || null;
-
+        // Get email from Stripe (prioritize customer_details.email over customer_email)
+        const stripeEmail = session.customer_details?.email || session.customer_email || null;
+        
+        // Determine if this is a guest purchase
+        const isGuestPurchase = !userId || userId === 'null' || purchaseType === 'guest';
+        
         console.log('✅ Stripe checkout completed:', { 
           originalSessionId, 
           userId, 
-          email,
+          stripeEmail,
+          purchaseType,
+          isGuestPurchase,
           stripeSessionId: session.id 
         });
 
@@ -115,31 +173,55 @@ router.post(
           return res.status(400).send('Missing original session ID');
         }
 
+        // For guest purchases, email is required
+        if (isGuestPurchase && !stripeEmail) {
+          console.error('❌ Guest purchase missing email from Stripe');
+          return res.status(400).send('Guest purchase missing email');
+        }
+
         try {
-          // Record the purchase first
-          const purchaseId = await recordPurchase({ 
+          // Record the purchase
+          const purchaseData = { 
             stripeSessionId: session.id,
-            sessionId: originalSessionId,  // ✅ Use original session ID to find cart
-            userId, 
-            email,
-            totalAmount: session.amount_total / 100, // Convert from cents
-            currency: session.currency
-          });
+            sessionId: originalSessionId,
+            userId: isGuestPurchase ? null : userId,
+            email: stripeEmail,
+            totalAmount: session.amount_total / 100,
+            currency: session.currency,
+            purchaseType: isGuestPurchase ? 'guest' : 'user'
+          };
+          
+          const purchaseId = await recordPurchase(purchaseData);
           console.log('📦 Purchase recorded successfully with ID:', purchaseId);
 
-          // ✅ NEW: Clear the cart after successful purchase
+          // Clear the cart
           let clearedItems = 0;
           
-          if (userId && userId !== 'null' && userId !== null) {
+          if (!isGuestPurchase && userId) {
             // Clear user cart
             clearedItems = await clearUserCart(userId);
             console.log(`🧹 Cleared ${clearedItems} items from user ${userId} cart`);
           } else if (originalSessionId) {
-            // Clear session cart
+            // Clear session cart (for guests)
             clearedItems = await clearSessionCart(originalSessionId);
             console.log(`🧹 Cleared ${clearedItems} items from session ${originalSessionId} cart`);
-          } else {
-            console.warn('⚠️ No userId or sessionId found - cannot clear cart');
+          }
+
+          // ✅ NEW: Handle guest downloads
+          if (isGuestPurchase && stripeEmail) {
+            console.log(`👻 Processing guest purchase for: ${stripeEmail}`);
+            
+            // Generate download token
+            const downloadToken = await generateGuestDownloadToken(stripeEmail, purchaseId);
+            
+            // Send download email (placeholder for now)
+            await sendGuestDownloadEmail(stripeEmail, downloadToken, {
+              purchaseId: purchaseId,
+              totalAmount: session.amount_total / 100,
+              currency: session.currency
+            });
+            
+            console.log(`✅ Guest download system processed for ${stripeEmail}`);
           }
 
           if (clearedItems > 0) {
@@ -149,7 +231,7 @@ router.post(
           }
 
         } catch (error) {
-          console.error('❌ Failed to record purchase or clear cart:', error);
+          console.error('❌ Failed to record purchase or process download:', error);
           // Don't return error - let Stripe know we received the webhook
         }
 
