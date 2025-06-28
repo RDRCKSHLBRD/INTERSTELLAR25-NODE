@@ -20,6 +20,7 @@
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "helmet": "^8.1.0",
+    "nodemailer": "^7.0.3",
     "pg": "^8.16.0",
     "stripe": "^18.2.1"
   },
