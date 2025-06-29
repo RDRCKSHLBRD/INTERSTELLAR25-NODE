@@ -1,10 +1,10 @@
-//purchaseWebhook.js - UPDATED with Guest Checkout Support
-// src/routes/api/purchaseWebhook.js
+// src/routes/api/purchaseWebhook.js - FINAL with Real Email Service
 import express from 'express';
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
 import { recordPurchase } from '../../utils/purchaseHelpers.js';
+import { sendGuestDownloadEmail } from '../../utils/emailService.js';
 import { query } from '../../config/database.js';
 
 dotenv.config();
@@ -17,6 +17,8 @@ const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 console.log('🔧 Webhook config check:');
 console.log('- STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY ? 'SET' : 'MISSING');
 console.log('- STRIPE_WEBHOOK_SECRET:', process.env.STRIPE_WEBHOOK_SECRET ? 'SET' : 'MISSING');
+console.log('- EMAIL_USER:', process.env.EMAIL_USER ? 'SET' : 'MISSING');
+console.log('- EMAIL_APP_PASSWORD:', process.env.EMAIL_APP_PASSWORD ? 'SET' : 'MISSING');
 
 // Cart clearing functions
 async function clearUserCart(userId) {
@@ -59,7 +61,7 @@ async function clearSessionCart(sessionId) {
   }
 }
 
-// ✅ NEW: Guest download token generation
+// Generate guest download token
 async function generateGuestDownloadToken(email, purchaseId) {
   try {
     console.log(`🎫 Generating guest download token for ${email}, purchase ${purchaseId}`);
@@ -94,20 +96,39 @@ async function generateGuestDownloadToken(email, purchaseId) {
   }
 }
 
-// ✅ NEW: Send guest download email (placeholder for now)
-async function sendGuestDownloadEmail(email, downloadToken, purchaseDetails) {
+// Get purchased items details for email
+async function getPurchasedItemsDetails(purchaseId) {
   try {
-    console.log(`📧 [PLACEHOLDER] Would send download email to: ${email}`);
-    console.log(`🔗 Download link would be: ${process.env.CLIENT_URL}/guest-downloads/${downloadToken.token}`);
-    console.log(`📦 Purchase details:`, purchaseDetails);
+    const query_text = `
+      SELECT 
+        pi.quantity,
+        pi.price,
+        p.name,
+        p.catalogue_id,
+        p.song_id,
+        CASE 
+          WHEN p.catalogue_id IS NOT NULL THEN 'album'
+          WHEN p.song_id IS NOT NULL THEN 'song'
+          ELSE 'unknown'
+        END as item_type
+      FROM purchase_items pi
+      JOIN products p ON pi.product_id = p.id
+      WHERE pi.purchase_id = $1
+      ORDER BY pi.id
+    `;
     
-    // TODO: Implement actual email sending (Nodemailer + Gmail/SendGrid)
-    // For now, just log what we would send
+    const result = await query(query_text, [purchaseId]);
     
-    return true;
+    return result.rows.map(item => ({
+      name: item.name,
+      price: parseFloat(item.price).toFixed(2),
+      quantity: item.quantity,
+      type: item.item_type
+    }));
+    
   } catch (error) {
-    console.error(`❌ Error sending guest download email:`, error);
-    throw error;
+    console.error(`❌ Error getting purchased items for purchase ${purchaseId}:`, error);
+    return [];
   }
 }
 
@@ -207,21 +228,37 @@ router.post(
             console.log(`🧹 Cleared ${clearedItems} items from session ${originalSessionId} cart`);
           }
 
-          // ✅ NEW: Handle guest downloads
+          // ✅ Handle guest downloads with REAL email service
           if (isGuestPurchase && stripeEmail) {
             console.log(`👻 Processing guest purchase for: ${stripeEmail}`);
             
-            // Generate download token
-            const downloadToken = await generateGuestDownloadToken(stripeEmail, purchaseId);
-            
-            // Send download email (placeholder for now)
-            await sendGuestDownloadEmail(stripeEmail, downloadToken, {
-              purchaseId: purchaseId,
-              totalAmount: session.amount_total / 100,
-              currency: session.currency
-            });
-            
-            console.log(`✅ Guest download system processed for ${stripeEmail}`);
+            try {
+              // Generate download token
+              const downloadToken = await generateGuestDownloadToken(stripeEmail, purchaseId);
+              
+              // Get purchased items details for email
+              const purchasedItems = await getPurchasedItemsDetails(purchaseId);
+              
+              // Send download email with REAL email service
+              const emailResult = await sendGuestDownloadEmail({
+                email: stripeEmail,
+                downloadToken: downloadToken,
+                purchaseDetails: {
+                  purchaseId: purchaseId,
+                  totalAmount: session.amount_total / 100,
+                  currency: session.currency
+                },
+                purchasedItems: purchasedItems
+              });
+              
+              console.log(`✅ Guest download email sent successfully to ${stripeEmail}`);
+              console.log(`📧 Email message ID: ${emailResult.messageId}`);
+              console.log(`🔗 Download URL: ${emailResult.downloadUrl}`);
+              
+            } catch (emailError) {
+              console.error(`❌ Failed to send guest download email to ${stripeEmail}:`, emailError);
+              // Don't fail the webhook - purchase was still recorded
+            }
           }
 
           if (clearedItems > 0) {

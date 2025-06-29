@@ -11,7 +11,7 @@ const createTransporter = () => {
   
   if (isGoogleWorkspace) {
     // Google Workspace configuration
-    return nodemailer.createTransporter({
+    return nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 587,
       secure: false, // true for 465, false for other ports
@@ -22,7 +22,7 @@ const createTransporter = () => {
     });
   } else {
     // Regular Gmail configuration
-    return nodemailer.createTransporter({
+    return nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: process.env.EMAIL_USER, // interstellarpackages@gmail.com or rdxenv3@gmail.com
