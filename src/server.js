@@ -56,7 +56,7 @@ app.use(
         scriptSrc: ["'self'", "https://js.stripe.com"],
         imgSrc: ["'self'", "https://storage.googleapis.com", "data:"],
         mediaSrc: ["'self'", "https://storage.googleapis.com"],
-        connectSrc: ["'self'", "https://api.stripe.com", "https://checkout.stripe.com"],
+        connectSrc: ["'self'", "https://api.stripe.com", "https://checkout.stripe.com","https://storage.googleapis.com"],
         fontSrc: ["'self'"],
         objectSrc: ["'none'"],
         frameSrc: ["'self'", "https://player.vimeo.com", "https://js.stripe.com", "https://hooks.stripe.com"]
@@ -125,7 +125,7 @@ app.use('/api/health', healthRoutes);
 app.use('/', pageRoutes);
 
 // Download routes (individual album pages)
-app.use('/downloads', downloadRoutes);
+app.use('/', downloadRoutes);
 
 // API documentation (development only)
 if (config.enableApiDocs) {

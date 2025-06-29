@@ -237,3 +237,173 @@
                 grid-template-columns: 1fr;
             }
         }
+    </style>
+</head>
+<body>
+    <div class="album-download-container">
+        <!-- Header with purchase info -->
+        <div class="album-header">
+            <% if (items[0] && items[0].cover_url) { %>
+                <img src="<%= items[0].cover_url %>" alt="Album Cover" class="album-cover">
+            <% } else { %>
+                <div style="width: 300px; height: 300px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #64748b;">
+                    🎵 Music Download
+                </div>
+            <% } %>
+            
+            <div class="album-info">
+                <h1>Your Music Download</h1>
+                <div class="artist">Interstellar Packages</div>
+                
+                <div class="album-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Email</div>
+                        <div class="detail-value"><%= email %></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Purchase Date</div>
+                        <div class="detail-value"><%= new Date(purchaseDate).toLocaleDateString() %></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Total Amount</div>
+                        <div class="detail-value">$<%= parseFloat(totalAmount).toFixed(2) %></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Items</div>
+                        <div class="detail-value"><%= items.length %> item<%= items.length !== 1 ? 's' : '' %></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Options -->
+        <div class="download-options">
+            <h2>🎵 Your Music Files</h2>
+            
+            <% items.forEach((item, index) => { %>
+                <div style="margin-bottom: 2rem; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px;" data-album-id="<%= item.id %>">
+                    <h3 style="color: #1e293b; margin-bottom: 1rem;">
+                        <%= item.name %> 
+                        <% if (item.type === 'song') { %>
+                            <span style="color: #64748b; font-size: 0.9rem; font-weight: normal;">from <%= item.album %></span>
+                        <% } %>
+                    </h3>
+                    
+                    <% if (item.type === 'album' && item.songs && item.songs.length > 0) { %>
+                        <!-- Album with tracklist -->
+                        <div class="format-grid">
+                            <div class="format-option">
+                                <div class="format-icon">🎵</div>
+                                <div class="format-name">MP3 Album</div>
+                                <div class="format-description">High quality MP3 files for all tracks</div>
+                                <div class="format-size"><%= item.songs.length %> tracks</div>
+                                <a href="#" class="download-btn" onclick="downloadAlbumFiles('<%= item.id %>', 'mp3')">
+                                    Download MP3s
+                                </a>
+                            </div>
+                            
+                            <div class="format-option">
+                                <div class="format-icon">🎧</div>
+                                <div class="format-name">WAV Album</div>
+                                <div class="format-description">Lossless audio files (when available)</div>
+                                <div class="format-size"><%= item.songs.length %> tracks</div>
+                                <a href="#" class="download-btn" onclick="downloadAlbumFiles('<%= item.id %>', 'wav')">
+                                    Download WAVs
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Tracklist -->
+                        <div class="tracklist" style="margin-top: 1.5rem;">
+                            <h4 style="color: #1e293b; margin-bottom: 1rem;">Album Tracks</h4>
+                            <ul class="track-list">
+                                <% item.songs.forEach((song, trackIndex) => { %>
+                                    <li class="track-item" data-song-url="<%= song.audio_url %>" data-song-name="<%= song.name %>" data-song-id="<%= song.id %>">
+                                        <span class="track-number"><%= trackIndex + 1 %>.</span>
+                                        <span class="track-name"><%= song.name %></span>
+                                        <span class="track-duration">
+                                            <% if (song.duration) { %>
+                                                <%= song.duration %>
+                                            <% } %>
+                                        </span>
+                                    </li>
+                                <% }) %>
+                            </ul>
+                        </div>
+                    <% } else if (item.type === 'song') { %>
+                        <!-- Individual song -->
+                        <div class="format-grid">
+                            <div class="format-option">
+                                <div class="format-icon">🎵</div>
+                                <div class="format-name">MP3 Download</div>
+                                <div class="format-description">High quality MP3 file</div>
+                                <a href="/download-file/<%= token %>/<%= item.id %>" class="download-btn" download="<%= item.name %>.mp3">
+                                    Download MP3
+                                </a>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            <% }) %>
+        </div>
+
+        <!-- Download Information -->
+        <div class="download-info">
+            <h3>📋 Download Information</h3>
+            <ul>
+                <li>Your download link expires on <%= new Date(expiresAt).toLocaleDateString() %></li>
+                <li>Files are high-quality MP3 format (320kbps when available)</li>
+                <li>WAV files are provided when available for audiophile listening</li>
+                <li>Save your files to your device before the expiration date</li>
+                <li>Having trouble? Reply to your purchase email for support</li>
+            </ul>
+            
+            <div style="margin-top: 1.5rem; padding: 1rem; background: #eff6ff; border-radius: 6px; border-left: 4px solid #0891b2;">
+                <strong style="color: #0891b2;">Thank you for your purchase!</strong><br>
+                <span style="color: #64748b;">Enjoy your ambient electronic music journey with Roderick Shoolbraid.</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function downloadFile(url, filename) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function downloadAlbumFiles(albumId, format) {
+            // Get the album data from the page
+            const albumElement = document.querySelector(`[data-album-id="${albumId}"]`);
+            if (!albumElement) {
+                alert('Album not found.');
+                return;
+            }
+
+            const songElements = albumElement.querySelectorAll('[data-song-url]');
+            if (songElements.length === 0) {
+                alert('No songs found for this album.');
+                return;
+            }
+
+            // Use server download route for each song
+            songElements.forEach((songEl, index) => {
+                setTimeout(() => {
+                    const songId = songEl.getAttribute('data-song-id');
+                    const songName = songEl.getAttribute('data-song-name');
+                    
+                    // Create download link through our server
+                    const downloadUrl = `/download-file/<%= token %>/${songId}`;
+                    downloadFile(downloadUrl, `${songName}.${format}`);
+                }, index * 500);
+            });
+            
+            alert(`Started downloading ${songElements.length} ${format.toUpperCase()} files.`);
+        }
+    </script>
+</body>
+</html>
