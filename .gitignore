@@ -51,4 +51,7 @@ Thumbs.db
 
 # Temporary files
 tmp/
-temp/credentials/
+temp/
+
+# Credentials
+credentials/
