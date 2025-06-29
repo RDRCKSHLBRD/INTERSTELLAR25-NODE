@@ -84,11 +84,11 @@ export async function sendGuestDownloadEmail({
             color: white; 
             padding: 15px 30px; 
             text-decoration: none; 
-            border-radius: 5px; 
-            font-weight: bold; 
+            border-radius: 2px; 
+            font-weight: 300; 
             margin: 20px 0;
           }
-          .items-list { background: white; padding: 20px; border-left: 4px solid #3AA0A0; margin: 20px 0; }
+          .items-list { background: white; padding: 20px; border-left: 2px solid #3AA0A0; margin: 20px 0; }
           .footer { text-align: center; color: #666; margin-top: 30px; font-size: 14px; }
           .warning { background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 20px 0; }
         </style>
@@ -96,7 +96,7 @@ export async function sendGuestDownloadEmail({
       <body>
         <div class="container">
           <div class="header">
-            <h1>🎵 Interstellar Packages</h1>
+            <h1>Interstellar Packages</h1>
             <h2>Your Download is Ready!</h2>
           </div>
           
