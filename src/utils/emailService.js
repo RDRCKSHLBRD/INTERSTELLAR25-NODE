@@ -67,7 +67,7 @@ export async function sendGuestDownloadEmail({
       : 'Your purchased items';
     
     // Email content
-    const subject = '🎵 Your Interstellar Packages Download is Ready!';
+    const subject = 'Your Interstellar Packages Download is Ready!';
     
     const htmlContent = `
       <!DOCTYPE html>
@@ -76,8 +76,8 @@ export async function sendGuestDownloadEmail({
         <style>
           body { font-family: Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #083D5E, #3AA0A0); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+          .header { background: linear-gradient(135deg, #083D5E, #3AA0A0); color: white; padding: 30px; text-align: center; border-radius: 2px 2px 0 0; }
+          .content { background: #d1e2e5; padding: 30px; border-radius: 0 0 8px 8px; }
           .download-button { 
             display: inline-block; 
             background: #3AA0A0; 
@@ -89,8 +89,8 @@ export async function sendGuestDownloadEmail({
             margin: 20px 0;
           }
           .items-list { background: white; padding: 20px; border-left: 2px solid #3AA0A0; margin: 20px 0; }
-          .footer { text-align: center; color: #666; margin-top: 30px; font-size: 14px; }
-          .warning { background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin: 20px 0; }
+          .footer { text-align: center; color: #3D6C9B; margin-top: 30px; font-size: 14px; }
+          .warning { background: #bfd4d6; border: 1px solid #367687; padding: 15px; border-radius: 5px; margin: 20px 0; }
         </style>
       </head>
       <body>
@@ -104,7 +104,7 @@ export async function sendGuestDownloadEmail({
             <p>Thank you for your purchase! Your ambient electronic music is ready for download.</p>
             
             <div class="items-list">
-              <h3>📦 Your Purchase:</h3>
+              <h3>Your Purchase:</h3>
               <pre>${itemsList}</pre>
               <p><strong>Total: $${purchaseDetails.totalAmount} ${purchaseDetails.currency.toUpperCase()}</strong></p>
             </div>
