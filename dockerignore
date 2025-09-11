@@ -1,0 +1,10 @@
+node_modules
+.git
+.env
+README.md
+Dockerfile
+.dockerignore
+tests/
+reports/
+Deploy/
+.DS_Store
