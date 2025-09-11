@@ -174,7 +174,7 @@ const startServer = async () => {
       process.exit(1);
     }
 
-    const server = app.listen(config.port, "0.0.0.0", () => {
+    const server = app.listen(config.port, () => {
       console.log(`🚀 Server running on port ${config.port}`);
       console.log(`📊 Health check: http://localhost:${config.port}/api/health`);
       console.log(`🎵 Main app: http://localhost:${config.port}`);
