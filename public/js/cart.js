@@ -598,7 +598,7 @@ renderCartItems() {
     const data = await response.json();
 
     if (data.id) {
-      const stripe = Stripe('pk_test_51KdJ4iC7g8sqmaXgpX4MP3pGmU7GSnwT4UNBhSXcENXcKriTCSHuvBBc9GbJg24FN7Vx9zh9sQuuYwxoQy3v58vT00evpFqn47');
+      const stripe = Stripe('pk_live_51KdJ4iC7g8sqmaXgwArORMdCJ5ENZu6W5ikA63SftUqqW5x2Xo7MQG4CZqPVgm7rIbdNYdZ0qrI3gClc99eIsVBv00huAgKhHO');
       await stripe.redirectToCheckout({ sessionId: data.id });
     } else {
       this.showCartNotification('Could not start checkout.', 'error');
