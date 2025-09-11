@@ -121,6 +121,17 @@ app.use('/api/purchase', purchaseRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/health', healthRoutes);
 
+
+// Config endpoint for frontend
+app.get('/api/config', (req, res) => {
+  res.json({
+    stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY
+  });
+});
+
+
+
+
 // Page routes (serve HTML pages)
 app.use('/', pageRoutes);
 

@@ -548,10 +548,14 @@ renderCartItems() {
     }
   }
 
-  async handleCheckout() {
+async handleCheckout() {
   if (!this.cart.items || this.cart.items.length === 0) return;
 
   try {
+    // Get Stripe publishable key from server
+    const configResponse = await fetch('/api/config');
+    const config = await configResponse.json();
+    
     // Prepare checkout data
     const checkoutData = {
       isLoggedIn: this.isLoggedIn,
@@ -560,24 +564,23 @@ renderCartItems() {
       cartItems: this.cart.items
     };
 
-    // ✅ For guest purchases, collect email
+    // For guest purchases, collect email
     if (!this.isLoggedIn) {
-      // Show email collection modal
       const guestEmail = await this.collectGuestEmail();
       
       if (!guestEmail) {
-        console.log('❌ Guest checkout cancelled - no email provided');
-        return; // User cancelled
+        console.log('Guest checkout cancelled - no email provided');
+        return;
       }
       
       checkoutData.guestEmail = guestEmail;
       checkoutData.purchaseType = 'guest';
-      console.log('📧 Guest email collected:', guestEmail);
+      console.log('Guest email collected:', guestEmail);
     } else {
       checkoutData.purchaseType = 'user';
     }
 
-    console.log('🛒 Checkout cart payload:', checkoutData);
+    console.log('Checkout cart payload:', checkoutData);
 
     const response = await fetch('/api/purchase/create-session', {
       method: 'POST',
@@ -590,7 +593,7 @@ renderCartItems() {
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error('❌ Checkout failed:', response.status, errorData);
+      console.error('Checkout failed:', response.status, errorData);
       this.showCartNotification(`Checkout failed: ${errorData}`, 'error');
       return;
     }
@@ -598,13 +601,13 @@ renderCartItems() {
     const data = await response.json();
 
     if (data.id) {
-      const stripe = Stripe('pk_live_51KdJ4iC7g8sqmaXgwArORMdCJ5ENZu6W5ikA63SftUqqW5x2Xo7MQG4CZqPVgm7rIbdNYdZ0qrI3gClc99eIsVBv00huAgKhHO');
+      const stripe = Stripe(config.stripePublishableKey);
       await stripe.redirectToCheckout({ sessionId: data.id });
     } else {
       this.showCartNotification('Could not start checkout.', 'error');
     }
   } catch (error) {
-    console.error('❌ Checkout error:', error);
+    console.error('Checkout error:', error);
     this.showCartNotification('Checkout failed. Try again.', 'error');
   }
 }
