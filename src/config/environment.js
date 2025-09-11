@@ -81,37 +81,40 @@ const config = {
   }
 };
 
-// --- START of REQUIRED MODIFICATION for Google Cloud Credentials on Render ---
-if (config.nodeEnv === 'production' && process.env.GCLOUD_SERVICE_ACCOUNT_KEY_BASE64) {
+// --- UPDATED Google Cloud Credentials Section ---
+if (config.nodeEnv === 'production' && process.env.K_SERVICE) {
+  // Running on Google Cloud Run - use default service account
+  console.log('Using default Cloud Run service account credentials');
+  // No explicit credentials needed - Cloud Run provides them automatically
+} else if (config.nodeEnv === 'production' && process.env.GCLOUD_SERVICE_ACCOUNT_KEY_BASE64) {
+  // Use explicit credentials (for other platforms like Render)
   try {
     const credentialsJson = Buffer.from(process.env.GCLOUD_SERVICE_ACCOUNT_KEY_BASE64, 'base64').toString('utf8');
-    const tempDirPath = '/tmp'; // Render's /tmp directory is writable
-    const tempFilePath = path.join(tempDirPath, 'gcloud-key.json'); //
+    const tempDirPath = '/tmp';
+    const tempFilePath = path.join(tempDirPath, 'gcloud-key.json');
 
-    // Ensure the directory exists (though /tmp usually does)
-    if (!fs.existsSync(tempDirPath)) { //
-      fs.mkdirSync(tempDirPath, { recursive: true }); //
+    if (!fs.existsSync(tempDirPath)) {
+      fs.mkdirSync(tempDirPath, { recursive: true });
     }
 
-    fs.writeFileSync(tempFilePath, credentialsJson); //
-    process.env.GOOGLE_APPLICATION_CREDENTIALS = tempFilePath; // Set this for the GCS library
+    fs.writeFileSync(tempFilePath, credentialsJson);
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = tempFilePath;
     console.log('Google Cloud credentials loaded from environment variable to temporary file.');
   } catch (error) {
     console.error('Error processing Google Cloud credentials from base64:', error);
-    process.exit(1); // Exit if credentials cannot be set up
+    process.exit(1);
   }
 } else if (process.env.GOOGLE_CLOUD_KEY_FILE) {
-  // This block is for local development if you store the key file directly
-  // Ensure the path is correct if used locally
+  // Local development with key file
   process.env.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_CLOUD_KEY_FILE;
 } else if (config.nodeEnv === 'production') {
-    // In production, if the base64 env var is missing, it's a critical error
-    console.error('In production, GCLOUD_SERVICE_ACCOUNT_KEY_BASE64 environment variable is required.');
-    process.exit(1);
+  // In production on non-Google platforms, require explicit credentials
+  console.error('In production on non-Google Cloud platforms, GCLOUD_SERVICE_ACCOUNT_KEY_BASE64 environment variable is required.');
+  process.exit(1);
 } else {
   console.warn('Google Cloud credentials file path or base64 not found. GCS operations might fail in development.');
 }
-// --- END of REQUIRED MODIFICATION for Google Cloud Credentials on Render ---
+// --- END Google Cloud Credentials Section ---
 
 
 // Development-specific settings
