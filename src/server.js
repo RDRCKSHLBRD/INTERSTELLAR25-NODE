@@ -49,8 +49,6 @@ app.use((req, res, next) => {
 });
 
 // Security middleware
-// REPLACE THIS SECTION IN src/server.js:
-
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -97,7 +95,6 @@ app.use(
 
 app.use('/api/purchase/webhook', purchaseWebhook);
 
-
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -116,9 +113,8 @@ if (config.nodeEnv === 'development') {
   });
 }
 
-
 // Authenticated audio serving route
-app.get('/api/audio/*', async (req, res) => {
+app.get(/^\/api\/audio\/(.*)$/, async (req, res) => {
   try {
     const audioPath = req.params[0];
     const file = storage.bucket(bucketName).file(audioPath);
@@ -145,11 +141,9 @@ app.get('/api/audio/*', async (req, res) => {
 });
 
 // Authenticated image serving route
-app.get('/api/image/*', async (req, res) => {
-
+app.get(/^\/api\/image\/(.*)$/, async (req, res) => {
   try {
     const imagePath = req.params[0];
-
     const file = storage.bucket(bucketName).file(imagePath);
     const [exists] = await file.exists();
 
@@ -171,7 +165,6 @@ app.get('/api/image/*', async (req, res) => {
   }
 });
 
-
 // API Routes
 app.use('/api/artists', artistRoutes);
 app.use('/api/albums', albumRoutes);
@@ -181,16 +174,12 @@ app.use('/api/purchase', purchaseRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/health', healthRoutes);
 
-
 // Config endpoint for frontend
 app.get('/api/config', (req, res) => {
   res.json({
     stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY
   });
 });
-
-
-
 
 // Page routes (serve HTML pages)
 app.use('/', pageRoutes);

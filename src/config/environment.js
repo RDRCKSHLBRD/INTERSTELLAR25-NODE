@@ -1,12 +1,12 @@
 import dotenv from 'dotenv';
-import fs from 'fs'; // Import fs module
-import path from 'path'; // Import path module
-import { fileURLToPath } from 'url'; // Import fileURLToPath for __dirname in ESM
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url); // Define __filename for ESM
-const __dirname = path.dirname(__filename); // Define __dirname for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Validate required environment variables
 const requiredEnvVars = [
@@ -14,8 +14,6 @@ const requiredEnvVars = [
   'DB_PASSWORD',
   'DB_NAME',
   'JWT_SECRET',
-  // You might want to add other critical production vars here later,
-  // but for now, these are the ones that cause process.exit(1) if missing.
 ];
 
 const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
@@ -38,7 +36,7 @@ const config = {
     name: process.env.DB_NAME,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    url: process.env.DATABASE_URL // It's good that this is here
+    url: process.env.DATABASE_URL
   },
 
   // Security configuration
@@ -62,32 +60,30 @@ const config = {
   // Google Cloud Storage
   googleCloud: {
     projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
-    // keyFile: process.env.GOOGLE_CLOUD_KEY_FILE, // REMOVE or COMMENT OUT this line
-    bucket: process.env.GOOGLE_CLOUD_BUCKET || 'ip-public-bucket1' //
+    bucket: process.env.GOOGLE_CLOUD_BUCKET || 'rdxenv3-interstellar-assets'
   },
 
   // CORS settings
   cors: {
     origins: process.env.ALLOWED_ORIGINS
       ? process.env.ALLOWED_ORIGINS.split(',')
-      : ['http://localhost:3000', 'http://localhost:3001'] //
+      : ['http://localhost:3000', 'http://localhost:3001']
   },
 
   // File upload settings
   upload: {
     maxFileSize: parseInt(process.env.MAX_FILE_SIZE) || 10 * 1024 * 1024, // 10MB
-    allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp'], //
-    allowedAudioTypes: ['audio/mpeg', 'audio/wav', 'audio/mp3'] //
+    allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    allowedAudioTypes: ['audio/mpeg', 'audio/wav', 'audio/mp3']
   }
 };
 
-// --- UPDATED Google Cloud Credentials Section ---
+// Google Cloud Credentials Configuration
 if (config.nodeEnv === 'production' && process.env.K_SERVICE) {
   // Running on Google Cloud Run - use default service account
   console.log('Using default Cloud Run service account credentials');
-  // No explicit credentials needed - Cloud Run provides them automatically
 } else if (config.nodeEnv === 'production' && process.env.GCLOUD_SERVICE_ACCOUNT_KEY_BASE64) {
-  // Use explicit credentials (for other platforms like Render)
+  // Use explicit credentials for other production platforms
   try {
     const credentialsJson = Buffer.from(process.env.GCLOUD_SERVICE_ACCOUNT_KEY_BASE64, 'base64').toString('utf8');
     const tempDirPath = '/tmp';
@@ -104,34 +100,31 @@ if (config.nodeEnv === 'production' && process.env.K_SERVICE) {
     console.error('Error processing Google Cloud credentials from base64:', error);
     process.exit(1);
   }
-} else if (process.env.GOOGLE_CLOUD_KEY_FILE) {
-  // Local development with key file
-  process.env.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_CLOUD_KEY_FILE;
 } else if (config.nodeEnv === 'production') {
   // In production on non-Google platforms, require explicit credentials
   console.error('In production on non-Google Cloud platforms, GCLOUD_SERVICE_ACCOUNT_KEY_BASE64 environment variable is required.');
   process.exit(1);
 } else {
-  console.warn('Google Cloud credentials file path or base64 not found. GCS operations might fail in development.');
+  // Development mode - use Application Default Credentials
+  console.log('Using Application Default Credentials for local development');
+  // Do not set GOOGLE_APPLICATION_CREDENTIALS - let ADC handle it automatically
 }
-// --- END Google Cloud Credentials Section ---
-
 
 // Development-specific settings
 if (config.nodeEnv === 'development') {
-  config.logLevel = 'debug'; //
-  config.enableApiDocs = true; //
+  config.logLevel = 'debug';
+  config.enableApiDocs = true;
 }
 
 // Production-specific settings
 if (config.nodeEnv === 'production') {
-  config.logLevel = 'info'; //
-  config.enableApiDocs = false; //
+  config.logLevel = 'info';
+  config.enableApiDocs = false;
 
   // Additional security in production
   config.security = {
-    enableHelmet: true, //
-    enableRateLimit: true, //
+    enableHelmet: true,
+    enableRateLimit: true,
     rateLimitMax: 100, // requests per window
     rateLimitWindow: 15 * 60 * 1000 // 15 minutes
   };
