@@ -8,10 +8,14 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import config from './config/environment.js';
 import { testConnection, closePool } from './config/database.js';
+import { Storage } from '@google-cloud/storage';
 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const storage = new Storage();
+const bucketName = 'rdxenv3-interstellar-assets';
 
 // Import route modules
 import artistRoutes from './routes/api/artists.js';
@@ -56,7 +60,7 @@ app.use(
         scriptSrc: ["'self'", "https://js.stripe.com"],
         imgSrc: ["'self'", "https://storage.googleapis.com", "data:"],
         mediaSrc: ["'self'", "https://storage.googleapis.com"],
-        connectSrc: ["'self'", "https://api.stripe.com", "https://checkout.stripe.com","https://storage.googleapis.com"],
+        connectSrc: ["'self'", "https://api.stripe.com", "https://checkout.stripe.com", "https://storage.googleapis.com"],
         fontSrc: ["'self'"],
         objectSrc: ["'none'"],
         frameSrc: ["'self'", "https://player.vimeo.com", "https://js.stripe.com", "https://hooks.stripe.com"]
@@ -111,6 +115,62 @@ if (config.nodeEnv === 'development') {
     next();
   });
 }
+
+
+// Authenticated audio serving route
+app.get('/api/audio/*', async (req, res) => {
+  try {
+    const audioPath = req.params[0];
+    const file = storage.bucket(bucketName).file(audioPath);
+    const [exists] = await file.exists();
+
+    if (!exists) {
+      return res.status(404).send('Audio not found');
+    }
+
+    const [metadata] = await file.getMetadata();
+    res.set({
+      'Content-Type': metadata.contentType || 'audio/mpeg',
+      'Cache-Control': 'public, max-age=3600',
+      'Content-Length': metadata.size,
+      'Accept-Ranges': 'bytes'
+    });
+
+    const stream = file.createReadStream();
+    stream.pipe(res);
+  } catch (error) {
+    console.error('Audio serving error:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+// Authenticated image serving route
+app.get('/api/image/*', async (req, res) => {
+
+  try {
+    const imagePath = req.params[0];
+
+    const file = storage.bucket(bucketName).file(imagePath);
+    const [exists] = await file.exists();
+
+    if (!exists) {
+      return res.status(404).send('Image not found');
+    }
+
+    const [metadata] = await file.getMetadata();
+    res.set({
+      'Content-Type': metadata.contentType || 'image/png',
+      'Cache-Control': 'public, max-age=86400'
+    });
+
+    const stream = file.createReadStream();
+    stream.pipe(res);
+  } catch (error) {
+    console.error('Image serving error:', error);
+    res.status(500).send('Server error');
+  }
+});
+
 
 // API Routes
 app.use('/api/artists', artistRoutes);
