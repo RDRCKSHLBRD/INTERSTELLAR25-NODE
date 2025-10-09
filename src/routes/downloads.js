@@ -27,7 +27,7 @@ if (process.env.GOOGLE_CLOUD_CREDENTIALS) {
   });
 }
 
-const bucket = storage.bucket('ip-public-bucket1');
+const bucket = storage.bucket(process.env.GOOGLE_CLOUD_BUCKET || 'rdxenv3-interstellar-assets');
 
 // Guest download route - handles the email download links
 router.get('/guest-downloads/:token', async (req, res) => {
@@ -205,7 +205,8 @@ router.get('/download-file/:token/:songId', async (req, res) => {
 
     // Extract filename from the Google Cloud Storage URL
     const urlParts = song.audio_url.split('/');
-    const bucketIndex = urlParts.findIndex(part => part === 'ip-public-bucket1');
+    const bucketName = process.env.GOOGLE_CLOUD_BUCKET || 'rdxenv3-interstellar-assets';
+    const bucketIndex = urlParts.findIndex(part => part === bucketName);
     const fileName = urlParts.slice(bucketIndex + 1).join('/');
     console.log(`📁 File name: ${fileName}`);
 
@@ -273,7 +274,8 @@ router.get('/download-album/:token/:albumId/:format', async (req, res) => {
 
     for (const song of songs) {
       const urlParts = song.audio_url.split('/');
-      const bucketIndex = urlParts.findIndex(part => part === 'ip-public-bucket1');
+      const bucketName = process.env.GOOGLE_CLOUD_BUCKET || 'rdxenv3-interstellar-assets';
+      const bucketIndex = urlParts.findIndex(part => part === bucketName);
       const fileName = urlParts.slice(bucketIndex + 1).join('/');
 
       // For WAV, try to replace .mp3 with .wav in filename
