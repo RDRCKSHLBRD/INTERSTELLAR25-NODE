@@ -5,9 +5,9 @@ import { query } from '../config/database.js';
 
 async function sendMissingEmails(options = {}) {
   const { dryRun = false, limit = null, email = null } = options;
-  
+
   console.log('🔍 Looking for purchases with tokens but no emails sent...\n');
-  
+
   if (dryRun) {
     console.log('🧪 DRY RUN MODE - No emails will actually be sent\n');
   }
@@ -17,32 +17,33 @@ async function sendMissingEmails(options = {}) {
     // We'll track email sends by checking if accessed_at is null (never accessed = email not sent yet)
     let findQuery = `
       SELECT 
-        p.id as purchase_id,
-        p.email,
-        p.purchased_at,
-        p.total_amount,
-        gd.token,
-        gd.expires_at,
-        gd.created_at as token_created_at
-      FROM purchases p
+       p.id as purchase_id,
+       p.email,
+       p.purchased_at,
+       p.total_amount,
+       p.currency,
+       gd.token,
+       gd.expires_at,
+       gd.created_at as token_created_at
+    FROM purchases p
       JOIN guest_downloads gd ON gd.purchase_id = p.id
       WHERE p.email IS NOT NULL
       ORDER BY p.purchased_at DESC
     `;
-    
+
     const params = [];
-    
+
     if (email) {
       findQuery = findQuery.replace('ORDER BY', 'AND p.email = $1 ORDER BY');
       params.push(email);
     }
-    
+
     if (limit) {
       findQuery += ` LIMIT ${parseInt(limit)}`;
     }
-    
+
     const result = await query(findQuery, params);
-    
+
     if (result.rows.length === 0) {
       console.log('✅ No purchases found to process.\n');
       return { sent: 0, failed: 0, emails: [] };
@@ -68,37 +69,46 @@ async function sendMissingEmails(options = {}) {
 
     for (const purchase of result.rows) {
       console.log(`📧 Sending email to ${purchase.email} for purchase #${purchase.purchase_id}...`);
-      
+
       try {
         const emailResult = await sendGuestDownloadEmail({
-          to: purchase.email,
-          token: purchase.token
+          email: purchase.email,
+          downloadToken: {
+            token: purchase.token,
+            expiresAt: purchase.expires_at
+          },
+          purchaseDetails: {
+            totalAmount: purchase.total_amount,
+            purchasedAt: purchase.purchased_at,
+            currency: purchase.currency 
+          },
+          purchasedItems: [] // We don't have items in this utility, that's OK
         });
-        
+
         console.log(`   ✅ Email sent! Message ID: ${emailResult.messageId}\n`);
-        
+
         results.push({
           purchaseId: purchase.purchase_id,
           email: purchase.email,
           success: true,
           messageId: emailResult.messageId
         });
-        
+
         sent++;
-        
+
         // Small delay between emails to avoid rate limits
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
       } catch (error) {
         console.error(`   ❌ Failed to send: ${error.message}\n`);
-        
+
         results.push({
           purchaseId: purchase.purchase_id,
           email: purchase.email,
           success: false,
           error: error.message
         });
-        
+
         failed++;
       }
     }
@@ -107,9 +117,9 @@ async function sendMissingEmails(options = {}) {
     console.log(`   ✅ Sent: ${sent}`);
     console.log(`   ❌ Failed: ${failed}`);
     console.log(`   📧 Total processed: ${results.length}\n`);
-    
+
     return { sent, failed, emails: results };
-    
+
   } catch (error) {
     console.error('❌ Error processing emails:', error);
     throw error;
@@ -124,7 +134,7 @@ function parseArgs() {
     limit: null,
     email: null
   };
-  
+
   for (let i = 0; i < args.length; i++) {
     switch (args[i]) {
       case '--dry-run':
@@ -154,14 +164,14 @@ Examples:
         process.exit(0);
     }
   }
-  
+
   return options;
 }
 
 // Run if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const options = parseArgs();
-  
+
   sendMissingEmails(options)
     .then(result => {
       if (!options.dryRun) {
