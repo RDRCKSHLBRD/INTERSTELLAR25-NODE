@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 422.7 351.62">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke: #231f20;
+        stroke-width: 6px;
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4, .cls-5, .cls-6, .cls-7, .cls-8 {
+        stroke-linecap: round;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-1, .cls-4, .cls-7 {
+        fill: #231f20;
+      }
+
+      .cls-2 {
+        fill: #d9e0cd;
+        stroke: #d9e0cd;
+        stroke-width: 3px;
+      }
+
+      .cls-3 {
+        fill: #3d3c38;
+        stroke: #3d3c38;
+        stroke-width: 4px;
+      }
+
+      .cls-4 {
+        stroke: #8e8c86;
+        stroke-width: 7px;
+      }
+
+      .cls-5 {
+        stroke: #9da2a5;
+      }
+
+      .cls-5, .cls-6 {
+        fill: #8c9a9b;
+      }
+
+      .cls-6 {
+        stroke: #8c9a9b;
+        stroke-width: 2px;
+      }
+
+      .cls-7 {
+        stroke: #959b9a;
+        stroke-width: 9px;
+      }
+
+      .cls-8 {
+        fill: #adaaa1;
+        stroke: #adaaa1;
+        stroke-width: 5px;
+      }
+    </style>
+  </defs>
+  <g id="Layer_13" data-name="Layer 13">
+    <line class="cls-1" x1="346.9" y1="22.78" x2="346.89" y2="189.78"/>
+  </g>
+  <g id="Layer_12" data-name="Layer 12">
+    <line class="cls-3" x1="280.89" y1="23.78" x2="280.9" y2="256.78"/>
+  </g>
+  <g id="Layer_11" data-name="Layer 11">
+    <line class="cls-2" x1="255.39" y1="24.28" x2="255.39" y2="283.28"/>
+  </g>
+  <g id="Layer_10" data-name="Layer 10">
+    <line class="cls-8" x1="314.39" y1="24.28" x2="314.39" y2="215.28"/>
+  </g>
+  <g id="Layer_9" data-name="Layer 9">
+    <line class="cls-1" x1="21.89" y1="23.78" x2="21.89" y2="189.78"/>
+  </g>
+  <g id="Layer_8" data-name="Layer 8">
+    <line class="cls-6" x1="132.89" y1="23.78" x2="132.89" y2="302.78"/>
+  </g>
+  <g id="Layer_7" data-name="Layer 7">
+    <line class="cls-5" x1="184.39" y1="24.28" x2="184.39" y2="335.28"/>
+  </g>
+  <g id="Layer_6" data-name="Layer 6">
+    <line class="cls-6" x1="235.89" y1="23.78" x2="235.89" y2="302.78"/>
+  </g>
+  <g id="Layer_5" data-name="Layer 5">
+    <line class="cls-2" x1="112.39" y1="24.28" x2="113.39" y2="283.28"/>
+  </g>
+  <g id="Layer_4" data-name="Layer 4">
+    <line class="cls-3" x1="87.89" y1="23.78" x2="87.9" y2="256.78"/>
+  </g>
+  <g id="Layer_3" data-name="Layer 3">
+    <line class="cls-8" x1="54.39" y1="24.28" x2="54.39" y2="222.28"/>
+  </g>
+  <g id="Layer_2" data-name="Layer 2">
+    <line class="cls-4" x1="371.39" y1="23.28" x2="371.39" y2="163.28"/>
+  </g>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <line class="cls-7" x1="398.39" y1="24.28" x2="398.39" y2="140.28"/>
+  </g>
+</svg>
