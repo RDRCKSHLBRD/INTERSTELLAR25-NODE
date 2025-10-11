@@ -14,8 +14,8 @@
     <div class="album-download-container">
         <div class="album-header">
             <div>
-                <% if (song.cover_url) { %>
-                    <img src="<%= song.cover_url %>" alt="<%= song.album_name %>" class="album-cover">
+                <% if (items[0].cover_url) { %>
+                    <img src="<%= items[0].cover_url %>" alt="<%= items[0].album %>" class="album-cover">
                 <% } else { %>
                     <div class="album-cover" style="background: rgba(24, 69, 81, 0.3); display: flex; align-items: center; justify-content: center; color: #8ab7ce; font-size: 3rem;">
                         🎵
@@ -24,29 +24,20 @@
             </div>
             
             <div class="album-info">
-                <h1><%= song.song_name %></h1>
-                <div class="artist"><%= song.artist_name %></div>
-                <p style="color: #8ab7ce; margin-top: 0.5rem;">from "<%= song.album_name %>"</p>
+                <h1><%= items[0].name %></h1>
+                <div class="artist"><%= items[0].artist %></div>
+                <p style="color: #8ab7ce; margin-top: 0.5rem;">from "<%= items[0].album %>"</p>
                 
                 <div class="album-details">
-                    <% if (song.duration) { %>
-                        <div class="detail-item">
-                            <div class="detail-label">Duration</div>
-                            <div class="detail-value"><%= song.duration %></div>
-                        </div>
-                    <% } %>
-                    
                     <div class="detail-item">
-                        <div class="detail-label">Track #</div>
-                        <div class="detail-value"><%= song.track_id %></div>
+                        <div class="detail-label">Purchase Date</div>
+                        <div class="detail-value"><%= new Date(purchaseDate).toLocaleDateString() %></div>
                     </div>
                     
-                    <% if (song.album_catalogue) { %>
-                        <div class="detail-item">
-                            <div class="detail-label">Album</div>
-                            <div class="detail-value"><%= song.album_catalogue %></div>
-                        </div>
-                    <% } %>
+                    <div class="detail-item">
+                        <div class="detail-label">Price</div>
+                        <div class="detail-value">$<%= parseFloat(items[0].price).toFixed(2) %></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -60,8 +51,8 @@
                     <div class="format-name">MP3 Download</div>
                     <div class="format-description">High-quality MP3 file, ready for any device</div>
                     <div class="format-size">~5-8MB estimated</div>
-                    <a href="/downloads/file/song/<%= song.song_id %>/mp3/<%= downloadTokens.mp3 %>" 
-                       class="download-btn">Download MP3</a>
+                    <a href="/download-file/<%= token %>/<%= items[0].id %>" 
+                       class="download-btn" download="<%= items[0].name %>.mp3">Download MP3</a>
                 </div>
 
                 <div class="format-option">
@@ -69,15 +60,15 @@
                     <div class="format-name">WAV Download</div>
                     <div class="format-description">Lossless audio file for audiophiles</div>
                     <div class="format-size">~25-40MB estimated</div>
-                    <a href="/downloads/file/song/<%= song.song_id %>/wav/<%= downloadTokens.wav %>" 
-                       class="download-btn">Download WAV</a>
+                    <a href="/download-file/<%= token %>/<%= items[0].id %>" 
+                       class="download-btn" download="<%= items[0].name %>.wav">Download WAV</a>
                 </div>
             </div>
 
             <div class="download-info">
                 <h3>Download Information</h3>
                 <ul>
-                    <li>Downloads are available for 24 hours after purchase</li>
+                    <li>Your download link expires on <%= new Date(expiresAt).toLocaleDateString() %></li>
                     <li>MP3 files are 320kbps quality</li>
                     <li>WAV files are CD-quality lossless</li>
                     <li>Files include embedded metadata and artwork</li>
@@ -86,7 +77,7 @@
         </div>
 
         <div style="text-align: center; margin: 2rem 0;">
-            <a href="/downloads/my-downloads" class="download-btn secondary">← Back to My Downloads</a>
+            <a href="/" class="download-btn secondary">← Browse More Music</a>
         </div>
     </div>
 
