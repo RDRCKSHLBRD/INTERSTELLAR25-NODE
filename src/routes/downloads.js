@@ -79,7 +79,7 @@ router.get('/guest-downloads/:token', async (req, res) => {
       if (item.song_id) {
         // This is a song purchase
         const songQuery = `
-          SELECT s.*, a.name as album_name, ar.name as artist_name
+          SELECT s.*, a.name as album_name, ar.name as artist_name, a.cover_url
           FROM songs s
           JOIN albums a ON s.album_id = a.id  
           JOIN artists ar ON a.artist_id = ar.id
