@@ -7,8 +7,27 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/additional-styles.css">
     <link rel="stylesheet" href="/css/downloads.css">
-</head>
-<body>
+    
+    <style>
+        .downloads-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .downloads-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .browse-btn {
+            background: #0891b2;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-block;
             font-weight: 500;
             transition: background 0.2s ease;
         }
@@ -38,8 +57,7 @@
     </style>
 </head>
 <body>
-    <!-- Include your navigation header here -->
-    <%- include('partials/header', { user: user }) %>
+    <%- include('../partials/header', { user: user }) %>
 
     <div class="downloads-container">
         <div class="downloads-header">
@@ -122,6 +140,6 @@
         <% } %>
     </div>
 
-    <%- include('partials/footer') %>
+    <%- include('../partials/footer') %>
 </body>
 </html>
