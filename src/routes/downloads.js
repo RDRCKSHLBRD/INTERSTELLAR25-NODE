@@ -96,6 +96,7 @@ router.get('/guest-downloads/:token', async (req, res) => {
             artist: song.artist_name,
             album: song.album_name,
             audio_url: song.audio_url,
+            cover_url: song.cover_url,  // ← ADD THIS
             price: item.price
           });
         }
