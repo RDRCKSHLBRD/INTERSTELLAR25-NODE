@@ -4,6 +4,9 @@ import { fileURLToPath } from 'url';
 import pool from '../config/database.js';
 import { Storage } from '@google-cloud/storage';
 
+console.log('🔧 Downloads routes module loaded');
+
+
 const router = express.Router();
 
 // Directory fix for __dirname in ESM
@@ -169,6 +172,10 @@ router.get('/guest-downloads/:token', async (req, res) => {
     });
   }
 });
+
+
+console.log('✅ Registered route: GET /guest-downloads/:token');  // <- ADD THIS
+
 
 // Download individual song file - generates signed URL
 router.get('/download-file/:token/:songId', async (req, res) => {
