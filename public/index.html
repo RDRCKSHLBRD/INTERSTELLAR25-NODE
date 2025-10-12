@@ -5,16 +5,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INTERSTELLAR PACKAGES</title>
-    
+
     <!-- ADD THIS LINE HERE - BEFORE YOUR CSS -->
     <script src="https://js.stripe.com/v3/"></script>
-    
+
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/loading-styles.css">
     <link rel="stylesheet" href="/css/additional-styles.css">
+    <link rel="stylesheet" href="css/preloader.css">
 </head>
 
 <body>
+
+
+
+    <div class="preloader-overlay" id="preloader">
+        <div class="logo-container">
+            <div class="logo-bar"><img src="/svg/1.svg" alt=""></div>
+            <div class="logo-bar"><img src="/svg/2.svg" alt=""></div>
+            <div class="logo-bar"><img src="/svg/3.svg" alt=""></div>
+            <div class="logo-bar"><img src="/svg/4.svg" alt=""></div>
+            <div class="logo-bar"><img src="/svg/5.svg" alt=""></div>
+            <div class="logo-bar"><img src="/svg/6.svg" alt=""></div>
+            <div class="logo-bar"><img src="/svg/7.svg" alt=""></div>
+            <div class="logo-bar"><img src="/svg/8.svg" alt=""></div>
+            <div class="logo-bar"><img src="/svg/9.svg" alt=""></div>
+            <div class="logo-bar"><img src="/svg/10.svg" alt=""></div>
+            <div class="logo-bar"><img src="/svg/11.svg" alt=""></div>
+            <div class="logo-bar"><img src="/svg/12.svg" alt=""></div>
+            <div class="logo-bar"><img src="/svg/13.svg" alt=""></div>
+        </div>
+        <div class="loading-text">Interstellar Packages</div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <header>
         <div class="Logo">
             <img src="/images/IP_TAG24.svg" alt="Interstellar Packages Logo">
@@ -68,17 +104,27 @@
         </details>
     </footer>
 
+    <!-- interstellar system-->
+    <script type="module" src="/js/InterstellarSystem.js"></script>
+
+    <!--main-->
+    <script type="module" src="/js/main.js"></script>
+
     <!-- Load API client first as an ESM module -->
     <script type="module" src="/js/api-client.js"></script>
-    
+    <!-- Load UI manager and main as ESM modules -->
+    <script type="module" src="/js/ui-manager.js"></script>
+
     <!-- Load other scripts that depend on global objects (non-module) -->
     <script src="/js/auth.js"></script>
     <script src="/js/cart.js"></script>
     <script src="/js/player.js"></script>
+
     
-    <!-- Load UI manager and main as ESM modules -->
-    <script type="module" src="/js/ui-manager.js"></script>
-    <script type="module" src="/js/main.js"></script>
+
+
+
+
 
     <!-- Auth Modal -->
     <div id="authModal" class="auth-modal">

@@ -1,10 +1,19 @@
 /**
  * Main Application Script for Interstellar Packages
- * API-driven version - CLEANED VERSION (no hardcoded Stripe links)
+ * API-driven version with InterstellarSystem integration
  */
 
 import apiClient, { loadingManager, showError } from './api-client.js';
 import uiManager from './ui-manager.js';
+
+// Import the new system (optional - graceful fallback if not available)
+let Interstellar = null;
+try {
+  const { default: InterstellarSystemModule } = await import('./InterstellarSystem.js');
+  Interstellar = InterstellarSystemModule;
+} catch (error) {
+  console.log('ℹ️ InterstellarSystem not available, using standard mode');
+}
 
 // Global data object (populated from API)
 let data = {
@@ -13,16 +22,13 @@ let data = {
   songs: {}
 };
 
-// REMOVED: Global purchase links object - now handled by cart system
-
 /**
- * Application Initialization
+ * Application Initialization - ENHANCED
  */
 async function initializeApp() {
   try {
-    showLoadingState('Loading music collection...');
-    
     // Load data from API
+    console.log('📡 Loading music collection...');
     data = await apiClient.getOrganizedData();
     
     // Check if we have data
@@ -36,23 +42,26 @@ async function initializeApp() {
     // Initialize UI using the UI Manager
     await uiManager.initialize();
     
-    hideLoadingState();
+    // Hide loading state
+    if (Interstellar && Interstellar.preloader) {
+      Interstellar.preloader.hide();
+    } else {
+      hideLoadingState();
+    }
     
-    // Albums loaded silently now - better UX
+    console.log('🎉 App ready!');
     
   } catch (error) {
-    hideLoadingState();
-    console.error('App initialization failed:', error);
-    
-    // Fallback to static data if API fails
-    if (typeof initializeWithStaticData === 'function') {
-      console.log('🔄 Falling back to static data...');
-      showError('API unavailable. Loading from static files...');
-      initializeWithStaticData();
+    // Hide loading on error
+    if (Interstellar && Interstellar.preloader) {
+      Interstellar.preloader.forceHide();
     } else {
-      showError('Failed to load music data. Please refresh the page or check your connection.');
-      showRetryButton();
+      hideLoadingState();
     }
+    
+    console.error('App initialization failed:', error);
+    showError('Failed to load music data. Please refresh the page or check your connection.');
+    showRetryButton();
   }
 }
 
@@ -68,7 +77,7 @@ function hideLoadingState() {
 }
 
 /**
- * Success message (kept for potential future use)
+ * Success message
  */
 function showSuccessMessage(message) {
   const successElement = document.createElement('div');
@@ -92,12 +101,14 @@ function showSuccessMessage(message) {
  */
 function showRetryButton() {
   const albumArtContainer = document.querySelector('.album-art');
-  albumArtContainer.innerHTML = `
-    <div class="retry-container">
-      <p>Failed to load music collection.</p>
-      <button class="retry-button" onclick="initializeApp()">Retry</button>
-    </div>
-  `;
+  if (albumArtContainer) {
+    albumArtContainer.innerHTML = `
+      <div class="retry-container">
+        <p>Failed to load music collection.</p>
+        <button class="retry-button" onclick="window.initializeApp()">Retry</button>
+      </div>
+    `;
+  }
 }
 
 /**
@@ -109,7 +120,6 @@ function monitorAPIStatus() {
   statusIndicator.textContent = 'API Connected';
   document.body.appendChild(statusIndicator);
 
-  // Test API connectivity periodically
   setInterval(async () => {
     try {
       await fetch('/api/health');
@@ -119,23 +129,13 @@ function monitorAPIStatus() {
       statusIndicator.className = 'api-status disconnected show';
       statusIndicator.textContent = 'API Disconnected';
     }
-  }, 30000); // Check every 30 seconds
+  }, 30000);
 }
 
 /**
- * Fallback to static data (if available)
- */
-function initializeWithStaticData() {
-  // This would use the original script.js data as fallback
-  // Implementation depends on whether we keep the static data available
-  console.log('Static data fallback not implemented yet');
-}
-
-/**
- * Compatibility layer for original script.js functions
+ * Compatibility layer
  */
 function ensureCompatibility() {
-  // Make sure global functions exist for any remaining references
   if (!window.loadAlbumArt) {
     window.loadAlbumArt = () => uiManager.loadAlbumArt();
   }
@@ -145,45 +145,96 @@ function ensureCompatibility() {
   }
   
   if (!window.playSong) {
-    window.playSong = (songId, albumId) => audioPlayer.playSong(songId, albumId);
+    window.playSong = (songId, albumId) => {
+      if (window.audioPlayer) {
+        window.audioPlayer.playSong(songId, albumId);
+      }
+    };
   }
   
-  // Ensure data object structure matches original
   if (!window.data) {
     window.data = { artists: {}, albums: {}, songs: {} };
+  }
+  
+  if (Interstellar) {
+    window.Interstellar = Interstellar;
   }
 }
 
 /**
- * App startup
+ * System event listeners
  */
-document.addEventListener('DOMContentLoaded', () => {
+function setupSystemListeners() {
+  if (!Interstellar) return;
+  
+  Interstellar.on('system:ready', (e) => {
+    console.log('🎵 System ready, version:', e.detail.version);
+  });
+
+  Interstellar.on('layout:change', (e) => {
+    const { mode, vw, vh } = e.detail.state;
+    console.log(`📐 Layout: ${mode} (${vw}x${vh})`);
+  });
+}
+
+/**
+ * App startup - FIXED for module timing
+ */
+function startApp() {
   console.log('🎵 Interstellar Packages - Starting App...');
   
-  // Ensure compatibility
+  setupSystemListeners();
   ensureCompatibility();
-  
-  // Initialize API monitoring
   monitorAPIStatus();
-  
-  // Start the app
   initializeApp();
-});
+}
 
-// Global error handler
+// Check if DOM is already loaded (it usually is for module scripts)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startApp);
+} else {
+  // DOM already loaded, start immediately
+  startApp();
+}
+
+/**
+ * Global error handlers
+ */
 window.addEventListener('error', (e) => {
   console.error('Global error:', e.error);
   showError('An unexpected error occurred. Please refresh the page.');
 });
 
-// Handle unhandled promise rejections
 window.addEventListener('unhandledrejection', (e) => {
   console.error('Unhandled promise rejection:', e.reason);
   showError('A network error occurred. Please check your connection.');
 });
 
-// Export globals for compatibility
+/**
+ * Export globals for compatibility
+ */
 window.data = data;
 window.loadAlbumArt = () => uiManager.loadAlbumArt();
 window.displayAlbumDetails = (albumId) => uiManager.displayAlbumDetails(albumId);
 window.initializeApp = initializeApp;
+
+/**
+ * Debug helpers
+ */
+if (Interstellar && Interstellar.get && Interstellar.get('debug.enabled')) {
+  window.debugInterstellar = () => {
+    console.log('=== INTERSTELLAR DEBUG ===');
+    console.log('State:', Interstellar.getState());
+    console.log('Config:', Interstellar.config);
+    console.log('Layout:', Interstellar.layout?.getState());
+    console.log('Metrics:', Interstellar.layout?.getMetrics());
+    console.log('Data:', { 
+      albums: Object.keys(data.albums).length,
+      songs: Object.keys(data.songs).length,
+      artists: Object.keys(data.artists).length
+    });
+    console.log('=========================');
+  };
+  
+  console.log('💡 Debug mode enabled. Run window.debugInterstellar() to inspect.');
+}

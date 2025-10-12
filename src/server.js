@@ -101,6 +101,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Static file serving
 app.use(express.static(path.join(__dirname, '../public')));
+app.use('/system', express.static(path.join(__dirname, '../system')));
+app.use('/config.json', express.static(path.join(__dirname, '../config.json')));
 
 // Request logging middleware (development only)
 if (config.nodeEnv === 'development') {
