@@ -15,130 +15,140 @@ export class QuadContent {
    * @param {Object} options 
    * @returns {Object} Content scaling result
    */
-  static calculateContentScale(container, spatialBounds, options = {}) {
-    if (!container || !spatialBounds) {
-      return this.getEmptyResult();
-    }
-    
-    // Determine container type and breakpoint FIRST
-    const containerType = this.determineContainerType(container);
-    const breakpoint = this.getCurrentBreakpoint();
-    const isLandscape = window.innerWidth > window.innerHeight;
-    
-    // Get container-specific base size with complete fallback chain
-    let baseSize = null;
-    
-    // 1. Try container-specific size for current breakpoint
-    baseSize = quadConfig.get(`baseSizes.${containerType}.${breakpoint}`);
-    
-    // 2. If not found, try fallback container types
-    if (!baseSize) {
-      const fallbackTypes = {
-        'media': 'header',      // Logo falls back to header
-        'navigation': 'header', // Nav falls back to header  
-        'generic': 'content'    // Generic falls back to content
-      };
-      
-      const fallbackType = fallbackTypes[containerType];
-      if (fallbackType) {
-        baseSize = quadConfig.get(`baseSizes.${fallbackType}.${breakpoint}`);
-      }
-    }
-    
-    // 3. Final fallback to scaling.baseSize or 100
-    if (!baseSize) {
-      baseSize = quadConfig.get('scaling.baseSize') || 100;
-    }
-    
-    // Apply landscape multiplier if in landscape mode
-    if (isLandscape && breakpoint !== 'desktop') {
-      const landscapeMultiplier = quadConfig.get(`breakpointOverrides.${breakpoint}.landscapeMultiplier`) || 1.0;
-      baseSize = baseSize * landscapeMultiplier;
-    }
-    
-    // Debug logging for development
-    if (quadConfig.get('debug.enabled')) {
-      console.log(`📐 ${containerType} (${breakpoint}${isLandscape ? ' landscape' : ''}): baseSize=${baseSize}`);
-    }
-    
-    const {
-      minScale = quadConfig.get('scaleConstraints.min') || quadConfig.get('scaling.minScale') || 0.5,
-      maxScale = quadConfig.get('scaleConstraints.max') || quadConfig.get('scaling.maxScale') || 3.0,
-      aspectRatio = quadConfig.get('scaling.aspectRatio') || QUAD_CONSTANTS.ASPECT_16_9,
-      contentType = 'auto'
-    } = options;
-    
-    // Calculate base scale from spatial bounds
-    const baseScale = QuadMath.calculateScale(
-      spatialBounds.absolute.width,
-      spatialBounds.absolute.height,
-      baseSize,
-      aspectRatio
-    );
-    
-    // Apply content-specific adjustments
-    const contentAdjustment = this.calculateContentAdjustment(
-      container, 
-      containerType, 
-      breakpoint, 
-      contentType
-    );
-    
-    // Calculate final scale with constraints
-    const finalScale = QuadMath.clamp(
-      baseScale * contentAdjustment.multiplier,
-      minScale,
-      maxScale
-    );
-    
-    // Generate CSS variables
-    const cssVariables = this.generateCSSVariables(
-      finalScale,
-      spatialBounds,
-      contentAdjustment,
-      breakpoint
-    );
-    
-    return {
-      scale: finalScale,
-      baseScale: baseScale,
-      baseSize: baseSize,           // Include the resolved base size
-      adjustment: contentAdjustment,
-      containerType: containerType,
-      breakpoint: breakpoint,
-      isLandscape: isLandscape,     // Include orientation info
-      cssVariables: cssVariables,
-      spatialData: {
-        aspect: spatialBounds.math.aspect,
-        area: spatialBounds.math.area,
-        visibility: spatialBounds.viewport.visibilityRatio
-      }
-    };
-  }
 
-  static determineContainerType(container) {
-    const classList = container.classList;
-    
-    if (classList.contains('qt-hero')) return 'hero';
-    if (classList.contains('qt-card')) return 'card';
-    if (classList.contains('qt-grid')) return 'grid';
-    if (classList.contains('qt-text')) return 'text';
-    if (classList.contains('qt-media')) return 'media';
-    if (classList.contains('qt-nav')) return 'navigation';
-    if (classList.contains('header-icon-button')) return 'actions';
-    if (classList.contains('header-actions-section')) return 'actions';
-    if (classList.contains('mathematical-icon')) return 'actions';
-    
-    const hasImages = container.querySelectorAll('img, video').length > 0;
-    const hasText = container.textContent.trim().length > 50;
-    const hasMultipleChildren = container.children.length > 3;
-    
-    if (hasMultipleChildren) return 'grid';
-    if (hasImages) return 'media';
-    if (hasText) return 'text';
-    
-    return 'generic';
+
+
+
+  // Replace the calculateContentScale method in QuadContent.js with this:
+
+static calculateContentScale(container, spatialBounds, options = {}) {
+  if (!container || !spatialBounds) {
+    return this.getEmptyResult();
   }
+  
+  // Determine container type and breakpoint FIRST
+  const containerType = this.determineContainerType(container);
+  const breakpoint = this.getCurrentBreakpoint();
+  const isLandscape = window.innerWidth > window.innerHeight;
+  
+  // Get container-specific base size with complete fallback chain
+  let baseSize = null;
+  
+  // 1. Try container-specific size for current breakpoint
+  baseSize = quadConfig.get(`baseSizes.${containerType}.${breakpoint}`);
+  
+  // 2. If not found, try fallback container types
+  if (!baseSize) {
+    const fallbackTypes = {
+      'media': 'header',      // Logo falls back to header
+      'navigation': 'header', // Nav falls back to header  
+      'generic': 'content'    // Generic falls back to content
+    };
+    
+    const fallbackType = fallbackTypes[containerType];
+    if (fallbackType) {
+      baseSize = quadConfig.get(`baseSizes.${fallbackType}.${breakpoint}`);
+    }
+  }
+  
+  // 3. Final fallback to scaling.baseSize or 100
+  if (!baseSize) {
+    baseSize = quadConfig.get('scaling.baseSize') || 100;
+  }
+  
+  // Apply landscape multiplier if in landscape mode
+  if (isLandscape && breakpoint !== 'desktop') {
+    const landscapeMultiplier = quadConfig.get(`breakpointOverrides.${breakpoint}.landscapeMultiplier`) || 1.0;
+    baseSize = baseSize * landscapeMultiplier;
+  }
+  
+  // Debug logging for development
+  if (quadConfig.get('debug.enabled')) {
+    console.log(`📐 ${containerType} (${breakpoint}${isLandscape ? ' landscape' : ''}): baseSize=${baseSize}`);
+  }
+  
+  const {
+    minScale = quadConfig.get('scaleConstraints.min') || quadConfig.get('scaling.minScale') || 0.5,
+    maxScale = quadConfig.get('scaleConstraints.max') || quadConfig.get('scaling.maxScale') || 3.0,
+    aspectRatio = quadConfig.get('scaling.aspectRatio') || QUAD_CONSTANTS.ASPECT_16_9,
+    contentType = 'auto'
+  } = options;
+  
+  // Calculate base scale from spatial bounds
+  const baseScale = QuadMath.calculateScale(
+    spatialBounds.absolute.width,
+    spatialBounds.absolute.height,
+    baseSize,
+    aspectRatio
+  );
+  
+  // Apply content-specific adjustments
+  const contentAdjustment = this.calculateContentAdjustment(
+    container, 
+    containerType, 
+    breakpoint, 
+    contentType
+  );
+  
+  // Calculate final scale with constraints
+  const finalScale = QuadMath.clamp(
+    baseScale * contentAdjustment.multiplier,
+    minScale,
+    maxScale
+  );
+  
+  // Generate CSS variables
+  const cssVariables = this.generateCSSVariables(
+    finalScale,
+    spatialBounds,
+    contentAdjustment,
+    breakpoint
+  );
+  
+  return {
+    scale: finalScale,
+    baseScale: baseScale,
+    baseSize: baseSize,           // Include the resolved base size
+    adjustment: contentAdjustment,
+    containerType: containerType,
+    breakpoint: breakpoint,
+    isLandscape: isLandscape,     // Include orientation info
+    cssVariables: cssVariables,
+    spatialData: {
+      aspect: spatialBounds.math.aspect,
+      area: spatialBounds.math.area,
+      visibility: spatialBounds.viewport.visibilityRatio
+    }
+  };
+}
+
+  // In QuadContent.js, update determineContainerType method:
+static determineContainerType(container) {
+  const classList = container.classList;
+  
+  if (classList.contains('qt-hero')) return 'hero';
+  if (classList.contains('qt-card')) return 'card';
+  if (classList.contains('qt-grid')) return 'grid';
+  if (classList.contains('qt-text')) return 'text';
+  if (classList.contains('qt-media')) return 'media';
+  if (classList.contains('qt-nav')) return 'navigation';
+  
+  // ADD THESE LINES:
+  if (classList.contains('header-icon-button')) return 'actions';
+  if (classList.contains('header-actions-section')) return 'actions';
+  if (classList.contains('mathematical-icon')) return 'actions';
+  
+  // Auto-detect based on content (existing code...)
+  const hasImages = container.querySelectorAll('img, video').length > 0;
+  const hasText = container.textContent.trim().length > 50;
+  const hasMultipleChildren = container.children.length > 3;
+  
+  if (hasMultipleChildren) return 'grid';
+  if (hasImages) return 'media';
+  if (hasText) return 'text';
+  
+  return 'generic';
+}
 
   /**
    * Get current breakpoint

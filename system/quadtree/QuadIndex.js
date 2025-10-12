@@ -370,3 +370,31 @@ export const getGlobalQuadTree = () => {
 };
 
 console.log('🎯 QuadIndex v1.0 loaded - QuadTree System orchestrator ready');
+
+/* ================================================================
+   USAGE EXAMPLES:
+   
+   // Basic usage
+   const qt = new QuadTreeSystem();
+   qt.apply(document.querySelector('.hero'));
+   
+   // Auto-observe
+   const qt = observeQuadTree('.qt-container');
+   
+   // Batch processing
+   quickScale('.card, .hero, .section');
+   
+   // Advanced usage with custom config
+   const qt = new QuadTreeSystem({
+     debug: true,
+     cacheSize: 100,
+     autoInit: true
+   });
+   
+   // Layout calculation
+   const layout = qt.calculateLayout(container, items, {
+     maxColumns: 3,
+     aspectRatio: 16/9,
+     gap: 20
+   });
+   ================================================================ */

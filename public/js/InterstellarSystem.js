@@ -202,23 +202,16 @@ class InterstellarSystem {
    * Initialize QuadTree system
    */
   async initQuadTree() {
-    // Import QuadTree modules dynamically
-    const { QuadSpatial } = await import('../system/quadtree/QuadSpatial.js');
-    const { QuadIndex } = await import('../system/quadtree/QuadIndex.js');
-    
-    // Initialize QuadTree
-    this.quadtree = {
-      spatial: new QuadSpatial(this.config.quadtree),
-      index: new QuadIndex(this.config.quadtree),
-      config: quadConfig
-    };
+  // Import QuadTree modules dynamically
+  const { QuadTreeSystem } = await import('../system/quadtree/QuadIndex.js');  // ✅ CORRECT!
+  
+  // Initialize QuadTree
+  this.quadtree = new QuadTreeSystem(this.config.quadtree);  // ✅ Single unified system
+  
+  console.log('✅ QuadTree initialized');
+}
 
-    // Register preloader as a node if it exists
-    if (this.preloader) {
-      this.quadtree.index.register('preloader', this.preloader);
-    }
-  }
-
+   
   /**
    * Initialize Preloader
    */

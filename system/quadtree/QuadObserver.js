@@ -1,161 +1,244 @@
 /* ================================================================
-   QUAD CACHE - Performance Optimization Cache
-   Simple LRU cache for expensive calculations
+   QUAD OBSERVER - Resize & Viewport Observer
+   Handles container resize events and viewport changes
    ================================================================ */
 
-export class QuadCache {
-  constructor(maxSize = 50) {
-    this.maxSize = maxSize;
-    this.cache = new Map();
-    this.accessOrder = [];
+export class QuadObserver {
+  constructor() {
+    this.observers = new Map();
+    this.debounceTimers = new Map();
+    this.isDestroyed = false;
+    
+    this.setupGlobalListeners();
   }
   
   /**
-   * Generate cache key from container and viewport state
+   * Observe container for resize events
    * @param {Element} container 
+   * @param {Function} callback 
    * @param {Object} options 
-   * @returns {string} Unique cache key
    */
-  generateKey(container, options = {}) {
-    const rect = container.getBoundingClientRect();
-    const breakpoint = document.documentElement.dataset.breakpoint || 'desktop';
-    const isLandscape = window.innerWidth > window.innerHeight;
+  observeContainer(container, callback, options = {}) {
+    if (this.isDestroyed || !container) return;
     
-    const keyComponents = [
-      container.className || 'no-class',
-      Math.round(rect.width),
-      Math.round(rect.height),
-      breakpoint,
-      isLandscape ? 'landscape' : 'portrait',
-      JSON.stringify(options)
-    ];
+    const debounceDelay = options.debounce || 50;
+    const observerId = this.generateObserverId(container);
     
-    return keyComponents.join('-');
-  }
-  
-  /**
-   * Get cached calculation result
-   * @param {string} key 
-   * @returns {Object|null} Cached result or null
-   */
-  get(key) {
-    if (!this.cache.has(key)) return null;
+    // Clean up existing observer
+    this.unobserveContainer(container);
     
-    // Update access order (LRU)
-    this.updateAccessOrder(key);
-    
-    const cached = this.cache.get(key);
-    
-    // Check if cache is stale (older than 5 seconds)
-    if (Date.now() - cached.timestamp > 5000) {
-      this.delete(key);
-      return null;
-    }
-    
-    return cached.result;
-  }
-  
-  /**
-   * Store calculation result in cache
-   * @param {string} key 
-   * @param {Object} result 
-   */
-  set(key, result) {
-    // Remove old entry if exists
-    if (this.cache.has(key)) {
-      this.delete(key);
-    }
-    
-    // Add new entry
-    this.cache.set(key, {
-      result: result,
-      timestamp: Date.now()
+    // Create ResizeObserver
+    const resizeObserver = new ResizeObserver((entries) => {
+      this.debounceCallback(observerId, () => {
+        if (this.isDestroyed) return;
+        
+        entries.forEach(entry => {
+          if (entry.target === container) {
+            callback({
+              container: entry.target,
+              bounds: entry.contentRect,
+              timestamp: Date.now()
+            });
+          }
+        });
+      }, debounceDelay);
     });
     
-    this.accessOrder.push(key);
-    
-    // Enforce size limit
-    this.enforceSize();
-  }
-  
-  /**
-   * Delete entry from cache
-   * @param {string} key 
-   */
-  delete(key) {
-    this.cache.delete(key);
-    this.accessOrder = this.accessOrder.filter(k => k !== key);
-  }
-  
-  /**
-   * Update access order for LRU
-   * @param {string} key 
-   */
-  updateAccessOrder(key) {
-    this.accessOrder = this.accessOrder.filter(k => k !== key);
-    this.accessOrder.push(key);
-  }
-  
-  /**
-   * Enforce cache size limit (LRU eviction)
-   */
-  enforceSize() {
-    while (this.cache.size > this.maxSize) {
-      const oldestKey = this.accessOrder.shift();
-      if (oldestKey) {
-        this.cache.delete(oldestKey);
-      }
+    try {
+      resizeObserver.observe(container);
+      
+      this.observers.set(observerId, {
+        container: container,
+        observer: resizeObserver,
+        callback: callback,
+        options: options
+      });
+      
+      // Trigger initial callback
+      callback({
+        container: container,
+        bounds: container.getBoundingClientRect(),
+        timestamp: Date.now(),
+        initial: true
+      });
+      
+    } catch (error) {
+      console.warn('QuadObserver: Failed to observe container:', error.message);
     }
   }
   
   /**
-   * Clear all cached entries
+   * Stop observing container
+   * @param {Element} container 
    */
-  clear() {
-    this.cache.clear();
-    this.accessOrder = [];
+  unobserveContainer(container) {
+    const observerId = this.generateObserverId(container);
+    const observerData = this.observers.get(observerId);
+    
+    if (observerData) {
+      try {
+        observerData.observer.disconnect();
+      } catch (error) {
+        console.warn('QuadObserver: Disconnect error:', error.message);
+      }
+      
+      this.observers.delete(observerId);
+      this.clearDebounceTimer(observerId);
+    }
   }
   
   /**
-   * Get cache statistics
-   * @returns {Object} Cache stats
+   * Setup global viewport listeners
+   */
+  setupGlobalListeners() {
+    let orientationTimer = null;
+    
+    // Handle orientation changes
+    window.addEventListener('orientationchange', () => {
+      if (orientationTimer) clearTimeout(orientationTimer);
+      
+      orientationTimer = setTimeout(() => {
+        this.handleGlobalChange('orientation');
+      }, 300);
+    });
+    
+    // Handle window resize (debounced)
+    window.addEventListener('resize', () => {
+      this.debounceCallback('global-resize', () => {
+        this.handleGlobalChange('resize');
+      }, 100);
+    });
+    
+    // Handle breakpoint changes (from ViewportState)
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-breakpoint') {
+          this.handleGlobalChange('breakpoint');
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-breakpoint']
+    });
+  }
+  
+  /**
+   * Handle global viewport changes
+   * @param {string} changeType 
+   */
+  handleGlobalChange(changeType) {
+    if (this.isDestroyed) return;
+    
+    // Notify all observers of global change
+    this.observers.forEach((observerData, observerId) => {
+      const { container, callback } = observerData;
+      
+      if (container && callback) {
+        callback({
+          container: container,
+          bounds: container.getBoundingClientRect(),
+          timestamp: Date.now(),
+          changeType: changeType,
+          global: true
+        });
+      }
+    });
+  }
+  
+  /**
+   * Generate unique observer ID
+   * @param {Element} container 
+   * @returns {string} Observer ID
+   */
+  generateObserverId(container) {
+    return `${container.tagName}-${container.id || 'no-id'}-${Date.now()}`;
+  }
+  
+  /**
+   * Debounce callback execution
+   * @param {string} id 
+   * @param {Function} callback 
+   * @param {number} delay 
+   */
+  debounceCallback(id, callback, delay) {
+    this.clearDebounceTimer(id);
+    
+    this.debounceTimers.set(id, setTimeout(() => {
+      callback();
+      this.debounceTimers.delete(id);
+    }, delay));
+  }
+  
+  /**
+   * Clear debounce timer
+   * @param {string} id 
+   */
+  clearDebounceTimer(id) {
+    const timer = this.debounceTimers.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      this.debounceTimers.delete(id);
+    }
+  }
+  
+  /**
+   * Force update all observed containers
+   */
+  forceUpdate() {
+    this.observers.forEach((observerData) => {
+      const { container, callback } = observerData;
+      
+      if (container && callback) {
+        callback({
+          container: container,
+          bounds: container.getBoundingClientRect(),
+          timestamp: Date.now(),
+          forced: true
+        });
+      }
+    });
+  }
+  
+  /**
+   * Get observer statistics
+   * @returns {Object} Observer stats
    */
   getStats() {
-    const now = Date.now();
-    let staleCount = 0;
-    
-    this.cache.forEach(entry => {
-      if (now - entry.timestamp > 5000) {
-        staleCount++;
-      }
-    });
-    
     return {
-      size: this.cache.size,
-      maxSize: this.maxSize,
-      staleEntries: staleCount,
-      hitRate: this.hitCount / Math.max(1, this.hitCount + this.missCount),
-      accessOrder: this.accessOrder.length
+      observedContainers: this.observers.size,
+      activeTimers: this.debounceTimers.size,
+      isDestroyed: this.isDestroyed
     };
   }
   
   /**
-   * Clean up stale entries
+   * Destroy all observers
    */
-  cleanup() {
-    const now = Date.now();
-    const staleKeys = [];
+  destroy() {
+    this.isDestroyed = true;
     
-    this.cache.forEach((entry, key) => {
-      if (now - entry.timestamp > 5000) {
-        staleKeys.push(key);
+    // Disconnect all observers
+    this.observers.forEach((observerData) => {
+      try {
+        observerData.observer.disconnect();
+      } catch (error) {
+        // Ignore disconnect errors
       }
     });
     
-    staleKeys.forEach(key => this.delete(key));
+    // Clear all timers
+    this.debounceTimers.forEach((timer) => {
+      clearTimeout(timer);
+    });
     
-    return staleKeys.length;
+    this.observers.clear();
+    this.debounceTimers.clear();
   }
 }
 
-console.log('💾 QuadCache v1.0 loaded - Performance optimization ready');
+// Global observer instance
+export const quadObserver = new QuadObserver();
+
+console.log('👁️ QuadObserver v1.0 loaded - Resize & viewport monitoring ready');

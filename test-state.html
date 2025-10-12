@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>State.js Test</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      background: #0a0a0a;
+      color: #d9e0cd;
+    }
+    h1 { color: #9da2a5; }
+    pre {
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+    .pass { color: #4ade80; }
+    .fail { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <h1>State.js Test</h1>
+  <div id="status"></div>
+  <h2>Calculated State:</h2>
+  <pre id="output"></pre>
+
+  <script type="module">
+    import { ViewportState } from './system/State.js';
+
+    const statusEl = document.getElementById('status');
+    const outputEl = document.getElementById('output');
+
+    try {
+      // Create state calculator
+      const state = new ViewportState();
+      
+      // Get measurements
+      const measurements = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        dpr: window.devicePixelRatio || 1
+      };
+      
+      // Calculate state
+      const result = state.calculate(measurements);
+      
+      // Display results
+      outputEl.textContent = JSON.stringify(result, null, 2);
+      statusEl.innerHTML = '<p class="pass">✅ State.js working!</p>';
+      
+      // Log to console
+      console.log('📐 State calculated:', result);
+      
+      // Test with config
+      console.log('⚙️ Config:', state.getConfig());
+      
+    } catch (error) {
+      statusEl.innerHTML = `<p class="fail">❌ Error: ${error.message}</p>`;
+      console.error('State.js error:', error);
+    }
+  </script>
+</body>
+</html>
