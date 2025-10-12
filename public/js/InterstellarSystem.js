@@ -220,83 +220,92 @@ class InterstellarSystem {
   }
 
   /**
- * Initialize Preloader
- */
-initPreloader() {
-  const preloaderEl = document.getElementById('preloader');
-  
-  if (!preloaderEl) {
-    console.warn('⚠️ Preloader element not found');
-    return;
-  }
-
-  // Create preloader controller
-  this.preloader = {
-    element: preloaderEl,
-    bars: preloaderEl.querySelectorAll('.logo-bar'),
-    config: this.config.preloader,
-    activeRequests: 0,
-    showTime: null,
-    animationTriggered: false,
-    clickPromptShown: false,
-
-    show: () => {
-      this.preloader.activeRequests++;
-      this.preloader.showTime = Date.now();
-      preloaderEl.classList.remove('hidden', 'removed');
-      
-      if (!this.preloader.animationTriggered) {
-        setTimeout(() => this.preloader.triggerAnimation(), 100);
-        this.preloader.animationTriggered = true;
-      }
-    },
-
-    hide: () => {
-      this.preloader.activeRequests = Math.max(0, this.preloader.activeRequests - 1);
-      
-      if (this.preloader.activeRequests === 0) {
-        const elapsed = Date.now() - this.preloader.showTime;
-        const animationDuration = 3000; // Last bar finishes at ~2.8s + buffer
-        const remaining = Math.max(0, animationDuration - elapsed);
-        
-        // Show click prompt after animation completes
-        setTimeout(() => {
-          if (!this.preloader.clickPromptShown && !preloaderEl.classList.contains('hidden')) {
-            this.preloader.showClickPrompt();
-          }
-        }, remaining);
-      }
-    },
-
-   showClickPrompt: () => {
-  if (this.preloader.clickPromptShown) return;
-  
-  this.preloader.clickPromptShown = true;
-  
-  // Make entire preloader clickable (no text prompt)
-  preloaderEl.style.cursor = 'pointer';
-  preloaderEl.addEventListener('click', () => {
-    this.preloader.forceHide();
-  });
-},
-
-    triggerAnimation: () => {
-      this.preloader.bars.forEach(bar => bar.classList.add('animate'));
-    },
-
-    forceHide: () => {
-      this.preloader.activeRequests = 0;
-      preloaderEl.classList.add('hidden');
-      setTimeout(() => preloaderEl.classList.add('removed'), 800);
+   * Initialize Preloader
+   */
+  initPreloader() {
+    const preloaderEl = document.getElementById('preloader');
+    
+    if (!preloaderEl) {
+      console.warn('⚠️ Preloader element not found');
+      return;
     }
-  };
 
-  // Auto-show on init
-  this.preloader.show();
+    // Create preloader controller
+    this.preloader = {
+      element: preloaderEl,
+      bars: preloaderEl.querySelectorAll('.logo-bar'),
+      config: this.config.preloader,
+      activeRequests: 0,
+      showTime: null,
+      animationTriggered: false,
+      clickPromptShown: false,
 
-  // Make globally accessible
-  window.Preloader = this.preloader;
-}
+      show: () => {
+        this.preloader.activeRequests++;
+        this.preloader.showTime = Date.now();
+        preloaderEl.classList.remove('hidden', 'removed');
+        
+        if (!this.preloader.animationTriggered) {
+          setTimeout(() => this.preloader.triggerAnimation(), 100);
+          this.preloader.animationTriggered = true;
+        }
+      },
+
+      hide: () => {
+        this.preloader.activeRequests = Math.max(0, this.preloader.activeRequests - 1);
+        
+        if (this.preloader.activeRequests === 0) {
+          const elapsed = Date.now() - this.preloader.showTime;
+          const animationDuration = 3000; // Last bar finishes at ~2.8s + buffer
+          const remaining = Math.max(0, animationDuration - elapsed);
+          
+          // Show click prompt after animation completes
+          setTimeout(() => {
+            if (!this.preloader.clickPromptShown && !preloaderEl.classList.contains('hidden')) {
+              this.preloader.showClickPrompt();
+            }
+          }, remaining);
+        }
+      },
+
+      showClickPrompt: () => {
+        if (this.preloader.clickPromptShown) return;
+        
+        this.preloader.clickPromptShown = true;
+        
+        // Make entire preloader clickable (no text prompt)
+        preloaderEl.style.cursor = 'pointer';
+        preloaderEl.addEventListener('click', () => {
+          this.preloader.forceHide();
+        });
+      },
+
+      triggerAnimation: () => {
+        this.preloader.bars.forEach(bar => bar.classList.add('animate'));
+      },
+
+      forceHide: () => {
+        this.preloader.activeRequests = 0;
+        preloaderEl.classList.add('hidden');
+        setTimeout(() => preloaderEl.classList.add('removed'), 800);
+      }
+    };
+
+    // Auto-show on init
+    this.preloader.show();
+
+    // Auto-hide when page fully loads (triggers click prompt)
+    if (document.readyState === 'complete') {
+      this.preloader.hide();
+    } else {
+      window.addEventListener('load', () => {
+        this.preloader.hide();
+      });
+    }
+
+    // Make globally accessible
+    window.Preloader = this.preloader;
+  }
 
   /**
    * Setup event listeners
@@ -414,15 +423,12 @@ const Interstellar = new InterstellarSystem();
 // Make globally accessible
 window.Interstellar = Interstellar;
 
-
-
+// Auto-initialize on DOM load
 window.addEventListener('DOMContentLoaded', () => {
   if (!window.Interstellar.isInitialized) {
     window.Interstellar.init();
   }
 });
-
-
 
 // Export for modules
 export default Interstellar;

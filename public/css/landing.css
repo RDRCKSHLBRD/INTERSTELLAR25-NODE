@@ -54,21 +54,21 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 0 40px;
-    gap: 30px;
+    padding: 0 20px;
+    gap: 10px;
 }
 
 .artist-link {
-    color: #d9e0cd;
-    font-size: 24px;
-    font-weight: 300;
-    letter-spacing: 2px;
+    color: #0e9bcc;
+    font-size: 15px;
+    font-weight: 150;
+    letter-spacing: .8px;
     text-decoration: none;
-    text-transform: uppercase;
+    
     transition: all 0.3s ease;
     cursor: pointer;
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-10px);
     animation: slideIn 0.6s ease-out forwards;
 }
 
@@ -85,9 +85,9 @@ body {
 }
 
 .artist-link:hover {
-    color: #fff;
-    letter-spacing: 4px;
-    transform: translateX(10px);
+    color: #48BBD8;
+    letter-spacing: 3px;
+    transform: translateX(5px);
 }
 
 /* Responsive */

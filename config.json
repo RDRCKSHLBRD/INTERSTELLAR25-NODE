@@ -74,9 +74,9 @@
     },
     "pages": {
       "landing": {
-        "splitRatio": 0.7,
+        "splitRatio": 0.8,
         "sidebar": {
-          "contentRatio": 0.7
+          "contentRatio": 0.9
         }
       },
       "artist": {
