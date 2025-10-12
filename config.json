@@ -72,6 +72,20 @@
       "1440": { "name": "desktop-lg", "controls.ratio": 0.30 },
       "1920": { "name": "desktop-xl", "controls.ratio": 0.28 }
     },
+    "pages": {
+      "landing": {
+        "splitRatio": 0.7,
+        "sidebar": {
+          "contentRatio": 0.7
+        }
+      },
+      "artist": {
+        "regions": {
+          "header": { "ratio": 0.08 },
+          "controls": { "ratioRange": [0.25, 0.40] }
+        }
+      }
+    },
     "regions": {
       "header": {
         "height": 64,

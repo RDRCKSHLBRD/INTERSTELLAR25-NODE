@@ -1,0 +1,16 @@
+{
+  "artists": [
+    {
+      "id": "roderick",
+      "name": "Roderick Shoolbraid",
+      "page": "roderick.html",
+      "order": 1
+    },
+    {
+      "id": "deborah",
+      "name": "Deborah",
+      "page": "deborah.html",
+      "order": 2
+    }
+  ]
+}
