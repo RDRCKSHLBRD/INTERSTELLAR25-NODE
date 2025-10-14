@@ -12,27 +12,36 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/loading-styles.css">
     <link rel="stylesheet" href="/css/additional-styles.css">
+    <link rel="stylesheet" href="/css/header-system.css">
+
 </head>
 
 <body>
 
-    <header>
-        <div class="Logo">
+    <header class="header-system">
+        <div class="Logo header-logo">
             <img src="/images/IP_TAG24.svg" alt="Interstellar Packages Logo">
         </div>
-        <nav class="Nav">
+
+        <!-- NEW: Artist Name Container -->
+        <div class="artist-name-container">
+            <span id="artist-name" class="artist-name">Loading...</span>
+        </div>
+
+        <!-- NEW: Spacer (flex grows to fill space) -->
+        <div class="header-spacer"></div>
+
+        <nav class="Nav header-nav">
             <ul>
                 <li><a href="filmography.html">Film</a></li>
                 <li><a href="contact.html">Contact</a></li>
                 <li class="loginSquare">
                     <button id="loginBtn" class="login-button">Log In</button>
                 </li>
-                <!-- User info (hidden by default, shown when logged in) -->
                 <li id="userInfo" class="user-info" style="display: none;">
                     <span id="userName"></span>
                     <button id="logoutBtn" class="logout-button">Logout</button>
                 </li>
-                <!-- Cart Icon -->
                 <li class="cartSquare">
                     <button id="cartBtn" class="cart-button">
                         <img src="/images/IP-CART25-m1.svg" alt="Shopping Cart" class="cart-icon">
@@ -84,8 +93,10 @@
     <script src="/js/auth.js"></script>
     <script src="/js/cart.js"></script>
     <script src="/js/player.js"></script>
+    <script type="module" src="/js/header.js"></script>
 
-    
+
+
 
 
 

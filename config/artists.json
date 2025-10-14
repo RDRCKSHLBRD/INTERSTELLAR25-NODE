@@ -1,0 +1,28 @@
+{
+  "artists": [
+    {
+      "id": "roderick",
+      "name": "Roderick Shoolbraid",
+      "page": "roderick.html",
+      "order": 1
+    },
+    {
+      "id": "rodux",
+      "name": "Rodux",
+      "page": "rodux.html",
+      "order": 2
+    },
+    {
+      "id": "betacarotine",
+      "name": "Betacarotine",
+      "page": "betacarotine.html",
+      "order": 3
+    },
+    {
+      "id": "3ofCups",
+      "name": "3 of Cups",
+      "page": "3ofcups.html",
+      "order": 4
+    }
+  ]
+}

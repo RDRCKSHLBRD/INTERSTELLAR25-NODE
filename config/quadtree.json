@@ -1,0 +1,57 @@
+{
+  "_comment": "QuadTree-specific config - references root config.json",
+  "_extends": "../config.json",
+  
+  "elements": {
+    "artistLink": {
+      "mobile-sm": {
+        "baseHeight": 40,
+        "minHeight": 36,
+        "maxHeight": 48,
+        "fontSize": 13,
+        "padding": 10,
+        "gap": 6
+      },
+      "mobile": {
+        "baseHeight": 44,
+        "minHeight": 40,
+        "maxHeight": 52,
+        "fontSize": 14,
+        "padding": 12,
+        "gap": 8
+      },
+      "tablet": {
+        "baseHeight": 52,
+        "minHeight": 48,
+        "maxHeight": 60,
+        "fontSize": 16,
+        "padding": 16,
+        "gap": 12
+      },
+      "desktop": {
+        "baseHeight": 56,
+        "minHeight": 52,
+        "maxHeight": 64,
+        "fontSize": 18,
+        "padding": 20,
+        "gap": 16
+      },
+      "desktop-lg": {
+        "baseHeight": 60,
+        "minHeight": 56,
+        "maxHeight": 68,
+        "fontSize": 19,
+        "padding": 22,
+        "gap": 18
+      },
+      "desktop-xl": {
+        "baseHeight": 64,
+        "minHeight": 60,
+        "maxHeight": 72,
+        "fontSize": 20,
+        "padding": 24,
+        "gap": 20
+      }
+    }
+  }
+}

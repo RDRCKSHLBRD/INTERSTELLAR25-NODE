@@ -1,0 +1,55 @@
+{
+  "_comment": "Layout-specific config - references root config.json",
+  "_extends": "../config.json",
+  
+  "landing": {
+    "video": {
+      "flexRatio": 0.8,
+      "minWidth": "60vw",
+      "objectFit": "cover"
+    },
+    "sidebar": {
+      "flexRatio": 0.2,
+      "minWidth": "20vw",
+      "maxWidth": "400px",
+      "regions": {
+        "spacerTop": 0.3,
+        "navigation": 0.65,
+        "spacerBottom": 0.05
+      }
+    },
+    "breakpoints": {
+      "mobile": {
+        "mode": "stack",
+        "video": { "height": "60vh" },
+        "sidebar": { "height": "40vh" }
+      },
+      "tablet": {
+        "mode": "split",
+        "video": { "flexRatio": 0.8 },
+        "sidebar": { "flexRatio": 0.2 }
+      },
+      "desktop": {
+        "mode": "split",
+        "video": { "flexRatio": 0.8 },
+        "sidebar": { "flexRatio": 0.2 }
+      }
+    }
+  },
+  
+  "artist": {
+    "header": {
+      "ratio": 0.08,
+      "minHeight": 48,
+      "maxHeight": 80
+    },
+    "controls": {
+      "ratioRange": [0.25, 0.40],
+      "minHeight": 200,
+      "maxHeight": 600
+    },
+    "library": {
+      "fillRemaining": true
+    }
+  }
+}

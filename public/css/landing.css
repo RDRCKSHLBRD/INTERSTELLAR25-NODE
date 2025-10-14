@@ -1,123 +1,291 @@
-/* Landing Page - JSON-driven layout (CSS migration coming tomorrow) */
+/**
+ * LANDING.CSS - Data-Driven Layout
+ * All sizing from config.json via landing.js
+ * NO hardcoded px values, NO media queries
+ */
 
-:root {
-    --landing-split: 0.7;
-    --sidebar-content-ratio: 0.7;
-}
+/* =================================================================
+   BASE STYLES
+   ================================================================= */
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    display: flex;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    background: #0a0a0a;
-    font-family: Helvetica, sans-serif;
+  /* Layout structure */
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  
+  /* Visual styling (use theme colors from config) */
+  background: var(--color-bg-primary, #0a0a0a);
+  font-family: var(--font-family, Helvetica, sans-serif);
 }
 
-/* Video Section - 70% */
+/* =================================================================
+   VIDEO SECTION (size from RatioEngine)
+   ================================================================= */
+
 .landing-video {
-    width: calc(var(--landing-split) * 100%);
-    height: 100vh;
-    position: relative;
-    overflow: hidden;
+  /* Size from landing.js (--video-flex from config.json) */
+  flex: var(--video-flex, 0.7);
+  min-width: var(--video-min-width, 60vw);
+  
+  /* Layout */
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
 }
 
 .landing-video video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  
+  /* Visual only */
+  object-fit: var(--video-object-fit, cover);
 }
 
-/* Sidebar - 30% */
+/* =================================================================
+   SIDEBAR SECTION (size from RatioEngine)
+   ================================================================= */
+
 .landing-sidebar {
-    width: calc((1 - var(--landing-split)) * 100%);
-    height: 100vh;
-    background: #0F1D38;
-    display: flex;
-    flex-direction: column;
+  /* Size from landing.js (--sidebar-flex from config.json) */
+  flex: var(--sidebar-flex, 0.3);
+  min-width: var(--sidebar-min-width, 20vw);
+  max-width: var(--sidebar-max-width, 400px);
+  
+  /* Layout */
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  
+  /* Visual styling (use theme colors) */
+  background: var(--color-bg-secondary, #0F1D38);
 }
 
-/* Spacer - 70% of sidebar height */
+/* =================================================================
+   SIDEBAR REGIONS (proportions from config)
+   ================================================================= */
+
+/* Spacer - top buffer space */
 .sidebar-spacer {
-    flex: var(--sidebar-content-ratio);
+  /* Size from landing.js (--sidebar-spacer-flex from config) */
+  flex: var(--sidebar-spacer-flex, 0.05);
 }
 
-/* Artist Nav - 30% of sidebar height */
+/* Artist Navigation - main content area */
 .artist-nav {
-    flex: calc(1 - var(--sidebar-content-ratio));
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 0 20px;
-    gap: 10px;
+  /* Size from landing.js (--sidebar-nav-flex from config) */
+  flex: var(--sidebar-nav-flex, 0.9);
+  
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+  
+  /* Spacing from QuadTree */
+  padding: 0 var(--qt-padding, 20px);
+  gap: var(--qt-gap, 10px);
 }
+
+/* =================================================================
+   ARTIST LINKS (sizing from QuadTree)
+   ================================================================= */
 
 .artist-link {
-    color: #0e9bcc;
-    font-size: 15px;
-    font-weight: 100;
-    letter-spacing: .8px;
-    text-decoration: none;
-
-    transition: all 0.3s ease;
-    cursor: pointer;
-    opacity: 0;
-    transform: translateX(-10px);
-    animation: slideIn 0.6s ease-out forwards;
+  /* Visual styling only */
+  color: var(--color-accent, #0e9bcc);
+  text-decoration: none;
+  cursor: pointer;
+  
+  /* Typography from QuadTree */
+  font-size: var(--qt-font-size, 15px);
+  font-weight: 100;
+  letter-spacing: var(--qt-letter-spacing, 0.8px);
+  
+  /* Animation state (keep for entrance effect) */
+  opacity: 0;
+  transform: translateX(calc(-1 * var(--qt-slide-distance, 10px)));
+  transition: all 0.3s ease;
+  
+  /* Entrance animation */
+  animation: slideIn 0.6s ease-out forwards;
 }
 
-.artist-link:nth-child(1) {
-    animation-delay: 0.1s;
-}
-
-.artist-link:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.artist-link:nth-child(3) {
-    animation-delay: 0.3s;
-}
-
-.artist-link:nth-child(4) {
-    animation-delay: 0.4s;
-}
+/* Staggered animation delays */
+.artist-link:nth-child(1) { animation-delay: 0.1s; }
+.artist-link:nth-child(2) { animation-delay: 0.2s; }
+.artist-link:nth-child(3) { animation-delay: 0.3s; }
+.artist-link:nth-child(4) { animation-delay: 0.4s; }
+.artist-link:nth-child(5) { animation-delay: 0.5s; }
+.artist-link:nth-child(6) { animation-delay: 0.6s; }
+.artist-link:nth-child(7) { animation-delay: 0.7s; }
+.artist-link:nth-child(8) { animation-delay: 0.8s; }
 
 @keyframes slideIn {
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
+/* Hover state */
 .artist-link:hover {
-    color: #48BBD8;
-    letter-spacing: 3px;
-    transform: translateX(5px);
+  /* Visual changes */
+  color: var(--color-accent-hover, #48BBD8);
+  letter-spacing: var(--qt-letter-spacing-hover, 3px);
+  transform: translateX(var(--qt-hover-distance, 5px));
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    body {
-        flex-direction: column;
-    }
+/* Focus state (accessibility) */
+.artist-link:focus {
+  outline: 2px solid var(--color-accent, #0e9bcc);
+  outline-offset: 2px;
+}
 
-    .landing-video {
-        width: 100%;
-        height: 60vh;
-    }
+/* Active state */
+.artist-link:active {
+  transform: translateX(calc(var(--qt-hover-distance, 5px) / 2));
+}
 
-    .landing-sidebar {
-        width: 100%;
-        height: 40vh;
-    }
+/* =================================================================
+   RESPONSIVE BEHAVIOR (StateJS handles via data attributes)
+   NO MEDIA QUERIES - JavaScript sets data-mode attribute
+   ================================================================= */
 
-    .artist-link {
-        font-size: 18px;
-    }
+/* Stack mode for mobile (set by StateJS when viewport < 720px) */
+[data-mode="stack"] body {
+  flex-direction: column;
+}
+
+[data-mode="stack"] .landing-video {
+  width: 100%;
+  height: var(--video-height-mobile, 60vh);
+  flex: none;
+}
+
+[data-mode="stack"] .landing-sidebar {
+  width: 100%;
+  height: var(--sidebar-height-mobile, 40vh);
+  flex: none;
+  max-width: none;
+}
+
+[data-mode="stack"] .artist-nav {
+  justify-content: flex-start;
+  padding-top: var(--qt-padding, 20px);
+}
+
+[data-mode="stack"] .artist-link {
+  font-size: var(--qt-font-size-mobile, 18px);
+  text-align: center;
+}
+
+/* =================================================================
+   ORIENTATION ADAPTATIONS (StateJS sets data-orientation)
+   ================================================================= */
+
+[data-orientation="portrait"] .artist-nav {
+  /* More vertical spacing in portrait */
+  gap: calc(var(--qt-gap, 10px) * 1.5);
+}
+
+[data-orientation="landscape"][data-mode="split"] .sidebar-spacer {
+  /* Less spacer in landscape split mode */
+  flex: calc(var(--sidebar-spacer-flex, 0.05) * 0.5);
+}
+
+/* =================================================================
+   CUSTOM SCROLLBAR STYLING
+   ================================================================= */
+
+.artist-nav {
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+  
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(14, 155, 204, 0.3) transparent;
+}
+
+.artist-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.artist-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.artist-nav::-webkit-scrollbar-thumb {
+  background-color: rgba(14, 155, 204, 0.3);
+  border-radius: 2px;
+}
+
+.artist-nav::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(14, 155, 204, 0.5);
+}
+
+/* =================================================================
+   ACCESSIBILITY & REDUCED MOTION
+   ================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* =================================================================
+   DEBUG MODE (QuadConfig debug.enabled)
+   ================================================================= */
+
+[data-debug="true"] .landing-video::after,
+[data-debug="true"] .landing-sidebar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px dashed rgba(0, 255, 0, 0.5);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+[data-debug="true"] .artist-link {
+  position: relative;
+}
+
+[data-debug="true"] .artist-link::before {
+  content: 'fs:' attr(data-font-size) ' gap:' attr(data-gap);
+  position: absolute;
+  top: -16px;
+  left: 0;
+  font-size: 10px;
+  background: rgba(0, 255, 0, 0.8);
+  color: #000;
+  padding: 2px 4px;
+  pointer-events: none;
+  white-space: nowrap;
 }

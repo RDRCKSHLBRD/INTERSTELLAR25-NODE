@@ -1,0 +1,56 @@
+{
+  "version": "1.0",
+  "layout": {
+    "structure": "logo-artist-spacer-nav",
+    "flexRatios": {
+      "logo": 0.15,
+      "artist": 0.25,
+      "spacer": 0.4,
+      "nav": 0.2
+    },
+    "height": {
+      "desktop": 64,
+      "tablet": 56,
+      "mobile": 48
+    },
+    "padding": {
+      "desktop": 20,
+      "tablet": 16,
+      "mobile": 12
+    }
+  },
+  
+  "artistName": {
+    "display": true,
+    "position": "after-logo",
+    "fontSize": {
+      "desktop": 18,
+      "tablet": 16,
+      "mobile": 14
+    },
+    "fontWeight": 500,
+    "color": "#cadbda",
+    "letterSpacing": 0.5
+  },
+  
+  "logo": {
+    "width": {
+      "desktop": 200,
+      "tablet": 180,
+      "mobile": 160
+    }
+  },
+  
+  "nav": {
+    "gap": {
+      "desktop": 24,
+      "tablet": 20,
+      "mobile": 16
+    },
+    "fontSize": {
+      "desktop": 16,
+      "tablet": 15,
+      "mobile": 14
+    }
+  }
+}

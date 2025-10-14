@@ -1,0 +1,75 @@
+/**
+ * HEADER SYSTEM - Data-Driven
+ * Reads from config/header.json via header.js
+ * Does NOT touch existing styles
+ */
+
+/* Header container - NEW system */
+.header-system {
+  /* Layout from config */
+  display: flex;
+  align-items: center;
+  height: var(--header-height, 64px);
+  padding: 0 var(--header-padding, 20px);
+  
+  /* Keep existing visual styles */
+  background-color: #083D5E;
+  color: #cadbda;
+}
+
+/* Logo section */
+.header-logo {
+  flex: var(--header-logo-flex, 0.15);
+  display: flex;
+  align-items: center;
+}
+
+.header-logo img {
+  width: var(--header-logo-width, 200px);
+  height: auto;
+}
+
+/* Artist name section - NEW */
+.artist-name-container {
+  flex: var(--header-artist-flex, 0.25);
+  display: flex;
+  align-items: center;
+  padding-left: var(--header-padding, 20px);
+}
+
+.artist-name {
+  font-size: var(--artist-name-font-size, 18px);
+  font-weight: var(--artist-name-font-weight, 500);
+  color: var(--artist-name-color, #cadbda);
+  letter-spacing: var(--artist-name-letter-spacing, 0.5px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Spacer - grows to fill remaining space */
+.header-spacer {
+  flex: var(--header-spacer-flex, 0.4);
+}
+
+/* Nav section */
+.header-nav {
+  flex: var(--header-nav-flex, 0.2);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.header-nav ul {
+  display: flex;
+  gap: var(--header-nav-gap, 24px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.header-nav a,
+.header-nav button {
+  font-size: var(--header-nav-font-size, 16px);
+  /* Keep existing button/link styles */
+}

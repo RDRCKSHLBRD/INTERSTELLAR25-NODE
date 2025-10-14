@@ -103,6 +103,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/system', express.static(path.join(__dirname, '../system')));
 app.use('/config.json', express.static(path.join(__dirname, '../config.json')));
+app.use('/config', express.static(path.join(__dirname, '../config')));  // ← ADD THIS LINE
+
 
 // Request logging middleware (development only)
 if (config.nodeEnv === 'development') {
@@ -114,6 +116,12 @@ if (config.nodeEnv === 'development') {
     next();
   });
 }
+
+
+
+
+
+
 
 // Authenticated audio serving route
 app.get(/^\/api\/audio\/(.*)$/, async (req, res) => {
