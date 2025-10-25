@@ -240,6 +240,18 @@ router.get('/me', async (req, res, next) => {
   }
 });
 
+
+// --- TEMP STUB: Google OAuth routes so probes don't 404 ---
+router.get('/google', (req, res) => {
+  const redirectUri = encodeURIComponent('https://www.interstellarpackages.com/api/auth/google/callback');
+  return res.redirect(`https://accounts.google.com/o/oauth2/auth?redirect_uri=${redirectUri}`);
+});
+
+router.get('/google/callback', (req, res) => {
+  return res.status(400).json({ ok: false, msg: 'Callback reached (stub). Provide real code parameter to exchange tokens.', query: req.query });
+});
+
+
 // GET /api/auth/status - Quick auth status check
 router.get('/status', (req, res) => {
   res.json({
