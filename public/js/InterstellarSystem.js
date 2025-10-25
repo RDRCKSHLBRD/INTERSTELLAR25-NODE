@@ -224,65 +224,72 @@ class InterstellarSystem {
     }
 
     // Create preloader controller
-    this.preloader = {
-      element: preloaderEl,
-      bars: preloaderEl.querySelectorAll('.logo-bar'),
-      config: this.config.preloader,
-      activeRequests: 0,
-      showTime: null,
-      animationTriggered: false,
-      clickPromptShown: false,
+ this.preloader = {
+  element: preloaderEl,
+  lines: preloaderEl.querySelectorAll('.logo-line'),
+  text: preloaderEl.querySelector('.logo-text'),
+  config: this.config.preloader,
+  activeRequests: 0,
+  showTime: null,
+  animationTriggered: false,
+  clickPromptShown: false,
 
-      show: () => {
-        this.preloader.activeRequests++;
-        this.preloader.showTime = Date.now();
-        preloaderEl.classList.remove('hidden', 'removed');
-        
-        if (!this.preloader.animationTriggered) {
-          setTimeout(() => this.preloader.triggerAnimation(), 100);
-          this.preloader.animationTriggered = true;
+  show: () => {
+    this.preloader.activeRequests++;
+    this.preloader.showTime = Date.now();
+    preloaderEl.classList.remove('hidden', 'removed');
+    
+    if (!this.preloader.animationTriggered) {
+      setTimeout(() => this.preloader.triggerAnimation(), 100);
+      this.preloader.animationTriggered = true;
+    }
+  },
+
+  hide: () => {
+    this.preloader.activeRequests = Math.max(0, this.preloader.activeRequests - 1);
+    
+    if (this.preloader.activeRequests === 0) {
+      const elapsed = Date.now() - this.preloader.showTime;
+      const animationDuration = 3500; // Lines finish at 2.8s + text at 2.2s + buffer
+      const remaining = Math.max(0, animationDuration - elapsed);
+      
+      // Show click prompt after animation completes
+      setTimeout(() => {
+        if (!this.preloader.clickPromptShown && !preloaderEl.classList.contains('hidden')) {
+          this.preloader.showClickPrompt();
         }
-      },
+      }, remaining);
+    }
+  },
 
-      hide: () => {
-        this.preloader.activeRequests = Math.max(0, this.preloader.activeRequests - 1);
-        
-        if (this.preloader.activeRequests === 0) {
-          const elapsed = Date.now() - this.preloader.showTime;
-          const animationDuration = 3000; // Last bar finishes at ~2.8s + buffer
-          const remaining = Math.max(0, animationDuration - elapsed);
-          
-          // Show click prompt after animation completes
-          setTimeout(() => {
-            if (!this.preloader.clickPromptShown && !preloaderEl.classList.contains('hidden')) {
-              this.preloader.showClickPrompt();
-            }
-          }, remaining);
-        }
-      },
+  showClickPrompt: () => {
+    if (this.preloader.clickPromptShown) return;
+    
+    this.preloader.clickPromptShown = true;
+    
+    // Make entire preloader clickable (no text prompt)
+    preloaderEl.style.cursor = 'pointer';
+    preloaderEl.addEventListener('click', () => {
+      this.preloader.forceHide();
+    }, { once: true });
+  },
 
-      showClickPrompt: () => {
-        if (this.preloader.clickPromptShown) return;
-        
-        this.preloader.clickPromptShown = true;
-        
-        // Make entire preloader clickable (no text prompt)
-        preloaderEl.style.cursor = 'pointer';
-        preloaderEl.addEventListener('click', () => {
-          this.preloader.forceHide();
-        });
-      },
+  triggerAnimation: () => {
+    // Animate all lines
+    this.preloader.lines.forEach(line => line.classList.add('animate'));
+    
+    // Animate text after lines
+    if (this.preloader.text) {
+      this.preloader.text.classList.add('animate');
+    }
+  },
 
-      triggerAnimation: () => {
-        this.preloader.bars.forEach(bar => bar.classList.add('animate'));
-      },
-
-      forceHide: () => {
-        this.preloader.activeRequests = 0;
-        preloaderEl.classList.add('hidden');
-        setTimeout(() => preloaderEl.classList.add('removed'), 800);
-      }
-    };
+  forceHide: () => {
+    this.preloader.activeRequests = 0;
+    preloaderEl.classList.add('hidden');
+    setTimeout(() => preloaderEl.classList.add('removed'), 800);
+  }
+};
 
     // Auto-show on init
     this.preloader.show();
