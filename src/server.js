@@ -10,6 +10,9 @@ import config from './config/environment.js';
 import { testConnection, closePool } from './config/database.js';
 import { Storage } from '@google-cloud/storage';
 
+const isProd = config.nodeEnv === 'production';
+
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,16 +44,21 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Make session data available to all templates
-app.use((req, res, next) => {
-  res.locals.user = req.session?.user || null;
-  res.locals.authenticated = !!req.session?.userId;
-  next();
-});
+
+
+// Cloud Run/HTTPS proxy awareness (MUST be before session)
+if (isProd) app.set('trust proxy', 1);
 
 // Security middleware
 app.use(
   helmet({
+
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+    crossOriginEmbedderPolicy: false,
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    hsts: isProd ? { maxAge: 31536000, includeSubDomains: true, preload: true } : false,
+
+
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
@@ -74,14 +82,29 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: config.nodeEnv === 'production', // HTTPS only in production
+     secure: isProd,               // HTTPS only in production
       httpOnly: true, // Prevent XSS attacks
       maxAge: config.session.maxAge, // 7 days from config
-      sameSite: 'lax' // CSRF protection
+      // Mobile/tablet + cross-site OAuth needs this:
+      sameSite: 'none'
+      // If API and pages live on different subdomains and you want one cookie:
+    // domain: '.yourdomain.tld'
     },
-    name: 'interstellar.sid' // Custom session cookie name
+    name: 'interstellar.sid' // keep; or switch to "__Secure-interstellar" if you add a Domain
   })
 );
+
+
+
+// Make session data available to all templates (AFTER session)
+app.use((req, res, next) => {
+  res.locals.user = req.session?.user || null;
+  res.locals.authenticated = !!req.session?.userId;
+  next();
+});
+
+
+
 
 // CORS configuration (must be after session for credentials)
 app.use(
