@@ -11,6 +11,7 @@ import SystemTimer from './SystemTimer.js';
 export class InterstellarSystem {
   constructor(config = null) {
     this.config = config;
+    this.pageConfig = null; // Page-specific config (e.g., landing.json)
     this.isInitialized = false;
     
     // Core systems
@@ -42,6 +43,9 @@ export class InterstellarSystem {
         this.config = await this.loadConfig();
       }
 
+      // Store page-specific config if provided
+      this.pageConfig = options.pageConfig || null;
+
       // Initialize SystemTimer first (for performance tracking)
       this.timer = new SystemTimer();
       this.timer.startPeriodicCleanup(this.config.performance?.cleanupInterval || 300000);
@@ -50,10 +54,11 @@ export class InterstellarSystem {
       this.state = new ViewportState(this.config.state);
       console.log('✅ ViewportState ready');
 
-      // Initialize RatioLayoutEngine
+      // Initialize RatioLayoutEngine with page config
       this.layout = new RatioLayoutEngine(this.config, {
         debug: options.debug || false,
-        autoApply: options.autoApply !== false
+        autoApply: options.autoApply !== false,
+        pageConfig: this.pageConfig
       });
       console.log('✅ RatioLayoutEngine ready');
 
@@ -66,6 +71,9 @@ export class InterstellarSystem {
       
       await this.quadtree.init();
       console.log('✅ QuadTree System ready');
+
+      // Apply initial layout based on current viewport
+      this.applyPageLayout();
 
       // Setup coordinated resize handling
       this.setupGlobalListeners();
@@ -93,6 +101,66 @@ export class InterstellarSystem {
       console.error('❌ System initialization failed:', error);
       throw error;
     }
+  }
+
+  /**
+   * Apply page-specific layout based on viewport and config
+   */
+  applyPageLayout() {
+    if (!this.pageConfig) return;
+
+    const viewport = this.state.calculate();
+    const root = document.documentElement;
+
+    // Set viewport data attributes
+    root.dataset.breakpoint = viewport.bp;
+    root.dataset.mode = viewport.mode;
+    root.dataset.orientation = viewport.orientation;
+
+    // Get breakpoint-specific config
+    const bpConfig = this.pageConfig.breakpoints?.[viewport.bp] || {};
+    const baseLayout = this.pageConfig.layout || {};
+
+    // Apply layout ratios based on mode
+    if (viewport.mode === 'stack') {
+      // Stack mode: use height-based layout
+      if (bpConfig.video?.height) {
+        root.style.setProperty('--video-height-mobile', bpConfig.video.height);
+      }
+      if (bpConfig.sidebar?.height) {
+        root.style.setProperty('--sidebar-height-mobile', bpConfig.sidebar.height);
+      }
+    } else {
+      // Split mode: use flex ratios
+      const videoRatio = bpConfig.video?.flexRatio || baseLayout.video?.flexRatio || 0.8;
+      const sidebarRatio = bpConfig.sidebar?.flexRatio || baseLayout.sidebar?.flexRatio || 0.2;
+      
+      root.style.setProperty('--video-flex', videoRatio);
+      root.style.setProperty('--sidebar-flex', sidebarRatio);
+    }
+
+    // Apply constraints
+    if (baseLayout.video?.minWidth) {
+      root.style.setProperty('--video-min-width', baseLayout.video.minWidth);
+    }
+    if (baseLayout.sidebar?.minWidth) {
+      root.style.setProperty('--sidebar-min-width', baseLayout.sidebar.minWidth);
+    }
+    if (bpConfig.sidebar?.maxWidth || baseLayout.sidebar?.maxWidth) {
+      root.style.setProperty('--sidebar-max-width', bpConfig.sidebar?.maxWidth || baseLayout.sidebar.maxWidth);
+    }
+
+    // Apply sidebar regions if present
+    if (baseLayout.sidebar?.regions) {
+      const regions = baseLayout.sidebar.regions;
+      if (regions.spacerTop) root.style.setProperty('--sidebar-spacer-flex', regions.spacerTop);
+      if (regions.navigation) root.style.setProperty('--sidebar-nav-flex', regions.navigation);
+    }
+
+    console.log('📐 Page layout applied:', {
+      breakpoint: viewport.bp,
+      mode: viewport.mode
+    });
   }
 
   /**
@@ -142,8 +210,13 @@ export class InterstellarSystem {
     // Calculate new viewport state
     const viewport = this.state.calculate();
     
-    // Apply layout changes
+    // Apply layout changes (RatioLayoutEngine)
     this.layout.apply();
+    
+    // Reapply page-specific layout if config exists
+    if (this.pageConfig) {
+      this.applyPageLayout();
+    }
     
     // Force update all observed QuadTree containers
     this.quadtree.forceUpdate();
