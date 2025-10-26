@@ -4,6 +4,7 @@
  * Makes everything globally accessible via window.Interstellar
  */
 
+import { ViewportState } from '../system/State.js';
 import { RatioLayoutEngine } from '../system/RatioLayoutEngine.js';
 import { RatioPosition } from '../system/RatioPosition.js';
 import { quadConfig } from '../system/quadtree/QuadConfig.js';
@@ -12,8 +13,9 @@ class InterstellarSystem {
   constructor() {
     this.version = '1.0.0';
     this.config = null;
+    this.state = null;     // ← NEW: ViewportState
     this.layout = null;
-    this.position = null;  // ← NEW: RatioPosition
+    this.position = null;  // RatioPosition
     this.quadtree = null;
     this.preloader = null;
     
@@ -54,11 +56,15 @@ class InterstellarSystem {
       this.applyTheme();
       console.log('✅ Theme applied');
 
-      // Step 3: Initialize Layout Engine
+      // Step 3: Initialize ViewportState
+      this.state = new ViewportState(this.config.state);
+      console.log('✅ ViewportState initialized');
+
+      // Step 4: Initialize Layout Engine
       this.layout = new RatioLayoutEngine(this.config.layout);
       console.log('✅ Layout engine initialized');
 
-      // Step 4: Initialize RatioPosition
+      // Step 5: Initialize RatioPosition (needs state for viewport info)
       this.position = new RatioPosition({
         debug: this.config.position?.debug || false,
         useCSSTransform: this.config.position?.useCSSTransform !== false,
@@ -66,19 +72,19 @@ class InterstellarSystem {
       });
       console.log('✅ RatioPosition initialized');
 
-      // Step 5: Initialize QuadTree (if enabled)
+      // Step 6: Initialize QuadTree (if enabled)
       if (this.config.quadtree?.enabled) {
         await this.initQuadTree();
         console.log('✅ QuadTree initialized');
       }
 
-      // Step 6: Initialize Preloader (if enabled)
+      // Step 7: Initialize Preloader (if enabled)
       if (this.config.preloader?.enabled) {
         this.initPreloader();
         console.log('✅ Preloader initialized');
       }
 
-      // Step 7: Set up event listeners
+      // Step 8: Set up event listeners
       this.setupEventListeners();
 
       this.isInitialized = true;
@@ -89,6 +95,7 @@ class InterstellarSystem {
         version: this.version,
         systems: {
           config: !!this.config,
+          state: !!this.state,
           layout: !!this.layout,
           position: !!this.position,
           quadtree: !!this.quadtree,
@@ -431,6 +438,11 @@ class InterstellarSystem {
       version: this.version,
       isInitialized: this.isInitialized,
       config: this.config,
+      viewport: this.state ? this.state.calculate({
+        width: window.innerWidth,
+        height: window.innerHeight,
+        dpr: window.devicePixelRatio || 1
+      }) : null,
       layout: this.layout?.getState(),
       position: this.position?.getMetrics(),
       metrics: this.layout?.getMetrics()

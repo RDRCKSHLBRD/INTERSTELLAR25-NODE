@@ -176,7 +176,7 @@ function positionArtistNav(position, config, state) {
     return;
   }
   
-  // Get viewport info
+  // Get viewport info from State
   const viewport = state ? state.calculate({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -191,20 +191,23 @@ function positionArtistNav(position, config, state) {
     return;
   }
 
-  // Merge breakpoint-specific overrides
+  // Merge mode-specific overrides based on viewport
   if (viewport && config.breakpoints) {
-    const bpConfig = config.breakpoints[viewport.bp];
-    if (bpConfig?.positions?.artistNav) {
+    const modeConfig = viewport.mode === 'stack' 
+      ? config.breakpoints.mobile 
+      : config.breakpoints.desktop;
+    
+    if (modeConfig?.positions?.artistNav) {
       posConfig = {
         ...posConfig,
-        ...bpConfig.positions.artistNav
+        ...modeConfig.positions.artistNav
       };
       
       // Merge styles separately
-      if (bpConfig.positions.artistNav.styles) {
+      if (modeConfig.positions.artistNav.styles) {
         posConfig.styles = {
           ...posConfig.styles,
-          ...bpConfig.positions.artistNav.styles
+          ...modeConfig.positions.artistNav.styles
         };
       }
     }
@@ -214,7 +217,7 @@ function positionArtistNav(position, config, state) {
   position.apply(artistNav, sidebar, posConfig, viewport);
   
   console.log('🎯 Artist nav positioned:', {
-    breakpoint: viewport?.bp,
+    mode: viewport?.mode,
     top: posConfig.top,
     system: posConfig.system
   });
