@@ -132,9 +132,12 @@ export class RatioPosition {
     const dx = this._resolveValue(spec.dx ?? 0, rect.width, viewport, 'width');
     const dy = this._resolveValue(spec.dy ?? 0, rect.height, viewport, 'height');
 
+    // Return CONTAINER-RELATIVE position (not viewport-absolute)
+    // For transform: use relative offsets
+    // For absolute: add rect.x/rect.y later
     return {
-      x: rect.x + left + dx,
-      y: rect.y + top + dy
+      x: left + dx,
+      y: top + dy
     };
   }
 
@@ -222,11 +225,11 @@ export class RatioPosition {
     const w = element.offsetWidth || 0;
     const h = element.offsetHeight || 0;
 
-    // Clamp within bounds
-    const minX = rect.x + padding;
-    const maxX = rect.x + rect.width - padding - w;
-    const minY = rect.y + padding;
-    const maxY = rect.y + rect.height - padding - h;
+    // Clamp within container bounds (container-relative, so 0,0 is top-left of container)
+    const minX = padding;
+    const maxX = rect.width - padding - w;
+    const minY = padding;
+    const maxY = rect.height - padding - h;
 
     return {
       x: Math.max(minX, Math.min(maxX, pos.x)),
@@ -247,17 +250,11 @@ export class RatioPosition {
       y = Math.round(y * dpr) / dpr;
     }
 
-    // Apply using transform (preferred) or top/left
-    if (this.opts.useCSSTransform) {
-      element.style.position = element.style.position || 'relative';
-      element.style.transform = `translate(${x}px, ${y}px)`;
-      element.style.left = '0';
-      element.style.top = '0';
-    } else {
-      element.style.position = 'absolute';
-      element.style.left = `${x}px`;
-      element.style.top = `${y}px`;
-    }
+    // Use absolute positioning within container (not transform)
+    // This way coordinates are relative to container, not viewport
+    element.style.position = 'absolute';
+    element.style.left = `${x}px`;
+    element.style.top = `${y}px`;
 
     // Apply optional styles from spec
     if (spec.styles) {
@@ -308,7 +305,6 @@ export class RatioPosition {
     if (!element) return;
 
     element.style.position = '';
-    element.style.transform = '';
     element.style.left = '';
     element.style.top = '';
 

@@ -2,35 +2,56 @@
   "layout": {
     "video": {
       "flexRatio": 0.8,
-      "minWidth": "60vw"
+      "minWidth": "60vw",
+      "objectFit": "cover"
     },
     "sidebar": {
       "flexRatio": 0.2,
       "minWidth": "20vw",
       "maxWidth": "400px",
       "regions": {
-        "spacerTop": 0.05,
-        "navigation": 0.9
+        "spacerTop": 0.6,
+        "navigation": 0.27,
+        "spacerBottom": 0.13
+      }
+    },
+    "breakpoints": {
+      "mobile": {
+        "mode": "stack",
+        "video": { "height": "60vh" },
+        "sidebar": { "height": "40vh" }
+      },
+      "tablet": {
+        "mode": "split",
+        "video": { "flexRatio": 0.8 },
+        "sidebar": { "flexRatio": 0.2 }
+      },
+      "desktop": {
+        "mode": "split",
+        "video": { "flexRatio": 0.8 },
+        "sidebar": { "flexRatio": 0.2 }
       }
     }
   },
+  
   "positions": {
     "artistNav": {
       "system": "cartesian",
-      "top": 0.7,
+      "top": 0.6,
       "left": 0,
       "anchor": "top-left",
       "clamp": true,
-      "padding": 0.01,
+      "padding": 0.02,
       "styles": {
         "display": "flex",
         "flexDirection": "column",
         "justifyContent": "flex-start",
         "width": "100%",
-        "height": "30%"
+        "height": "27%"
       }
     }
   },
+  
   "breakpoints": {
     "desktop": {
       "video": {
@@ -41,9 +62,9 @@
       },
       "positions": {
         "artistNav": {
-          "top": 0.7,
+          "top": 0.6,
           "styles": {
-            "height": "30%"
+            "height": "27%"
           }
         }
       }
@@ -59,12 +80,13 @@
         "artistNav": {
           "top": 0.05,
           "styles": {
-            "height": "95%"
+            "height": "90%"
           }
         }
       }
     }
   },
+  
   "theme": {
     "colors": {
       "bgPrimary": "#0a0a0a",
