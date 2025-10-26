@@ -109,7 +109,7 @@ export class InterstellarSystem {
   applyPageLayout() {
     if (!this.pageConfig) return;
 
-    const viewport = this.state.calculate();
+    const viewport = this.state.calculate(this.getMeasurements());
     const root = document.documentElement;
 
     // Set viewport data attributes
@@ -208,7 +208,7 @@ export class InterstellarSystem {
     const startTime = performance.now();
     
     // Calculate new viewport state
-    const viewport = this.state.calculate();
+    const viewport = this.state.calculate(this.getMeasurements());
     
     // Apply layout changes (RatioLayoutEngine)
     this.layout.apply();
@@ -240,10 +240,21 @@ export class InterstellarSystem {
   }
 
   /**
+   * Get current viewport measurements
+   */
+  getMeasurements() {
+    return {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      dpr: window.devicePixelRatio || 1
+    };
+  }
+
+  /**
    * Get current viewport state
    */
   getViewport() {
-    return this.state ? this.state.calculate() : null;
+    return this.state ? this.state.calculate(this.getMeasurements()) : null;
   }
 
   /**
