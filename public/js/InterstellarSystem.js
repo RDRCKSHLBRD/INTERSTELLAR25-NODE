@@ -1,10 +1,11 @@
 /**
  * InterstellarSystem.js - Global System Manager
- * Unified control for Config, Layout, QuadTree, and Preloader
+ * Unified control for Config, Layout, QuadTree, RatioPosition, and Preloader
  * Makes everything globally accessible via window.Interstellar
  */
 
 import { RatioLayoutEngine } from '../system/RatioLayoutEngine.js';
+import { RatioPosition } from '../system/RatioPosition.js';
 import { quadConfig } from '../system/quadtree/QuadConfig.js';
 
 class InterstellarSystem {
@@ -12,6 +13,7 @@ class InterstellarSystem {
     this.version = '1.0.0';
     this.config = null;
     this.layout = null;
+    this.position = null;  // ← NEW: RatioPosition
     this.quadtree = null;
     this.preloader = null;
     
@@ -56,26 +58,43 @@ class InterstellarSystem {
       this.layout = new RatioLayoutEngine(this.config.layout);
       console.log('✅ Layout engine initialized');
 
-      // Step 4: Initialize QuadTree (if enabled)
+      // Step 4: Initialize RatioPosition
+      this.position = new RatioPosition({
+        debug: this.config.position?.debug || false,
+        useCSSTransform: this.config.position?.useCSSTransform !== false,
+        roundToPixel: this.config.position?.roundToPixel !== false
+      });
+      console.log('✅ RatioPosition initialized');
+
+      // Step 5: Initialize QuadTree (if enabled)
       if (this.config.quadtree?.enabled) {
         await this.initQuadTree();
         console.log('✅ QuadTree initialized');
       }
 
-      // Step 5: Initialize Preloader (if enabled)
+      // Step 6: Initialize Preloader (if enabled)
       if (this.config.preloader?.enabled) {
         this.initPreloader();
         console.log('✅ Preloader initialized');
       }
 
-      // Step 6: Set up event listeners
+      // Step 7: Set up event listeners
       this.setupEventListeners();
 
       this.isInitialized = true;
       console.log('🎉 Interstellar System ready!');
 
       // Emit ready event
-      this.emit('system:ready', { version: this.version });
+      this.emit('system:ready', { 
+        version: this.version,
+        systems: {
+          config: !!this.config,
+          layout: !!this.layout,
+          position: !!this.position,
+          quadtree: !!this.quadtree,
+          preloader: !!this.preloader
+        }
+      });
 
       return this;
 
@@ -127,6 +146,7 @@ class InterstellarSystem {
         animation: { duration: { normal: 300 } }
       },
       layout: { mode: 'auto' },
+      position: { debug: false },
       preloader: { enabled: true, minDisplayTime: 2000 },
       performance: { throttleResize: 100 }
     };
@@ -202,14 +222,14 @@ class InterstellarSystem {
    * Initialize QuadTree system
    */
   async initQuadTree() {
-  // Import QuadTree modules dynamically
-  const { QuadTreeSystem } = await import('../system/quadtree/QuadIndex.js');  // ✅ CORRECT!
-  
-  // Initialize QuadTree
-  this.quadtree = new QuadTreeSystem(this.config.quadtree);  // ✅ Single unified system
-  
-  console.log('✅ QuadTree initialized');
-}
+    // Import QuadTree modules dynamically
+    const { QuadTreeSystem } = await import('../system/quadtree/QuadIndex.js');
+    
+    // Initialize QuadTree
+    this.quadtree = new QuadTreeSystem(this.config.quadtree);
+    
+    console.log('✅ QuadTree initialized');
+  }
 
    
   /**
@@ -224,72 +244,72 @@ class InterstellarSystem {
     }
 
     // Create preloader controller
- this.preloader = {
-  element: preloaderEl,
-  lines: preloaderEl.querySelectorAll('.logo-line'),
-  text: preloaderEl.querySelector('.logo-text'),
-  config: this.config.preloader,
-  activeRequests: 0,
-  showTime: null,
-  animationTriggered: false,
-  clickPromptShown: false,
+    this.preloader = {
+      element: preloaderEl,
+      lines: preloaderEl.querySelectorAll('.logo-line'),
+      text: preloaderEl.querySelector('.logo-text'),
+      config: this.config.preloader,
+      activeRequests: 0,
+      showTime: null,
+      animationTriggered: false,
+      clickPromptShown: false,
 
-  show: () => {
-    this.preloader.activeRequests++;
-    this.preloader.showTime = Date.now();
-    preloaderEl.classList.remove('hidden', 'removed');
-    
-    if (!this.preloader.animationTriggered) {
-      setTimeout(() => this.preloader.triggerAnimation(), 100);
-      this.preloader.animationTriggered = true;
-    }
-  },
-
-  hide: () => {
-    this.preloader.activeRequests = Math.max(0, this.preloader.activeRequests - 1);
-    
-    if (this.preloader.activeRequests === 0) {
-      const elapsed = Date.now() - this.preloader.showTime;
-      const animationDuration = 3500; // Lines finish at 2.8s + text at 2.2s + buffer
-      const remaining = Math.max(0, animationDuration - elapsed);
-      
-      // Show click prompt after animation completes
-      setTimeout(() => {
-        if (!this.preloader.clickPromptShown && !preloaderEl.classList.contains('hidden')) {
-          this.preloader.showClickPrompt();
+      show: () => {
+        this.preloader.activeRequests++;
+        this.preloader.showTime = Date.now();
+        preloaderEl.classList.remove('hidden', 'removed');
+        
+        if (!this.preloader.animationTriggered) {
+          setTimeout(() => this.preloader.triggerAnimation(), 100);
+          this.preloader.animationTriggered = true;
         }
-      }, remaining);
-    }
-  },
+      },
 
-  showClickPrompt: () => {
-    if (this.preloader.clickPromptShown) return;
-    
-    this.preloader.clickPromptShown = true;
-    
-    // Make entire preloader clickable (no text prompt)
-    preloaderEl.style.cursor = 'pointer';
-    preloaderEl.addEventListener('click', () => {
-      this.preloader.forceHide();
-    }, { once: true });
-  },
+      hide: () => {
+        this.preloader.activeRequests = Math.max(0, this.preloader.activeRequests - 1);
+        
+        if (this.preloader.activeRequests === 0) {
+          const elapsed = Date.now() - this.preloader.showTime;
+          const animationDuration = 3500; // Lines finish at 2.8s + text at 2.2s + buffer
+          const remaining = Math.max(0, animationDuration - elapsed);
+          
+          // Show click prompt after animation completes
+          setTimeout(() => {
+            if (!this.preloader.clickPromptShown && !preloaderEl.classList.contains('hidden')) {
+              this.preloader.showClickPrompt();
+            }
+          }, remaining);
+        }
+      },
 
-  triggerAnimation: () => {
-    // Animate all lines
-    this.preloader.lines.forEach(line => line.classList.add('animate'));
-    
-    // Animate text after lines
-    if (this.preloader.text) {
-      this.preloader.text.classList.add('animate');
-    }
-  },
+      showClickPrompt: () => {
+        if (this.preloader.clickPromptShown) return;
+        
+        this.preloader.clickPromptShown = true;
+        
+        // Make entire preloader clickable (no text prompt)
+        preloaderEl.style.cursor = 'pointer';
+        preloaderEl.addEventListener('click', () => {
+          this.preloader.forceHide();
+        }, { once: true });
+      },
 
-  forceHide: () => {
-    this.preloader.activeRequests = 0;
-    preloaderEl.classList.add('hidden');
-    setTimeout(() => preloaderEl.classList.add('removed'), 800);
-  }
-};
+      triggerAnimation: () => {
+        // Animate all lines
+        this.preloader.lines.forEach(line => line.classList.add('animate'));
+        
+        // Animate text after lines
+        if (this.preloader.text) {
+          this.preloader.text.classList.add('animate');
+        }
+      },
+
+      forceHide: () => {
+        this.preloader.activeRequests = 0;
+        preloaderEl.classList.add('hidden');
+        setTimeout(() => preloaderEl.classList.add('removed'), 800);
+      }
+    };
 
     // Auto-show on init
     this.preloader.show();
@@ -314,6 +334,17 @@ class InterstellarSystem {
     // Listen for layout changes
     window.addEventListener('rdxexp:layoutchange', (e) => {
       this.emit('layout:change', e.detail);
+    });
+
+    // Handle resize - update positioned elements
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (this.position) {
+          this.position.updateAll();
+        }
+      }, this.config.performance?.throttleResize || 100);
     });
 
     // Config change listener
@@ -401,6 +432,7 @@ class InterstellarSystem {
       isInitialized: this.isInitialized,
       config: this.config,
       layout: this.layout?.getState(),
+      position: this.position?.getMetrics(),
       metrics: this.layout?.getMetrics()
     };
   }
@@ -411,6 +443,10 @@ class InterstellarSystem {
   destroy() {
     if (this.layout) {
       this.layout.destroy();
+    }
+    
+    if (this.position) {
+      this.position.clearAll();
     }
     
     console.log('🛑 Interstellar System destroyed');
