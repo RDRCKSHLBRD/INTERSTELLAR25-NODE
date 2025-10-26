@@ -14,8 +14,8 @@
       "minWidth": "20vw",
       "maxWidth": "400px",
       "regions": {
-        "spacerTop": 0.3,
-        "navigation": 0.65,
+        "spacerTop": 0.08,
+        "navigation": 0.87,
         "spacerBottom": 0.05
       }
     }
@@ -25,23 +25,27 @@
     "mobile-sm": {
       "mode": "stack",
       "video": {
-        "height": "70vh",
-        "flexRatio": null
+        "height": "60vh"
       },
       "sidebar": {
-        "height": "30vh",
-        "flexRatio": null
+        "height": "40vh",
+        "regions": {
+          "spacerTop": 0.05,
+          "navigation": 0.9
+        }
       }
     },
     "mobile": {
       "mode": "stack",
       "video": {
-        "height": "60vh",
-        "flexRatio": null
+        "height": "60vh"
       },
       "sidebar": {
         "height": "40vh",
-        "flexRatio": null
+        "regions": {
+          "spacerTop": 0.05,
+          "navigation": 0.9
+        }
       }
     },
     "tablet": {
@@ -50,7 +54,11 @@
         "flexRatio": 0.75
       },
       "sidebar": {
-        "flexRatio": 0.25
+        "flexRatio": 0.25,
+        "regions": {
+          "spacerTop": 0.05,
+          "navigation": 0.9
+        }
       }
     },
     "desktop": {
@@ -59,7 +67,11 @@
         "flexRatio": 0.8
       },
       "sidebar": {
-        "flexRatio": 0.2
+        "flexRatio": 0.2,
+        "regions": {
+          "spacerTop": 0.08,
+          "navigation": 0.87
+        }
       }
     },
     "desktop-lg": {
@@ -68,7 +80,11 @@
         "flexRatio": 0.82
       },
       "sidebar": {
-        "flexRatio": 0.18
+        "flexRatio": 0.18,
+        "regions": {
+          "spacerTop": 0.08,
+          "navigation": 0.87
+        }
       }
     },
     "desktop-xl": {
@@ -78,7 +94,11 @@
       },
       "sidebar": {
         "flexRatio": 0.15,
-        "maxWidth": "500px"
+        "maxWidth": "500px",
+        "regions": {
+          "spacerTop": 0.08,
+          "navigation": 0.87
+        }
       }
     }
   },

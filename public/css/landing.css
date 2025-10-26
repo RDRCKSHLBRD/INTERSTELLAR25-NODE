@@ -184,7 +184,6 @@ body {
 
 [data-mode="stack"] .artist-link {
   font-size: var(--qt-font-size-mobile, 18px);
-  text-align: center;
 }
 
 /* =================================================================
