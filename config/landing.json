@@ -43,7 +43,7 @@
       "sidebar": {
         "height": "40vh",
         "regions": {
-          "spacerTop": 0.05,
+          "spacerTop": 0.02,
           "navigation": 0.9
         }
       }
