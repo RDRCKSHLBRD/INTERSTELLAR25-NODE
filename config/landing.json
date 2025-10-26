@@ -1,155 +1,91 @@
 {
-  "_comment": "Landing Page Configuration - All layout, styling, and behavior",
-  "_version": "1.0.0",
-  
   "layout": {
-    "type": "split",
     "video": {
       "flexRatio": 0.8,
-      "minWidth": "60vw",
-      "objectFit": "cover"
+      "minWidth": "60vw"
     },
     "sidebar": {
       "flexRatio": 0.2,
       "minWidth": "20vw",
       "maxWidth": "400px",
       "regions": {
-        "spacerTop": 0.08,
-        "navigation": 0.87,
-        "spacerBottom": 0.05
+        "spacerTop": 0.05,
+        "navigation": 0.9
       }
     }
   },
-  
+  "positions": {
+    "artistNav": {
+      "system": "cartesian",
+      "top": 0.7,
+      "left": 0,
+      "anchor": "top-left",
+      "clamp": true,
+      "padding": 0.01,
+      "styles": {
+        "display": "flex",
+        "flexDirection": "column",
+        "justifyContent": "flex-start",
+        "width": "100%",
+        "height": "30%"
+      }
+    }
+  },
   "breakpoints": {
-    "mobile-sm": {
-      "mode": "stack",
-      "video": {
-        "height": "60vh"
-      },
-      "sidebar": {
-        "height": "40vh",
-        "regions": {
-          "spacerTop": 0.05,
-          "navigation": 0.9
-        }
-      }
-    },
-    "mobile": {
-      "mode": "stack",
-      "video": {
-        "height": "60vh"
-      },
-      "sidebar": {
-        "height": "40vh",
-        "regions": {
-          "spacerTop": 0.02,
-          "navigation": 0.9
-        }
-      }
-    },
-    "tablet": {
-      "mode": "split",
-      "video": {
-        "flexRatio": 0.75
-      },
-      "sidebar": {
-        "flexRatio": 0.25,
-        "regions": {
-          "spacerTop": 0.05,
-          "navigation": 0.9
-        }
-      }
-    },
     "desktop": {
-      "mode": "split",
       "video": {
         "flexRatio": 0.8
       },
       "sidebar": {
-        "flexRatio": 0.2,
-        "regions": {
-          "spacerTop": 0.08,
-          "navigation": 0.87
+        "flexRatio": 0.2
+      },
+      "positions": {
+        "artistNav": {
+          "top": 0.7,
+          "styles": {
+            "height": "30%"
+          }
         }
       }
     },
-    "desktop-lg": {
-      "mode": "split",
+    "mobile": {
       "video": {
-        "flexRatio": 0.82
+        "height": "55vh"
       },
       "sidebar": {
-        "flexRatio": 0.18,
-        "regions": {
-          "spacerTop": 0.08,
-          "navigation": 0.87
-        }
-      }
-    },
-    "desktop-xl": {
-      "mode": "split",
-      "video": {
-        "flexRatio": 0.85
+        "height": "45vh"
       },
-      "sidebar": {
-        "flexRatio": 0.15,
-        "maxWidth": "500px",
-        "regions": {
-          "spacerTop": 0.08,
-          "navigation": 0.87
+      "positions": {
+        "artistNav": {
+          "top": 0.05,
+          "styles": {
+            "height": "95%"
+          }
         }
       }
     }
   },
-  
-  "artistLinks": {
-    "containerSelector": ".landing-sidebar",
-    "navigationSelector": "#artistNav",
-    "dataSource": "/config/artists.json",
-    "linkClass": "artist-link",
-    "layout": {
-      "justifyContent": "center",
-      "gap": "var(--qt-gap, 10px)",
-      "padding": "0 var(--qt-padding, 20px)"
-    },
-    "quadtreeObserve": true
-  },
-  
   "theme": {
-    "video": {
-      "background": "#000000"
+    "colors": {
+      "bgPrimary": "#0a0a0a",
+      "bgSecondary": "#0F1D38",
+      "accent": "#0e9bcc",
+      "accentHover": "#48BBD8"
     },
-    "sidebar": {
-      "background": "#0F1D38",
-      "color": "#cadbda"
-    },
-    "links": {
-      "color": "#0e9bcc",
-      "colorHover": "#48BBD8",
+    "typography": {
+      "fontFamily": "Helvetica, sans-serif",
+      "fontSize": 15,
       "fontWeight": 100,
       "letterSpacing": "0.8px",
       "letterSpacingHover": "3px"
-    }
-  },
-  
-  "animation": {
-    "enabled": true,
-    "entrance": {
-      "type": "slideIn",
-      "duration": "0.6s",
-      "easing": "ease-out",
-      "stagger": 0.1
     },
-    "hover": {
-      "duration": "0.3s",
-      "easing": "ease"
+    "spacing": {
+      "padding": 20,
+      "gap": 10
+    },
+    "animation": {
+      "slideDistance": 10,
+      "hoverDistance": 5
     }
-  },
-  
-  "accessibility": {
-    "respectReducedMotion": true,
-    "focusOutline": true,
-    "scrollBehavior": "smooth"
   }
 }

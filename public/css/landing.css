@@ -1,6 +1,6 @@
 /**
- * LANDING.CSS - Data-Driven Layout
- * All sizing from config.json via landing.js
+ * LANDING.CSS - RatioPosition-Based Layout
+ * Positioning controlled by ratioPosition.js + landing.json
  * NO hardcoded px values, NO media queries
  */
 
@@ -59,39 +59,43 @@ body {
   min-width: var(--sidebar-min-width, 20vw);
   max-width: var(--sidebar-max-width, 400px);
   
-  /* Layout */
+  /* Layout - CHANGED: Now relative for absolute positioning children */
   height: 100vh;
-  display: flex;
-  flex-direction: column;
+  position: relative;
   
   /* Visual styling (use theme colors) */
   background: var(--color-bg-secondary, #0F1D38);
 }
 
 /* =================================================================
-   SIDEBAR REGIONS (proportions from config)
+   SIDEBAR REGIONS (NO LONGER USING FLEX)
    ================================================================= */
 
-/* Spacer - top buffer space */
+/* Spacer - no longer needed with absolute positioning, but kept for legacy */
 .sidebar-spacer {
-  /* Size from landing.js (--sidebar-spacer-flex from config) */
-  flex: var(--sidebar-spacer-flex, 0.05);
+  display: none;
 }
 
-/* Artist Navigation - main content area */
+/* Artist Navigation - positioned by ratioPosition.js */
 .artist-nav {
-  /* Size from landing.js (--sidebar-nav-flex from config) */
-  flex: var(--sidebar-nav-flex, 0.9);
+  /* Position set by JavaScript - DO NOT set position/top/left here */
+  /* These styles only handle internal layout and scrolling */
   
-  /* Layout */
+  /* Internal layout */
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  overflow-y: auto;
-  
-  /* Spacing from QuadTree */
-  padding: 0 var(--qt-padding, 20px);
+  justify-content: flex-start;
   gap: var(--qt-gap, 10px);
+  
+  /* Overflow handling */
+  overflow-y: auto;
+  overflow-x: hidden;
+  
+  /* Spacing */
+  padding: 0 var(--qt-padding, 20px);
+  
+  /* Ensure content is visible */
+  z-index: 1;
 }
 
 /* =================================================================
@@ -104,10 +108,13 @@ body {
   text-decoration: none;
   cursor: pointer;
   
-  /* Typography from QuadTree */
+  /* Typography from QuadTree/config */
   font-size: var(--qt-font-size, 15px);
-  font-weight: 100;
+  font-weight: var(--qt-font-weight, 100);
   letter-spacing: var(--qt-letter-spacing, 0.8px);
+  
+  /* Flexbox to prevent shrinking */
+  flex-shrink: 0;
   
   /* Animation state (keep for entrance effect) */
   opacity: 0;
@@ -177,8 +184,9 @@ body {
   max-width: none;
 }
 
+/* Mobile: Artist nav repositioned by ratioPosition.js */
 [data-mode="stack"] .artist-nav {
-  justify-content: flex-start;
+  /* Position updated by JavaScript */
   padding-top: var(--qt-padding, 20px);
 }
 
@@ -193,11 +201,6 @@ body {
 [data-orientation="portrait"] .artist-nav {
   /* More vertical spacing in portrait */
   gap: calc(var(--qt-gap, 10px) * 1.5);
-}
-
-[data-orientation="landscape"][data-mode="split"] .sidebar-spacer {
-  /* Less spacer in landscape split mode */
-  flex: calc(var(--sidebar-spacer-flex, 0.05) * 0.5);
 }
 
 /* =================================================================
@@ -231,60 +234,24 @@ body {
 }
 
 /* =================================================================
-   ACCESSIBILITY & REDUCED MOTION
+   DEBUG MODE (shows positioning)
    ================================================================= */
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+[data-debug="true"] .artist-nav {
+  outline: 2px dashed rgba(0, 255, 0, 0.5);
+  outline-offset: -2px;
 }
 
-/* Screen reader only */
-.sr-only {
+[data-debug="true"] .artist-nav::before {
+  content: 'Artist Nav (RatioPosition)';
   position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
-/* =================================================================
-   DEBUG MODE (QuadConfig debug.enabled)
-   ================================================================= */
-
-[data-debug="true"] .landing-video::after,
-[data-debug="true"] .landing-sidebar::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: 2px dashed rgba(0, 255, 0, 0.5);
-  pointer-events: none;
-  z-index: 9999;
-}
-
-[data-debug="true"] .artist-link {
-  position: relative;
-}
-
-[data-debug="true"] .artist-link::before {
-  content: 'fs:' attr(data-font-size) ' gap:' attr(data-gap);
-  position: absolute;
-  top: -16px;
+  top: -20px;
   left: 0;
   font-size: 10px;
-  background: rgba(0, 255, 0, 0.8);
-  color: #000;
-  padding: 2px 4px;
+  color: lime;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 2px 6px;
+  border-radius: 3px;
   pointer-events: none;
-  white-space: nowrap;
+  z-index: 1000;
 }

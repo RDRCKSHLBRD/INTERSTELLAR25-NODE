@@ -5,6 +5,7 @@
 
 import { ViewportState } from './State.js';
 import RatioLayoutEngine from './RatioLayoutEngine.js';
+import { RatioPosition } from './RatioPosition.js';
 import { QuadTreeSystem } from './quadtree/QuadIndex.js';
 import SystemTimer from './SystemTimer.js';
 
@@ -17,6 +18,7 @@ export class InterstellarSystem {
     // Core systems
     this.state = null;
     this.layout = null;
+    this.position = null;  // ← NEW: RatioPosition
     this.quadtree = null;
     this.timer = null;
     
@@ -62,6 +64,14 @@ export class InterstellarSystem {
       });
       console.log('✅ RatioLayoutEngine ready');
 
+      // Initialize RatioPosition system
+      this.position = new RatioPosition({
+        debug: options.debug || this.config.position?.debug || false,
+        useCSSTransform: this.config.position?.useCSSTransform !== false,
+        roundToPixel: this.config.position?.roundToPixel !== false
+      });
+      console.log('✅ RatioPosition ready');
+
       // Initialize QuadTree system
       this.quadtree = new QuadTreeSystem({
         debug: options.debug || this.config.quadtree?.debug?.enabled || false,
@@ -90,6 +100,7 @@ export class InterstellarSystem {
         systems: {
           state: !!this.state,
           layout: !!this.layout,
+          position: !!this.position,  // ← NEW
           quadtree: !!this.quadtree,
           timer: !!this.timer
         }
@@ -218,6 +229,11 @@ export class InterstellarSystem {
       this.applyPageLayout();
     }
     
+    // Update all positioned elements (RatioPosition)
+    if (this.position) {
+      this.position.updateAll();
+    }
+    
     // Force update all observed QuadTree containers
     this.quadtree.forceUpdate();
     
@@ -266,6 +282,7 @@ export class InterstellarSystem {
       metrics: this.metrics,
       viewport: this.getViewport(),
       layout: this.layout ? this.layout.getMetrics() : null,
+      position: this.position ? this.position.getMetrics() : null,  // ← NEW
       quadtree: this.quadtree ? this.quadtree.getStats() : null,
       timer: this.timer ? this.timer.getPerformanceReport() : null
     };
@@ -291,47 +308,27 @@ export class InterstellarSystem {
   }
 
   /**
-   * Cleanup and destroy all systems
+   * Destroy system (cleanup)
    */
   destroy() {
-    console.log('🧹 Destroying Interstellar System...');
-
     if (this.layout) {
       this.layout.destroy();
     }
-
+    
+    if (this.position) {
+      this.position.clearAll();
+    }
+    
     if (this.quadtree) {
       this.quadtree.destroy();
     }
-
+    
     if (this.timer) {
       this.timer.destroy();
     }
-
-    this.isInitialized = false;
-    console.log('✅ System destroyed');
+    
+    console.log('🛑 Interstellar System destroyed');
   }
-}
-
-// Singleton instance (optional - can be created manually)
-let systemInstance = null;
-
-export function getSystem() {
-  if (!systemInstance) {
-    systemInstance = new InterstellarSystem();
-  }
-  return systemInstance;
-}
-
-export function createSystem(config = null) {
-  systemInstance = new InterstellarSystem(config);
-  return systemInstance;
-}
-
-// Debug helper
-if (typeof window !== 'undefined') {
-  window.InterstellarSystem = InterstellarSystem;
-  window.getSystem = getSystem;
 }
 
 export default InterstellarSystem;
