@@ -1,9 +1,9 @@
 /**
  * RatioPosition.js - Deterministic positioning system
- * 
- * Positions elements using ratio coordinates (0-1) instead of flexbox
- * Integrates with State.js and RatioLayoutEngine
- * 
+ *
+ * Positions elements using ratio coordinates (0-1) instead of flexbox.
+ * Integrates with State.js and RatioLayoutEngine.
+ *
  * Phase 1: Simple cartesian positioning only
  * Future: polar, bezier, centered coordinates
  */
@@ -15,26 +15,24 @@ export class RatioPosition {
       useCSSTransform: options.useCSSTransform !== false,
       roundToPixel: options.roundToPixel !== false
     };
-    
-    // Track positioned elements for updates
+
     this.positioned = new Map();
-    
-    // Performance metrics
+
     this.metrics = {
       positionCount: 0,
       updateCount: 0,
       lastUpdateTime: 0
     };
-    
+
     console.log('🎯 RatioPosition initialized');
   }
 
   /**
    * Position an element using ratio coordinates
-   * @param {HTMLElement} element - Element to position
-   * @param {HTMLElement|string} container - Container element or selector
-   * @param {Object} spec - Position specification
-   * @param {Object} viewport - Optional viewport info from State.js
+   * @param {HTMLElement} element
+   * @param {HTMLElement|string} container
+   * @param {Object} spec
+   * @param {Object} viewport
    */
   apply(element, container, spec, viewport = null) {
     if (!element || !spec) {
@@ -42,11 +40,10 @@ export class RatioPosition {
       return;
     }
 
-    // Resolve container
-    const containerEl = typeof container === 'string' 
+    const containerEl = typeof container === 'string'
       ? document.querySelector(container)
       : container;
-    
+
     if (!containerEl) {
       console.warn('⚠️ RatioPosition.apply: Container not found');
       return;
@@ -62,16 +59,11 @@ export class RatioPosition {
     const rect = this._getContainerRect(containerEl);
     const pos = this.compute(spec, rect, viewport, element);
 
-    // Apply positioning
+    // Apply
     this._applyPosition(element, pos, spec);
 
-    // Store for updates
-    this.positioned.set(element, {
-      container: containerEl,
-      spec,
-      viewport
-    });
-
+    // Track
+    this.positioned.set(element, { container: containerEl, spec, viewport });
     this.metrics.positionCount++;
 
     if (this.opts.debug) {
@@ -85,19 +77,17 @@ export class RatioPosition {
 
   /**
    * Compute position from spec
-   * @param {Object} spec - Position specification
-   * @param {Object} rect - Container rect {x, y, width, height}
-   * @param {Object} viewport - Viewport info (optional)
-   * @param {HTMLElement} element - Element being positioned (for anchor)
-   * @returns {Object} {x, y} in pixels
+   * @param {Object} spec
+   * @param {Object} rect {x,y,width,height}
+   * @param {Object} viewport
+   * @param {HTMLElement} element
+   * @returns {{x:number,y:number}}
    */
   compute(spec, rect, viewport = null, element = null) {
     const system = (spec.system || 'cartesian').toLowerCase();
     const anchor = (spec.anchor || 'top-left').toLowerCase();
-    
-    let p = { x: 0, y: 0 };
 
-    // Phase 1: Only cartesian for now
+    let p;
     if (system === 'cartesian') {
       p = this._computeCartesian(spec, rect, viewport);
     } else {
@@ -105,14 +95,12 @@ export class RatioPosition {
       p = this._computeCartesian(spec, rect, viewport);
     }
 
-    // Apply anchor offset if element provided
     if (element) {
       const shift = this._computeAnchorShift(anchor, element);
       p.x -= shift.x;
       p.y -= shift.y;
     }
 
-    // Apply clamping if requested
     if (spec.clamp) {
       p = this._applyClamp(p, rect, spec, element);
     }
@@ -124,45 +112,164 @@ export class RatioPosition {
    * Compute cartesian position (top/left ratios)
    */
   _computeCartesian(spec, rect, viewport) {
-    // Get top/left values (default to 0)
-    const top = this._resolveValue(spec.top ?? 0, rect.height, viewport, 'height');
-    const left = this._resolveValue(spec.left ?? 0, rect.width, viewport, 'width');
+    const top  = this._resolveValue(spec.top  ?? 0, rect.height, viewport, 'height');
+    const left = this._resolveValue(spec.left ?? 0, rect.width,  viewport, 'width');
 
-    // Apply optional dx/dy offsets
-    const dx = this._resolveValue(spec.dx ?? 0, rect.width, viewport, 'width');
+    const dx = this._resolveValue(spec.dx ?? 0, rect.width,  viewport, 'width');
     const dy = this._resolveValue(spec.dy ?? 0, rect.height, viewport, 'height');
 
-    // Return CONTAINER-RELATIVE position (not viewport-absolute)
-    // For transform: use relative offsets
-    // For absolute: add rect.x/rect.y later
-    return {
-      x: left + dx,
-      y: top + dy
-    };
+    return { x: left + dx, y: top + dy };
   }
 
   /**
-   * Resolve value - can be ratio (0-1), px, vh, vw
+   * Resolve value - ratio (0–1), px, vh, vw. Tolerates viewport.{width,height} or {w,h} or {vw,vh}.
    */
   _resolveValue(val, containerSize, viewport, axis) {
     const getV = (k) => {
       if (!viewport) return null;
-      if (k === "width")  return viewport.width  ?? viewport.w  ?? viewport.vw ?? null;
-      if (k === "height") return viewport.height ?? viewport.h  ?? viewport.vh ?? null;
+      if (k === 'width')  return viewport.width  ?? viewport.w  ?? viewport.vw ?? null;
+      if (k === 'height') return viewport.height ?? viewport.h  ?? viewport.vh ?? null;
       return null;
     };
 
-    if (typeof val === "number") return val * containerSize;
+    if (typeof val === 'number') return val * containerSize;
 
-    if (typeof val === "string") {
+    if (typeof val === 'string') {
       const str = val.trim().toLowerCase();
-      if (str.endsWith("px")) return parseFloat(str);
-      if (str.endsWith("vh")) { const vh = getV("height"); return vh ? (parseFloat(str)/100)*vh : 0; }
-      if (str.endsWith("vw")) { const vw = getV("width");  return vw ? (parseFloat(str)/100)*vw : 0; }
+      if (str.endsWith('px')) return parseFloat(str);
+
+      if (str.endsWith('vh')) {
+        const vh = getV('height');
+        return vh ? (parseFloat(str) / 100) * vh : 0;
+      }
+      if (str.endsWith('vw')) {
+        const vw = getV('width');
+        return vw ? (parseFloat(str) / 100) * vw : 0;
+      }
+
       const num = parseFloat(str);
-      if (Number.isFinite(num)) return num * containerSize;
+      if (Number.isFinite(num)) return num * containerSize; // bare number => ratio
     }
+
     return 0;
   }
 
-export default RatioPosition;
+  /**
+   * Compute anchor shift - offset element by its own size
+   */
+  _computeAnchorShift(anchor, element) {
+    const w = element.offsetWidth || 0;
+    const h = element.offsetHeight || 0;
+
+    switch (anchor) {
+      case 'top-left':       return { x: 0,   y: 0   };
+      case 'top-center':     return { x: w/2, y: 0   };
+      case 'top-right':      return { x: w,   y: 0   };
+      case 'middle-left':    return { x: 0,   y: h/2 };
+      case 'center':         return { x: w/2, y: h/2 };
+      case 'middle-right':   return { x: w,   y: h/2 };
+      case 'bottom-left':    return { x: 0,   y: h   };
+      case 'bottom-center':  return { x: w/2, y: h   };
+      case 'bottom-right':   return { x: w,   y: h   };
+      default:               return { x: 0,   y: 0   };
+    }
+  }
+
+  /**
+   * Clamp within container bounds
+   */
+  _applyClamp(pos, rect, spec, element) {
+    if (!element) return pos;
+
+    const padding = this._resolveValue(
+      spec.padding ?? 0,
+      Math.min(rect.width, rect.height),
+      null,
+      'min'
+    );
+
+    const w = element.offsetWidth  || 0;
+    const h = element.offsetHeight || 0;
+
+    const minX = padding;
+    const maxX = rect.width  - padding - w;
+    const minY = padding;
+    const maxY = rect.height - padding - h;
+
+    return {
+      x: Math.max(minX, Math.min(maxX, pos.x)),
+      y: Math.max(minY, Math.min(maxY, pos.y))
+    };
+  }
+
+  /**
+   * Apply computed position to element
+   */
+  _applyPosition(element, pos, spec) {
+    let { x, y } = pos;
+
+    if (this.opts.roundToPixel) {
+      const dpr = window.devicePixelRatio || 1;
+      x = Math.round(x * dpr) / dpr;
+      y = Math.round(y * dpr) / dpr;
+    }
+
+    element.style.position = 'absolute';
+    element.style.left = `${x}px`;
+    element.style.top  = `${y}px`;
+
+    if (spec.styles) {
+      Object.entries(spec.styles).forEach(([k, v]) => {
+        element.style[k] = v;
+      });
+    }
+  }
+
+  /**
+   * Container bounds
+   */
+  _getContainerRect(container) {
+    const rect = container.getBoundingClientRect();
+    return { x: rect.left, y: rect.top, width: rect.width, height: rect.height };
+  }
+
+  /**
+   * Update all tracked elements
+   */
+  updateAll() {
+    const start = performance.now();
+    this.positioned.forEach((data, element) => {
+      this.apply(element, data.container, data.spec, data.viewport);
+    });
+    this.metrics.updateCount++;
+    this.metrics.lastUpdateTime = performance.now() - start;
+
+    if (this.opts.debug) {
+      console.log('🔄 Updated all positions:', {
+        count: this.positioned.size,
+        time: this.metrics.lastUpdateTime.toFixed(2) + 'ms'
+      });
+    }
+  }
+
+  clear(element) {
+    if (!element) return;
+    element.style.position = '';
+    element.style.left = '';
+    element.style.top = '';
+    this.positioned.delete(element);
+  }
+
+  clearAll() {
+    this.positioned.forEach((_, el) => this.clear(el));
+    this.positioned.clear();
+  }
+
+  getMetrics() {
+    return { ...this.metrics, elementCount: this.positioned.size };
+  }
+
+  getInfo(element) { return this.positioned.get(element); }
+
+  isPositioned(element) { return this.positioned.has(element); }
+}
