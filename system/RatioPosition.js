@@ -145,203 +145,24 @@ export class RatioPosition {
    * Resolve value - can be ratio (0-1), px, vh, vw
    */
   _resolveValue(val, containerSize, viewport, axis) {
-    // Number: treat as ratio of container
-    if (typeof val === 'number') {
-      return val * containerSize;
-    }
+    const getV = (k) => {
+      if (!viewport) return null;
+      if (k === "width")  return viewport.width  ?? viewport.w  ?? viewport.vw ?? null;
+      if (k === "height") return viewport.height ?? viewport.h  ?? viewport.vh ?? null;
+      return null;
+    };
 
-    // String: parse units
-    if (typeof val === 'string') {
+    if (typeof val === "number") return val * containerSize;
+
+    if (typeof val === "string") {
       const str = val.trim().toLowerCase();
-      
-      if (str.endsWith('px')) {
-        return parseFloat(str);
-      }
-      
-      if (str.endsWith('vh') && viewport) {
-        return (parseFloat(str) / 100) * viewport.h;
-      }
-      
-      if (str.endsWith('vw') && viewport) {
-        return (parseFloat(str) / 100) * viewport.w;
-      }
-
-      // Try parsing as number (ratio)
+      if (str.endsWith("px")) return parseFloat(str);
+      if (str.endsWith("vh")) { const vh = getV("height"); return vh ? (parseFloat(str)/100)*vh : 0; }
+      if (str.endsWith("vw")) { const vw = getV("width");  return vw ? (parseFloat(str)/100)*vw : 0; }
       const num = parseFloat(str);
-      if (Number.isFinite(num)) {
-        return num * containerSize;
-      }
+      if (Number.isFinite(num)) return num * containerSize;
     }
-
     return 0;
   }
-
-  /**
-   * Compute anchor shift - offset element by its own size
-   */
-  _computeAnchorShift(anchor, element) {
-    const w = element.offsetWidth || 0;
-    const h = element.offsetHeight || 0;
-
-    switch (anchor) {
-      case 'top-left':
-        return { x: 0, y: 0 };
-      case 'top-center':
-        return { x: w / 2, y: 0 };
-      case 'top-right':
-        return { x: w, y: 0 };
-      case 'middle-left':
-        return { x: 0, y: h / 2 };
-      case 'center':
-        return { x: w / 2, y: h / 2 };
-      case 'middle-right':
-        return { x: w, y: h / 2 };
-      case 'bottom-left':
-        return { x: 0, y: h };
-      case 'bottom-center':
-        return { x: w / 2, y: h };
-      case 'bottom-right':
-        return { x: w, y: h };
-      default:
-        return { x: 0, y: 0 };
-    }
-  }
-
-  /**
-   * Apply clamping to keep element within container bounds
-   */
-  _applyClamp(pos, rect, spec, element) {
-    if (!element) return pos;
-
-    // Get padding
-    const padding = this._resolveValue(
-      spec.padding ?? 0,
-      Math.min(rect.width, rect.height),
-      null,
-      'min'
-    );
-
-    // Get element size
-    const w = element.offsetWidth || 0;
-    const h = element.offsetHeight || 0;
-
-    // Clamp within container bounds (container-relative, so 0,0 is top-left of container)
-    const minX = padding;
-    const maxX = rect.width - padding - w;
-    const minY = padding;
-    const maxY = rect.height - padding - h;
-
-    return {
-      x: Math.max(minX, Math.min(maxX, pos.x)),
-      y: Math.max(minY, Math.min(maxY, pos.y))
-    };
-  }
-
-  /**
-   * Apply computed position to element
-   */
-  _applyPosition(element, pos, spec) {
-    let { x, y } = pos;
-
-    // Round to pixel if enabled
-    if (this.opts.roundToPixel) {
-      const dpr = window.devicePixelRatio || 1;
-      x = Math.round(x * dpr) / dpr;
-      y = Math.round(y * dpr) / dpr;
-    }
-
-    // Use absolute positioning within container (not transform)
-    // This way coordinates are relative to container, not viewport
-    element.style.position = 'absolute';
-    element.style.left = `${x}px`;
-    element.style.top = `${y}px`;
-
-    // Apply optional styles from spec
-    if (spec.styles) {
-      Object.entries(spec.styles).forEach(([key, value]) => {
-        element.style[key] = value;
-      });
-    }
-  }
-
-  /**
-   * Get container bounding rect
-   */
-  _getContainerRect(container) {
-    const rect = container.getBoundingClientRect();
-    return {
-      x: rect.left,
-      y: rect.top,
-      width: rect.width,
-      height: rect.height
-    };
-  }
-
-  /**
-   * Update all positioned elements (call on resize)
-   */
-  updateAll() {
-    const startTime = performance.now();
-    
-    this.positioned.forEach((data, element) => {
-      this.apply(element, data.container, data.spec, data.viewport);
-    });
-
-    this.metrics.updateCount++;
-    this.metrics.lastUpdateTime = performance.now() - startTime;
-
-    if (this.opts.debug) {
-      console.log('🔄 Updated all positions:', {
-        count: this.positioned.size,
-        time: this.metrics.lastUpdateTime.toFixed(2) + 'ms'
-      });
-    }
-  }
-
-  /**
-   * Remove positioning from element
-   */
-  clear(element) {
-    if (!element) return;
-
-    element.style.position = '';
-    element.style.left = '';
-    element.style.top = '';
-
-    this.positioned.delete(element);
-  }
-
-  /**
-   * Clear all positioned elements
-   */
-  clearAll() {
-    this.positioned.forEach((_, element) => this.clear(element));
-    this.positioned.clear();
-  }
-
-  /**
-   * Get metrics
-   */
-  getMetrics() {
-    return {
-      ...this.metrics,
-      elementCount: this.positioned.size
-    };
-  }
-
-  /**
-   * Get info about positioned element
-   */
-  getInfo(element) {
-    return this.positioned.get(element);
-  }
-
-  /**
-   * Check if element is positioned
-   */
-  isPositioned(element) {
-    return this.positioned.has(element);
-  }
-}
 
 export default RatioPosition;

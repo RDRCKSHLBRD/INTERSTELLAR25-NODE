@@ -1,9 +1,11 @@
 {
   "version": "1.0.0",
   "project": "interstellar",
+  
   "_architecture": "Two-tier config: Root (global) + Modular (page-specific)",
   "_root_purpose": "Global system settings used by InterstellarSystem and all pages",
   "_modular_location": "Page-specific configs in /config/pages/[page].json",
+  
   "_comment_state": "ViewportState - Pure viewport calculations (globally accessible)",
   "state": {
     "precision": 4,
@@ -31,22 +33,24 @@
       "factor": 0.08
     },
     "modes": {
-      "stack": {
-        "maxWidth": 720,
+      "stack": { 
+        "maxWidth": 720, 
         "maxAr": 1.1
       },
-      "split": {
-        "minWidth": 720,
+      "split": { 
+        "minWidth": 720, 
         "minAr": 1.1
       }
     }
   },
+
   "_comment_position": "RatioPosition - Global positioning settings",
   "position": {
     "debug": false,
     "useCSSTransform": true,
     "roundToPixel": true
   },
+
   "_comment_theme": "Global theme - CSS variables applied by InterstellarSystem",
   "theme": {
     "colors": {
@@ -107,6 +111,7 @@
       "useGPU": true
     }
   },
+
   "_comment_quadTree": "QuadTree spatial system - Global settings (camelCase!)",
   "quadTree": {
     "enabled": true,
@@ -123,6 +128,7 @@
       "showOverlay": false
     }
   },
+
   "_comment_preloader": "Preloader - Global animation settings",
   "preloader": {
     "enabled": true,
@@ -134,14 +140,7 @@
     },
     "bars": {
       "count": 13,
-      "colors": [
-        "#231f20",
-        "#adaaa1",
-        "#3d3c38",
-        "#d9e0cd",
-        "#8c9a9b",
-        "#9da2a5"
-      ],
+      "colors": ["#231f20", "#adaaa1", "#3d3c38", "#d9e0cd", "#8c9a9b", "#9da2a5"],
       "redshift": {
         "enabled": true,
         "intensity": 1.5,
@@ -154,14 +153,16 @@
       "fadeInDuration": 1000
     }
   },
+
   "_comment_audio": "Audio player - Global settings",
   "audio": {
-    "defaultVolume": 1,
+    "defaultVolume": 1.0,
     "fadeEffectDuration": 1000,
     "skipInterval": 30,
     "autoPlay": false,
     "repeatMode": false
   },
+
   "_comment_performance": "Performance monitoring - Global settings",
   "performance": {
     "enableMemoryMonitoring": true,
@@ -176,6 +177,7 @@
       "lowFPS": 30
     }
   },
+
   "_comment_api": "API configuration - Global settings",
   "api": {
     "requestTimeout": 30000,
@@ -183,6 +185,7 @@
     "retryDelay": 1000,
     "enableCaching": true
   },
+
   "_comment_features": "Feature flags - Global toggles",
   "features": {
     "enableEffects": true,
@@ -191,6 +194,7 @@
     "enableCrossfade": false,
     "enableKeyboardShortcuts": true
   },
+
   "_comment_debug": "Debug and logging - Global settings",
   "debug": {
     "enableLogging": true,

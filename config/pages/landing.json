@@ -1,0 +1,10 @@
+{
+  "positions": {
+    "heroTitle": { "top": 0.18, "left": 0.08, "anchor": "top-left" },
+    "cta":       { "top": 0.28, "left": 0.08, "anchor": "top-left" },
+    "albumGrid": { "top": 0.52, "left": 0.05, "anchor": "top-left" }
+  },
+  "quadTree": {
+    "albumGrid": { "enabled": true, "maxDepth": 3, "minNodeSize": 96 }
+  }
+}

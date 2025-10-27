@@ -48,9 +48,5 @@
 
     <script type="module" src="/js/InterstellarSystem.js"></script>
     <script type="module" src="/js/landing.js"></script>
-  <div id="heroTitle" class="hero-title">Interstellar Packages</div>
-  <button id="cta" class="cta">Explore</button>
-  <div id="albumGrid" class="album-grid"></div>
-
 </body>
 </html>

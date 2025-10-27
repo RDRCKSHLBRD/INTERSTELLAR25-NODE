@@ -89,7 +89,6 @@ class InterstellarSystem {
       this.setupEventListeners();
 
       this.isInitialized = true;
-      window.Interstellar = this;
       console.log('🎉 Interstellar System ready!');
       console.log('📦 Global access: window.Interstellar');
 
