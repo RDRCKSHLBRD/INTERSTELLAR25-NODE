@@ -1,12 +1,18 @@
 {
+  "_page": "landing",
+  "_loaded_by": "/public/js/landing.js",
+  "_uses_global": "window.Interstellar (state, position, layout, quadTree)",
+  
+  "_comment": "Landing page specific configuration - loaded on demand",
+  
   "layout": {
-    "video": {
-      "flexRatio": 0.8,
-      "minWidth": "60vw",
-      "objectFit": "cover"
+    "mode": "split",
+    "videoSection": {
+      "flex": 0.7,
+      "minWidth": "60vw"
     },
-    "sidebar": {
-      "flexRatio": 0.2,
+    "sidebarSection": {
+      "flex": 0.3,
       "minWidth": "20vw",
       "maxWidth": "400px"
     }
@@ -15,100 +21,71 @@
   "positions": {
     "artistNav": {
       "system": "cartesian",
-      "top": 0.55,
+      "top": 0.1,
       "left": 0,
       "anchor": "top-left",
       "clamp": true,
-      "padding": 0.02,
       "styles": {
-        "display": "flex",
-        "flexDirection": "column",
-        "justifyContent": "flex-start",
-        "width": "100%",
-        "height": "35%"
+        "height": "80%",
+        "width": "100%"
+      }
+    },
+    "videoOverlay": {
+      "system": "cartesian",
+      "top": 0.9,
+      "left": 0.5,
+      "anchor": "bottom-center",
+      "styles": {
+        "width": "80%"
       }
     }
   },
   
-  "breakpoints": {
-    "desktop": {
-      "video": {
-        "flexRatio": 0.8
-      },
-      "sidebar": {
-        "flexRatio": 0.2,
-        "height": "100vh"
-      },
+  "positionBreakpoints": {
+    "mobile-portrait": {
+      "maxWidth": 480,
+      "orientation": "portrait",
       "positions": {
         "artistNav": {
-          "top": 0.55,
+          "top": 0.6,
           "styles": {
             "height": "35%"
           }
         }
       }
     },
-    "tablet-landscape": {
-      "video": {
-        "flexRatio": 0.7
-      },
-      "sidebar": {
-        "flexRatio": 0.3,
-        "height": "100vh"
-      },
-      "positions": {
-        "artistNav": {
-          "top": 0.4,
-          "styles": {
-            "height": "50%"
-          }
-        }
-      }
-    },
-    "tablet-portrait": {
-      "video": {
-        "height": "50vh"
-      },
-      "sidebar": {
-        "height": "50vh"
-      },
-      "positions": {
-        "artistNav": {
-          "top": 0.1,
-          "styles": {
-            "height": "85%"
-          }
-        }
-      }
-    },
     "mobile-landscape": {
-      "video": {
-        "height": "50vh"
-      },
-      "sidebar": {
-        "height": "50vh"
-      },
+      "minWidth": 481,
+      "maxWidth": 844,
+      "orientation": "landscape",
       "positions": {
         "artistNav": {
-          "top": 0.05,
+          "top": 0.5,
           "styles": {
-            "height": "90%"
+            "height": "40%"
           }
         }
       }
     },
-    "mobile-portrait": {
-      "video": {
-        "height": "55vh"
-      },
-      "sidebar": {
-        "height": "45vh"
-      },
+    "tablet": {
+      "minWidth": 768,
+      "maxWidth": 1023,
       "positions": {
         "artistNav": {
-          "top": 0.05,
+          "top": 0.55,
           "styles": {
-            "height": "90%"
+            "height": "40%"
+          }
+        }
+      }
+    },
+    "desktop": {
+      "minWidth": 1024,
+      "positions": {
+        "artistNav": {
+          "top": 0.5,
+          "styles": {
+            "height": "45%"
           }
         }
       }
@@ -116,26 +93,12 @@
   },
   
   "theme": {
-    "colors": {
-      "bgPrimary": "#0a0a0a",
-      "bgSecondary": "#0F1D38",
-      "accent": "#0e9bcc",
-      "accentHover": "#48BBD8"
-    },
-    "typography": {
-      "fontFamily": "Helvetica, sans-serif",
-      "fontSize": 15,
-      "fontWeight": 100,
-      "letterSpacing": "0.8px",
-      "letterSpacingHover": "3px"
-    },
-    "spacing": {
-      "padding": 20,
-      "gap": 10
-    },
-    "animation": {
-      "slideDistance": 10,
-      "hoverDistance": 5
-    }
+    "sidebarBackground": "#0F1D38",
+    "videoObjectFit": "cover"
+  },
+  
+  "data": {
+    "artistsSource": "/config/data/artists.json",
+    "preloadVideo": true
   }
 }

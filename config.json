@@ -2,6 +2,11 @@
   "version": "1.0.0",
   "project": "interstellar",
   
+  "_architecture": "Two-tier config: Root (global) + Modular (page-specific)",
+  "_root_purpose": "Global system settings used by InterstellarSystem and all pages",
+  "_modular_location": "Page-specific configs in /config/pages/[page].json",
+  
+  "_comment_state": "ViewportState - Pure viewport calculations (globally accessible)",
   "state": {
     "precision": 4,
     "throttle": 100,
@@ -28,62 +33,25 @@
       "factor": 0.08
     },
     "modes": {
-      "stack": { "maxWidth": 720, "maxAr": 1.1 },
-      "split": { "minWidth": 720, "minAr": 1.1 }
-    }
-  },
-
-  "breakpoints": {
-    "mobilePortrait": {
-      "maxWidth": 480,
-      "orientation": "portrait",
-      "positions": {
-        "artistNav": {
-          "top": 0.6,
-          "left": 0,
-          "height": "35%",
-          "width": "100%"
-        }
-      }
-    },
-    "mobileLandscape": {
-      "minWidth": 481,
-      "maxWidth": 844,
-      "orientation": "landscape",
-      "positions": {
-        "artistNav": {
-          "top": 0.5,
-          "left": 0,
-          "height": "40%",
-          "width": "100%"
-        }
-      }
-    },
-    "tablet": {
-      "minWidth": 768,
-      "maxWidth": 1023,
-      "positions": {
-        "artistNav": {
-          "top": 0.55,
-          "left": 0,
-          "height": "40%",
-          "width": "100%"
-        }
-      }
-    },
-    "desktop": {
-      "minWidth": 1024,
-      "positions": {
-        "artistNav": {
-          "top": 0.5,
-          "left": 0,
-          "height": "45%",
-          "width": "100%"
-        }
+      "stack": { 
+        "maxWidth": 720, 
+        "maxAr": 1.1
+      },
+      "split": { 
+        "minWidth": 720, 
+        "minAr": 1.1
       }
     }
   },
 
+  "_comment_position": "RatioPosition - Global positioning settings",
+  "position": {
+    "debug": false,
+    "useCSSTransform": true,
+    "roundToPixel": true
+  },
+
+  "_comment_theme": "Global theme - CSS variables applied by InterstellarSystem",
   "theme": {
     "colors": {
       "bg": {
@@ -144,52 +112,8 @@
     }
   },
 
-  "layout": {
-    "mode": "auto",
-    "breakpoints": {
-      "320": { "name": "mobile-sm" },
-      "568": { "name": "mobile" },
-      "768": { "name": "tablet", "controls.ratio": 0.35 },
-      "1024": { "name": "desktop", "controls.ratio": 0.32 },
-      "1440": { "name": "desktop-lg", "controls.ratio": 0.30 },
-      "1920": { "name": "desktop-xl", "controls.ratio": 0.28 }
-    },
-    "pages": {
-      "landing": {
-        "splitRatio": 0.8,
-        "sidebar": {
-          "contentRatio": 0.9
-        }
-      },
-      "artist": {
-        "regions": {
-          "header": { "ratio": 0.08 },
-          "controls": { "ratioRange": [0.25, 0.40] }
-        }
-      }
-    },
-    "regions": {
-      "header": {
-        "height": 64,
-        "minHeight": 48,
-        "maxHeight": 80,
-        "ratio": 0.08
-      },
-      "footer": {
-        "height": 44,
-        "minHeight": 32,
-        "maxHeight": 56,
-        "ratio": 0.055
-      },
-      "controls": {
-        "ratioRange": [0.25, 0.40],
-        "minHeight": 200,
-        "maxHeight": 600
-      }
-    }
-  },
-
-  "quadtree": {
+  "_comment_quadTree": "QuadTree spatial system - Global settings (camelCase!)",
+  "quadTree": {
     "enabled": true,
     "maxDepth": 4,
     "minNodeSize": 64,
@@ -205,6 +129,7 @@
     }
   },
 
+  "_comment_preloader": "Preloader - Global animation settings",
   "preloader": {
     "enabled": true,
     "minDisplayTime": 2000,
@@ -229,6 +154,7 @@
     }
   },
 
+  "_comment_audio": "Audio player - Global settings",
   "audio": {
     "defaultVolume": 1.0,
     "fadeEffectDuration": 1000,
@@ -237,6 +163,7 @@
     "repeatMode": false
   },
 
+  "_comment_performance": "Performance monitoring - Global settings",
   "performance": {
     "enableMemoryMonitoring": true,
     "cleanupInterval": 300000,
@@ -251,6 +178,7 @@
     }
   },
 
+  "_comment_api": "API configuration - Global settings",
   "api": {
     "requestTimeout": 30000,
     "retryAttempts": 3,
@@ -258,6 +186,7 @@
     "enableCaching": true
   },
 
+  "_comment_features": "Feature flags - Global toggles",
   "features": {
     "enableEffects": true,
     "enableVisualization": false,
@@ -266,6 +195,7 @@
     "enableKeyboardShortcuts": true
   },
 
+  "_comment_debug": "Debug and logging - Global settings",
   "debug": {
     "enableLogging": true,
     "enablePerformanceTracking": true,

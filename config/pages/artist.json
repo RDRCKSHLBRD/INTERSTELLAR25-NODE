@@ -1,0 +1,139 @@
+{
+  "_page": "artist",
+  "_loaded_by": "/public/js/artist.js",
+  "_uses_global": "window.Interstellar (state, position, layout, quadTree)",
+  
+  "_comment": "Artist page specific configuration - loaded on demand",
+  
+  "layout": {
+    "mode": "auto",
+    "regions": {
+      "header": {
+        "ratio": 0.08,
+        "minHeight": 48,
+        "maxHeight": 80
+      },
+      "main": {
+        "ratio": 0.60,
+        "minHeight": 400
+      },
+      "controls": {
+        "ratioRange": [0.25, 0.40],
+        "minHeight": 200,
+        "maxHeight": 600
+      }
+    }
+  },
+  
+  "positions": {
+    "albumGrid": {
+      "system": "cartesian",
+      "top": 0.1,
+      "left": 0.05,
+      "anchor": "top-left",
+      "styles": {
+        "width": "90%",
+        "height": "auto"
+      }
+    },
+    "bioSection": {
+      "system": "cartesian",
+      "top": 0.5,
+      "left": 0.05,
+      "anchor": "top-left",
+      "styles": {
+        "width": "90%",
+        "maxHeight": "40%"
+      }
+    },
+    "playerControls": {
+      "system": "cartesian",
+      "top": 1.0,
+      "left": 0.5,
+      "anchor": "bottom-center",
+      "styles": {
+        "width": "100%",
+        "height": "var(--controls-height)"
+      }
+    }
+  },
+  
+  "positionBreakpoints": {
+    "mobile": {
+      "maxWidth": 767,
+      "positions": {
+        "albumGrid": {
+          "top": 0.15,
+          "styles": {
+            "width": "95%"
+          }
+        },
+        "bioSection": {
+          "top": 0.6,
+          "styles": {
+            "width": "95%"
+          }
+        }
+      }
+    },
+    "tablet": {
+      "minWidth": 768,
+      "maxWidth": 1023,
+      "positions": {
+        "albumGrid": {
+          "left": 0.1,
+          "styles": {
+            "width": "80%"
+          }
+        }
+      }
+    },
+    "desktop": {
+      "minWidth": 1024,
+      "positions": {
+        "albumGrid": {
+          "left": 0.15,
+          "styles": {
+            "width": "70%"
+          }
+        },
+        "bioSection": {
+          "left": 0.15,
+          "styles": {
+            "width": "70%"
+          }
+        }
+      }
+    }
+  },
+  
+  "quadTree": {
+    "albumGrid": {
+      "enabled": true,
+      "columns": {
+        "min": 1,
+        "max": 4,
+        "default": 3
+      },
+      "gap": 16,
+      "aspectRatio": 1.5
+    },
+    "bioSection": {
+      "enabled": true,
+      "maxWidth": 800,
+      "padding": 20
+    }
+  },
+  
+  "data": {
+    "albumsSource": "/api/artists/:artistId/albums",
+    "bioSource": "/api/artists/:artistId/bio",
+    "preloadAlbumArt": true,
+    "lazyLoadBio": false
+  },
+  
+  "theme": {
+    "albumGridBackground": "transparent",
+    "bioBackground": "rgba(26, 26, 26, 0.5)"
+  }
+}
