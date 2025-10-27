@@ -2,6 +2,8 @@
  * State.js - Pure Viewport/Device State Calculator
  * NO DOM ACCESS - Pure mathematical functions
  * Configurable via config.state section
+ * 
+ * FIXED: Supports both maxAr/minAr AND maxAspect/minAspect property names
  */
 
 export class ViewportState {
@@ -46,11 +48,24 @@ export class ViewportState {
       ...stateConfig
     };
     
+    // Support both naming conventions
+    const stackMaxAspect = this.config.modes.stack.maxAspect !== undefined 
+      ? this.config.modes.stack.maxAspect 
+      : this.config.modes.stack.maxAr;
+      
+    const splitMinAspect = this.config.modes.split.minAspect !== undefined
+      ? this.config.modes.split.minAspect
+      : this.config.modes.split.minAr;
+    
     console.log('📐 State.js initialized with config:', {
       stackMaxWidth: this.config.modes.stack.maxWidth,
-      stackMaxAspect: this.config.modes.stack.maxAspect,
+      stackMaxAspect: stackMaxAspect,
       splitMinWidth: this.config.modes.split.minWidth,
-      splitMinAspect: this.config.modes.split.minAspect
+      splitMinAspect: splitMinAspect,
+      usingPropertyNames: {
+        stack: this.config.modes.stack.maxAspect !== undefined ? 'maxAspect' : 'maxAr',
+        split: this.config.modes.split.minAspect !== undefined ? 'minAspect' : 'minAr'
+      }
     });
   }
 
@@ -149,28 +164,35 @@ export class ViewportState {
 
   /**
    * Determine layout mode based on viewport
+   * FIXED: Supports both maxAr/minAr AND maxAspect/minAspect
    */
   determineMode(width, height, aspect) {
     const { stack, split } = this.config.modes;
+    
+    // Support both naming conventions
+    const stackMaxAspect = stack.maxAspect !== undefined ? stack.maxAspect : stack.maxAr;
+    const splitMinAspect = split.minAspect !== undefined ? split.minAspect : split.minAr;
     
     console.log('🎯 Determining mode:', {
       width,
       height,
       aspect: aspect.toFixed(4),
       'width < stack.maxWidth': width < stack.maxWidth,
-      'aspect < stack.maxAspect': aspect < stack.maxAspect,
+      'aspect < stackMaxAspect': stackMaxAspect !== undefined ? aspect < stackMaxAspect : 'N/A',
       'width >= split.minWidth': width >= split.minWidth,
-      'aspect >= split.minAspect': aspect >= split.minAspect
+      'aspect >= splitMinAspect': splitMinAspect !== undefined ? aspect >= splitMinAspect : 'N/A',
+      stackMaxAspect,
+      splitMinAspect
     });
     
     // Stack mode for narrow/portrait
-    if (width < stack.maxWidth || aspect < stack.maxAspect) {
+    if (width < stack.maxWidth || (stackMaxAspect !== undefined && aspect < stackMaxAspect)) {
       console.log('🎯 Mode selected: STACK (narrow or portrait)');
       return 'stack';
     }
     
     // Split mode for wider viewports
-    if (width >= split.minWidth && aspect >= split.minAspect) {
+    if (width >= split.minWidth && splitMinAspect !== undefined && aspect >= splitMinAspect) {
       console.log('🎯 Mode selected: SPLIT (wide landscape)');
       return 'split';
     }
@@ -199,5 +221,5 @@ export class ViewportState {
 
 // For debugging
 if (typeof window !== 'undefined') {
-  console.log('📐 State.js loaded - Pure viewport calculator');
+  console.log('📐 State.js loaded - Pure viewport calculator (FIXED for maxAr/minAr)');
 }

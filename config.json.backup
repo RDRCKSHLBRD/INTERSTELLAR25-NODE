@@ -33,57 +33,6 @@
     }
   },
 
-  "breakpoints": {
-    "mobilePortrait": {
-      "maxWidth": 480,
-      "orientation": "portrait",
-      "positions": {
-        "artistNav": {
-          "top": 0.6,
-          "left": 0,
-          "height": "35%",
-          "width": "100%"
-        }
-      }
-    },
-    "mobileLandscape": {
-      "minWidth": 481,
-      "maxWidth": 844,
-      "orientation": "landscape",
-      "positions": {
-        "artistNav": {
-          "top": 0.5,
-          "left": 0,
-          "height": "40%",
-          "width": "100%"
-        }
-      }
-    },
-    "tablet": {
-      "minWidth": 768,
-      "maxWidth": 1023,
-      "positions": {
-        "artistNav": {
-          "top": 0.55,
-          "left": 0,
-          "height": "40%",
-          "width": "100%"
-        }
-      }
-    },
-    "desktop": {
-      "minWidth": 1024,
-      "positions": {
-        "artistNav": {
-          "top": 0.5,
-          "left": 0,
-          "height": "45%",
-          "width": "100%"
-        }
-      }
-    }
-  },
-
   "theme": {
     "colors": {
       "bg": {
