@@ -7,16 +7,15 @@
 import { ViewportState } from '../system/State.js';
 import { RatioLayoutEngine } from '../system/RatioLayoutEngine.js';
 import { RatioPosition } from '../system/RatioPosition.js';
-import { quadConfig } from '../system/quadtree/QuadConfig.js';
 
 class InterstellarSystem {
   constructor() {
     this.version = '1.0.0';
     this.config = null;
-    this.state = null;     // ← NEW: ViewportState
+    this.state = null;     // ViewportState
     this.layout = null;
     this.position = null;  // RatioPosition
-    this.quadtree = null;
+    this.quadTree = null;  // ← Changed from quadtree to match property name
     this.preloader = null;
     
     this.isInitialized = false;
@@ -50,7 +49,7 @@ class InterstellarSystem {
     try {
       // Step 1: Load unified config
       this.config = await this.loadConfig();
-      console.log('✅ Config loaded');
+      console.log('✅ Config loaded:', this.config);
 
       // Step 2: Apply theme (CSS variables from config)
       this.applyTheme();
@@ -73,9 +72,11 @@ class InterstellarSystem {
       console.log('✅ RatioPosition initialized');
 
       // Step 6: Initialize QuadTree (if enabled)
-      if (this.config.quadtree?.enabled) {
+      if (this.config.quadTree?.enabled) {
+        console.log('🌳 QuadTree enabled in config, initializing...');
         await this.initQuadTree();
-        console.log('✅ QuadTree initialized');
+      } else {
+        console.log('⏭️ QuadTree disabled in config, skipping');
       }
 
       // Step 7: Initialize Preloader (if enabled)
@@ -89,6 +90,7 @@ class InterstellarSystem {
 
       this.isInitialized = true;
       console.log('🎉 Interstellar System ready!');
+      console.log('📦 Global access: window.Interstellar');
 
       // Emit ready event
       this.emit('system:ready', { 
@@ -98,7 +100,7 @@ class InterstellarSystem {
           state: !!this.state,
           layout: !!this.layout,
           position: !!this.position,
-          quadtree: !!this.quadtree,
+          quadTree: !!this.quadTree,
           preloader: !!this.preloader
         }
       });
@@ -116,17 +118,21 @@ class InterstellarSystem {
    */
   async loadConfig() {
     try {
+      console.log('📦 Loading config from /config.json...');
+      
       // Try loading from /config.json
       const response = await fetch('/config.json');
       if (!response.ok) {
-        throw new Error('Config file not found');
+        throw new Error(`Config fetch failed: ${response.status}`);
       }
       
       const config = await response.json();
+      console.log('✅ Config loaded from /config.json');
       
       // Merge with localStorage overrides
       const stored = localStorage.getItem('interstellar-config');
       if (stored) {
+        console.log('🔄 Merging localStorage overrides...');
         const overrides = JSON.parse(stored);
         return this.deepMerge(config, overrides);
       }
@@ -152,10 +158,18 @@ class InterstellarSystem {
         spacing: { unit: 8 },
         animation: { duration: { normal: 300 } }
       },
+      state: {
+        modes: {
+          stack: { maxWidth: 720, maxAspect: 1.1 },
+          split: { minWidth: 720, minAspect: 1.1 }
+        }
+      },
       layout: { mode: 'auto' },
       position: { debug: false },
       preloader: { enabled: true, minDisplayTime: 2000 },
-      performance: { throttleResize: 100 }
+      quadTree: { enabled: false },
+      performance: { throttleResize: 100 },
+      breakpoints: {}
     };
   }
 
@@ -167,6 +181,8 @@ class InterstellarSystem {
     const theme = this.config.theme;
 
     if (!theme) return;
+
+    console.log('🎨 Applying theme...');
 
     // Apply colors
     if (theme.colors) {
@@ -229,16 +245,24 @@ class InterstellarSystem {
    * Initialize QuadTree system
    */
   async initQuadTree() {
-    // Import QuadTree modules dynamically
-    const { QuadTreeSystem } = await import('../system/quadtree/QuadIndex.js');
-    
-    // Initialize QuadTree
-    this.quadtree = new QuadTreeSystem(this.config.quadtree);
-    
-    console.log('✅ QuadTree initialized');
+    try {
+      console.log('🌳 Loading QuadTree modules...');
+      
+      // Import QuadTree modules dynamically
+      // Note: Check your actual file path - might be quadIndex.js (lowercase)
+      const { QuadTree } = await import('../system/quadtree/quadIndex.js');
+      
+      // Initialize QuadTree with config
+      this.quadTree = new QuadTree(this.config.quadTree);
+      
+      console.log('✅ QuadTree initialized:', this.quadTree);
+      
+    } catch (error) {
+      console.error('❌ QuadTree initialization failed:', error);
+      console.warn('⚠️ Check that quadIndex.js exists at ../system/quadtree/quadIndex.js');
+    }
   }
 
-   
   /**
    * Initialize Preloader
    */
@@ -277,10 +301,9 @@ class InterstellarSystem {
         
         if (this.preloader.activeRequests === 0) {
           const elapsed = Date.now() - this.preloader.showTime;
-          const animationDuration = 3500; // Lines finish at 2.8s + text at 2.2s + buffer
+          const animationDuration = 3500;
           const remaining = Math.max(0, animationDuration - elapsed);
           
-          // Show click prompt after animation completes
           setTimeout(() => {
             if (!this.preloader.clickPromptShown && !preloaderEl.classList.contains('hidden')) {
               this.preloader.showClickPrompt();
@@ -293,8 +316,6 @@ class InterstellarSystem {
         if (this.preloader.clickPromptShown) return;
         
         this.preloader.clickPromptShown = true;
-        
-        // Make entire preloader clickable (no text prompt)
         preloaderEl.style.cursor = 'pointer';
         preloaderEl.addEventListener('click', () => {
           this.preloader.forceHide();
@@ -302,10 +323,7 @@ class InterstellarSystem {
       },
 
       triggerAnimation: () => {
-        // Animate all lines
         this.preloader.lines.forEach(line => line.classList.add('animate'));
-        
-        // Animate text after lines
         if (this.preloader.text) {
           this.preloader.text.classList.add('animate');
         }
@@ -321,7 +339,7 @@ class InterstellarSystem {
     // Auto-show on init
     this.preloader.show();
 
-    // Auto-hide when page fully loads (triggers click prompt)
+    // Auto-hide when page fully loads
     if (document.readyState === 'complete') {
       this.preloader.hide();
     } else {
@@ -351,6 +369,9 @@ class InterstellarSystem {
         if (this.position) {
           this.position.updateAll();
         }
+        
+        // Emit viewport change event
+        this.emit('viewport:change', this.getViewportState());
       }, this.config.performance?.throttleResize || 100);
     });
 
@@ -364,6 +385,65 @@ class InterstellarSystem {
         });
       }
     });
+  }
+
+  /**
+   * Get current viewport state
+   */
+  getViewportState() {
+    if (!this.state) {
+      console.warn('⚠️ ViewportState not initialized');
+      return null;
+    }
+    
+    return this.state.calculate({
+      width: window.innerWidth,
+      height: window.innerHeight,
+      dpr: window.devicePixelRatio || 1
+    });
+  }
+
+  /**
+   * Get active breakpoint config
+   */
+  getActiveBreakpoint() {
+    if (!this.config?.breakpoints) {
+      console.warn('⚠️ No breakpoints defined in config');
+      return null;
+    }
+
+    const viewport = this.getViewportState();
+    if (!viewport) return null;
+
+    console.log('🔍 Checking breakpoints for viewport:', viewport);
+
+    // Check each breakpoint
+    for (const [name, breakpoint] of Object.entries(this.config.breakpoints)) {
+      const matches = this.matchesBreakpoint(viewport, breakpoint);
+      
+      console.log(`  ${name}:`, matches ? '✅ MATCH' : '❌', breakpoint);
+      
+      if (matches) {
+        console.log(`📱 Active breakpoint: ${name}`);
+        return { name, config: breakpoint };
+      }
+    }
+
+    console.log('⚠️ No breakpoint matched');
+    return null;
+  }
+
+  /**
+   * Check if viewport matches breakpoint
+   */
+  matchesBreakpoint(viewport, breakpoint) {
+    return (
+      (breakpoint.minWidth === undefined || viewport.width >= breakpoint.minWidth) &&
+      (breakpoint.maxWidth === undefined || viewport.width <= breakpoint.maxWidth) &&
+      (breakpoint.minHeight === undefined || viewport.height >= breakpoint.minHeight) &&
+      (breakpoint.maxHeight === undefined || viewport.height <= breakpoint.maxHeight) &&
+      (breakpoint.orientation === undefined || viewport.orientation === breakpoint.orientation)
+    );
   }
 
   /**
@@ -438,14 +518,11 @@ class InterstellarSystem {
       version: this.version,
       isInitialized: this.isInitialized,
       config: this.config,
-      viewport: this.state ? this.state.calculate({
-        width: window.innerWidth,
-        height: window.innerHeight,
-        dpr: window.devicePixelRatio || 1
-      }) : null,
+      viewport: this.getViewportState(),
       layout: this.layout?.getState(),
       position: this.position?.getMetrics(),
-      metrics: this.layout?.getMetrics()
+      metrics: this.layout?.getMetrics(),
+      activeBreakpoint: this.getActiveBreakpoint()
     };
   }
 
@@ -474,7 +551,9 @@ window.Interstellar = Interstellar;
 // Auto-initialize on DOM load
 window.addEventListener('DOMContentLoaded', () => {
   if (!window.Interstellar.isInitialized) {
-    window.Interstellar.init();
+    window.Interstellar.init().then(() => {
+      console.log('✅ Interstellar System initialized from DOMContentLoaded');
+    });
   }
 });
 
