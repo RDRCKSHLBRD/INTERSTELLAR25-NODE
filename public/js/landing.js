@@ -1,16 +1,14 @@
 /**
  * LANDING PAGE INITIALIZATION
- * Uses RatioPosition for precise element positioning
+ * Complete implementation with orientation-aware breakpoint matching
  */
 
 async function initLanding() {
   try {
     console.log('🎬 Landing page initializing...');
 
-    // Wait for InterstellarSystem to be ready
     await waitForSystem();
 
-    // Get system instances
     const system = window.Interstellar;
     const position = system.position;
     const state = system.state;
@@ -20,24 +18,18 @@ async function initLanding() {
       return;
     }
 
-    // Load landing configuration
     const config = await loadLandingConfig();
-    
-    // Store config in system for layout management
     system.pageConfig = config;
-
-    // Apply theme CSS variables
     applyThemeVariables(config);
-    
-    // Load and render artists
     await loadArtists(config);
     
-    // Position artist nav using RatioPosition
+    await waitForLayoutSettlement();
+    
     positionArtistNav(position, config, state);
     
-    // Listen for breakpoint changes
-    system.on('system:update', (detail) => {
+    system.on('system:update', async (detail) => {
       console.log('🔄 System updated, repositioning...');
+      await waitForLayoutSettlement();
       positionArtistNav(position, config, state);
     });
 
@@ -48,24 +40,27 @@ async function initLanding() {
   }
 }
 
-/**
- * Wait for InterstellarSystem to be ready
- */
 function waitForSystem() {
   return new Promise((resolve) => {
     if (window.Interstellar?.isInitialized) {
       resolve();
     } else {
       window.addEventListener('system:ready', resolve, { once: true });
-      // Timeout fallback
       setTimeout(resolve, 3000);
     }
   });
 }
 
-/**
- * Load landing page configuration
- */
+function waitForLayoutSettlement() {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(resolve);
+      });
+    });
+  });
+}
+
 async function loadLandingConfig() {
   try {
     const response = await fetch('/config/landing.json');
@@ -75,30 +70,33 @@ async function loadLandingConfig() {
     return await response.json();
   } catch (error) {
     console.error('❌ Failed to load landing config:', error);
-    // Return minimal config as fallback
     return {
       positions: {
         artistNav: {
           system: 'cartesian',
-          top: 0.7,
+          top: 0.1,
           left: 0,
-          anchor: 'top-left'
+          anchor: 'top-left',
+          styles: { height: '80%' }
+        }
+      },
+      breakpoints: {
+        desktop: {
+          positions: {
+            artistNav: { top: 0.55, styles: { height: '35%' } }
+          }
         }
       }
     };
   }
 }
 
-/**
- * Apply theme CSS variables
- */
 function applyThemeVariables(config) {
   const root = document.documentElement;
   const theme = config.theme;
   
   if (!theme) return;
   
-  // Colors
   if (theme.colors) {
     Object.entries(theme.colors).forEach(([key, value]) => {
       const varName = `--color-${key.replace(/[A-Z]/g, m => '-' + m.toLowerCase())}`;
@@ -106,7 +104,6 @@ function applyThemeVariables(config) {
     });
   }
   
-  // Typography
   if (theme.typography) {
     root.style.setProperty('--font-family', theme.typography.fontFamily);
     root.style.setProperty('--qt-font-size', `${theme.typography.fontSize}px`);
@@ -115,22 +112,17 @@ function applyThemeVariables(config) {
     root.style.setProperty('--qt-letter-spacing-hover', theme.typography.letterSpacingHover);
   }
   
-  // Spacing
   if (theme.spacing) {
     root.style.setProperty('--qt-padding', `${theme.spacing.padding}px`);
     root.style.setProperty('--qt-gap', `${theme.spacing.gap}px`);
   }
   
-  // Animation
   if (theme.animation) {
     root.style.setProperty('--qt-slide-distance', `${theme.animation.slideDistance}px`);
     root.style.setProperty('--qt-hover-distance', `${theme.animation.hoverDistance}px`);
   }
 }
 
-/**
- * Load and render artists
- */
 async function loadArtists(config) {
   try {
     const response = await fetch('/config/artists.json');
@@ -143,10 +135,8 @@ async function loadArtists(config) {
       return;
     }
 
-    // Clear existing content
     artistNav.innerHTML = '';
     
-    // Render artist links
     artistsData.artists
       .sort((a, b) => a.order - b.order)
       .forEach(artist => {
@@ -164,73 +154,154 @@ async function loadArtists(config) {
   }
 }
 
-/**
- * Position artist nav using RatioPosition
- */
+function getBreakpointConfig(viewport, config) {
+  if (!viewport || !config.breakpoints) {
+    console.warn('⚠️ No breakpoints config found, using fallback');
+    return config.breakpoints?.desktop || null;
+  }
+
+  const w = viewport.w || viewport.vw || window.innerWidth;
+  const h = viewport.h || viewport.vh || window.innerHeight;
+  const orientation = h > w ? 'portrait' : 'landscape';
+  
+  console.log('🔍 Breakpoint matching:', {
+    width: w,
+    height: h,
+    orientation,
+    aspect: (w/h).toFixed(2),
+    mode: viewport.mode
+  });
+
+  // Desktop (1280+)
+  if (w >= 1280) {
+    console.log('✅ Using: desktop config');
+    return config.breakpoints.desktop;
+  }
+  
+  // Tablet Portrait (768-1279, portrait)
+  if (w >= 768 && w < 1280 && orientation === 'portrait') {
+    if (config.breakpoints['tablet-portrait']) {
+      console.log('✅ Using: tablet-portrait config');
+      return config.breakpoints['tablet-portrait'];
+    }
+    console.log('⚠️ tablet-portrait not found, using tablet');
+    return config.breakpoints.tablet;
+  }
+  
+  // Tablet Landscape (768-1279, landscape)
+  if (w >= 768 && w < 1280 && orientation === 'landscape') {
+    if (config.breakpoints['tablet-landscape']) {
+      console.log('✅ Using: tablet-landscape config');
+      return config.breakpoints['tablet-landscape'];
+    }
+    console.log('⚠️ tablet-landscape not found, using tablet');
+    return config.breakpoints.tablet;
+  }
+  
+  // Mobile Landscape (<768, landscape)
+  if (w < 768 && orientation === 'landscape') {
+    if (config.breakpoints['mobile-landscape']) {
+      console.log('✅ Using: mobile-landscape config');
+      return config.breakpoints['mobile-landscape'];
+    }
+    console.log('⚠️ mobile-landscape not found, using mobile');
+    return config.breakpoints.mobile;
+  }
+  
+  // Mobile Portrait (<768, portrait)
+  if (w < 768 && orientation === 'portrait') {
+    if (config.breakpoints['mobile-portrait']) {
+      console.log('✅ Using: mobile-portrait config');
+      return config.breakpoints['mobile-portrait'];
+    }
+    console.log('⚠️ mobile-portrait not found, using mobile');
+    return config.breakpoints.mobile;
+  }
+  
+  // Fallback
+  console.warn('⚠️ No breakpoint matched, using desktop as fallback');
+  return config.breakpoints.desktop || null;
+}
+
 function positionArtistNav(position, config, state) {
   const artistNav = document.getElementById('artistNav');
   const sidebar = document.querySelector('.landing-sidebar');
   
-  if (!artistNav || !sidebar) {
-    console.warn('⚠️ Artist nav or sidebar element not found');
+  if (!artistNav) {
+    console.error('❌ Artist nav element not found (#artistNav)');
     return;
   }
   
-  // Get viewport info from State
+  if (!sidebar) {
+    console.error('❌ Sidebar element not found (.landing-sidebar)');
+    return;
+  }
+  
+  const sidebarRect = sidebar.getBoundingClientRect();
+  console.log('📏 Sidebar dimensions:', {
+    width: Math.round(sidebarRect.width),
+    height: Math.round(sidebarRect.height),
+    viewport: `${window.innerWidth} x ${window.innerHeight}`
+  });
+  
   const viewport = state ? state.calculate({
     width: window.innerWidth,
     height: window.innerHeight,
     dpr: window.devicePixelRatio || 1
-  }) : null;
+  }) : { 
+    w: window.innerWidth, 
+    h: window.innerHeight 
+  };
 
-  // Get base position config
   let posConfig = config.positions?.artistNav;
   
   if (!posConfig) {
-    console.warn('⚠️ No position config for artistNav');
+    console.error('❌ No position config found for artistNav');
     return;
   }
 
-  // Merge mode-specific overrides based on viewport
-  if (viewport && config.breakpoints) {
-    const modeConfig = viewport.mode === 'stack' 
-      ? config.breakpoints.mobile 
-      : config.breakpoints.desktop;
+  posConfig = JSON.parse(JSON.stringify(posConfig));
+
+  const breakpointConfig = getBreakpointConfig(viewport, config);
+  
+  if (breakpointConfig?.positions?.artistNav) {
+    const bpArtistNav = breakpointConfig.positions.artistNav;
     
-    if (modeConfig?.positions?.artistNav) {
-      posConfig = {
-        ...posConfig,
-        ...modeConfig.positions.artistNav
+    if (bpArtistNav.top !== undefined) posConfig.top = bpArtistNav.top;
+    if (bpArtistNav.left !== undefined) posConfig.left = bpArtistNav.left;
+    if (bpArtistNav.anchor) posConfig.anchor = bpArtistNav.anchor;
+    if (bpArtistNav.clamp !== undefined) posConfig.clamp = bpArtistNav.clamp;
+    if (bpArtistNav.padding !== undefined) posConfig.padding = bpArtistNav.padding;
+    
+    if (bpArtistNav.styles) {
+      posConfig.styles = {
+        ...(posConfig.styles || {}),
+        ...bpArtistNav.styles
       };
-      
-      // Merge styles separately
-      if (modeConfig.positions.artistNav.styles) {
-        posConfig.styles = {
-          ...posConfig.styles,
-          ...modeConfig.positions.artistNav.styles
-        };
-      }
     }
   }
   
-  // Apply positioning
+  const expectedY = posConfig.top * sidebarRect.height;
+  
   position.apply(artistNav, sidebar, posConfig, viewport);
   
   console.log('🎯 Artist nav positioned:', {
-    mode: viewport?.mode,
     top: posConfig.top,
-    system: posConfig.system
+    height: posConfig.styles?.height,
+    expectedY: `${Math.round(expectedY)}px`,
+    actualTop: artistNav.style.top,
+    actualHeight: artistNav.style.height
   });
 }
 
-// Initialize on load
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initLanding);
 } else {
   initLanding();
 }
 
-// Export for debugging
 window.LandingPage = {
-  initLanding
+  initLanding,
+  positionArtistNav,
+  getBreakpointConfig
 };
