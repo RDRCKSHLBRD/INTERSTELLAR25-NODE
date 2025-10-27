@@ -17,10 +17,10 @@ class InterstellarSystem {
     this.position = null;  // RatioPosition
     this.quadTree = null;  // ← Changed from quadtree to match property name
     this.preloader = null;
-    
+
     this.isInitialized = false;
     this.initPromise = null;
-    
+
     // Bind methods for global access
     this.init = this.init.bind(this);
     this.applyTheme = this.applyTheme.bind(this);
@@ -45,7 +45,7 @@ class InterstellarSystem {
 
   async _initialize() {
     console.log('🚀 Initializing Interstellar System...');
-    
+
     try {
       // Step 1: Load unified config
       this.config = await this.loadConfig();
@@ -94,7 +94,7 @@ class InterstellarSystem {
       console.log('📦 Global access: window.Interstellar');
 
       // Emit ready event
-      this.emit('system:ready', { 
+      this.emit('system:ready', {
         version: this.version,
         systems: {
           config: !!this.config,
@@ -120,16 +120,16 @@ class InterstellarSystem {
   async loadConfig() {
     try {
       console.log('📦 Loading config from /config.json...');
-      
+
       // Try loading from /config.json
       const response = await fetch('/config.json');
       if (!response.ok) {
         throw new Error(`Config fetch failed: ${response.status}`);
       }
-      
+
       const config = await response.json();
       console.log('✅ Config loaded from /config.json');
-      
+
       // Merge with localStorage overrides
       const stored = localStorage.getItem('interstellar-config');
       if (stored) {
@@ -137,9 +137,9 @@ class InterstellarSystem {
         const overrides = JSON.parse(stored);
         return this.deepMerge(config, overrides);
       }
-      
+
       return config;
-      
+
     } catch (error) {
       console.warn('⚠️ Failed to load config.json, using defaults:', error.message);
       return this.getDefaultConfig();
@@ -233,7 +233,7 @@ class InterstellarSystem {
   applyCSSVars(root, obj, prefix = '') {
     Object.entries(obj).forEach(([key, value]) => {
       const varName = prefix ? `--${prefix}-${key}` : `--${key}`;
-      
+
       if (typeof value === 'object' && !Array.isArray(value)) {
         this.applyCSSVars(root, value, prefix ? `${prefix}-${key}` : key);
       } else {
@@ -248,16 +248,14 @@ class InterstellarSystem {
   async initQuadTree() {
     try {
       console.log('🌳 Loading QuadTree modules...');
-      
+
       // Import QuadTree modules dynamically
       // Note: Check your actual file path - might be quadIndex.js (lowercase)
-      const { QuadTree } = await import('../system/quadtree/quadIndex.js');
-      
-      // Initialize QuadTree with config
-      this.quadTree = new QuadTree(this.config.quadTree);
-      
+      const { QuadTreeSystem } = await import('../system/quadtree/quadIndex.js');
+      this.quadTree = new QuadTreeSystem(this.config.quadTree);
+
       console.log('✅ QuadTree initialized:', this.quadTree);
-      
+
     } catch (error) {
       console.error('❌ QuadTree initialization failed:', error);
       console.warn('⚠️ Check that quadIndex.js exists at ../system/quadtree/quadIndex.js');
@@ -269,7 +267,7 @@ class InterstellarSystem {
    */
   initPreloader() {
     const preloaderEl = document.getElementById('preloader');
-    
+
     if (!preloaderEl) {
       console.warn('⚠️ Preloader element not found');
       return;
@@ -290,7 +288,7 @@ class InterstellarSystem {
         this.preloader.activeRequests++;
         this.preloader.showTime = Date.now();
         preloaderEl.classList.remove('hidden', 'removed');
-        
+
         if (!this.preloader.animationTriggered) {
           setTimeout(() => this.preloader.triggerAnimation(), 100);
           this.preloader.animationTriggered = true;
@@ -299,12 +297,12 @@ class InterstellarSystem {
 
       hide: () => {
         this.preloader.activeRequests = Math.max(0, this.preloader.activeRequests - 1);
-        
+
         if (this.preloader.activeRequests === 0) {
           const elapsed = Date.now() - this.preloader.showTime;
           const animationDuration = 3500;
           const remaining = Math.max(0, animationDuration - elapsed);
-          
+
           setTimeout(() => {
             if (!this.preloader.clickPromptShown && !preloaderEl.classList.contains('hidden')) {
               this.preloader.showClickPrompt();
@@ -315,7 +313,7 @@ class InterstellarSystem {
 
       showClickPrompt: () => {
         if (this.preloader.clickPromptShown) return;
-        
+
         this.preloader.clickPromptShown = true;
         preloaderEl.style.cursor = 'pointer';
         preloaderEl.addEventListener('click', () => {
@@ -370,7 +368,7 @@ class InterstellarSystem {
         if (this.position) {
           this.position.updateAll();
         }
-        
+
         // Emit viewport change event
         this.emit('viewport:change', this.getViewportState());
       }, this.config.performance?.throttleResize || 100);
@@ -396,7 +394,7 @@ class InterstellarSystem {
       console.warn('⚠️ ViewportState not initialized');
       return null;
     }
-    
+
     return this.state.calculate({
       width: window.innerWidth,
       height: window.innerHeight,
@@ -421,9 +419,9 @@ class InterstellarSystem {
     // Check each breakpoint
     for (const [name, breakpoint] of Object.entries(this.config.breakpoints)) {
       const matches = this.matchesBreakpoint(viewport, breakpoint);
-      
+
       console.log(`  ${name}:`, matches ? '✅ MATCH' : '❌', breakpoint);
-      
+
       if (matches) {
         console.log(`📱 Active breakpoint: ${name}`);
         return { name, config: breakpoint };
@@ -461,14 +459,14 @@ class InterstellarSystem {
     const keys = path.split('.');
     const lastKey = keys.pop();
     let current = this.config;
-    
+
     for (const key of keys) {
       if (!current[key]) current[key] = {};
       current = current[key];
     }
-    
+
     current[lastKey] = value;
-    
+
     if (persist) {
       localStorage.setItem('interstellar-config', JSON.stringify(this.config));
     }
@@ -484,7 +482,7 @@ class InterstellarSystem {
    */
   deepMerge(target, source) {
     const result = { ...target };
-    
+
     for (const key in source) {
       if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
         result[key] = this.deepMerge(target[key] || {}, source[key]);
@@ -492,7 +490,7 @@ class InterstellarSystem {
         result[key] = source[key];
       }
     }
-    
+
     return result;
   }
 
@@ -534,11 +532,11 @@ class InterstellarSystem {
     if (this.layout) {
       this.layout.destroy();
     }
-    
+
     if (this.position) {
       this.position.clearAll();
     }
-    
+
     console.log('🛑 Interstellar System destroyed');
   }
 }

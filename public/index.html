@@ -11,7 +11,6 @@
     <!-- PRELOADER FIRST -->
     <div class="preloader-overlay" id="preloader">
         <div class="logo-container">
-            <!-- Lines Layer -->
             <div class="logo-line"><img src="/svg/preloaderSvg/line-1.svg" alt=""></div>
             <div class="logo-line"><img src="/svg/preloaderSvg/line-2.svg" alt=""></div>
             <div class="logo-line"><img src="/svg/preloaderSvg/line-3.svg" alt=""></div>
@@ -25,32 +24,29 @@
             <div class="logo-line"><img src="/svg/preloaderSvg/line-11.svg" alt=""></div>
             <div class="logo-line"><img src="/svg/preloaderSvg/line-12.svg" alt=""></div>
             <div class="logo-line"><img src="/svg/preloaderSvg/line-13.svg" alt=""></div>
-            
-            <!-- Text Layer (appears after lines) -->
             <div class="logo-text"><img src="/svg/preloaderSvg/text.svg" alt=""></div>
         </div>
     </div>
 
-    <!-- Video Section (70%) -->
-    <div class="landing-video">
-        <video autoplay muted loop playsinline>
-            <source src="/mp4/INTERSTELLAR_1B.mp4" type="video/mp4">
-        </video>
+    <!-- LANDING PAGE CONTENT (after preloader hides) -->
+    <div class="landing-container">
+        <!-- Video Section (70%) -->
+        <div class="landing-video">
+            <video autoplay muted loop playsinline>
+                <source src="/mp4/INTERSTELLAR_1B.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <!-- Artist Sidebar (30%) -->
+        <aside class="landing-sidebar">
+            <nav class="artist-nav" id="artistNav">
+                <!-- Artists loaded by landing.js from /config/artists.json -->
+            </nav>
+        </aside>
     </div>
 
-    <!-- Artist Sidebar (30%) -->
-    <aside class="landing-sidebar">
-        <div class="sidebar-spacer"></div>
-        <nav class="artist-nav" id="artistNav">
-            <!-- Artists loaded from JSON -->
-        </nav>
-    </aside>
-
+    <!-- Scripts LAST -->
     <script type="module" src="/js/InterstellarSystem.js"></script>
     <script type="module" src="/js/landing.js"></script>
-  <div id="heroTitle" class="hero-title">Interstellar Packages</div>
-  <button id="cta" class="cta">Explore</button>
-  <div id="albumGrid" class="album-grid"></div>
-
 </body>
 </html>
