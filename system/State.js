@@ -39,12 +39,19 @@ export class ViewportState {
       },
       
       modes: {
-        stack: { maxWidth: 720, maxAr: 1.1 },
-        split: { minWidth: 720, minAr: 1.1 }
+        stack: { maxWidth: 720, maxAspect: 1.1 },
+        split: { minWidth: 720, minAspect: 1.1 }
       },
       
       ...stateConfig
     };
+    
+    console.log('📐 State.js initialized with config:', {
+      stackMaxWidth: this.config.modes.stack.maxWidth,
+      stackMaxAspect: this.config.modes.stack.maxAspect,
+      splitMinWidth: this.config.modes.split.minWidth,
+      splitMinAspect: this.config.modes.split.minAspect
+    });
   }
 
   /**
@@ -53,34 +60,56 @@ export class ViewportState {
    * @returns {Object} calculated state
    */
   calculate(measurements) {
-    const { width, height, dpr } = measurements;
-    const ar = width / height;
+    console.log('📊 State.calculate() called with:', measurements);
     
-    return {
-      // Core measurements
-      vw: width,
-      vh: height,
-      ar: parseFloat(ar.toFixed(this.config.precision)),
-      pr: dpr,
+    const { width, height, dpr } = measurements;
+    const aspect = width / height;
+    
+    console.log('🔢 Calculated aspect ratio:', {
+      width,
+      height,
+      aspect: aspect.toFixed(4),
+      orientation: aspect > 1 ? 'landscape' : 'portrait'
+    });
+    
+    const mode = this.determineMode(width, height, aspect);
+    
+    const state = {
+      // Core measurements - clean property names
+      width: width,
+      height: height,
+      aspect: parseFloat(aspect.toFixed(this.config.precision)),
+      pixelRatio: dpr,
       
       // Orientation
-      orientation: ar > 1 ? 'landscape' : 'portrait',
+      orientation: aspect > 1 ? 'landscape' : 'portrait',
       
       // Golden ratio detection
-      isGolden: Math.abs(ar - this.config.golden.phi) < this.config.golden.tolerance,
+      isGolden: Math.abs(aspect - this.config.golden.phi) < this.config.golden.tolerance,
       
       // Calculated values
       measure: this.calculateMeasure(width),
       gutter: this.calculateGutter(width),
       cols: this.calculateColumns(width),
-      headerH: this.calculateHeaderHeight(height),
+      headerHeight: this.calculateHeaderHeight(height),
       
       // Layout mode
-      mode: this.determineMode(width, height, ar),
+      mode: mode,
       
       // Timestamp
       timestamp: Date.now()
     };
+    
+    console.log('✅ State calculated:', {
+      dimensions: `${state.width} x ${state.height}`,
+      aspect: state.aspect,
+      orientation: state.orientation,
+      mode: state.mode,
+      cols: state.cols,
+      gutter: state.gutter
+    });
+    
+    return state;
   }
 
   /**
@@ -121,19 +150,32 @@ export class ViewportState {
   /**
    * Determine layout mode based on viewport
    */
-  determineMode(width, height, ar) {
+  determineMode(width, height, aspect) {
     const { stack, split } = this.config.modes;
     
+    console.log('🎯 Determining mode:', {
+      width,
+      height,
+      aspect: aspect.toFixed(4),
+      'width < stack.maxWidth': width < stack.maxWidth,
+      'aspect < stack.maxAspect': aspect < stack.maxAspect,
+      'width >= split.minWidth': width >= split.minWidth,
+      'aspect >= split.minAspect': aspect >= split.minAspect
+    });
+    
     // Stack mode for narrow/portrait
-    if (width < stack.maxWidth || ar < stack.maxAr) {
+    if (width < stack.maxWidth || aspect < stack.maxAspect) {
+      console.log('🎯 Mode selected: STACK (narrow or portrait)');
       return 'stack';
     }
     
     // Split mode for wider viewports
-    if (width >= split.minWidth && ar >= split.minAr) {
+    if (width >= split.minWidth && aspect >= split.minAspect) {
+      console.log('🎯 Mode selected: SPLIT (wide landscape)');
       return 'split';
     }
     
+    console.log('🎯 Mode selected: AUTO (fallback)');
     return 'auto';
   }
 
