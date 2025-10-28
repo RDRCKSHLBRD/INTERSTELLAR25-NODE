@@ -1,0 +1,617 @@
+{
+  "meta": {
+    "source": "../0INTERSTELLAR/INTERSTELLAR25-NODE/public/css/contact.css",
+    "generatedAt": "2025-10-28T20:58:46.351Z",
+    "sha256": "c3b20087a21c5f20a658d445471c92d2cf52e5d585742ecc02d95eea3dca4f5b"
+  },
+  "tokens": {
+    "colors": {},
+    "fonts": {},
+    "fontSizes": {},
+    "lineHeights": {},
+    "spacing": {},
+    "radii": {},
+    "shadows": {},
+    "zIndex": {},
+    "durations": {},
+    "easings": {},
+    "breakpoints": {},
+    "customProperties": {}
+  },
+  "layers": {},
+  "fonts": [],
+  "keyframes": {},
+  "media": {
+    "(max-width: 768px)": {
+      "selectors": [
+        {
+          "selector": ".contact-card",
+          "decls": {
+            "max-width": "100%",
+            "aspect-ratio": "16 / 9"
+          }
+        },
+        {
+          "selector": ".contact-info",
+          "decls": {
+            "width": "50%",
+            "bottom": "15px",
+            "left": "10px",
+            "padding": "12px",
+            "font-size": "0.75rem"
+          }
+        },
+        {
+          "selector": ".contact-text-title",
+          "decls": {
+            "font-size": "0.85rem",
+            "border-bottom": "1px solid #859E98"
+          }
+        },
+        {
+          "selector": ".contact-text",
+          "decls": {
+            "font-size": "0.7rem",
+            "line-height": "1.2em"
+          }
+        },
+        {
+          "selector": ".contact-card p",
+          "decls": {
+            "font-size": "0.7rem",
+            "line-height": "1.2em"
+          }
+        }
+      ]
+    },
+    "(max-width: 400px)": {
+      "selectors": [
+        {
+          "selector": ".contact-info",
+          "decls": {
+            "width": "60%",
+            "bottom": "10px",
+            "left": "5px",
+            "padding": "10px"
+          }
+        },
+        {
+          "selector": ".contact-text",
+          "decls": {
+            "font-size": "0.65rem"
+          }
+        },
+        {
+          "selector": ".contact-card p",
+          "decls": {
+            "font-size": "0.65rem"
+          }
+        }
+      ]
+    }
+  },
+  "selectors": [
+    {
+      "selector": "body",
+      "specificity": [
+        0,
+        0,
+        1
+      ],
+      "decls": {
+        "display": "flex",
+        "flex-direction": "column",
+        "align-items": "center",
+        "justify-content": "flex-start",
+        "height": "100vh"
+      },
+      "sourceLocations": [
+        {
+          "line": 2,
+          "prop": "display"
+        },
+        {
+          "line": 2,
+          "prop": "flex-direction"
+        },
+        {
+          "line": 2,
+          "prop": "align-items"
+        },
+        {
+          "line": 2,
+          "prop": "justify-content"
+        },
+        {
+          "line": 2,
+          "prop": "height"
+        }
+      ]
+    },
+    {
+      "selector": "main.contact-main",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "flex": "1",
+        "display": "flex",
+        "justify-content": "center",
+        "align-items": "center",
+        "width": "100%",
+        "padding": "50px 20px"
+      },
+      "sourceLocations": [
+        {
+          "line": 11,
+          "prop": "flex"
+        },
+        {
+          "line": 11,
+          "prop": "display"
+        },
+        {
+          "line": 11,
+          "prop": "justify-content"
+        },
+        {
+          "line": 11,
+          "prop": "align-items"
+        },
+        {
+          "line": 11,
+          "prop": "width"
+        },
+        {
+          "line": 11,
+          "prop": "padding"
+        }
+      ]
+    },
+    {
+      "selector": ".contact-card",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background": "url(https://storage.googleapis.com/ip-public-bucket1/RESOURCES/EPK/RODERICK_SHOOLBRAID-PROMO1_2022.jpg)center/cover no-repeat",
+        "width": "100%",
+        "max-width": "850px",
+        "height": "auto",
+        "aspect-ratio": "16/9",
+        "position": "relative",
+        "display": "flex",
+        "align-items": "flex-end",
+        "justify-content": "flex-start",
+        "overflow": "hidden"
+      },
+      "sourceLocations": [
+        {
+          "line": 21,
+          "prop": "background"
+        },
+        {
+          "line": 21,
+          "prop": "width"
+        },
+        {
+          "line": 21,
+          "prop": "max-width"
+        },
+        {
+          "line": 21,
+          "prop": "height"
+        },
+        {
+          "line": 21,
+          "prop": "aspect-ratio"
+        },
+        {
+          "line": 21,
+          "prop": "position"
+        },
+        {
+          "line": 21,
+          "prop": "display"
+        },
+        {
+          "line": 21,
+          "prop": "align-items"
+        },
+        {
+          "line": 21,
+          "prop": "justify-content"
+        },
+        {
+          "line": 21,
+          "prop": "overflow"
+        }
+      ]
+    },
+    {
+      "selector": ".contact-info",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "width": "25%",
+        "background": "rgba(8,61,94,0.85)",
+        "padding": "15px",
+        "border-radius": "6px",
+        "position": "absolute",
+        "bottom": "20px",
+        "left": "20px",
+        "text-align": "left"
+      },
+      "sourceLocations": [
+        {
+          "line": 35,
+          "prop": "width"
+        },
+        {
+          "line": 35,
+          "prop": "background"
+        },
+        {
+          "line": 35,
+          "prop": "padding"
+        },
+        {
+          "line": 35,
+          "prop": "border-radius"
+        },
+        {
+          "line": 35,
+          "prop": "position"
+        },
+        {
+          "line": 35,
+          "prop": "bottom"
+        },
+        {
+          "line": 35,
+          "prop": "left"
+        },
+        {
+          "line": 35,
+          "prop": "text-align"
+        }
+      ]
+    },
+    {
+      "selector": ".contact-text-title",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "padding-bottom": ".3em",
+        "border-bottom": "1px solid #859E98"
+      },
+      "sourceLocations": [
+        {
+          "line": 47,
+          "prop": "padding-bottom"
+        },
+        {
+          "line": 47,
+          "prop": "border-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".contact-text",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "0.8rem",
+        "font-weight": "normal",
+        "color": "#a9d2d6",
+        "margin-bottom": "5px"
+      },
+      "sourceLocations": [
+        {
+          "line": 52,
+          "prop": "font-size"
+        },
+        {
+          "line": 52,
+          "prop": "font-weight"
+        },
+        {
+          "line": 52,
+          "prop": "color"
+        },
+        {
+          "line": 52,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".contact-card h2",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "font-size": "1rem",
+        "color": "#a9d2d6",
+        "margin-bottom": "5px"
+      },
+      "sourceLocations": [
+        {
+          "line": 59,
+          "prop": "font-size"
+        },
+        {
+          "line": 59,
+          "prop": "color"
+        },
+        {
+          "line": 59,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".contact-card p",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "font-size": "0.8em",
+        "margin-bottom": "3px"
+      },
+      "sourceLocations": [
+        {
+          "line": 65,
+          "prop": "font-size"
+        },
+        {
+          "line": 65,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": "footer",
+      "specificity": [
+        0,
+        0,
+        1
+      ],
+      "decls": {
+        "display": "none"
+      },
+      "sourceLocations": [
+        {
+          "line": 71,
+          "prop": "display"
+        }
+      ]
+    },
+    {
+      "selector": ".contact-card",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "max-width": "100%",
+        "aspect-ratio": "16/9"
+      },
+      "sourceLocations": [
+        {
+          "line": 77,
+          "prop": "max-width"
+        },
+        {
+          "line": 77,
+          "prop": "aspect-ratio"
+        }
+      ]
+    },
+    {
+      "selector": ".contact-info",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "width": "50%",
+        "bottom": "15px",
+        "left": "10px",
+        "padding": "12px",
+        "font-size": "0.75rem"
+      },
+      "sourceLocations": [
+        {
+          "line": 82,
+          "prop": "width"
+        },
+        {
+          "line": 82,
+          "prop": "bottom"
+        },
+        {
+          "line": 82,
+          "prop": "left"
+        },
+        {
+          "line": 82,
+          "prop": "padding"
+        },
+        {
+          "line": 82,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".contact-text-title",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "0.85rem",
+        "border-bottom": "1px solid #859E98"
+      },
+      "sourceLocations": [
+        {
+          "line": 90,
+          "prop": "font-size"
+        },
+        {
+          "line": 90,
+          "prop": "border-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".contact-text",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "0.7rem",
+        "line-height": "1.2em"
+      },
+      "sourceLocations": [
+        {
+          "line": 95,
+          "prop": "font-size"
+        },
+        {
+          "line": 95,
+          "prop": "line-height"
+        }
+      ]
+    },
+    {
+      "selector": ".contact-card p",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "font-size": "0.7rem",
+        "line-height": "1.2em"
+      },
+      "sourceLocations": [
+        {
+          "line": 95,
+          "prop": "font-size"
+        },
+        {
+          "line": 95,
+          "prop": "line-height"
+        }
+      ]
+    },
+    {
+      "selector": ".contact-info",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "width": "60%",
+        "bottom": "10px",
+        "left": "5px",
+        "padding": "10px"
+      },
+      "sourceLocations": [
+        {
+          "line": 104,
+          "prop": "width"
+        },
+        {
+          "line": 104,
+          "prop": "bottom"
+        },
+        {
+          "line": 104,
+          "prop": "left"
+        },
+        {
+          "line": 104,
+          "prop": "padding"
+        }
+      ]
+    },
+    {
+      "selector": ".contact-text",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "0.65rem"
+      },
+      "sourceLocations": [
+        {
+          "line": 111,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".contact-card p",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "font-size": "0.65rem"
+      },
+      "sourceLocations": [
+        {
+          "line": 111,
+          "prop": "font-size"
+        }
+      ]
+    }
+  ],
+  "cascades": {
+    "overrides": []
+  },
+  "plugins": {
+    "tokens": {
+      "counts": {
+        "colors": 0,
+        "custom": 0
+      }
+    },
+    "ratio": {
+      "keys": [],
+      "snapshot": {}
+    },
+    "quadtree": {
+      "note": "QuadTree hook ready for future extractors"
+    }
+  }
+}

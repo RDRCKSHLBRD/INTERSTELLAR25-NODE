@@ -1,0 +1,335 @@
+{
+  "meta": {
+    "source": "../0INTERSTELLAR/INTERSTELLAR25-NODE/public/css/header-system.css",
+    "generatedAt": "2025-10-28T20:58:46.351Z",
+    "sha256": "a9b07443e997e7c135ca6c3f3f11cea4a4dc4f67e39295c6ac80c58bb84d760a"
+  },
+  "tokens": {
+    "colors": {},
+    "fonts": {},
+    "fontSizes": {},
+    "lineHeights": {},
+    "spacing": {},
+    "radii": {},
+    "shadows": {},
+    "zIndex": {},
+    "durations": {},
+    "easings": {},
+    "breakpoints": {},
+    "customProperties": {}
+  },
+  "layers": {},
+  "fonts": [],
+  "keyframes": {},
+  "media": {},
+  "selectors": [
+    {
+      "selector": ".header-system",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "display": "flex",
+        "align-items": "center",
+        "height": "var(--header-height, 64px)",
+        "padding": "0 var(--header-padding, 20px)",
+        "background-color": "#083D5E",
+        "color": "#cadbda"
+      },
+      "sourceLocations": [
+        {
+          "line": 8,
+          "prop": "display"
+        },
+        {
+          "line": 8,
+          "prop": "align-items"
+        },
+        {
+          "line": 8,
+          "prop": "height"
+        },
+        {
+          "line": 8,
+          "prop": "padding"
+        },
+        {
+          "line": 8,
+          "prop": "background-color"
+        },
+        {
+          "line": 8,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".header-logo",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "flex": "var(--header-logo-flex, 0.15)",
+        "display": "flex",
+        "align-items": "center"
+      },
+      "sourceLocations": [
+        {
+          "line": 21,
+          "prop": "flex"
+        },
+        {
+          "line": 21,
+          "prop": "display"
+        },
+        {
+          "line": 21,
+          "prop": "align-items"
+        }
+      ]
+    },
+    {
+      "selector": ".header-logo img",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "width": "var(--header-logo-width, 200px)",
+        "height": "auto"
+      },
+      "sourceLocations": [
+        {
+          "line": 27,
+          "prop": "width"
+        },
+        {
+          "line": 27,
+          "prop": "height"
+        }
+      ]
+    },
+    {
+      "selector": ".artist-name-container",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "flex": "var(--header-artist-flex, 0.25)",
+        "display": "flex",
+        "align-items": "center",
+        "padding-left": "var(--header-padding, 20px)"
+      },
+      "sourceLocations": [
+        {
+          "line": 33,
+          "prop": "flex"
+        },
+        {
+          "line": 33,
+          "prop": "display"
+        },
+        {
+          "line": 33,
+          "prop": "align-items"
+        },
+        {
+          "line": 33,
+          "prop": "padding-left"
+        }
+      ]
+    },
+    {
+      "selector": ".artist-name",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "var(--artist-name-font-size, 18px)",
+        "font-weight": "var(--artist-name-font-weight, 500)",
+        "color": "var(--artist-name-color, #cadbda)",
+        "letter-spacing": "var(--artist-name-letter-spacing, 0.5px)",
+        "white-space": "nowrap",
+        "overflow": "hidden",
+        "text-overflow": "ellipsis"
+      },
+      "sourceLocations": [
+        {
+          "line": 40,
+          "prop": "font-size"
+        },
+        {
+          "line": 40,
+          "prop": "font-weight"
+        },
+        {
+          "line": 40,
+          "prop": "color"
+        },
+        {
+          "line": 40,
+          "prop": "letter-spacing"
+        },
+        {
+          "line": 40,
+          "prop": "white-space"
+        },
+        {
+          "line": 40,
+          "prop": "overflow"
+        },
+        {
+          "line": 40,
+          "prop": "text-overflow"
+        }
+      ]
+    },
+    {
+      "selector": ".header-spacer",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "flex": "var(--header-spacer-flex, 0.4)"
+      },
+      "sourceLocations": [
+        {
+          "line": 51,
+          "prop": "flex"
+        }
+      ]
+    },
+    {
+      "selector": ".header-nav",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "flex": "var(--header-nav-flex, 0.2)",
+        "display": "flex",
+        "justify-content": "flex-end"
+      },
+      "sourceLocations": [
+        {
+          "line": 56,
+          "prop": "flex"
+        },
+        {
+          "line": 56,
+          "prop": "display"
+        },
+        {
+          "line": 56,
+          "prop": "justify-content"
+        }
+      ]
+    },
+    {
+      "selector": ".header-nav ul",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "display": "flex",
+        "gap": "var(--header-nav-gap, 24px)",
+        "list-style": "none",
+        "margin": "0",
+        "padding": "0",
+        "align-items": "center"
+      },
+      "sourceLocations": [
+        {
+          "line": 62,
+          "prop": "display"
+        },
+        {
+          "line": 62,
+          "prop": "gap"
+        },
+        {
+          "line": 62,
+          "prop": "list-style"
+        },
+        {
+          "line": 62,
+          "prop": "margin"
+        },
+        {
+          "line": 62,
+          "prop": "padding"
+        },
+        {
+          "line": 62,
+          "prop": "align-items"
+        }
+      ]
+    },
+    {
+      "selector": ".header-nav a",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "font-size": "var(--header-nav-font-size, 16px)"
+      },
+      "sourceLocations": [
+        {
+          "line": 71,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".header-nav button",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "font-size": "var(--header-nav-font-size, 16px)"
+      },
+      "sourceLocations": [
+        {
+          "line": 71,
+          "prop": "font-size"
+        }
+      ]
+    }
+  ],
+  "cascades": {
+    "overrides": []
+  },
+  "plugins": {
+    "tokens": {
+      "counts": {
+        "colors": 0,
+        "custom": 0
+      }
+    },
+    "ratio": {
+      "keys": [],
+      "snapshot": {}
+    },
+    "quadtree": {
+      "note": "QuadTree hook ready for future extractors"
+    }
+  }
+}

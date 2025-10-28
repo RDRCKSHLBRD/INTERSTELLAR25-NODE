@@ -1,0 +1,5518 @@
+{
+  "meta": {
+    "source": "../0INTERSTELLAR/INTERSTELLAR25-NODE/public/css/additional-styles.css",
+    "generatedAt": "2025-10-28T20:58:46.351Z",
+    "sha256": "f56a1253f9e352033c1b578bdf00d1687ac663616655b02558287093bd5f3ac9"
+  },
+  "tokens": {
+    "colors": {},
+    "fonts": {},
+    "fontSizes": {},
+    "lineHeights": {},
+    "spacing": {},
+    "radii": {},
+    "shadows": {},
+    "zIndex": {
+      "z-index": "10000"
+    },
+    "durations": {},
+    "easings": {},
+    "breakpoints": {},
+    "customProperties": {}
+  },
+  "layers": {},
+  "fonts": [],
+  "keyframes": {
+    "spin": [
+      {
+        "0%": {
+          "transform": "translate(-50%, -50%) rotate(0deg)"
+        }
+      },
+      {
+        "100%": {
+          "transform": "translate(-50%, -50%) rotate(360deg)"
+        }
+      }
+    ],
+    "slideInFromRight": [
+      {
+        "from": {
+          "transform": "translateX(100%)",
+          "opacity": "0"
+        }
+      },
+      {
+        "to": {
+          "transform": "translateX(0)",
+          "opacity": "1"
+        }
+      }
+    ]
+  },
+  "media": {
+    "(max-width: 768px)": {
+      "selectors": [
+        {
+          "selector": ".custom-audio-controls",
+          "decls": {
+            "gap": "4px"
+          }
+        },
+        {
+          "selector": ".custom-audio-controls button",
+          "decls": {
+            "width": "32px",
+            "height": "32px",
+            "padding": "6px"
+          }
+        },
+        {
+          "selector": ".volume-control",
+          "decls": {
+            "flex-direction": "column",
+            "gap": "4px"
+          }
+        },
+        {
+          "selector": "#volume-slider",
+          "decls": {
+            "width": "60px"
+          }
+        },
+        {
+          "selector": ".songList li",
+          "decls": {
+            "padding": "6px 8px",
+            "font-size": "0.9em"
+          }
+        },
+        {
+          "selector": ".purchaseLink a",
+          "decls": {
+            "padding": "10px 20px",
+            "font-size": "0.9em"
+          }
+        },
+        {
+          "selector": ".auth-modal-content",
+          "decls": {
+            "margin": "10% auto",
+            "padding": "20px",
+            "width": "95%"
+          }
+        },
+        {
+          "selector": ".loginSquare",
+          "decls": {
+            "margin-bottom": "5px"
+          }
+        },
+        {
+          "selector": ".login-button",
+          "decls": {
+            "padding": "6px 12px",
+            "font-size": "0.9em"
+          }
+        },
+        {
+          "selector": ".user-info",
+          "decls": {
+            "margin-top": "5px",
+            "padding": "3px"
+          }
+        },
+        {
+          "selector": ".guest-email-modal .modal-content",
+          "decls": {
+            "margin": "10% auto",
+            "padding": "20px",
+            "width": "95%"
+          }
+        },
+        {
+          "selector": ".guest-email-modal .modal-content h3",
+          "decls": {
+            "font-size": "1.3em"
+          }
+        },
+        {
+          "selector": ".guest-email-modal .modal-buttons",
+          "decls": {
+            "flex-direction": "column",
+            "gap": "0.75rem"
+          }
+        },
+        {
+          "selector": ".guest-email-modal .modal-buttons button",
+          "decls": {
+            "padding": "14px",
+            "font-size": "1.1em"
+          }
+        },
+        {
+          "selector": ".cart-sidebar",
+          "decls": {
+            "width": "100%",
+            "right": "-100%"
+          }
+        },
+        {
+          "selector": ".cartSquare",
+          "decls": {
+            "margin-bottom": "5px"
+          }
+        },
+        {
+          "selector": ".cart-button",
+          "decls": {
+            "padding": "2px 4px"
+          }
+        },
+        {
+          "selector": ".cart-icon",
+          "decls": {
+            "width": "22px",
+            "height": "22px"
+          }
+        },
+        {
+          "selector": ".cart-count",
+          "decls": {
+            "width": "16px",
+            "height": "16px",
+            "font-size": "0.6em",
+            "top": "-3px",
+            "right": "-3px"
+          }
+        },
+        {
+          "selector": ".song-actions",
+          "decls": {
+            "opacity": "1"
+          }
+        },
+        {
+          "selector": ".song-action-btn",
+          "decls": {
+            "width": "28px",
+            "height": "28px"
+          }
+        },
+        {
+          "selector": ".song-action-btn img",
+          "decls": {
+            "width": "18px",
+            "height": "18px"
+          }
+        }
+      ]
+    },
+    "(max-width: 480px)": {
+      "selectors": [
+        {
+          "selector": ".cart-item-title .song-name",
+          "decls": {
+            "font-size": "0.9em"
+          }
+        },
+        {
+          "selector": ".cart-item-title .album-subtitle",
+          "decls": {
+            "font-size": "0.7em"
+          }
+        }
+      ]
+    }
+  },
+  "selectors": [
+    {
+      "selector": ".album-art img.enlarged",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "grid-column": "1/-1",
+        "width": "100%",
+        "height": "auto",
+        "justify-self": "center",
+        "z-index": "5",
+        "box-shadow": "0 4px 12px rgba(0,0,0,0.3)",
+        "transition": "all 0.3s ease"
+      },
+      "sourceLocations": [
+        {
+          "line": 8,
+          "prop": "grid-column"
+        },
+        {
+          "line": 8,
+          "prop": "width"
+        },
+        {
+          "line": 8,
+          "prop": "height"
+        },
+        {
+          "line": 8,
+          "prop": "justify-self"
+        },
+        {
+          "line": 8,
+          "prop": "z-index"
+        },
+        {
+          "line": 8,
+          "prop": "box-shadow"
+        },
+        {
+          "line": 8,
+          "prop": "transition"
+        }
+      ]
+    },
+    {
+      "selector": ".album-art img.loaded",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "opacity": "1",
+        "transition": "opacity 0.3s ease"
+      },
+      "sourceLocations": [
+        {
+          "line": 23,
+          "prop": "opacity"
+        },
+        {
+          "line": 23,
+          "prop": "transition"
+        }
+      ]
+    },
+    {
+      "selector": ".album-art img.error",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "opacity": "0.6",
+        "filter": "grayscale(100%)"
+      },
+      "sourceLocations": [
+        {
+          "line": 28,
+          "prop": "opacity"
+        },
+        {
+          "line": 28,
+          "prop": "filter"
+        }
+      ]
+    },
+    {
+      "selector": ".albumDetails",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "margin-bottom": "20px"
+      },
+      "sourceLocations": [
+        {
+          "line": 34,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".albumName",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "1.5em",
+        "font-weight": "bold",
+        "margin-bottom": "10px",
+        "color": "#333"
+      },
+      "sourceLocations": [
+        {
+          "line": 38,
+          "prop": "font-size"
+        },
+        {
+          "line": 38,
+          "prop": "font-weight"
+        },
+        {
+          "line": 38,
+          "prop": "margin-bottom"
+        },
+        {
+          "line": 38,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".albumDescription",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "line-height": "1.4",
+        "margin-bottom": "15px",
+        "color": "#666"
+      },
+      "sourceLocations": [
+        {
+          "line": 45,
+          "prop": "line-height"
+        },
+        {
+          "line": 45,
+          "prop": "margin-bottom"
+        },
+        {
+          "line": 45,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".albumCredit",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "0.9em",
+        "color": "#888",
+        "font-style": "italic",
+        "margin-bottom": "15px"
+      },
+      "sourceLocations": [
+        {
+          "line": 51,
+          "prop": "font-size"
+        },
+        {
+          "line": 51,
+          "prop": "color"
+        },
+        {
+          "line": 51,
+          "prop": "font-style"
+        },
+        {
+          "line": 51,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".album-info",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background": "rgba(0,0,0,0.05)",
+        "padding": "10px",
+        "border-radius": "4px",
+        "margin-bottom": "20px"
+      },
+      "sourceLocations": [
+        {
+          "line": 59,
+          "prop": "background"
+        },
+        {
+          "line": 59,
+          "prop": "padding"
+        },
+        {
+          "line": 59,
+          "prop": "border-radius"
+        },
+        {
+          "line": 59,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".catalogue-number",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "0.85em",
+        "color": "#666",
+        "margin-bottom": "5px"
+      },
+      "sourceLocations": [
+        {
+          "line": 66,
+          "prop": "font-size"
+        },
+        {
+          "line": 66,
+          "prop": "color"
+        },
+        {
+          "line": 66,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".production-date",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "0.85em",
+        "color": "#666",
+        "margin-bottom": "5px"
+      },
+      "sourceLocations": [
+        {
+          "line": 66,
+          "prop": "font-size"
+        },
+        {
+          "line": 66,
+          "prop": "color"
+        },
+        {
+          "line": 66,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".release-date",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "0.85em",
+        "color": "#666",
+        "margin-bottom": "5px"
+      },
+      "sourceLocations": [
+        {
+          "line": 66,
+          "prop": "font-size"
+        },
+        {
+          "line": 66,
+          "prop": "color"
+        },
+        {
+          "line": 66,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".catalogue-number",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-weight": "bold"
+      },
+      "sourceLocations": [
+        {
+          "line": 74,
+          "prop": "font-weight"
+        }
+      ]
+    },
+    {
+      "selector": ".songListContainer",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "margin-bottom": "20px"
+      },
+      "sourceLocations": [
+        {
+          "line": 79,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".songList",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "list-style": "none",
+        "padding": "0",
+        "margin": "0"
+      },
+      "sourceLocations": [
+        {
+          "line": 83,
+          "prop": "list-style"
+        },
+        {
+          "line": 83,
+          "prop": "padding"
+        },
+        {
+          "line": 83,
+          "prop": "margin"
+        }
+      ]
+    },
+    {
+      "selector": ".songList li",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "cursor": "pointer",
+        "padding": "8px 10px",
+        "border-bottom": "1px solid rgba(0,0,0,0.1)",
+        "transition": "background-color 0.2s",
+        "display": "flex",
+        "justify-content": "space-between",
+        "align-items": "center"
+      },
+      "sourceLocations": [
+        {
+          "line": 89,
+          "prop": "cursor"
+        },
+        {
+          "line": 89,
+          "prop": "padding"
+        },
+        {
+          "line": 89,
+          "prop": "border-bottom"
+        },
+        {
+          "line": 89,
+          "prop": "transition"
+        },
+        {
+          "line": 89,
+          "prop": "display"
+        },
+        {
+          "line": 89,
+          "prop": "justify-content"
+        },
+        {
+          "line": 89,
+          "prop": "align-items"
+        }
+      ]
+    },
+    {
+      "selector": ".songList li:hover",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "background": "rgba(0,0,0,0.05)"
+      },
+      "sourceLocations": [
+        {
+          "line": 99,
+          "prop": "background"
+        }
+      ]
+    },
+    {
+      "selector": ".songList li.playing",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "background": "rgba(0,123,255,0.1)",
+        "border-left": "3px solid #007bff"
+      },
+      "sourceLocations": [
+        {
+          "line": 103,
+          "prop": "background"
+        },
+        {
+          "line": 103,
+          "prop": "border-left"
+        }
+      ]
+    },
+    {
+      "selector": ".songList li.no-songs",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "font-style": "italic",
+        "color": "#888",
+        "cursor": "default"
+      },
+      "sourceLocations": [
+        {
+          "line": 108,
+          "prop": "font-style"
+        },
+        {
+          "line": 108,
+          "prop": "color"
+        },
+        {
+          "line": 108,
+          "prop": "cursor"
+        }
+      ]
+    },
+    {
+      "selector": ".song-duration",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "0.85em",
+        "color": "#888",
+        "font-family": "monospace"
+      },
+      "sourceLocations": [
+        {
+          "line": 114,
+          "prop": "font-size"
+        },
+        {
+          "line": 114,
+          "prop": "color"
+        },
+        {
+          "line": 114,
+          "prop": "font-family"
+        }
+      ]
+    },
+    {
+      "selector": ".sidebar .songList li",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "display": "flex",
+        "justify-content": "space-between",
+        "align-items": "center"
+      },
+      "sourceLocations": [
+        {
+          "line": 126,
+          "prop": "display"
+        },
+        {
+          "line": 126,
+          "prop": "justify-content"
+        },
+        {
+          "line": 126,
+          "prop": "align-items"
+        }
+      ]
+    },
+    {
+      "selector": ".song-info",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "display": "flex",
+        "justify-content": "space-between",
+        "align-items": "center",
+        "flex": "1",
+        "cursor": "pointer"
+      },
+      "sourceLocations": [
+        {
+          "line": 134,
+          "prop": "display"
+        },
+        {
+          "line": 134,
+          "prop": "justify-content"
+        },
+        {
+          "line": 134,
+          "prop": "align-items"
+        },
+        {
+          "line": 134,
+          "prop": "flex"
+        },
+        {
+          "line": 134,
+          "prop": "cursor"
+        }
+      ]
+    },
+    {
+      "selector": ".song-text",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "flex": "1"
+      },
+      "sourceLocations": [
+        {
+          "line": 142,
+          "prop": "flex"
+        }
+      ]
+    },
+    {
+      "selector": ".song-duration",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "color": "#8ab7ce",
+        "margin-left": "10px",
+        "font-size": "0.9em",
+        "margin-right": "1em"
+      },
+      "sourceLocations": [
+        {
+          "line": 146,
+          "prop": "color"
+        },
+        {
+          "line": 146,
+          "prop": "margin-left"
+        },
+        {
+          "line": 146,
+          "prop": "font-size"
+        },
+        {
+          "line": 146,
+          "prop": "margin-right"
+        }
+      ]
+    },
+    {
+      "selector": ".song-actions",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "display": "flex",
+        "flex-shrink": "0",
+        "gap": "6px",
+        "min-width": "60px"
+      },
+      "sourceLocations": [
+        {
+          "line": 153,
+          "prop": "display"
+        },
+        {
+          "line": 153,
+          "prop": "flex-shrink"
+        },
+        {
+          "line": 153,
+          "prop": "gap"
+        },
+        {
+          "line": 153,
+          "prop": "min-width"
+        }
+      ]
+    },
+    {
+      "selector": ".song-action-btn",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "width": "30px",
+        "height": "30px",
+        "border": "none",
+        "background": "transparent"
+      },
+      "sourceLocations": [
+        {
+          "line": 161,
+          "prop": "display"
+        },
+        {
+          "line": 161,
+          "prop": "align-items"
+        },
+        {
+          "line": 161,
+          "prop": "justify-content"
+        },
+        {
+          "line": 161,
+          "prop": "width"
+        },
+        {
+          "line": 161,
+          "prop": "height"
+        },
+        {
+          "line": 161,
+          "prop": "border"
+        },
+        {
+          "line": 161,
+          "prop": "background"
+        }
+      ]
+    },
+    {
+      "selector": ".song-action-btn:hover",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "background": "rgba(255,255,255,0.2)"
+      },
+      "sourceLocations": [
+        {
+          "line": 174,
+          "prop": "background"
+        }
+      ]
+    },
+    {
+      "selector": ".song-action-btn img",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "width": "20px",
+        "height": "20px",
+        "display": "block"
+      },
+      "sourceLocations": [
+        {
+          "line": 178,
+          "prop": "width"
+        },
+        {
+          "line": 178,
+          "prop": "height"
+        },
+        {
+          "line": 178,
+          "prop": "display"
+        }
+      ]
+    },
+    {
+      "selector": ".song-action-btn svg",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "width": "20px",
+        "height": "20px",
+        "display": "block"
+      },
+      "sourceLocations": [
+        {
+          "line": 178,
+          "prop": "width"
+        },
+        {
+          "line": 178,
+          "prop": "height"
+        },
+        {
+          "line": 178,
+          "prop": "display"
+        }
+      ]
+    },
+    {
+      "selector": ".song-action-btn:hover img",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "filter": "brightness(1)"
+      },
+      "sourceLocations": [
+        {
+          "line": 186,
+          "prop": "filter"
+        }
+      ]
+    },
+    {
+      "selector": ".song-item.playing",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "background-color": "#19606b",
+        "font-weight": "bold"
+      },
+      "sourceLocations": [
+        {
+          "line": 191,
+          "prop": "background-color"
+        },
+        {
+          "line": 191,
+          "prop": "font-weight"
+        }
+      ]
+    },
+    {
+      "selector": ".song-item.playing .song-actions",
+      "specificity": [
+        0,
+        3,
+        0
+      ],
+      "decls": {
+        "opacity": "1"
+      },
+      "sourceLocations": [
+        {
+          "line": 196,
+          "prop": "opacity"
+        }
+      ]
+    },
+    {
+      "selector": ".purchaseLink",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "text-align": "center",
+        "margin-top": "20px"
+      },
+      "sourceLocations": [
+        {
+          "line": 203,
+          "prop": "text-align"
+        },
+        {
+          "line": 203,
+          "prop": "margin-top"
+        }
+      ]
+    },
+    {
+      "selector": ".purchaseLink a",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "display": "inline-block",
+        "padding": "12px 24px",
+        "background": "#007bff",
+        "color": "white",
+        "text-decoration": "none",
+        "border-radius": "6px",
+        "font-weight": "500",
+        "transition": "background-color 0.2s"
+      },
+      "sourceLocations": [
+        {
+          "line": 208,
+          "prop": "display"
+        },
+        {
+          "line": 208,
+          "prop": "padding"
+        },
+        {
+          "line": 208,
+          "prop": "background"
+        },
+        {
+          "line": 208,
+          "prop": "color"
+        },
+        {
+          "line": 208,
+          "prop": "text-decoration"
+        },
+        {
+          "line": 208,
+          "prop": "border-radius"
+        },
+        {
+          "line": 208,
+          "prop": "font-weight"
+        },
+        {
+          "line": 208,
+          "prop": "transition"
+        }
+      ]
+    },
+    {
+      "selector": ".purchaseLink a:hover",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "background": "#0056b3"
+      },
+      "sourceLocations": [
+        {
+          "line": 219,
+          "prop": "background"
+        }
+      ]
+    },
+    {
+      "selector": ".PlayerSong",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-weight": "bold",
+        "margin-bottom": "15px",
+        "font-size": "1.1em",
+        "text-align": "center",
+        "color": "#333"
+      },
+      "sourceLocations": [
+        {
+          "line": 224,
+          "prop": "font-weight"
+        },
+        {
+          "line": 224,
+          "prop": "margin-bottom"
+        },
+        {
+          "line": 224,
+          "prop": "font-size"
+        },
+        {
+          "line": 224,
+          "prop": "text-align"
+        },
+        {
+          "line": 224,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".custom-audio-controls",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "display": "flex",
+        "gap": "8px",
+        "align-items": "center",
+        "flex-wrap": "wrap",
+        "justify-content": "center",
+        "margin-bottom": "15px"
+      },
+      "sourceLocations": [
+        {
+          "line": 232,
+          "prop": "display"
+        },
+        {
+          "line": 232,
+          "prop": "gap"
+        },
+        {
+          "line": 232,
+          "prop": "align-items"
+        },
+        {
+          "line": 232,
+          "prop": "flex-wrap"
+        },
+        {
+          "line": 232,
+          "prop": "justify-content"
+        },
+        {
+          "line": 232,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".custom-audio-controls button",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "background": "none",
+        "border": "none",
+        "cursor": "pointer",
+        "padding": "8px",
+        "border-radius": "4px",
+        "transition": "background-color 0.2s",
+        "width": "36px",
+        "height": "36px",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      },
+      "sourceLocations": [
+        {
+          "line": 241,
+          "prop": "background"
+        },
+        {
+          "line": 241,
+          "prop": "border"
+        },
+        {
+          "line": 241,
+          "prop": "cursor"
+        },
+        {
+          "line": 241,
+          "prop": "padding"
+        },
+        {
+          "line": 241,
+          "prop": "border-radius"
+        },
+        {
+          "line": 241,
+          "prop": "transition"
+        },
+        {
+          "line": 241,
+          "prop": "width"
+        },
+        {
+          "line": 241,
+          "prop": "height"
+        },
+        {
+          "line": 241,
+          "prop": "display"
+        },
+        {
+          "line": 241,
+          "prop": "align-items"
+        },
+        {
+          "line": 241,
+          "prop": "justify-content"
+        }
+      ]
+    },
+    {
+      "selector": ".custom-audio-controls button.active",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "background": "#007bff",
+        "color": "white"
+      },
+      "sourceLocations": [
+        {
+          "line": 257,
+          "prop": "background"
+        },
+        {
+          "line": 257,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".volume-control",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "display": "flex",
+        "align-items": "center",
+        "gap": "8px"
+      },
+      "sourceLocations": [
+        {
+          "line": 263,
+          "prop": "display"
+        },
+        {
+          "line": 263,
+          "prop": "align-items"
+        },
+        {
+          "line": 263,
+          "prop": "gap"
+        }
+      ]
+    },
+    {
+      "selector": ".volume-label",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "0.8em",
+        "color": "#666"
+      },
+      "sourceLocations": [
+        {
+          "line": 269,
+          "prop": "font-size"
+        },
+        {
+          "line": 269,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": "#volume-slider",
+      "specificity": [
+        1,
+        0,
+        0
+      ],
+      "decls": {
+        "width": "80px"
+      },
+      "sourceLocations": [
+        {
+          "line": 274,
+          "prop": "width"
+        }
+      ]
+    },
+    {
+      "selector": ".progress-container",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "width": "100%",
+        "height": "6px",
+        "background": "rgba(0,0,0,0.2)",
+        "cursor": "pointer",
+        "border-radius": "3px",
+        "margin": "10px 0"
+      },
+      "sourceLocations": [
+        {
+          "line": 279,
+          "prop": "width"
+        },
+        {
+          "line": 279,
+          "prop": "height"
+        },
+        {
+          "line": 279,
+          "prop": "background"
+        },
+        {
+          "line": 279,
+          "prop": "cursor"
+        },
+        {
+          "line": 279,
+          "prop": "border-radius"
+        },
+        {
+          "line": 279,
+          "prop": "margin"
+        }
+      ]
+    },
+    {
+      "selector": ".progress-bar",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "height": "100%",
+        "background": "#007bff",
+        "border-radius": "3px",
+        "transition": "width 0.1s",
+        "min-width": "0"
+      },
+      "sourceLocations": [
+        {
+          "line": 288,
+          "prop": "height"
+        },
+        {
+          "line": 288,
+          "prop": "background"
+        },
+        {
+          "line": 288,
+          "prop": "border-radius"
+        },
+        {
+          "line": 288,
+          "prop": "transition"
+        },
+        {
+          "line": 288,
+          "prop": "min-width"
+        }
+      ]
+    },
+    {
+      "selector": ".time-display",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "0.85em",
+        "color": "#666",
+        "text-align": "center",
+        "font-family": "monospace"
+      },
+      "sourceLocations": [
+        {
+          "line": 297,
+          "prop": "font-size"
+        },
+        {
+          "line": 297,
+          "prop": "color"
+        },
+        {
+          "line": 297,
+          "prop": "text-align"
+        },
+        {
+          "line": 297,
+          "prop": "font-family"
+        }
+      ]
+    },
+    {
+      "selector": ".no-albums",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "text-align": "center",
+        "padding": "40px 20px",
+        "color": "#666",
+        "font-style": "italic"
+      },
+      "sourceLocations": [
+        {
+          "line": 305,
+          "prop": "text-align"
+        },
+        {
+          "line": 305,
+          "prop": "padding"
+        },
+        {
+          "line": 305,
+          "prop": "color"
+        },
+        {
+          "line": 305,
+          "prop": "font-style"
+        }
+      ]
+    },
+    {
+      "selector": ".no-results",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "text-align": "center",
+        "padding": "40px 20px",
+        "color": "#666",
+        "font-style": "italic"
+      },
+      "sourceLocations": [
+        {
+          "line": 305,
+          "prop": "text-align"
+        },
+        {
+          "line": 305,
+          "prop": "padding"
+        },
+        {
+          "line": 305,
+          "prop": "color"
+        },
+        {
+          "line": 305,
+          "prop": "font-style"
+        }
+      ]
+    },
+    {
+      "selector": ".error",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "text-align": "center",
+        "padding": "40px 20px",
+        "color": "#666",
+        "font-style": "italic"
+      },
+      "sourceLocations": [
+        {
+          "line": 305,
+          "prop": "text-align"
+        },
+        {
+          "line": 305,
+          "prop": "padding"
+        },
+        {
+          "line": 305,
+          "prop": "color"
+        },
+        {
+          "line": 305,
+          "prop": "font-style"
+        }
+      ]
+    },
+    {
+      "selector": ".retry-container",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "text-align": "center",
+        "padding": "40px 20px"
+      },
+      "sourceLocations": [
+        {
+          "line": 314,
+          "prop": "text-align"
+        },
+        {
+          "line": 314,
+          "prop": "padding"
+        }
+      ]
+    },
+    {
+      "selector": ".retry-button",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background": "#007bff",
+        "color": "white",
+        "border": "none",
+        "padding": "10px 20px",
+        "border-radius": "5px",
+        "cursor": "pointer",
+        "font-size": "14px",
+        "margin-top": "10px",
+        "transition": "background-color 0.2s"
+      },
+      "sourceLocations": [
+        {
+          "line": 319,
+          "prop": "background"
+        },
+        {
+          "line": 319,
+          "prop": "color"
+        },
+        {
+          "line": 319,
+          "prop": "border"
+        },
+        {
+          "line": 319,
+          "prop": "padding"
+        },
+        {
+          "line": 319,
+          "prop": "border-radius"
+        },
+        {
+          "line": 319,
+          "prop": "cursor"
+        },
+        {
+          "line": 319,
+          "prop": "font-size"
+        },
+        {
+          "line": 319,
+          "prop": "margin-top"
+        },
+        {
+          "line": 319,
+          "prop": "transition"
+        }
+      ]
+    },
+    {
+      "selector": ".retry-button:hover",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "background": "#0056b3"
+      },
+      "sourceLocations": [
+        {
+          "line": 331,
+          "prop": "background"
+        }
+      ]
+    },
+    {
+      "selector": ".api-status",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "position": "fixed",
+        "bottom": "20px",
+        "left": "20px",
+        "padding": "8px 12px",
+        "border-radius": "4px",
+        "font-size": "12px",
+        "font-weight": "500",
+        "z-index": "1000",
+        "opacity": "0",
+        "transition": "opacity 0.3s"
+      },
+      "sourceLocations": [
+        {
+          "line": 336,
+          "prop": "position"
+        },
+        {
+          "line": 336,
+          "prop": "bottom"
+        },
+        {
+          "line": 336,
+          "prop": "left"
+        },
+        {
+          "line": 336,
+          "prop": "padding"
+        },
+        {
+          "line": 336,
+          "prop": "border-radius"
+        },
+        {
+          "line": 336,
+          "prop": "font-size"
+        },
+        {
+          "line": 336,
+          "prop": "font-weight"
+        },
+        {
+          "line": 336,
+          "prop": "z-index"
+        },
+        {
+          "line": 336,
+          "prop": "opacity"
+        },
+        {
+          "line": 336,
+          "prop": "transition"
+        }
+      ]
+    },
+    {
+      "selector": ".api-status.connected",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "background": "#28a745",
+        "color": "white"
+      },
+      "sourceLocations": [
+        {
+          "line": 349,
+          "prop": "background"
+        },
+        {
+          "line": 349,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".api-status.disconnected",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "background": "#dc3545",
+        "color": "white"
+      },
+      "sourceLocations": [
+        {
+          "line": 354,
+          "prop": "background"
+        },
+        {
+          "line": 354,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".api-status.show",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "opacity": "1"
+      },
+      "sourceLocations": [
+        {
+          "line": 359,
+          "prop": "opacity"
+        }
+      ]
+    },
+    {
+      "selector": ".loginSquare",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "margin-left": "5px",
+        "margin-right": "5px",
+        "margin-bottom": "10px"
+      },
+      "sourceLocations": [
+        {
+          "line": 367,
+          "prop": "margin-left"
+        },
+        {
+          "line": 367,
+          "prop": "margin-right"
+        },
+        {
+          "line": 367,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".login-button",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background-color": "transparent",
+        "color": "#3AA0A0",
+        "border": "1px solid #3AA0A0",
+        "padding": "5px 10px",
+        "font-size": "1em",
+        "cursor": "pointer",
+        "transition": "all 0.2s ease-in-out",
+        "border-radius": "2px"
+      },
+      "sourceLocations": [
+        {
+          "line": 373,
+          "prop": "background-color"
+        },
+        {
+          "line": 373,
+          "prop": "color"
+        },
+        {
+          "line": 373,
+          "prop": "border"
+        },
+        {
+          "line": 373,
+          "prop": "padding"
+        },
+        {
+          "line": 373,
+          "prop": "font-size"
+        },
+        {
+          "line": 373,
+          "prop": "cursor"
+        },
+        {
+          "line": 373,
+          "prop": "transition"
+        },
+        {
+          "line": 373,
+          "prop": "border-radius"
+        }
+      ]
+    },
+    {
+      "selector": ".login-button:hover",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "background-color": "#3AA0A0",
+        "color": "#cadbda"
+      },
+      "sourceLocations": [
+        {
+          "line": 384,
+          "prop": "background-color"
+        },
+        {
+          "line": 384,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".cartSquare",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "margin-left": "5px",
+        "margin-right": "5px",
+        "margin-bottom": "10px"
+      },
+      "sourceLocations": [
+        {
+          "line": 390,
+          "prop": "margin-left"
+        },
+        {
+          "line": 390,
+          "prop": "margin-right"
+        },
+        {
+          "line": 390,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-button",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background-color": "transparent",
+        "color": "#3AA0A0",
+        "border": "none",
+        "padding": "8px 10px",
+        "font-size": "1em",
+        "cursor": "pointer",
+        "transition": "all 0.2s ease-in-out",
+        "position": "relative",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      },
+      "sourceLocations": [
+        {
+          "line": 396,
+          "prop": "background-color"
+        },
+        {
+          "line": 396,
+          "prop": "color"
+        },
+        {
+          "line": 396,
+          "prop": "border"
+        },
+        {
+          "line": 396,
+          "prop": "padding"
+        },
+        {
+          "line": 396,
+          "prop": "font-size"
+        },
+        {
+          "line": 396,
+          "prop": "cursor"
+        },
+        {
+          "line": 396,
+          "prop": "transition"
+        },
+        {
+          "line": 396,
+          "prop": "position"
+        },
+        {
+          "line": 396,
+          "prop": "display"
+        },
+        {
+          "line": 396,
+          "prop": "align-items"
+        },
+        {
+          "line": 396,
+          "prop": "justify-content"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-button:hover",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "background-color": "#3AA0A0",
+        "border-color": "#3AA0A0"
+      },
+      "sourceLocations": [
+        {
+          "line": 410,
+          "prop": "background-color"
+        },
+        {
+          "line": 410,
+          "prop": "border-color"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-button:hover .cart-icon",
+      "specificity": [
+        0,
+        3,
+        0
+      ],
+      "decls": {
+        "filter": "brightness(0) saturate(100%) invert(89%) sepia(12%) saturate(200%) hue-rotate(139deg) brightness(95%) contrast(88%)"
+      },
+      "sourceLocations": [
+        {
+          "line": 415,
+          "prop": "filter"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-icon",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "width": "30px",
+        "height": "30px",
+        "transition": "filter 0.2s ease-in-out",
+        "filter": "brightness(0) saturate(100%) invert(71%) sepia(8%) saturate(1055%) hue-rotate(139deg) brightness(99%) contrast(88%)"
+      },
+      "sourceLocations": [
+        {
+          "line": 419,
+          "prop": "width"
+        },
+        {
+          "line": 419,
+          "prop": "height"
+        },
+        {
+          "line": 419,
+          "prop": "transition"
+        },
+        {
+          "line": 419,
+          "prop": "filter"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-count",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "position": "absolute",
+        "top": "-1px",
+        "right": "-1px",
+        "background-color": "#8D2016",
+        "color": "#EAE9DF",
+        "width": "18px",
+        "height": "18px",
+        "font-size": "0.7em",
+        "font-weight": "200",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "line-height": "1"
+      },
+      "sourceLocations": [
+        {
+          "line": 427,
+          "prop": "position"
+        },
+        {
+          "line": 427,
+          "prop": "top"
+        },
+        {
+          "line": 427,
+          "prop": "right"
+        },
+        {
+          "line": 427,
+          "prop": "background-color"
+        },
+        {
+          "line": 427,
+          "prop": "color"
+        },
+        {
+          "line": 427,
+          "prop": "width"
+        },
+        {
+          "line": 427,
+          "prop": "height"
+        },
+        {
+          "line": 427,
+          "prop": "font-size"
+        },
+        {
+          "line": 427,
+          "prop": "font-weight"
+        },
+        {
+          "line": 427,
+          "prop": "display"
+        },
+        {
+          "line": 427,
+          "prop": "align-items"
+        },
+        {
+          "line": 427,
+          "prop": "justify-content"
+        },
+        {
+          "line": 427,
+          "prop": "line-height"
+        }
+      ]
+    },
+    {
+      "selector": ".user-info",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "display": "flex",
+        "flex-direction": "column",
+        "align-items": "flex-start",
+        "gap": "5px",
+        "padding": "5px",
+        "border-top": "1px solid #3AA0A0",
+        "margin-top": "10px"
+      },
+      "sourceLocations": [
+        {
+          "line": 445,
+          "prop": "display"
+        },
+        {
+          "line": 445,
+          "prop": "flex-direction"
+        },
+        {
+          "line": 445,
+          "prop": "align-items"
+        },
+        {
+          "line": 445,
+          "prop": "gap"
+        },
+        {
+          "line": 445,
+          "prop": "padding"
+        },
+        {
+          "line": 445,
+          "prop": "border-top"
+        },
+        {
+          "line": 445,
+          "prop": "margin-top"
+        }
+      ]
+    },
+    {
+      "selector": ".user-info span",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "color": "#3AA0A0",
+        "font-size": "0.9em",
+        "font-weight": "bold"
+      },
+      "sourceLocations": [
+        {
+          "line": 455,
+          "prop": "color"
+        },
+        {
+          "line": 455,
+          "prop": "font-size"
+        },
+        {
+          "line": 455,
+          "prop": "font-weight"
+        }
+      ]
+    },
+    {
+      "selector": ".logout-button",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background-color": "#335D7E",
+        "color": "#cadbda",
+        "border": "1px solid #0597A1",
+        "padding": "4px 8px",
+        "font-size": "0.8em",
+        "cursor": "pointer",
+        "transition": "all 0.2s ease-in-out"
+      },
+      "sourceLocations": [
+        {
+          "line": 461,
+          "prop": "background-color"
+        },
+        {
+          "line": 461,
+          "prop": "color"
+        },
+        {
+          "line": 461,
+          "prop": "border"
+        },
+        {
+          "line": 461,
+          "prop": "padding"
+        },
+        {
+          "line": 461,
+          "prop": "font-size"
+        },
+        {
+          "line": 461,
+          "prop": "cursor"
+        },
+        {
+          "line": 461,
+          "prop": "transition"
+        }
+      ]
+    },
+    {
+      "selector": ".logout-button:hover",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "background-color": "#cadbda",
+        "color": "#083D5E"
+      },
+      "sourceLocations": [
+        {
+          "line": 471,
+          "prop": "background-color"
+        },
+        {
+          "line": 471,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".auth-modal",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "display": "none",
+        "position": "fixed",
+        "z-index": "1000",
+        "left": "0",
+        "top": "0",
+        "width": "100%",
+        "height": "100%",
+        "background-color": "rgba(8,61,94,0.8)",
+        "backdrop-filter": "blur(4px)"
+      },
+      "sourceLocations": [
+        {
+          "line": 477,
+          "prop": "display"
+        },
+        {
+          "line": 477,
+          "prop": "position"
+        },
+        {
+          "line": 477,
+          "prop": "z-index"
+        },
+        {
+          "line": 477,
+          "prop": "left"
+        },
+        {
+          "line": 477,
+          "prop": "top"
+        },
+        {
+          "line": 477,
+          "prop": "width"
+        },
+        {
+          "line": 477,
+          "prop": "height"
+        },
+        {
+          "line": 477,
+          "prop": "background-color"
+        },
+        {
+          "line": 477,
+          "prop": "backdrop-filter"
+        }
+      ]
+    },
+    {
+      "selector": ".auth-modal-content",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background-color": "#083D5E",
+        "margin": "5%auto",
+        "padding": "30px",
+        "border": "1px solid #3AA0A0",
+        "border-radius": "8px",
+        "width": "90%",
+        "max-width": "400px",
+        "color": "#cadbda",
+        "position": "relative"
+      },
+      "sourceLocations": [
+        {
+          "line": 489,
+          "prop": "background-color"
+        },
+        {
+          "line": 489,
+          "prop": "margin"
+        },
+        {
+          "line": 489,
+          "prop": "padding"
+        },
+        {
+          "line": 489,
+          "prop": "border"
+        },
+        {
+          "line": 489,
+          "prop": "border-radius"
+        },
+        {
+          "line": 489,
+          "prop": "width"
+        },
+        {
+          "line": 489,
+          "prop": "max-width"
+        },
+        {
+          "line": 489,
+          "prop": "color"
+        },
+        {
+          "line": 489,
+          "prop": "position"
+        }
+      ]
+    },
+    {
+      "selector": ".auth-modal-content h2",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "color": "#3AA0A0",
+        "margin-bottom": "20px",
+        "text-align": "center",
+        "font-size": "1.5em"
+      },
+      "sourceLocations": [
+        {
+          "line": 501,
+          "prop": "color"
+        },
+        {
+          "line": 501,
+          "prop": "margin-bottom"
+        },
+        {
+          "line": 501,
+          "prop": "text-align"
+        },
+        {
+          "line": 501,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".auth-modal .close",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "background-color": "transparent",
+        "border": "none",
+        "cursor": "pointer",
+        "padding": "0",
+        "width": "25px",
+        "height": "25px",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "transition": "all 0.2s",
+        "background-image": "url(/images/IP25-CLOSEv2.svg)",
+        "background-size": "25px 25px",
+        "background-repeat": "no-repeat",
+        "background-position": "center",
+        "position": "absolute",
+        "right": "15px",
+        "top": "10px",
+        "font-size": "0"
+      },
+      "sourceLocations": [
+        {
+          "line": 508,
+          "prop": "background-color"
+        },
+        {
+          "line": 508,
+          "prop": "border"
+        },
+        {
+          "line": 508,
+          "prop": "cursor"
+        },
+        {
+          "line": 508,
+          "prop": "padding"
+        },
+        {
+          "line": 508,
+          "prop": "width"
+        },
+        {
+          "line": 508,
+          "prop": "height"
+        },
+        {
+          "line": 508,
+          "prop": "display"
+        },
+        {
+          "line": 508,
+          "prop": "align-items"
+        },
+        {
+          "line": 508,
+          "prop": "justify-content"
+        },
+        {
+          "line": 508,
+          "prop": "transition"
+        },
+        {
+          "line": 508,
+          "prop": "background-image"
+        },
+        {
+          "line": 508,
+          "prop": "background-size"
+        },
+        {
+          "line": 508,
+          "prop": "background-repeat"
+        },
+        {
+          "line": 508,
+          "prop": "background-position"
+        },
+        {
+          "line": 508,
+          "prop": "position"
+        },
+        {
+          "line": 508,
+          "prop": "right"
+        },
+        {
+          "line": 508,
+          "prop": "top"
+        },
+        {
+          "line": 508,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".auth-modal .close:hover",
+      "specificity": [
+        0,
+        3,
+        0
+      ],
+      "decls": {
+        "background-color": "#CA381C"
+      },
+      "sourceLocations": [
+        {
+          "line": 531,
+          "prop": "background-color"
+        }
+      ]
+    },
+    {
+      "selector": ".auth-form",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": "15px"
+      },
+      "sourceLocations": [
+        {
+          "line": 536,
+          "prop": "display"
+        },
+        {
+          "line": 536,
+          "prop": "flex-direction"
+        },
+        {
+          "line": 536,
+          "prop": "gap"
+        }
+      ]
+    },
+    {
+      "selector": ".auth-form input",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "background-color": "#2b7f8c",
+        "border": "1px solid #3AA0A0",
+        "color": "#cadbda",
+        "padding": "12px",
+        "border-radius": "4px",
+        "font-size": "1em"
+      },
+      "sourceLocations": [
+        {
+          "line": 542,
+          "prop": "background-color"
+        },
+        {
+          "line": 542,
+          "prop": "border"
+        },
+        {
+          "line": 542,
+          "prop": "color"
+        },
+        {
+          "line": 542,
+          "prop": "padding"
+        },
+        {
+          "line": 542,
+          "prop": "border-radius"
+        },
+        {
+          "line": 542,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".password-input-container",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "position": "relative",
+        "width": "100%"
+      },
+      "sourceLocations": [
+        {
+          "line": 552,
+          "prop": "position"
+        },
+        {
+          "line": 552,
+          "prop": "width"
+        }
+      ]
+    },
+    {
+      "selector": ".password-input-container input",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "width": "100%",
+        "padding-right": "50px"
+      },
+      "sourceLocations": [
+        {
+          "line": 557,
+          "prop": "width"
+        },
+        {
+          "line": 557,
+          "prop": "padding-right"
+        }
+      ]
+    },
+    {
+      "selector": ".password-toggle-icon",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "position": "absolute",
+        "right": "15px",
+        "top": "50%",
+        "transform": "translateY(-50%)",
+        "width": "24px",
+        "height": "24px",
+        "cursor": "pointer",
+        "opacity": "0.6",
+        "transition": "opacity 0.2s,filter 0.2s",
+        "background-image": "url(/images/VIEW-ICON.svg)",
+        "background-size": "contain",
+        "background-repeat": "no-repeat",
+        "background-position": "center",
+        "filter": "brightness(0) saturate(100%) invert(69%) sepia(15%) saturate(332%) hue-rotate(139deg) brightness(96%) contrast(89%)"
+      },
+      "sourceLocations": [
+        {
+          "line": 563,
+          "prop": "position"
+        },
+        {
+          "line": 563,
+          "prop": "right"
+        },
+        {
+          "line": 563,
+          "prop": "top"
+        },
+        {
+          "line": 563,
+          "prop": "transform"
+        },
+        {
+          "line": 563,
+          "prop": "width"
+        },
+        {
+          "line": 563,
+          "prop": "height"
+        },
+        {
+          "line": 563,
+          "prop": "cursor"
+        },
+        {
+          "line": 563,
+          "prop": "opacity"
+        },
+        {
+          "line": 563,
+          "prop": "transition"
+        },
+        {
+          "line": 563,
+          "prop": "background-image"
+        },
+        {
+          "line": 563,
+          "prop": "background-size"
+        },
+        {
+          "line": 563,
+          "prop": "background-repeat"
+        },
+        {
+          "line": 563,
+          "prop": "background-position"
+        },
+        {
+          "line": 563,
+          "prop": "filter"
+        }
+      ]
+    },
+    {
+      "selector": ".password-toggle-icon:hover",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "opacity": "1",
+        "filter": "brightness(0) saturate(100%) invert(100%)"
+      },
+      "sourceLocations": [
+        {
+          "line": 581,
+          "prop": "opacity"
+        },
+        {
+          "line": 581,
+          "prop": "filter"
+        }
+      ]
+    },
+    {
+      "selector": ".password-toggle-icon.password-visible",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "opacity": "1",
+        "filter": "brightness(0) saturate(100%) invert(71%) sepia(77%) saturate(6088%) hue-rotate(153deg) brightness(96%) contrast(80%)"
+      },
+      "sourceLocations": [
+        {
+          "line": 586,
+          "prop": "opacity"
+        },
+        {
+          "line": 586,
+          "prop": "filter"
+        }
+      ]
+    },
+    {
+      "selector": ".auth-form input::placeholder",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "color": "#8ab7ce"
+      },
+      "sourceLocations": [
+        {
+          "line": 591,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".auth-form input:focus",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "outline": "none",
+        "border-color": "#3AA0A0",
+        "background-color": "#184551"
+      },
+      "sourceLocations": [
+        {
+          "line": 595,
+          "prop": "outline"
+        },
+        {
+          "line": 595,
+          "prop": "border-color"
+        },
+        {
+          "line": 595,
+          "prop": "background-color"
+        }
+      ]
+    },
+    {
+      "selector": ".auth-form button",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "background-color": "#3AA0A0",
+        "color": "#083D5E",
+        "border": "none",
+        "padding": "12px",
+        "border-radius": "4px",
+        "font-size": "1em",
+        "font-weight": "bold",
+        "cursor": "pointer",
+        "transition": "background-color 0.2s"
+      },
+      "sourceLocations": [
+        {
+          "line": 601,
+          "prop": "background-color"
+        },
+        {
+          "line": 601,
+          "prop": "color"
+        },
+        {
+          "line": 601,
+          "prop": "border"
+        },
+        {
+          "line": 601,
+          "prop": "padding"
+        },
+        {
+          "line": 601,
+          "prop": "border-radius"
+        },
+        {
+          "line": 601,
+          "prop": "font-size"
+        },
+        {
+          "line": 601,
+          "prop": "font-weight"
+        },
+        {
+          "line": 601,
+          "prop": "cursor"
+        },
+        {
+          "line": 601,
+          "prop": "transition"
+        }
+      ]
+    },
+    {
+      "selector": ".auth-form button:hover",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "background-color": "#2b7f8c",
+        "color": "#cadbda"
+      },
+      "sourceLocations": [
+        {
+          "line": 613,
+          "prop": "background-color"
+        },
+        {
+          "line": 613,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".auth-form button:disabled",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "opacity": "0.6",
+        "cursor": "not-allowed"
+      },
+      "sourceLocations": [
+        {
+          "line": 618,
+          "prop": "opacity"
+        },
+        {
+          "line": 618,
+          "prop": "cursor"
+        }
+      ]
+    },
+    {
+      "selector": ".form-toggle",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "text-align": "center",
+        "margin-top": "20px",
+        "color": "#8ab7ce"
+      },
+      "sourceLocations": [
+        {
+          "line": 624,
+          "prop": "text-align"
+        },
+        {
+          "line": 624,
+          "prop": "margin-top"
+        },
+        {
+          "line": 624,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".form-toggle a",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "color": "#3AA0A0",
+        "text-decoration": "none",
+        "cursor": "pointer"
+      },
+      "sourceLocations": [
+        {
+          "line": 630,
+          "prop": "color"
+        },
+        {
+          "line": 630,
+          "prop": "text-decoration"
+        },
+        {
+          "line": 630,
+          "prop": "cursor"
+        }
+      ]
+    },
+    {
+      "selector": ".form-toggle a:hover",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "text-decoration": "underline"
+      },
+      "sourceLocations": [
+        {
+          "line": 636,
+          "prop": "text-decoration"
+        }
+      ]
+    },
+    {
+      "selector": ".auth-error",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background-color": "rgba(220,53,69,0.2)",
+        "border": "1px solid #dc3545",
+        "color": "#dc3545",
+        "padding": "10px",
+        "border-radius": "4px",
+        "margin-bottom": "15px",
+        "font-size": "0.9em"
+      },
+      "sourceLocations": [
+        {
+          "line": 641,
+          "prop": "background-color"
+        },
+        {
+          "line": 641,
+          "prop": "border"
+        },
+        {
+          "line": 641,
+          "prop": "color"
+        },
+        {
+          "line": 641,
+          "prop": "padding"
+        },
+        {
+          "line": 641,
+          "prop": "border-radius"
+        },
+        {
+          "line": 641,
+          "prop": "margin-bottom"
+        },
+        {
+          "line": 641,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".auth-success",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background-color": "rgba(40,167,69,0.2)",
+        "border": "1px solid #28a745",
+        "color": "#28a745",
+        "padding": "10px",
+        "border-radius": "4px",
+        "margin-bottom": "15px",
+        "font-size": "0.9em"
+      },
+      "sourceLocations": [
+        {
+          "line": 652,
+          "prop": "background-color"
+        },
+        {
+          "line": 652,
+          "prop": "border"
+        },
+        {
+          "line": 652,
+          "prop": "color"
+        },
+        {
+          "line": 652,
+          "prop": "padding"
+        },
+        {
+          "line": 652,
+          "prop": "border-radius"
+        },
+        {
+          "line": 652,
+          "prop": "margin-bottom"
+        },
+        {
+          "line": 652,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "position": "fixed",
+        "top": "0",
+        "left": "0",
+        "width": "100%",
+        "height": "100%",
+        "z-index": "10000",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      },
+      "sourceLocations": [
+        {
+          "line": 667,
+          "prop": "position"
+        },
+        {
+          "line": 667,
+          "prop": "top"
+        },
+        {
+          "line": 667,
+          "prop": "left"
+        },
+        {
+          "line": 667,
+          "prop": "width"
+        },
+        {
+          "line": 667,
+          "prop": "height"
+        },
+        {
+          "line": 667,
+          "prop": "z-index"
+        },
+        {
+          "line": 667,
+          "prop": "display"
+        },
+        {
+          "line": 667,
+          "prop": "align-items"
+        },
+        {
+          "line": 667,
+          "prop": "justify-content"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal .modal-overlay",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "width": "100%",
+        "height": "100%",
+        "background": "rgba(8,61,94,0.8)",
+        "backdrop-filter": "blur(4px)",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      },
+      "sourceLocations": [
+        {
+          "line": 679,
+          "prop": "width"
+        },
+        {
+          "line": 679,
+          "prop": "height"
+        },
+        {
+          "line": 679,
+          "prop": "background"
+        },
+        {
+          "line": 679,
+          "prop": "backdrop-filter"
+        },
+        {
+          "line": 679,
+          "prop": "display"
+        },
+        {
+          "line": 679,
+          "prop": "align-items"
+        },
+        {
+          "line": 679,
+          "prop": "justify-content"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal .modal-content",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "background-color": "#083D5E",
+        "color": "#cadbda",
+        "padding": "30px",
+        "border": "1px solid #3AA0A0",
+        "border-radius": "8px",
+        "max-width": "400px",
+        "width": "90%",
+        "text-align": "center",
+        "position": "relative"
+      },
+      "sourceLocations": [
+        {
+          "line": 689,
+          "prop": "background-color"
+        },
+        {
+          "line": 689,
+          "prop": "color"
+        },
+        {
+          "line": 689,
+          "prop": "padding"
+        },
+        {
+          "line": 689,
+          "prop": "border"
+        },
+        {
+          "line": 689,
+          "prop": "border-radius"
+        },
+        {
+          "line": 689,
+          "prop": "max-width"
+        },
+        {
+          "line": 689,
+          "prop": "width"
+        },
+        {
+          "line": 689,
+          "prop": "text-align"
+        },
+        {
+          "line": 689,
+          "prop": "position"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal .modal-content h3",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "color": "#3AA0A0",
+        "margin": "0 0 1rem 0",
+        "font-size": "1.5em",
+        "font-weight": "200"
+      },
+      "sourceLocations": [
+        {
+          "line": 701,
+          "prop": "color"
+        },
+        {
+          "line": 701,
+          "prop": "margin"
+        },
+        {
+          "line": 701,
+          "prop": "font-size"
+        },
+        {
+          "line": 701,
+          "prop": "font-weight"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal .modal-content p",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "color": "#8ab7ce",
+        "margin-bottom": "1.5rem",
+        "line-height": "1.4"
+      },
+      "sourceLocations": [
+        {
+          "line": 708,
+          "prop": "color"
+        },
+        {
+          "line": 708,
+          "prop": "margin-bottom"
+        },
+        {
+          "line": 708,
+          "prop": "line-height"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal .modal-content input",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "width": "100%",
+        "background-color": "#2b7f8c",
+        "border": "1px solid #3AA0A0",
+        "color": "#cadbda",
+        "padding": "12px",
+        "border-radius": "4px",
+        "font-size": "1em",
+        "margin-bottom": "1.5rem",
+        "box-sizing": "border-box"
+      },
+      "sourceLocations": [
+        {
+          "line": 714,
+          "prop": "width"
+        },
+        {
+          "line": 714,
+          "prop": "background-color"
+        },
+        {
+          "line": 714,
+          "prop": "border"
+        },
+        {
+          "line": 714,
+          "prop": "color"
+        },
+        {
+          "line": 714,
+          "prop": "padding"
+        },
+        {
+          "line": 714,
+          "prop": "border-radius"
+        },
+        {
+          "line": 714,
+          "prop": "font-size"
+        },
+        {
+          "line": 714,
+          "prop": "margin-bottom"
+        },
+        {
+          "line": 714,
+          "prop": "box-sizing"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal .modal-content input::placeholder",
+      "specificity": [
+        0,
+        3,
+        1
+      ],
+      "decls": {
+        "color": "#8ab7ce",
+        "opacity": "0.7"
+      },
+      "sourceLocations": [
+        {
+          "line": 726,
+          "prop": "color"
+        },
+        {
+          "line": 726,
+          "prop": "opacity"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal .modal-content input:focus",
+      "specificity": [
+        0,
+        3,
+        1
+      ],
+      "decls": {
+        "outline": "none",
+        "border-color": "#3AA0A0",
+        "background-color": "#184551",
+        "box-shadow": "0 0 0 2px rgba(58,160,160,0.2)"
+      },
+      "sourceLocations": [
+        {
+          "line": 731,
+          "prop": "outline"
+        },
+        {
+          "line": 731,
+          "prop": "border-color"
+        },
+        {
+          "line": 731,
+          "prop": "background-color"
+        },
+        {
+          "line": 731,
+          "prop": "box-shadow"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal .modal-content input.error",
+      "specificity": [
+        0,
+        3,
+        1
+      ],
+      "decls": {
+        "border-color": "#dc3545",
+        "background-color": "rgba(220,53,69,0.1)"
+      },
+      "sourceLocations": [
+        {
+          "line": 738,
+          "prop": "border-color"
+        },
+        {
+          "line": 738,
+          "prop": "background-color"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal .modal-buttons",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "display": "flex",
+        "gap": "1rem",
+        "margin-top": "1.5rem"
+      },
+      "sourceLocations": [
+        {
+          "line": 743,
+          "prop": "display"
+        },
+        {
+          "line": 743,
+          "prop": "gap"
+        },
+        {
+          "line": 743,
+          "prop": "margin-top"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal .modal-buttons button",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "flex": "1",
+        "padding": "12px",
+        "border": "none",
+        "border-radius": "4px",
+        "cursor": "pointer",
+        "font-size": "1em",
+        "transition": "all 0.2s ease",
+        "font-weight": "200"
+      },
+      "sourceLocations": [
+        {
+          "line": 749,
+          "prop": "flex"
+        },
+        {
+          "line": 749,
+          "prop": "padding"
+        },
+        {
+          "line": 749,
+          "prop": "border"
+        },
+        {
+          "line": 749,
+          "prop": "border-radius"
+        },
+        {
+          "line": 749,
+          "prop": "cursor"
+        },
+        {
+          "line": 749,
+          "prop": "font-size"
+        },
+        {
+          "line": 749,
+          "prop": "transition"
+        },
+        {
+          "line": 749,
+          "prop": "font-weight"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal #emailSubmitBtn",
+      "specificity": [
+        1,
+        1,
+        0
+      ],
+      "decls": {
+        "background-color": "#3AA0A0",
+        "color": "#083D5E",
+        "font-weight": "500"
+      },
+      "sourceLocations": [
+        {
+          "line": 760,
+          "prop": "background-color"
+        },
+        {
+          "line": 760,
+          "prop": "color"
+        },
+        {
+          "line": 760,
+          "prop": "font-weight"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal #emailSubmitBtn:hover",
+      "specificity": [
+        1,
+        2,
+        0
+      ],
+      "decls": {
+        "background-color": "#2b7f8c",
+        "color": "#cadbda",
+        "transform": "translateY(-1px)"
+      },
+      "sourceLocations": [
+        {
+          "line": 766,
+          "prop": "background-color"
+        },
+        {
+          "line": 766,
+          "prop": "color"
+        },
+        {
+          "line": 766,
+          "prop": "transform"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal #emailSubmitBtn:disabled",
+      "specificity": [
+        1,
+        2,
+        0
+      ],
+      "decls": {
+        "opacity": "0.6",
+        "cursor": "not-allowed",
+        "transform": "none"
+      },
+      "sourceLocations": [
+        {
+          "line": 772,
+          "prop": "opacity"
+        },
+        {
+          "line": 772,
+          "prop": "cursor"
+        },
+        {
+          "line": 772,
+          "prop": "transform"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal #emailCancelBtn",
+      "specificity": [
+        1,
+        1,
+        0
+      ],
+      "decls": {
+        "background": "transparent",
+        "color": "#8ab7ce",
+        "border": "1px solid #8ab7ce"
+      },
+      "sourceLocations": [
+        {
+          "line": 778,
+          "prop": "background"
+        },
+        {
+          "line": 778,
+          "prop": "color"
+        },
+        {
+          "line": 778,
+          "prop": "border"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal #emailCancelBtn:hover",
+      "specificity": [
+        1,
+        2,
+        0
+      ],
+      "decls": {
+        "background-color": "#8ab7ce",
+        "color": "#083D5E",
+        "transform": "translateY(-1px)"
+      },
+      "sourceLocations": [
+        {
+          "line": 784,
+          "prop": "background-color"
+        },
+        {
+          "line": 784,
+          "prop": "color"
+        },
+        {
+          "line": 784,
+          "prop": "transform"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal #emailSubmitBtn.loading",
+      "specificity": [
+        1,
+        2,
+        0
+      ],
+      "decls": {
+        "position": "relative",
+        "color": "transparent"
+      },
+      "sourceLocations": [
+        {
+          "line": 791,
+          "prop": "position"
+        },
+        {
+          "line": 791,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal #emailSubmitBtn.loading::after",
+      "specificity": [
+        1,
+        3,
+        0
+      ],
+      "decls": {
+        "content": "\"\"",
+        "position": "absolute",
+        "top": "50%",
+        "left": "50%",
+        "transform": "translate(-50%,-50%)",
+        "width": "20px",
+        "height": "20px",
+        "border": "2px solid transparent",
+        "border-top": "2px solid #083D5E",
+        "border-radius": "50%",
+        "animation": "spin 1s linear infinite"
+      },
+      "sourceLocations": [
+        {
+          "line": 796,
+          "prop": "content"
+        },
+        {
+          "line": 796,
+          "prop": "position"
+        },
+        {
+          "line": 796,
+          "prop": "top"
+        },
+        {
+          "line": 796,
+          "prop": "left"
+        },
+        {
+          "line": 796,
+          "prop": "transform"
+        },
+        {
+          "line": 796,
+          "prop": "width"
+        },
+        {
+          "line": 796,
+          "prop": "height"
+        },
+        {
+          "line": 796,
+          "prop": "border"
+        },
+        {
+          "line": 796,
+          "prop": "border-top"
+        },
+        {
+          "line": 796,
+          "prop": "border-radius"
+        },
+        {
+          "line": 796,
+          "prop": "animation"
+        }
+      ]
+    },
+    {
+      "selector": "0%",
+      "specificity": [
+        0,
+        0,
+        0
+      ],
+      "decls": {
+        "transform": "translate(-50%,-50%) rotate(0deg)"
+      },
+      "sourceLocations": [
+        {
+          "line": 811,
+          "prop": "transform"
+        }
+      ]
+    },
+    {
+      "selector": "100%",
+      "specificity": [
+        0,
+        0,
+        0
+      ],
+      "decls": {
+        "transform": "translate(-50%,-50%) rotate(360deg)"
+      },
+      "sourceLocations": [
+        {
+          "line": 812,
+          "prop": "transform"
+        }
+      ]
+    },
+    {
+      "selector": ".add-to-cart-btn",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background-color": "#3AA0A0",
+        "color": "#083D5E",
+        "border": "none",
+        "padding": "8px 16px",
+        "border-radius": "4px",
+        "cursor": "pointer",
+        "font-size": "0.9em",
+        "font-weight": "500",
+        "transition": "background-color 0.2s"
+      },
+      "sourceLocations": [
+        {
+          "line": 831,
+          "prop": "background-color"
+        },
+        {
+          "line": 831,
+          "prop": "color"
+        },
+        {
+          "line": 831,
+          "prop": "border"
+        },
+        {
+          "line": 831,
+          "prop": "padding"
+        },
+        {
+          "line": 831,
+          "prop": "border-radius"
+        },
+        {
+          "line": 831,
+          "prop": "cursor"
+        },
+        {
+          "line": 831,
+          "prop": "font-size"
+        },
+        {
+          "line": 831,
+          "prop": "font-weight"
+        },
+        {
+          "line": 831,
+          "prop": "transition"
+        }
+      ]
+    },
+    {
+      "selector": ".add-to-cart-btn:hover",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "background-color": "#2b7f8c",
+        "color": "#cadbda"
+      },
+      "sourceLocations": [
+        {
+          "line": 843,
+          "prop": "background-color"
+        },
+        {
+          "line": 843,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-sidebar",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "position": "fixed",
+        "top": "0",
+        "right": "-100%",
+        "width": "400px",
+        "height": "100vh",
+        "background-color": "#083D5E",
+        "color": "#cadbda",
+        "z-index": "2000",
+        "transition": "right 0.3s ease-in-out",
+        "border-left": "1px solid #3AA0A0",
+        "display": "flex",
+        "flex-direction": "column"
+      },
+      "sourceLocations": [
+        {
+          "line": 849,
+          "prop": "position"
+        },
+        {
+          "line": 849,
+          "prop": "top"
+        },
+        {
+          "line": 849,
+          "prop": "right"
+        },
+        {
+          "line": 849,
+          "prop": "width"
+        },
+        {
+          "line": 849,
+          "prop": "height"
+        },
+        {
+          "line": 849,
+          "prop": "background-color"
+        },
+        {
+          "line": 849,
+          "prop": "color"
+        },
+        {
+          "line": 849,
+          "prop": "z-index"
+        },
+        {
+          "line": 849,
+          "prop": "transition"
+        },
+        {
+          "line": 849,
+          "prop": "border-left"
+        },
+        {
+          "line": 849,
+          "prop": "display"
+        },
+        {
+          "line": 849,
+          "prop": "flex-direction"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-header",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "padding": "10px",
+        "border-bottom": "1px solid #2b7f8c",
+        "display": "flex",
+        "justify-content": "space-between",
+        "align-items": "center"
+      },
+      "sourceLocations": [
+        {
+          "line": 864,
+          "prop": "padding"
+        },
+        {
+          "line": 864,
+          "prop": "border-bottom"
+        },
+        {
+          "line": 864,
+          "prop": "display"
+        },
+        {
+          "line": 864,
+          "prop": "justify-content"
+        },
+        {
+          "line": 864,
+          "prop": "align-items"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-header h3",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "margin": "0",
+        "color": "#3AA0A0",
+        "font-size": "1em",
+        "font-weight": "200"
+      },
+      "sourceLocations": [
+        {
+          "line": 872,
+          "prop": "margin"
+        },
+        {
+          "line": 872,
+          "prop": "color"
+        },
+        {
+          "line": 872,
+          "prop": "font-size"
+        },
+        {
+          "line": 872,
+          "prop": "font-weight"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-close",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background-color": "transparent",
+        "border": "none",
+        "cursor": "pointer",
+        "padding": "0",
+        "width": "25px",
+        "height": "25px",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "transition": "all 0.2s",
+        "background-image": "url(/images/IP25-CLOSEv2.svg)",
+        "background-size": "25px 25px",
+        "background-repeat": "no-repeat",
+        "background-position": "center"
+      },
+      "sourceLocations": [
+        {
+          "line": 879,
+          "prop": "background-color"
+        },
+        {
+          "line": 879,
+          "prop": "border"
+        },
+        {
+          "line": 879,
+          "prop": "cursor"
+        },
+        {
+          "line": 879,
+          "prop": "padding"
+        },
+        {
+          "line": 879,
+          "prop": "width"
+        },
+        {
+          "line": 879,
+          "prop": "height"
+        },
+        {
+          "line": 879,
+          "prop": "display"
+        },
+        {
+          "line": 879,
+          "prop": "align-items"
+        },
+        {
+          "line": 879,
+          "prop": "justify-content"
+        },
+        {
+          "line": 879,
+          "prop": "transition"
+        },
+        {
+          "line": 879,
+          "prop": "background-image"
+        },
+        {
+          "line": 879,
+          "prop": "background-size"
+        },
+        {
+          "line": 879,
+          "prop": "background-repeat"
+        },
+        {
+          "line": 879,
+          "prop": "background-position"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-close:hover",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "background-color": "#CA381C"
+      },
+      "sourceLocations": [
+        {
+          "line": 897,
+          "prop": "background-color"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-content",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "flex": "1",
+        "display": "flex",
+        "flex-direction": "column",
+        "overflow": "hidden"
+      },
+      "sourceLocations": [
+        {
+          "line": 902,
+          "prop": "flex"
+        },
+        {
+          "line": 902,
+          "prop": "display"
+        },
+        {
+          "line": 902,
+          "prop": "flex-direction"
+        },
+        {
+          "line": 902,
+          "prop": "overflow"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-items",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "flex": "1",
+        "overflow-y": "auto",
+        "padding": "10px 20px"
+      },
+      "sourceLocations": [
+        {
+          "line": 909,
+          "prop": "flex"
+        },
+        {
+          "line": 909,
+          "prop": "overflow-y"
+        },
+        {
+          "line": 909,
+          "prop": "padding"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-empty",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "text-align": "center",
+        "color": "#8ab7ce",
+        "font-style": "italic",
+        "padding": "40px 20px"
+      },
+      "sourceLocations": [
+        {
+          "line": 915,
+          "prop": "text-align"
+        },
+        {
+          "line": 915,
+          "prop": "color"
+        },
+        {
+          "line": 915,
+          "prop": "font-style"
+        },
+        {
+          "line": 915,
+          "prop": "padding"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-item",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "display": "flex",
+        "gap": "15px",
+        "padding": "15px 0",
+        "border-bottom": "1px solid rgba(43,127,140,0.3)"
+      },
+      "sourceLocations": [
+        {
+          "line": 922,
+          "prop": "display"
+        },
+        {
+          "line": 922,
+          "prop": "gap"
+        },
+        {
+          "line": 922,
+          "prop": "padding"
+        },
+        {
+          "line": 922,
+          "prop": "border-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-item:last-child",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "border-bottom": "none"
+      },
+      "sourceLocations": [
+        {
+          "line": 929,
+          "prop": "border-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-item-image",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "width": "100px",
+        "height": "100px",
+        "object-fit": "cover"
+      },
+      "sourceLocations": [
+        {
+          "line": 933,
+          "prop": "width"
+        },
+        {
+          "line": 933,
+          "prop": "height"
+        },
+        {
+          "line": 933,
+          "prop": "object-fit"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-item-details",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "flex": "1"
+      },
+      "sourceLocations": [
+        {
+          "line": 940,
+          "prop": "flex"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-item-details h4",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "margin": "0 0 5px 0",
+        "font-size": "1em",
+        "font-weight": "300",
+        "color": "#bfd4d6",
+        "line-height": "1.2"
+      },
+      "sourceLocations": [
+        {
+          "line": 944,
+          "prop": "margin"
+        },
+        {
+          "line": 944,
+          "prop": "font-size"
+        },
+        {
+          "line": 944,
+          "prop": "font-weight"
+        },
+        {
+          "line": 944,
+          "prop": "color"
+        },
+        {
+          "line": 944,
+          "prop": "line-height"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-item-price",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "margin": "0 0 10px 0",
+        "font-weight": "250",
+        "color": "#bfd4d6",
+        "font-size": "1em"
+      },
+      "sourceLocations": [
+        {
+          "line": 952,
+          "prop": "margin"
+        },
+        {
+          "line": 952,
+          "prop": "font-weight"
+        },
+        {
+          "line": 952,
+          "prop": "color"
+        },
+        {
+          "line": 952,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-item-controls",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "display": "flex",
+        "align-items": "center",
+        "gap": "8px",
+        "flex-wrap": "wrap"
+      },
+      "sourceLocations": [
+        {
+          "line": 959,
+          "prop": "display"
+        },
+        {
+          "line": 959,
+          "prop": "align-items"
+        },
+        {
+          "line": 959,
+          "prop": "gap"
+        },
+        {
+          "line": 959,
+          "prop": "flex-wrap"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-item-title .song-name",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "display": "block",
+        "font-size": "1em",
+        "font-weight": "300",
+        "color": "#bfd4d6",
+        "margin-bottom": "3px",
+        "line-height": "1.2"
+      },
+      "sourceLocations": [
+        {
+          "line": 968,
+          "prop": "display"
+        },
+        {
+          "line": 968,
+          "prop": "font-size"
+        },
+        {
+          "line": 968,
+          "prop": "font-weight"
+        },
+        {
+          "line": 968,
+          "prop": "color"
+        },
+        {
+          "line": 968,
+          "prop": "margin-bottom"
+        },
+        {
+          "line": 968,
+          "prop": "line-height"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-item-title .album-subtitle",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "display": "block",
+        "font-size": "0.75em",
+        "font-weight": "200",
+        "color": "#7a9ca0",
+        "font-style": "italic",
+        "opacity": "0.9",
+        "line-height": "1.1"
+      },
+      "sourceLocations": [
+        {
+          "line": 978,
+          "prop": "display"
+        },
+        {
+          "line": 978,
+          "prop": "font-size"
+        },
+        {
+          "line": 978,
+          "prop": "font-weight"
+        },
+        {
+          "line": 978,
+          "prop": "color"
+        },
+        {
+          "line": 978,
+          "prop": "font-style"
+        },
+        {
+          "line": 978,
+          "prop": "opacity"
+        },
+        {
+          "line": 978,
+          "prop": "line-height"
+        }
+      ]
+    },
+    {
+      "selector": ".quantity-btn",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background-color": "#2b7f8c",
+        "color": "#cadbda",
+        "border": "none",
+        "width": "24px",
+        "height": "24px",
+        "border-radius": "1px",
+        "cursor": "pointer",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "font-size": "14px",
+        "transition": "background-color 0.2s"
+      },
+      "sourceLocations": [
+        {
+          "line": 990,
+          "prop": "background-color"
+        },
+        {
+          "line": 990,
+          "prop": "color"
+        },
+        {
+          "line": 990,
+          "prop": "border"
+        },
+        {
+          "line": 990,
+          "prop": "width"
+        },
+        {
+          "line": 990,
+          "prop": "height"
+        },
+        {
+          "line": 990,
+          "prop": "border-radius"
+        },
+        {
+          "line": 990,
+          "prop": "cursor"
+        },
+        {
+          "line": 990,
+          "prop": "display"
+        },
+        {
+          "line": 990,
+          "prop": "align-items"
+        },
+        {
+          "line": 990,
+          "prop": "justify-content"
+        },
+        {
+          "line": 990,
+          "prop": "font-size"
+        },
+        {
+          "line": 990,
+          "prop": "transition"
+        }
+      ]
+    },
+    {
+      "selector": ".quantity-btn:hover",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "background-color": "#3AA0A0"
+      },
+      "sourceLocations": [
+        {
+          "line": 1005,
+          "prop": "background-color"
+        }
+      ]
+    },
+    {
+      "selector": ".quantity",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "margin": "0 5px",
+        "font-weight": "300",
+        "min-width": "20px",
+        "text-align": "center",
+        "font-size": "1em"
+      },
+      "sourceLocations": [
+        {
+          "line": 1009,
+          "prop": "margin"
+        },
+        {
+          "line": 1009,
+          "prop": "font-weight"
+        },
+        {
+          "line": 1009,
+          "prop": "min-width"
+        },
+        {
+          "line": 1009,
+          "prop": "text-align"
+        },
+        {
+          "line": 1009,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".remove-btn",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background-color": "#9e0505",
+        "color": "#cadbda",
+        "border": "1px solid #9e0505",
+        "padding": "4px 8px",
+        "border-radius": "2px",
+        "cursor": "pointer",
+        "font-size": "0.8em",
+        "transition": "all 0.2s"
+      },
+      "sourceLocations": [
+        {
+          "line": 1017,
+          "prop": "background-color"
+        },
+        {
+          "line": 1017,
+          "prop": "color"
+        },
+        {
+          "line": 1017,
+          "prop": "border"
+        },
+        {
+          "line": 1017,
+          "prop": "padding"
+        },
+        {
+          "line": 1017,
+          "prop": "border-radius"
+        },
+        {
+          "line": 1017,
+          "prop": "cursor"
+        },
+        {
+          "line": 1017,
+          "prop": "font-size"
+        },
+        {
+          "line": 1017,
+          "prop": "transition"
+        }
+      ]
+    },
+    {
+      "selector": ".remove-btn:hover",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "background-color": "#A5302F",
+        "border": "1px solid #3A2319",
+        "color": "white"
+      },
+      "sourceLocations": [
+        {
+          "line": 1028,
+          "prop": "background-color"
+        },
+        {
+          "line": 1028,
+          "prop": "border"
+        },
+        {
+          "line": 1028,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-footer",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "padding": "20px",
+        "border-top": "1px solid #2b7f8c"
+      },
+      "sourceLocations": [
+        {
+          "line": 1034,
+          "prop": "padding"
+        },
+        {
+          "line": 1034,
+          "prop": "border-top"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-total",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "margin-bottom": "15px",
+        "text-align": "right",
+        "font-size": "1.1em",
+        "font-weight": "200",
+        "color": "#A1DCF0"
+      },
+      "sourceLocations": [
+        {
+          "line": 1039,
+          "prop": "margin-bottom"
+        },
+        {
+          "line": 1039,
+          "prop": "text-align"
+        },
+        {
+          "line": 1039,
+          "prop": "font-size"
+        },
+        {
+          "line": 1039,
+          "prop": "font-weight"
+        },
+        {
+          "line": 1039,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".checkout-btn",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "width": "100%",
+        "padding": "12px",
+        "background-color": "#bfd4d6",
+        "color": "#083644",
+        "border": "none",
+        "border-radius": "1px",
+        "font-size": "1em",
+        "font-weight": "200",
+        "cursor": "pointer",
+        "transition": "background-color 0.2s"
+      },
+      "sourceLocations": [
+        {
+          "line": 1047,
+          "prop": "width"
+        },
+        {
+          "line": 1047,
+          "prop": "padding"
+        },
+        {
+          "line": 1047,
+          "prop": "background-color"
+        },
+        {
+          "line": 1047,
+          "prop": "color"
+        },
+        {
+          "line": 1047,
+          "prop": "border"
+        },
+        {
+          "line": 1047,
+          "prop": "border-radius"
+        },
+        {
+          "line": 1047,
+          "prop": "font-size"
+        },
+        {
+          "line": 1047,
+          "prop": "font-weight"
+        },
+        {
+          "line": 1047,
+          "prop": "cursor"
+        },
+        {
+          "line": 1047,
+          "prop": "transition"
+        }
+      ]
+    },
+    {
+      "selector": ".checkout-btn:hover:not(:disabled)",
+      "specificity": [
+        0,
+        4,
+        0
+      ],
+      "decls": {
+        "background-color": "#2b7f8c",
+        "color": "#cadbda"
+      },
+      "sourceLocations": [
+        {
+          "line": 1060,
+          "prop": "background-color"
+        },
+        {
+          "line": 1060,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".checkout-btn:disabled",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "opacity": "0.5",
+        "cursor": "not-allowed"
+      },
+      "sourceLocations": [
+        {
+          "line": 1065,
+          "prop": "opacity"
+        },
+        {
+          "line": 1065,
+          "prop": "cursor"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-notification",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "position": "fixed",
+        "top": "20px",
+        "right": "20px",
+        "background": "#083644",
+        "color": "#F1F8FF",
+        "padding": "12px 16px",
+        "font-weight": "200",
+        "z-index": "10000",
+        "animation": "slideInFromRight 0.3s ease-out",
+        "display": "flex",
+        "align-items": "center",
+        "gap": "8px",
+        "max-width": "300px"
+      },
+      "sourceLocations": [
+        {
+          "line": 1071,
+          "prop": "position"
+        },
+        {
+          "line": 1071,
+          "prop": "top"
+        },
+        {
+          "line": 1071,
+          "prop": "right"
+        },
+        {
+          "line": 1071,
+          "prop": "background"
+        },
+        {
+          "line": 1071,
+          "prop": "color"
+        },
+        {
+          "line": 1071,
+          "prop": "padding"
+        },
+        {
+          "line": 1071,
+          "prop": "font-weight"
+        },
+        {
+          "line": 1071,
+          "prop": "z-index"
+        },
+        {
+          "line": 1071,
+          "prop": "animation"
+        },
+        {
+          "line": 1071,
+          "prop": "display"
+        },
+        {
+          "line": 1071,
+          "prop": "align-items"
+        },
+        {
+          "line": 1071,
+          "prop": "gap"
+        },
+        {
+          "line": 1071,
+          "prop": "max-width"
+        }
+      ]
+    },
+    {
+      "selector": "from",
+      "specificity": [
+        0,
+        0,
+        1
+      ],
+      "decls": {
+        "transform": "translateX(100%)",
+        "opacity": "0"
+      },
+      "sourceLocations": [
+        {
+          "line": 1090,
+          "prop": "transform"
+        },
+        {
+          "line": 1090,
+          "prop": "opacity"
+        }
+      ]
+    },
+    {
+      "selector": "to",
+      "specificity": [
+        0,
+        0,
+        1
+      ],
+      "decls": {
+        "transform": "translateX(0)",
+        "opacity": "1"
+      },
+      "sourceLocations": [
+        {
+          "line": 1095,
+          "prop": "transform"
+        },
+        {
+          "line": 1095,
+          "prop": "opacity"
+        }
+      ]
+    },
+    {
+      "selector": ".custom-audio-controls",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "gap": "4px"
+      },
+      "sourceLocations": [
+        {
+          "line": 1103,
+          "prop": "gap"
+        }
+      ]
+    },
+    {
+      "selector": ".custom-audio-controls button",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "width": "32px",
+        "height": "32px",
+        "padding": "6px"
+      },
+      "sourceLocations": [
+        {
+          "line": 1107,
+          "prop": "width"
+        },
+        {
+          "line": 1107,
+          "prop": "height"
+        },
+        {
+          "line": 1107,
+          "prop": "padding"
+        }
+      ]
+    },
+    {
+      "selector": ".volume-control",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "flex-direction": "column",
+        "gap": "4px"
+      },
+      "sourceLocations": [
+        {
+          "line": 1113,
+          "prop": "flex-direction"
+        },
+        {
+          "line": 1113,
+          "prop": "gap"
+        }
+      ]
+    },
+    {
+      "selector": "#volume-slider",
+      "specificity": [
+        1,
+        0,
+        0
+      ],
+      "decls": {
+        "width": "60px"
+      },
+      "sourceLocations": [
+        {
+          "line": 1118,
+          "prop": "width"
+        }
+      ]
+    },
+    {
+      "selector": ".songList li",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "padding": "6px 8px",
+        "font-size": "0.9em"
+      },
+      "sourceLocations": [
+        {
+          "line": 1122,
+          "prop": "padding"
+        },
+        {
+          "line": 1122,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".purchaseLink a",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "padding": "10px 20px",
+        "font-size": "0.9em"
+      },
+      "sourceLocations": [
+        {
+          "line": 1127,
+          "prop": "padding"
+        },
+        {
+          "line": 1127,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".auth-modal-content",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "margin": "10%auto",
+        "padding": "20px",
+        "width": "95%"
+      },
+      "sourceLocations": [
+        {
+          "line": 1132,
+          "prop": "margin"
+        },
+        {
+          "line": 1132,
+          "prop": "padding"
+        },
+        {
+          "line": 1132,
+          "prop": "width"
+        }
+      ]
+    },
+    {
+      "selector": ".loginSquare",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "margin-bottom": "5px"
+      },
+      "sourceLocations": [
+        {
+          "line": 1138,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".login-button",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "padding": "6px 12px",
+        "font-size": "0.9em"
+      },
+      "sourceLocations": [
+        {
+          "line": 1142,
+          "prop": "padding"
+        },
+        {
+          "line": 1142,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".user-info",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "margin-top": "5px",
+        "padding": "3px"
+      },
+      "sourceLocations": [
+        {
+          "line": 1147,
+          "prop": "margin-top"
+        },
+        {
+          "line": 1147,
+          "prop": "padding"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal .modal-content",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "margin": "10%auto",
+        "padding": "20px",
+        "width": "95%"
+      },
+      "sourceLocations": [
+        {
+          "line": 1155,
+          "prop": "margin"
+        },
+        {
+          "line": 1155,
+          "prop": "padding"
+        },
+        {
+          "line": 1155,
+          "prop": "width"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal .modal-content h3",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "font-size": "1.3em"
+      },
+      "sourceLocations": [
+        {
+          "line": 1161,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal .modal-buttons",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "flex-direction": "column",
+        "gap": "0.75rem"
+      },
+      "sourceLocations": [
+        {
+          "line": 1165,
+          "prop": "flex-direction"
+        },
+        {
+          "line": 1165,
+          "prop": "gap"
+        }
+      ]
+    },
+    {
+      "selector": ".guest-email-modal .modal-buttons button",
+      "specificity": [
+        0,
+        2,
+        1
+      ],
+      "decls": {
+        "padding": "14px",
+        "font-size": "1.1em"
+      },
+      "sourceLocations": [
+        {
+          "line": 1170,
+          "prop": "padding"
+        },
+        {
+          "line": 1170,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-sidebar",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "width": "100%",
+        "right": "-100%"
+      },
+      "sourceLocations": [
+        {
+          "line": 1181,
+          "prop": "width"
+        },
+        {
+          "line": 1181,
+          "prop": "right"
+        }
+      ]
+    },
+    {
+      "selector": ".cartSquare",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "margin-bottom": "5px"
+      },
+      "sourceLocations": [
+        {
+          "line": 1186,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-button",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "padding": "2px 4px"
+      },
+      "sourceLocations": [
+        {
+          "line": 1190,
+          "prop": "padding"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-icon",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "width": "22px",
+        "height": "22px"
+      },
+      "sourceLocations": [
+        {
+          "line": 1194,
+          "prop": "width"
+        },
+        {
+          "line": 1194,
+          "prop": "height"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-count",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "width": "16px",
+        "height": "16px",
+        "font-size": "0.6em",
+        "top": "-3px",
+        "right": "-3px"
+      },
+      "sourceLocations": [
+        {
+          "line": 1199,
+          "prop": "width"
+        },
+        {
+          "line": 1199,
+          "prop": "height"
+        },
+        {
+          "line": 1199,
+          "prop": "font-size"
+        },
+        {
+          "line": 1199,
+          "prop": "top"
+        },
+        {
+          "line": 1199,
+          "prop": "right"
+        }
+      ]
+    },
+    {
+      "selector": ".song-actions",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "opacity": "1"
+      },
+      "sourceLocations": [
+        {
+          "line": 1208,
+          "prop": "opacity"
+        }
+      ]
+    },
+    {
+      "selector": ".song-action-btn",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "width": "28px",
+        "height": "28px"
+      },
+      "sourceLocations": [
+        {
+          "line": 1213,
+          "prop": "width"
+        },
+        {
+          "line": 1213,
+          "prop": "height"
+        }
+      ]
+    },
+    {
+      "selector": ".song-action-btn img",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "width": "18px",
+        "height": "18px"
+      },
+      "sourceLocations": [
+        {
+          "line": 1218,
+          "prop": "width"
+        },
+        {
+          "line": 1218,
+          "prop": "height"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-item-title .song-name",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "font-size": "0.9em"
+      },
+      "sourceLocations": [
+        {
+          "line": 1225,
+          "prop": "font-size"
+        }
+      ]
+    },
+    {
+      "selector": ".cart-item-title .album-subtitle",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "font-size": "0.7em"
+      },
+      "sourceLocations": [
+        {
+          "line": 1229,
+          "prop": "font-size"
+        }
+      ]
+    }
+  ],
+  "cascades": {
+    "overrides": []
+  },
+  "plugins": {
+    "tokens": {
+      "counts": {
+        "colors": 0,
+        "custom": 0
+      }
+    },
+    "ratio": {
+      "keys": [],
+      "snapshot": {}
+    },
+    "quadtree": {
+      "note": "QuadTree hook ready for future extractors"
+    }
+  }
+}
