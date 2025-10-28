@@ -1,0 +1,306 @@
+{
+  "meta": {
+    "source": "../0INTERSTELLAR/INTERSTELLAR25-NODE/public/css/success-cancel.css",
+    "generatedAt": "2025-10-28T20:58:46.351Z",
+    "sha256": "c2b67766a8708cb28f3c50187ad52b94608eb7d9d4c7e6afd92e4b8db907234b"
+  },
+  "tokens": {
+    "colors": {},
+    "fonts": {},
+    "fontSizes": {},
+    "lineHeights": {},
+    "spacing": {},
+    "radii": {},
+    "shadows": {},
+    "zIndex": {},
+    "durations": {},
+    "easings": {},
+    "breakpoints": {},
+    "customProperties": {}
+  },
+  "layers": {},
+  "fonts": [],
+  "keyframes": {},
+  "media": {},
+  "selectors": [
+    {
+      "selector": "body",
+      "specificity": [
+        0,
+        0,
+        1
+      ],
+      "decls": {
+        "background-color": "#083D5E",
+        "color": "#0AAAC3",
+        "font-family": "\"Helvetica Neue\",sans-serif",
+        "margin": "0",
+        "justify-content": "center",
+        "align-items": "center"
+      },
+      "sourceLocations": [
+        {
+          "line": 3,
+          "prop": "background-color"
+        },
+        {
+          "line": 3,
+          "prop": "color"
+        },
+        {
+          "line": 3,
+          "prop": "font-family"
+        },
+        {
+          "line": 3,
+          "prop": "margin"
+        },
+        {
+          "line": 3,
+          "prop": "min-height"
+        },
+        {
+          "line": 3,
+          "prop": "display"
+        },
+        {
+          "line": 3,
+          "prop": "flex-direction"
+        },
+        {
+          "line": 3,
+          "prop": "justify-content"
+        },
+        {
+          "line": 3,
+          "prop": "align-items"
+        }
+      ]
+    },
+    {
+      "selector": ".cancel-title",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-weight": "300",
+        "margin-top": "3em",
+        "text-align": "center",
+        "border": "2px solid #658E82",
+        "color": "#6B7F7B",
+        "border-radius": "3px",
+        "padding": "1em"
+      },
+      "sourceLocations": [
+        {
+          "line": 20,
+          "prop": "font-weight"
+        },
+        {
+          "line": 20,
+          "prop": "margin-top"
+        },
+        {
+          "line": 20,
+          "prop": "text-align"
+        },
+        {
+          "line": 20,
+          "prop": "border"
+        },
+        {
+          "line": 20,
+          "prop": "color"
+        },
+        {
+          "line": 20,
+          "prop": "border-radius"
+        },
+        {
+          "line": 20,
+          "prop": "padding"
+        }
+      ]
+    },
+    {
+      "selector": ".cancel-text",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "padding": "2em",
+        "background-color": "#0E5960",
+        "color": "#91b7b5",
+        "margin-bottom": ".5em"
+      },
+      "sourceLocations": [
+        {
+          "line": 32,
+          "prop": "padding"
+        },
+        {
+          "line": 32,
+          "prop": "background-color"
+        },
+        {
+          "line": 32,
+          "prop": "color"
+        },
+        {
+          "line": 32,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".success-title",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-weight": "300",
+        "margin-top": "3em",
+        "text-align": "center",
+        "border": "2px solid #3DA3A8",
+        "color": "#8FA338",
+        "border-radius": "3px",
+        "padding": "1em"
+      },
+      "sourceLocations": [
+        {
+          "line": 42,
+          "prop": "font-weight"
+        },
+        {
+          "line": 42,
+          "prop": "margin-top"
+        },
+        {
+          "line": 42,
+          "prop": "text-align"
+        },
+        {
+          "line": 42,
+          "prop": "border"
+        },
+        {
+          "line": 42,
+          "prop": "color"
+        },
+        {
+          "line": 42,
+          "prop": "border-radius"
+        },
+        {
+          "line": 42,
+          "prop": "padding"
+        }
+      ]
+    },
+    {
+      "selector": ".success-text",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "padding": "2em",
+        "background-color": "#0E5960",
+        "margin-bottom": ".5em"
+      },
+      "sourceLocations": [
+        {
+          "line": 53,
+          "prop": "padding"
+        },
+        {
+          "line": 53,
+          "prop": "background-color"
+        },
+        {
+          "line": 53,
+          "prop": "margin-bottom"
+        }
+      ]
+    },
+    {
+      "selector": ".back-home",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "text-decoration": "none",
+        "color": "#69a535",
+        "font-size": "1.2em",
+        "border-bottom": "1px solid transparent",
+        "transition": "border-bottom 0.4s ease"
+      },
+      "sourceLocations": [
+        {
+          "line": 62,
+          "prop": "text-decoration"
+        },
+        {
+          "line": 62,
+          "prop": "color"
+        },
+        {
+          "line": 62,
+          "prop": "font-size"
+        },
+        {
+          "line": 62,
+          "prop": "border-bottom"
+        },
+        {
+          "line": 62,
+          "prop": "transition"
+        }
+      ]
+    },
+    {
+      "selector": ".back-home:hover",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "border-bottom": "1px solid #3DA3A8"
+      },
+      "sourceLocations": [
+        {
+          "line": 70,
+          "prop": "border-bottom"
+        }
+      ]
+    }
+  ],
+  "cascades": {
+    "overrides": []
+  },
+  "plugins": {
+    "tokens": {
+      "counts": {
+        "colors": 0,
+        "custom": 0
+      }
+    },
+    "ratio": {
+      "keys": [],
+      "snapshot": {}
+    },
+    "quadtree": {
+      "note": "QuadTree hook ready for future extractors"
+    }
+  }
+}

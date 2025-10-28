@@ -1,14 +1,14 @@
 {
-  "_page": "artist",
-  "_loaded_by": "/public/js/artist.js",
+  "_page": "roderick",
+  "_loaded_by": "/public/js/roderick.js",
   "_uses_global": "window.Interstellar (state, position, layout, quadTree)",
-  "_comment": "Artist page specific configuration - loaded on demand",
+  "_comment": "Roderick page config — math-first layout + positions, no heavy CSS.",
 
   "layout": {
     "regions": {
       "header":   { "ratio": 0.08 },
       "main":     { "ratio": 0.60 },
-      "controls": { "ratioRange": [0.25, 0.40] }
+      "controls": { "ratioRange": [0.24, 0.32] }
     },
     "mainSplit": {
       "left":  { "ratio": 0.66 },
@@ -17,11 +17,12 @@
   },
 
   "positions": {
-    "brandLogo":  { "system": "cartesian", "top": 0.40, "left": 0.02, "anchor": "center-left" },
-    "topNav":     { "system": "cartesian", "top": 0.40, "left": 0.98, "anchor": "center-right" },
+    "brandLogo":  { "system": "cartesian", "top": 0.50, "left": 0.02, "anchor": "center-left" },
+    "pageCrumbs": { "system": "cartesian", "top": 0.50, "left": 0.26, "anchor": "center-left" },
+    "topNav":     { "system": "cartesian", "top": 0.50, "left": 0.98, "anchor": "center-right" },
 
     "albumGrid":  { "system": "cartesian", "top": 0.04, "left": 0.04, "anchor": "top-left",
-                    "styles": { "width": "92%", "height": "auto" } },
+                    "styles": { "width": "92%" } },
 
     "albumInfo":  { "system": "cartesian", "top": 0.04, "left": 0.04, "anchor": "top-left",
                     "styles": { "width": "92%", "maxHeight": "40%" } },
@@ -29,29 +30,29 @@
     "songList":   { "system": "cartesian", "top": 0.50, "left": 0.04, "anchor": "top-left" },
 
     "playerControls": { "system": "cartesian", "top": 1.0, "left": 0.5, "anchor": "bottom-center",
-                        "styles": { "width": "100%", "height": "var(--controls-height)" } }
+      "styles": { "width": "100%", "height": "var(--controls-height, 240px)" } }
   },
 
   "positionBreakpoints": {
     "mobile": {
       "maxWidth": 767,
       "positions": {
-        "albumGrid": { "top": 0.15, "styles": { "width": "95%" } },
-        "albumInfo": { "top": 0.58, "styles": { "width": "95%" } }
+        "albumGrid": { "top": 0.12, "styles": { "width": "94%" } },
+        "albumInfo": { "top": 0.55, "styles": { "width": "94%" } }
       }
     },
     "tablet": {
       "minWidth": 768, "maxWidth": 1023,
       "positions": {
-        "albumGrid": { "left": 0.10, "styles": { "width": "80%" } },
-        "albumInfo": { "left": 0.10, "styles": { "width": "80%" } }
+        "albumGrid": { "left": 0.08, "styles": { "width": "84%" } },
+        "albumInfo": { "left": 0.08, "styles": { "width": "84%" } }
       }
     },
     "desktop": {
       "minWidth": 1024,
       "positions": {
-        "albumGrid": { "left": 0.15, "styles": { "width": "70%" } },
-        "albumInfo": { "left": 0.15, "styles": { "width": "70%" } }
+        "albumGrid": { "left": 0.12, "styles": { "width": "76%" } },
+        "albumInfo": { "left": 0.12, "styles": { "width": "76%" } }
       }
     }
   },
@@ -79,8 +80,16 @@
     "lazyLoadBio": false
   },
 
-  "theme": {
-    "albumGridBackground": "transparent",
-    "bioBackground": "rgba(26, 26, 26, 0.5)"
+  "themeRefs": {
+    "paintKey": "default",
+    "componentPaint": {
+      "header": "header",
+      "nav": "nav",
+      "main": "main",
+      "sidebar": "sidebar",
+      "player": "player",
+      "footer": "footer",
+      "badges": "badges"
+    }
   }
 }

@@ -1,0 +1,272 @@
+{
+  "meta": {
+    "source": "../0INTERSTELLAR/INTERSTELLAR25-NODE/public/css/filmography.css",
+    "generatedAt": "2025-10-28T20:58:46.351Z",
+    "sha256": "dec8dc7980947c90d1c9881b174e77239981a4d7e935f834fde3793af90cf4d8"
+  },
+  "tokens": {
+    "colors": {},
+    "fonts": {},
+    "fontSizes": {},
+    "lineHeights": {},
+    "spacing": {},
+    "radii": {},
+    "shadows": {},
+    "zIndex": {},
+    "durations": {},
+    "easings": {},
+    "breakpoints": {},
+    "customProperties": {}
+  },
+  "layers": {},
+  "fonts": [],
+  "keyframes": {},
+  "media": {
+    "(max-width: 768px)": {
+      "selectors": [
+        {
+          "selector": ".film-container",
+          "decls": {
+            "padding": "10px"
+          }
+        },
+        {
+          "selector": ".filmDescription",
+          "decls": {
+            "font-size": "0.95rem"
+          }
+        }
+      ]
+    }
+  },
+  "selectors": [
+    {
+      "selector": "*",
+      "specificity": [
+        0,
+        0,
+        0
+      ],
+      "decls": {
+        "box-sizing": "border-box",
+        "margin": "0",
+        "padding": "0"
+      },
+      "sourceLocations": [
+        {
+          "line": 2,
+          "prop": "box-sizing"
+        },
+        {
+          "line": 2,
+          "prop": "margin"
+        },
+        {
+          "line": 2,
+          "prop": "padding"
+        }
+      ]
+    },
+    {
+      "selector": ".film-grid",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "margin": "0",
+        "padding": "0"
+      },
+      "sourceLocations": [
+        {
+          "line": 9,
+          "prop": "display"
+        },
+        {
+          "line": 9,
+          "prop": "grid-template-columns"
+        },
+        {
+          "line": 9,
+          "prop": "gap"
+        },
+        {
+          "line": 9,
+          "prop": "margin"
+        },
+        {
+          "line": 9,
+          "prop": "padding"
+        },
+        {
+          "line": 9,
+          "prop": "width"
+        }
+      ]
+    },
+    {
+      "selector": ".film-container",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background-color": "#083D5E",
+        "padding": "20px",
+        "border": "1px solid #144654",
+        "color": "#cadbda",
+        "align-items": "center",
+        "justify-content": "flex-start"
+      },
+      "sourceLocations": [
+        {
+          "line": 19,
+          "prop": "background-color"
+        },
+        {
+          "line": 19,
+          "prop": "padding"
+        },
+        {
+          "line": 19,
+          "prop": "border"
+        },
+        {
+          "line": 19,
+          "prop": "color"
+        },
+        {
+          "line": 19,
+          "prop": "width"
+        },
+        {
+          "line": 19,
+          "prop": "display"
+        },
+        {
+          "line": 19,
+          "prop": "flex-direction"
+        },
+        {
+          "line": 19,
+          "prop": "align-items"
+        },
+        {
+          "line": 19,
+          "prop": "justify-content"
+        }
+      ]
+    },
+    {
+      "selector": ".film-container iframe",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "border": "none"
+      },
+      "sourceLocations": [
+        {
+          "line": 32,
+          "prop": "width"
+        },
+        {
+          "line": 32,
+          "prop": "aspect-ratio"
+        },
+        {
+          "line": 32,
+          "prop": "border"
+        }
+      ]
+    },
+    {
+      "selector": ".filmDescription",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "1rem",
+        "color": "#a6cbd3",
+        "padding-top": "10px",
+        "text-align": "center"
+      },
+      "sourceLocations": [
+        {
+          "line": 39,
+          "prop": "font-size"
+        },
+        {
+          "line": 39,
+          "prop": "color"
+        },
+        {
+          "line": 39,
+          "prop": "padding-top"
+        },
+        {
+          "line": 39,
+          "prop": "text-align"
+        }
+      ]
+    },
+    {
+      "selector": ".film-container",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "padding": "10px"
+      },
+      "sourceLocations": [
+        {
+          "line": 48,
+          "prop": "padding"
+        }
+      ]
+    },
+    {
+      "selector": ".filmDescription",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "0.95rem"
+      },
+      "sourceLocations": [
+        {
+          "line": 52,
+          "prop": "font-size"
+        }
+      ]
+    }
+  ],
+  "cascades": {
+    "overrides": []
+  },
+  "plugins": {
+    "tokens": {
+      "counts": {
+        "colors": 0,
+        "custom": 0
+      }
+    },
+    "ratio": {
+      "keys": [],
+      "snapshot": {}
+    },
+    "quadtree": {
+      "note": "QuadTree hook ready for future extractors"
+    }
+  }
+}

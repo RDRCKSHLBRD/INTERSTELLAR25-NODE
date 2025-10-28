@@ -1,0 +1,30 @@
+{
+  "_comment": "Minimal paint tokens. Visuals only; no layout or positioning.",
+  "palettes": {
+    "default": {
+      "bg":        "#083D5E",
+      "fg":        "#cadbda",
+      "muted":     "#8ab7ce",
+      "primary":   "#3AA0A0",
+      "primaryHi": "#2b7f8c",
+      "accent":    "#007bff",
+      "danger":    "#dc3545",
+      "success":   "#28a745",
+      "ink":       "#1D4450"
+    }
+  },
+  "typography": {
+    "fontFamily": "Helvetica, sans-serif",
+    "baseSizePx": 16,
+    "scale": 1.125
+  },
+  "components": {
+    "header":  { "bg": "{default.bg}", "fg": "{default.fg}" },
+    "nav":     { "fg": "{default.primary}", "hoverBg": "{default.primaryHi}", "hoverFg": "{default.fg}" },
+    "main":    { "bg": "{default.bg}", "fg": "{default.fg}" },
+    "sidebar": { "bg": "rgba(26, 26, 26, 0.5)", "fg": "{default.fg}", "rule": "{default.primaryHi}" },
+    "player":  { "panel": "#cadbda", "ink": "{default.ink}" },
+    "footer":  { "bg": "{default.primaryHi}", "fg": "{default.fg}" },
+    "badges":  { "cart": "#8D2016", "cartFg": "#EAE9DF" }
+  }
+}

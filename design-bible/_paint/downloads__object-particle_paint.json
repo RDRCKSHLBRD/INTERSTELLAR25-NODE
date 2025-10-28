@@ -1,0 +1,537 @@
+{
+  "meta": {
+    "source": "../0INTERSTELLAR/INTERSTELLAR25-NODE/public/downloads/object-particle.css",
+    "generatedAt": "2025-10-28T20:58:46.351Z",
+    "sha256": "ca8e6d86765f1eaabf201ee734806f8ac7ab5ec4fdb3b3ad90c7d4c8fdb12307"
+  },
+  "tokens": {
+    "colors": {},
+    "fonts": {},
+    "fontSizes": {},
+    "lineHeights": {},
+    "spacing": {},
+    "radii": {},
+    "shadows": {},
+    "zIndex": {},
+    "durations": {},
+    "easings": {},
+    "breakpoints": {},
+    "customProperties": {}
+  },
+  "layers": {},
+  "fonts": [],
+  "keyframes": {},
+  "media": {
+    "(min-width: 768px)": {
+      "selectors": [
+        {
+          "selector": ".object-container",
+          "decls": {}
+        },
+        {
+          "selector": ".object-hero",
+          "decls": {}
+        },
+        {
+          "selector": ".object-sidebar",
+          "decls": {
+            "overflow-y": "auto"
+          }
+        }
+      ]
+    }
+  },
+  "selectors": [
+    {
+      "selector": "body",
+      "specificity": [
+        0,
+        0,
+        1
+      ],
+      "decls": {
+        "background-color": "#3D392F",
+        "margin": "0",
+        "padding": "0",
+        "font-family": "sans-serif"
+      },
+      "sourceLocations": [
+        {
+          "line": 2,
+          "prop": "background-color"
+        },
+        {
+          "line": 2,
+          "prop": "margin"
+        },
+        {
+          "line": 2,
+          "prop": "padding"
+        },
+        {
+          "line": 2,
+          "prop": "font-family"
+        }
+      ]
+    },
+    {
+      "selector": ".object-hero",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background-image": "url(https://storage.googleapis.com/ip-public-bucket1/Objects-and-Particles/OBJECTS_PARTICLES-ALL.png)",
+        "background-size": "cover",
+        "background-position": "center",
+        "background-repeat": "no-repeat"
+      },
+      "sourceLocations": [
+        {
+          "line": 10,
+          "prop": "width"
+        },
+        {
+          "line": 10,
+          "prop": "height"
+        },
+        {
+          "line": 10,
+          "prop": "background-image"
+        },
+        {
+          "line": 10,
+          "prop": "background-size"
+        },
+        {
+          "line": 10,
+          "prop": "background-position"
+        },
+        {
+          "line": 10,
+          "prop": "background-repeat"
+        }
+      ]
+    },
+    {
+      "selector": ".object-container",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "margin": "0",
+        "background-color": "#3D392F"
+      },
+      "sourceLocations": [
+        {
+          "line": 20,
+          "prop": "display"
+        },
+        {
+          "line": 20,
+          "prop": "flex-direction"
+        },
+        {
+          "line": 20,
+          "prop": "width"
+        },
+        {
+          "line": 20,
+          "prop": "margin"
+        },
+        {
+          "line": 20,
+          "prop": "background-color"
+        }
+      ]
+    },
+    {
+      "selector": ".object-sidebar",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "background-color": "#3D392F",
+        "color": "#cadbda",
+        "padding": "20px",
+        "box-sizing": "border-box"
+      },
+      "sourceLocations": [
+        {
+          "line": 29,
+          "prop": "background-color"
+        },
+        {
+          "line": 29,
+          "prop": "color"
+        },
+        {
+          "line": 29,
+          "prop": "padding"
+        },
+        {
+          "line": 29,
+          "prop": "width"
+        },
+        {
+          "line": 29,
+          "prop": "box-sizing"
+        }
+      ]
+    },
+    {
+      "selector": ".title",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "1.4em",
+        "margin-bottom": "10px",
+        "color": "#3D392F"
+      },
+      "sourceLocations": [
+        {
+          "line": 38,
+          "prop": "font-size"
+        },
+        {
+          "line": 38,
+          "prop": "margin-bottom"
+        },
+        {
+          "line": 38,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".file-description",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "font-size": "0.85em",
+        "color": "#b8c1c8",
+        "margin-top": "15px",
+        "line-height": "1.4"
+      },
+      "sourceLocations": [
+        {
+          "line": 44,
+          "prop": "font-size"
+        },
+        {
+          "line": 44,
+          "prop": "color"
+        },
+        {
+          "line": 44,
+          "prop": "margin-top"
+        },
+        {
+          "line": 44,
+          "prop": "line-height"
+        }
+      ]
+    },
+    {
+      "selector": ".file-description span",
+      "specificity": [
+        0,
+        1,
+        1
+      ],
+      "decls": {
+        "color": "#D1CAAE"
+      },
+      "sourceLocations": [
+        {
+          "line": 51,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": ".download-btn",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "margin-top": "1em",
+        "padding": "10px 15px",
+        "background-color": "#0C0101",
+        "color": "#D1CAAE",
+        "text-decoration": "none",
+        "border-radius": "2px",
+        "font-weight": "bold",
+        "transition": "background-color 0.3s ease-in-out"
+      },
+      "sourceLocations": [
+        {
+          "line": 56,
+          "prop": "display"
+        },
+        {
+          "line": 56,
+          "prop": "margin-top"
+        },
+        {
+          "line": 56,
+          "prop": "padding"
+        },
+        {
+          "line": 56,
+          "prop": "background-color"
+        },
+        {
+          "line": 56,
+          "prop": "color"
+        },
+        {
+          "line": 56,
+          "prop": "text-decoration"
+        },
+        {
+          "line": 56,
+          "prop": "border-radius"
+        },
+        {
+          "line": 56,
+          "prop": "font-weight"
+        },
+        {
+          "line": 56,
+          "prop": "transition"
+        }
+      ]
+    },
+    {
+      "selector": ".download-btn:hover",
+      "specificity": [
+        0,
+        2,
+        0
+      ],
+      "decls": {
+        "background-color": "#FEF8E0",
+        "color": "#35332d"
+      },
+      "sourceLocations": [
+        {
+          "line": 68,
+          "prop": "background-color"
+        },
+        {
+          "line": 68,
+          "prop": "color"
+        }
+      ]
+    },
+    {
+      "selector": "footer",
+      "specificity": [
+        0,
+        0,
+        1
+      ],
+      "decls": {
+        "background-color": "#35332d",
+        "color": "#fff",
+        "padding": "20px",
+        "text-align": "center"
+      },
+      "sourceLocations": [
+        {
+          "line": 74,
+          "prop": "background-color"
+        },
+        {
+          "line": 74,
+          "prop": "color"
+        },
+        {
+          "line": 74,
+          "prop": "padding"
+        },
+        {
+          "line": 74,
+          "prop": "text-align"
+        }
+      ]
+    },
+    {
+      "selector": "footer .Logo img",
+      "specificity": [
+        0,
+        1,
+        2
+      ],
+      "decls": {
+        "margin": "0 auto"
+      },
+      "sourceLocations": [
+        {
+          "line": 81,
+          "prop": "width"
+        },
+        {
+          "line": 81,
+          "prop": "height"
+        },
+        {
+          "line": 81,
+          "prop": "display"
+        },
+        {
+          "line": 81,
+          "prop": "margin"
+        }
+      ]
+    },
+    {
+      "selector": "#object-logo-link",
+      "specificity": [
+        1,
+        0,
+        0
+      ],
+      "decls": {
+        "cursor": "pointer",
+        "transition": "background-color 0.3s ease-in-out,padding 0.3s ease-in-out",
+        "padding": "4px",
+        "border-radius": "4px"
+      },
+      "sourceLocations": [
+        {
+          "line": 89,
+          "prop": "cursor"
+        },
+        {
+          "line": 89,
+          "prop": "display"
+        },
+        {
+          "line": 89,
+          "prop": "transition"
+        },
+        {
+          "line": 89,
+          "prop": "padding"
+        },
+        {
+          "line": 89,
+          "prop": "border-radius"
+        }
+      ]
+    },
+    {
+      "selector": "#object-logo-link:hover",
+      "specificity": [
+        1,
+        1,
+        0
+      ],
+      "decls": {
+        "background-color": "#0C0101"
+      },
+      "sourceLocations": [
+        {
+          "line": 97,
+          "prop": "background-color"
+        }
+      ]
+    },
+    {
+      "selector": ".object-container",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {},
+      "sourceLocations": [
+        {
+          "line": 106,
+          "prop": "flex-direction"
+        },
+        {
+          "line": 106,
+          "prop": "height"
+        }
+      ]
+    },
+    {
+      "selector": ".object-hero",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {},
+      "sourceLocations": [
+        {
+          "line": 111,
+          "prop": "width"
+        },
+        {
+          "line": 111,
+          "prop": "height"
+        }
+      ]
+    },
+    {
+      "selector": ".object-sidebar",
+      "specificity": [
+        0,
+        1,
+        0
+      ],
+      "decls": {
+        "overflow-y": "auto"
+      },
+      "sourceLocations": [
+        {
+          "line": 117,
+          "prop": "width"
+        },
+        {
+          "line": 117,
+          "prop": "height"
+        },
+        {
+          "line": 117,
+          "prop": "overflow-y"
+        }
+      ]
+    }
+  ],
+  "cascades": {
+    "overrides": []
+  },
+  "plugins": {
+    "tokens": {
+      "counts": {
+        "colors": 0,
+        "custom": 0
+      }
+    },
+    "ratio": {
+      "keys": [],
+      "snapshot": {}
+    },
+    "quadtree": {
+      "note": "QuadTree hook ready for future extractors"
+    }
+  }
+}
