@@ -62,6 +62,62 @@ function renderArtists(artists) {
   console.log(`✅ Rendered ${sortedArtists.length} artist links`);
 }
 
+// NEW: Apply layout directly via JavaScript (bypass CSS flex/grid)
+function applyDirectLayout(viewport, pageConfig) {
+  const videoEl = document.querySelector('.landing-video');
+  const sidebarEl = document.querySelector('.landing-sidebar');
+  
+  if (!videoEl || !sidebarEl) {
+    console.warn('⚠️ Video or sidebar element not found');
+    return;
+  }
+
+  if (viewport.mode === 'split') {
+    // SPLIT MODE: Calculate exact pixel values
+    const videoFlex = pageConfig.layout?.videoSection?.flex || 0.7;
+    const sidebarFlex = pageConfig.layout?.sidebarSection?.flex || 0.3;
+    const sidebarMaxWidth = 400;
+    
+    const videoWidth = window.innerWidth * videoFlex;
+    const sidebarWidth = Math.min(window.innerWidth * sidebarFlex, sidebarMaxWidth);
+    
+    // Apply video layout
+    videoEl.style.position = 'absolute';
+    videoEl.style.left = '0';
+    videoEl.style.top = '0';
+    videoEl.style.width = `${videoWidth}px`;
+    videoEl.style.height = '100vh';
+    
+    // Apply sidebar layout
+    sidebarEl.style.position = 'absolute';
+    sidebarEl.style.right = '0';
+    sidebarEl.style.top = '0';
+    sidebarEl.style.width = `${sidebarWidth}px`;
+    sidebarEl.style.height = '100vh';
+    
+    console.log('✅ Direct layout applied (SPLIT):', { 
+      videoWidth: `${videoWidth.toFixed(2)}px`, 
+      sidebarWidth: `${sidebarWidth.toFixed(2)}px` 
+    });
+    
+  } else {
+    // STACK MODE: Reset to CSS control
+    videoEl.style.position = '';
+    videoEl.style.left = '';
+    videoEl.style.top = '';
+    videoEl.style.width = '';
+    videoEl.style.height = '';
+    
+    sidebarEl.style.position = '';
+    sidebarEl.style.right = '';
+    sidebarEl.style.top = '';
+    sidebarEl.style.width = '';
+    sidebarEl.style.height = '';
+    
+    console.log('✅ Layout reset to CSS (STACK)');
+  }
+}
+
 async function initLanding() {
   try {
     console.log('🚀 Initializing landing page...');
@@ -82,27 +138,21 @@ async function initLanding() {
       pageConfig = await response.json();
       console.log('✅ Landing page config loaded');
 
-
-if (pageConfig.layout) {
-  const root = document.documentElement;
-  
-  // Video section
-  if (pageConfig.layout.videoSection) {
-    root.style.setProperty('--video-flex', pageConfig.layout.videoSection.flex || 0.7);
-    root.style.setProperty('--video-min-width', pageConfig.layout.videoSection.minWidth || '60vw');
-  }
-  
-  // Sidebar section
-  if (pageConfig.layout.sidebarSection) {
-    root.style.setProperty('--sidebar-flex', pageConfig.layout.sidebarSection.flex || 0.3);
-    root.style.setProperty('--sidebar-min-width', pageConfig.layout.sidebarSection.minWidth || '20vw');
-    root.style.setProperty('--sidebar-max-width', pageConfig.layout.sidebarSection.maxWidth || '400px');
-  }
-  
-  console.log('✅ Layout CSS variables applied');
-}
-
-
+      // Keep CSS variables for fallback/reference
+      if (pageConfig.layout) {
+        const root = document.documentElement;
+        
+        if (pageConfig.layout.videoSection) {
+          root.style.setProperty('--video-flex', pageConfig.layout.videoSection.flex || 0.7);
+        }
+        
+        if (pageConfig.layout.sidebarSection) {
+          root.style.setProperty('--sidebar-flex', pageConfig.layout.sidebarSection.flex || 0.3);
+          root.style.setProperty('--sidebar-max-width', pageConfig.layout.sidebarSection.maxWidth || '400px');
+        }
+        
+        console.log('✅ Layout CSS variables applied');
+      }
 
     } catch (error) {
       console.warn('⚠️ landing.json missing; using defaults');
@@ -117,11 +167,12 @@ if (pageConfig.layout) {
     });
     console.log('✅ Viewport calculated:', viewport.mode);
 
+    // Set data attributes
+    document.body.setAttribute('data-mode', viewport.mode);
+    document.body.setAttribute('data-orientation', viewport.orientation);
 
-    document.body.setAttribute('data-mode', viewport.mode);           // 'split' or 'stack'
-    document.body.setAttribute('data-orientation', viewport.orientation);  // 'landscape' or 'portrait'
-
-
+    // NEW: Apply layout directly (bypass CSS)
+    applyDirectLayout(viewport, pageConfig);
 
     // 4. Load and render artists
     const artists = await loadArtists();
@@ -150,13 +201,15 @@ if (pageConfig.layout) {
         dpr: window.devicePixelRatio || 1
       });
 
-
+      // Update data attributes
       document.body.setAttribute('data-mode', newViewport.mode);
       document.body.setAttribute('data-orientation', newViewport.orientation);
 
+      // NEW: Reapply layout directly
+      applyDirectLayout(newViewport, pageConfig);
 
-
-      if (artistNav && pageConfig.positions?.artistNav) {
+      // Reposition artist nav
+      if (artistNav && pageConfig.positions?.artistNav && container) {
         position.apply(artistNav, container, pageConfig.positions.artistNav, newViewport);
       }
     });

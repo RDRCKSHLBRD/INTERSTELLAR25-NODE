@@ -1,7 +1,6 @@
 /**
- * LANDING.CSS - RatioPosition-Based Layout
- * Positioning controlled by ratioPosition.js + landing.json
- * NO hardcoded px values, NO media queries
+ * LANDING.CSS - Visual Styles Only
+ * Layout controlled by landing.js (JavaScript)
  */
 
 /* =================================================================
@@ -15,73 +14,43 @@
 }
 
 body {
-  /* Layout structure */
-  display: flex;
-  flex-wrap: nowrap;
+  position: relative;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  
-  /* Visual styling (use theme colors from config) */
   background: var(--color-bg-primary, #0a0a0a);
   font-family: var(--font-family, Helvetica, sans-serif);
 }
 
 /* =================================================================
-   VIDEO SECTION (size from RatioEngine)
+   VIDEO SECTION
    ================================================================= */
 
 .landing-video {
-  /* Size from landing.js (--video-flex from config.json) */
-flex: var(--video-flex, 0.7) 0 0;
-  
-  
-  /* Layout */
-  height: 100vh;
-  position: relative;
   overflow: hidden;
 }
 
 .landing-video video {
   width: 100%;
   height: 100%;
-  
-  /* Visual only */
   object-fit: var(--video-object-fit, cover);
 }
 
 /* =================================================================
-   SIDEBAR SECTION (size from RatioEngine)
+   SIDEBAR SECTION
    ================================================================= */
 
 .landing-sidebar {
-  /* Size from landing.js (--sidebar-flex from config.json) */
-flex: var(--sidebar-flex, 0.3) 0 0;  /* ✅ grow 0.3, no shrink, basis 0 */
-  max-width: var(--sidebar-max-width, 400px);
-  
-  /* Layout - CHANGED: Now relative for absolute positioning children */
-  height: 100vh;
   position: relative;
-  
-  /* Visual styling (use theme colors) */
-  background: var(--color-bg-secondary, #0F1D38);
+  background: var(--color-bg-secondary, #1a1a1a);
 }
 
 /* =================================================================
-   SIDEBAR REGIONS (NO LONGER USING FLEX)
+   ARTIST NAVIGATION
    ================================================================= */
 
-/* Spacer - no longer needed with absolute positioning, but kept for legacy */
-.sidebar-spacer {
-  display: none;
-}
-
-/* Artist Navigation - positioned by ratioPosition.js */
 .artist-nav {
-  /* Position set by JavaScript - DO NOT set position/top/left here */
-  /* These styles only handle internal layout and scrolling */
-  
-  /* Internal layout */
+  /* Internal layout only */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -94,120 +63,9 @@ flex: var(--sidebar-flex, 0.3) 0 0;  /* ✅ grow 0.3, no shrink, basis 0 */
   /* Spacing */
   padding: 0 var(--qt-padding, 20px);
   
-  /* Ensure content is visible */
+  /* Layering */
   z-index: 1;
-}
-
-/* =================================================================
-   ARTIST LINKS (sizing from QuadTree)
-   ================================================================= */
-
-.artist-link {
-  /* Visual styling only */
-  color: var(--color-accent, #0e9bcc);
-  text-decoration: none;
-  cursor: pointer;
   
-  /* Typography from QuadTree/config */
-  font-size: var(--qt-font-size, 15px);
-  font-weight: var(--qt-font-weight, 100);
-  letter-spacing: var(--qt-letter-spacing, 0.8px);
-  
-  /* Flexbox to prevent shrinking */
-  flex-shrink: 0;
-  
-  /* Animation state (keep for entrance effect) */
-  opacity: 0;
-  transform: translateX(calc(-1 * var(--qt-slide-distance, 10px)));
-  transition: all 0.3s ease;
-  
-  /* Entrance animation */
-  animation: slideIn 0.6s ease-out forwards;
-}
-
-/* Staggered animation delays */
-.artist-link:nth-child(1) { animation-delay: 0.1s; }
-.artist-link:nth-child(2) { animation-delay: 0.2s; }
-.artist-link:nth-child(3) { animation-delay: 0.3s; }
-.artist-link:nth-child(4) { animation-delay: 0.4s; }
-.artist-link:nth-child(5) { animation-delay: 0.5s; }
-.artist-link:nth-child(6) { animation-delay: 0.6s; }
-.artist-link:nth-child(7) { animation-delay: 0.7s; }
-.artist-link:nth-child(8) { animation-delay: 0.8s; }
-
-@keyframes slideIn {
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Hover state */
-.artist-link:hover {
-  /* Visual changes */
-  color: var(--color-accent-hover, #48BBD8);
-  letter-spacing: var(--qt-letter-spacing-hover, 3px);
-  transform: translateX(var(--qt-hover-distance, 5px));
-}
-
-/* Focus state (accessibility) */
-.artist-link:focus {
-  outline: 2px solid var(--color-accent, #0e9bcc);
-  outline-offset: 2px;
-}
-
-/* Active state */
-.artist-link:active {
-  transform: translateX(calc(var(--qt-hover-distance, 5px) / 2));
-}
-
-/* =================================================================
-   RESPONSIVE BEHAVIOR (StateJS handles via data attributes)
-   NO MEDIA QUERIES - JavaScript sets data-mode attribute
-   ================================================================= */
-
-/* Stack mode for mobile (set by StateJS when viewport < 720px) */
-[data-mode="stack"] body {
-  flex-direction: column;
-}
-
-[data-mode="stack"] .landing-video {
-  width: 100%;
-  height: var(--video-height-mobile, 60vh);
-  flex: none;
-}
-
-[data-mode="stack"] .landing-sidebar {
-  width: 100%;
-  height: var(--sidebar-height-mobile, 40vh);
-  flex: none;
-  max-width: none;
-}
-
-/* Mobile: Artist nav repositioned by ratioPosition.js */
-[data-mode="stack"] .artist-nav {
-  /* Position updated by JavaScript */
-  padding-top: var(--qt-padding, 20px);
-}
-
-[data-mode="stack"] .artist-link {
-  font-size: var(--qt-font-size-mobile, 18px);
-}
-
-/* =================================================================
-   ORIENTATION ADAPTATIONS (StateJS sets data-orientation)
-   ================================================================= */
-
-[data-orientation="portrait"] .artist-nav {
-  /* More vertical spacing in portrait */
-  gap: calc(var(--qt-gap, 10px) * 1.5);
-}
-
-/* =================================================================
-   CUSTOM SCROLLBAR STYLING
-   ================================================================= */
-
-.artist-nav {
   /* Smooth scrolling */
   scroll-behavior: smooth;
   
@@ -234,7 +92,102 @@ flex: var(--sidebar-flex, 0.3) 0 0;  /* ✅ grow 0.3, no shrink, basis 0 */
 }
 
 /* =================================================================
-   DEBUG MODE (shows positioning)
+   ARTIST LINKS
+   ================================================================= */
+
+.artist-link {
+  /* Visual styling */
+  color: var(--color-accent, #0e9bcc);
+  text-decoration: none;
+  cursor: pointer;
+  
+  /* Typography */
+  font-size: var(--qt-font-size, 15px);
+  font-weight: var(--qt-font-weight, 100);
+  letter-spacing: var(--qt-letter-spacing, 0.8px);
+  
+  /* Prevent shrinking */
+  flex-shrink: 0;
+  
+  /* Entrance animation */
+  opacity: 0;
+  transform: translateX(calc(-1 * var(--qt-slide-distance, 10px)));
+  transition: all 0.3s ease;
+  animation: slideIn 0.6s ease-out forwards;
+}
+
+/* Staggered animation delays */
+.artist-link:nth-child(1) { animation-delay: 0.1s; }
+.artist-link:nth-child(2) { animation-delay: 0.2s; }
+.artist-link:nth-child(3) { animation-delay: 0.3s; }
+.artist-link:nth-child(4) { animation-delay: 0.4s; }
+.artist-link:nth-child(5) { animation-delay: 0.5s; }
+.artist-link:nth-child(6) { animation-delay: 0.6s; }
+.artist-link:nth-child(7) { animation-delay: 0.7s; }
+.artist-link:nth-child(8) { animation-delay: 0.8s; }
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Hover state */
+.artist-link:hover {
+  color: var(--color-accent-hover, #48BBD8);
+  letter-spacing: var(--qt-letter-spacing-hover, 3px);
+  transform: translateX(var(--qt-hover-distance, 5px));
+}
+
+/* Focus state (accessibility) */
+.artist-link:focus {
+  outline: 2px solid var(--color-accent, #0e9bcc);
+  outline-offset: 2px;
+}
+
+/* Active state */
+.artist-link:active {
+  transform: translateX(calc(var(--qt-hover-distance, 5px) / 2));
+}
+
+/* =================================================================
+   STACK MODE (for mobile - this works, keep it)
+   ================================================================= */
+
+[data-mode="stack"] body {
+  display: flex;
+  flex-direction: column;
+}
+
+[data-mode="stack"] .landing-video {
+  width: 100%;
+  height: var(--video-height-mobile, 60vh);
+}
+
+[data-mode="stack"] .landing-sidebar {
+  width: 100%;
+  height: var(--sidebar-height-mobile, 40vh);
+}
+
+[data-mode="stack"] .artist-nav {
+  padding-top: var(--qt-padding, 20px);
+}
+
+[data-mode="stack"] .artist-link {
+  font-size: var(--qt-font-size-mobile, 18px);
+}
+
+/* =================================================================
+   ORIENTATION ADAPTATIONS
+   ================================================================= */
+
+[data-orientation="portrait"] .artist-nav {
+  gap: calc(var(--qt-gap, 10px) * 1.5);
+}
+
+/* =================================================================
+   DEBUG MODE
    ================================================================= */
 
 [data-debug="true"] .artist-nav {
