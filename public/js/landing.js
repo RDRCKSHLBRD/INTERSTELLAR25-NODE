@@ -73,10 +73,14 @@ function applyDirectLayout(viewport, pageConfig) {
   }
 
   if (viewport.mode === 'split') {
-    // SPLIT MODE: Calculate exact pixel values
+    // READ FROM CONFIG (not hardcoded!)
     const videoFlex = pageConfig.layout?.videoSection?.flex || 0.7;
     const sidebarFlex = pageConfig.layout?.sidebarSection?.flex || 0.3;
-    const sidebarMaxWidth = 400;
+    
+    // ✅ READ maxWidth FROM CONFIG
+    const sidebarMaxWidth = pageConfig.layout?.sidebarSection?.maxWidth 
+      ? parseInt(pageConfig.layout.sidebarSection.maxWidth) 
+      : 400;
     
     const videoWidth = window.innerWidth * videoFlex;
     const sidebarWidth = Math.min(window.innerWidth * sidebarFlex, sidebarMaxWidth);
@@ -97,22 +101,27 @@ function applyDirectLayout(viewport, pageConfig) {
     
     console.log('✅ Direct layout applied (SPLIT):', { 
       videoWidth: `${videoWidth.toFixed(2)}px`, 
-      sidebarWidth: `${sidebarWidth.toFixed(2)}px` 
+      sidebarWidth: `${sidebarWidth.toFixed(2)}px`,
+      maxWidth: `${sidebarMaxWidth}px`
     });
     
   } else {
-    // STACK MODE: Reset to CSS control
+    // STACK mode - reset
     videoEl.style.position = '';
     videoEl.style.left = '';
     videoEl.style.top = '';
     videoEl.style.width = '';
     videoEl.style.height = '';
+    videoEl.style.boxSizing = 'border-box';  // ← ADD THIS
+
     
     sidebarEl.style.position = '';
     sidebarEl.style.right = '';
     sidebarEl.style.top = '';
     sidebarEl.style.width = '';
     sidebarEl.style.height = '';
+    sidebarEl.style.boxSizing = 'border-box';  // ← ADD THIS
+
     
     console.log('✅ Layout reset to CSS (STACK)');
   }

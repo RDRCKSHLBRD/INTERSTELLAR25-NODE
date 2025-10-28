@@ -8,13 +8,13 @@
   "layout": {
     "mode": "split",
     "videoSection": {
-      "flex": 0.7,
+      "flex": 0.75,
       "minWidth": "60vw"
     },
     "sidebarSection": {
-      "flex": 0.3,
+      "flex": 0.2,
       "minWidth": "20vw",
-      "maxWidth": "400px"
+      "maxWidth": "280px"
     }
   },
   
