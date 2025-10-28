@@ -17,6 +17,7 @@
 body {
   /* Layout structure */
   display: flex;
+  flex-wrap: nowrap;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -32,8 +33,8 @@ body {
 
 .landing-video {
   /* Size from landing.js (--video-flex from config.json) */
-  flex: var(--video-flex, 0.7);
-  min-width: var(--video-min-width, 60vw);
+flex: var(--video-flex, 0.7) 0 0;
+  
   
   /* Layout */
   height: 100vh;
@@ -55,8 +56,7 @@ body {
 
 .landing-sidebar {
   /* Size from landing.js (--sidebar-flex from config.json) */
-  flex: var(--sidebar-flex, 0.3);
-  min-width: var(--sidebar-min-width, 20vw);
+flex: var(--sidebar-flex, 0.3) 0 0;  /* ✅ grow 0.3, no shrink, basis 0 */
   max-width: var(--sidebar-max-width, 400px);
   
   /* Layout - CHANGED: Now relative for absolute positioning children */

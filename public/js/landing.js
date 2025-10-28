@@ -128,7 +128,7 @@ if (pageConfig.layout) {
     renderArtists(artists);
 
     // 5. Apply positions if configured
-    const container = document.body;
+    const container = document.querySelector('.landing-sidebar');
     const artistNav = document.getElementById('artistNav');
 
     if (artistNav && pageConfig.positions?.artistNav) {
