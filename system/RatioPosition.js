@@ -28,76 +28,167 @@ export class RatioPosition {
   }
 
   /**
-   * Position an element using ratio coordinates
-   * @param {HTMLElement} element
-   * @param {HTMLElement|string} container
-   * @param {Object} spec
-   * @param {Object} viewport
+   * Position an element using ratio coordinates.
+   *
+   * Supported signatures:
+   *   apply(element, spec, container?, viewport?)
+   *   apply(element, container, spec, viewport?)
+   *
+   * container may be:
+   *   - an Element
+   *   - a string selector
+   *   - an options bag: { container: Element }
+   *   - omitted, in which case we use spec.relativeTo or fallbacks
    */
-  apply(element, container, spec, viewport = null) {
-    // We need to check if the element exists *before* trying to process the container, 
-    // and provide better diagnostics if it fails.
+  apply(element, arg2, arg3, arg4 = null) {
+    let el = element;
+    let container = arg2;
+    let spec = arg3;
+    let viewport = arg4;
 
-    const containerEl = typeof container === 'string'
-      ? document.querySelector(container)
-      : container;
-      
-    // 👇 PATCH: Diagnostic Check for Missing Element or Spec
-    if (!element || !spec) {
-      const containerId = containerEl ? containerEl.id : (typeof container === 'string' ? container : 'N/A Container');
+    // ---- Signature normalization ------------------------------------------
+    const looksLikeSpec = (obj) =>
+      obj &&
+      typeof obj === 'object' &&
+      (('x' in obj) || ('y' in obj) || ('left' in obj) || ('top' in obj) ||
+       ('system' in obj) || ('anchor' in obj) || ('relativeTo' in obj));
+
+    const looksLikeContainerRef = (v) =>
+      v instanceof Element || typeof v === 'string' || (v && typeof v === 'object' && 'container' in v);
+
+    // If caller used apply(el, spec, container)
+    if (looksLikeSpec(container) && looksLikeContainerRef(spec)) {
+      [spec, container] = [container, spec];
+    }
+
+    // Basic guard
+    if (!el || !spec) {
+      const containerId =
+        container instanceof Element ? (container.id || container.className || '(element)') :
+        (typeof container === 'string' ? container : 'N/A Container');
       const specSystem = spec ? (spec.system || 'cartesian') : 'N/A Spec';
-      
-      console.warn('⚠️ RatioPosition.apply: Missing element (el=null) or spec. Cannot position.', {
-        ContainerID: containerId,
+
+      console.warn('⚠️ RatioPosition.apply: Missing element or spec. Cannot position.', {
+        Container: containerId,
         ConfigSystem: specSystem,
-        TargetElementMissing: !element
+        TargetElementMissing: !el
       });
       return;
     }
-    // END PATCH
 
-    if (!containerEl) {
-      console.warn(`⚠️ RatioPosition.apply: Container not found. Tried to position element: ${element.id || element.className}`);
+    // ---- Container normalization ------------------------------------------
+    // If container is an options bag like { container: host }
+    if (container && typeof container === 'object' && !(container instanceof Element)) {
+      container = container.container || null;
+    }
+
+    // If container is a selector string
+    if (typeof container === 'string') {
+      container = document.querySelector(container) || null;
+    }
+
+    // If still missing, allow CSS selector from spec.relativeTo
+    if (!container && spec.relativeTo) {
+      container = document.querySelector(spec.relativeTo) || null;
+    }
+
+    // Fallbacks: offset parent → parent → body
+    if (!container) {
+      container = el.offsetParent || el.parentElement || document.body;
+    }
+
+    if (!(container instanceof Element)) {
+      console.error('❌ RatioPosition.apply: container is not an Element.', { container, spec });
       return;
     }
 
-    // Ensure container is positioned
-    const containerStyle = getComputedStyle(containerEl);
+    // Ensure container is positioned (so absolute children are relative to it)
+    const containerStyle = getComputedStyle(container);
     if (containerStyle.position === 'static') {
-      containerEl.style.position = 'relative';
+      container.style.position = 'relative';
     }
 
-    // Compute position
-    const rect = this._getContainerRect(containerEl);
-    const pos = this.compute(spec, rect, viewport, element);
+    // ---- Spec normalization (aliases + anchors) ----------------------------
+    const normSpec = this._normalizeSpec(spec);
 
-    // Apply
-    this._applyPosition(element, pos, spec);
+    // ---- Compute & apply ---------------------------------------------------
+    const rect = this._getContainerRect(container);
+    const pos = this.compute(normSpec, rect, viewport, el);
+    this._applyPosition(el, pos, normSpec);
 
-    // Track
-    this.positioned.set(element, { container: containerEl, spec, viewport });
+    // Track for future updateAll()
+    this.positioned.set(el, { container, spec: normSpec, viewport });
     this.metrics.positionCount++;
 
     if (this.opts.debug) {
       console.log('🎯 Positioned:', {
-        element: element.id || element.className,
+        element: el.id || el.className,
+        container: container.id || container.className || '(container)',
         pos,
-        spec
+        spec: normSpec
       });
     }
   }
 
   /**
+   * Normalize spec:
+   * - map x/y → left/top (ratios)
+   * - expand anchor shorthands like 't-l', 'b-c', 'c' → 'top-left', etc.
+   * - preserve other fields
+   */
+  _normalizeSpec(spec) {
+    const out = { ...spec };
+
+    // Map x/y to left/top (if provided)
+    if (out.x != null && out.left == null) out.left = out.x;
+    if (out.y != null && out.top  == null) out.top  = out.y;
+
+    // Normalize anchor
+    out.anchor = this._normalizeAnchor(out.anchor || 'top-left');
+
+    // Normalize system
+    out.system = (out.system || 'cartesian').toLowerCase();
+
+    return out;
+  }
+
+  _normalizeAnchor(anchor) {
+    if (!anchor) return 'top-left';
+    const a = anchor.toLowerCase().trim();
+
+    // Accept full names
+    const full = [
+      'top-left','top-center','top-right',
+      'middle-left','center','middle-right',
+      'bottom-left','bottom-center','bottom-right'
+    ];
+    if (full.includes(a)) return a;
+
+    // Shorthands
+    const map = {
+      't-l': 'top-left',
+      't-c': 'top-center',
+      't-r': 'top-right',
+      'm-l': 'middle-left',
+      'c'  : 'center',
+      'm-r': 'middle-right',
+      'b-l': 'bottom-left',
+      'b-c': 'bottom-center',
+      'b-r': 'bottom-right'
+    };
+    return map[a] || 'top-left';
+  }
+
+  /**
    * Compute position from spec
-   * @param {Object} spec
-   * @param {Object} rect {x,y,width,height}
+   * @param {Object} spec  normalized spec
+   * @param {Object} rect  {x,y,width,height}
    * @param {Object} viewport
    * @param {HTMLElement} element
    * @returns {{x:number,y:number}}
    */
   compute(spec, rect, viewport = null, element = null) {
-    const system = (spec.system || 'cartesian').toLowerCase();
-    const anchor = (spec.anchor || 'top-left').toLowerCase();
+    const system = spec.system;
 
     let p;
     if (system === 'cartesian') {
@@ -108,7 +199,7 @@ export class RatioPosition {
     }
 
     if (element) {
-      const shift = this._computeAnchorShift(anchor, element);
+      const shift = this._computeAnchorShift(spec.anchor, element);
       p.x -= shift.x;
       p.y -= shift.y;
     }

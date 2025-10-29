@@ -50,6 +50,9 @@ body {
    ================================================================= */
 
 .artist-nav {
+  position: absolute;   /* new */
+  top: 0;               /* new */
+  left: 0;          
   /* Internal layout only */
   display: flex;
   flex-direction: column;

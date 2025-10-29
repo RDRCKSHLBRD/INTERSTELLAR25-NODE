@@ -2,24 +2,25 @@
   "_page": "landing",
   "_loaded_by": "/public/js/landing.js",
   "_uses_global": "window.Interstellar (state, position, quadTree)",
-
-  "_comment": "Landing page config - Video (70%) + Artist sidebar (30%)",
+  "_comment": "Landing page config - Video (≈75%) + Artist sidebar (≈25%)",
 
   "layout": {
     "mode": "split",
     "videoSection": { "flex": 0.75, "minWidth": "60vw" },
-    "sidebarSection": { "flex": 0.2, "minWidth": "20vw", "maxWidth": "280px" }
+    "sidebarSection": { "flex": 0.25, "minWidth": "20vw", "maxWidth": "320px" }
   },
 
   "positions": {
     "artistNav": {
-      "x": 0.00,
-      "y": 0.15,
-      "anchor": "t-l",
+      "relativeTo": ".landing-sidebar",
+      "anchor": "m-l",
+      "x": 0.05,
+      "y": 0.55,
       "clamp": true,
       "styles": {
-        "height": "70%",
-        "width": "100%"
+        "width": "90%",
+        "height": "30%",
+        "padding": "12px 16px 16px"
       }
     }
   },
@@ -30,8 +31,8 @@
       "orientation": "portrait",
       "positions": {
         "artistNav": {
-          "y": 0.60,
-          "styles": { "height": "35%" }
+          "y": 0.15,
+          "styles": { "height": "50%" }
         }
       }
     },
@@ -41,8 +42,8 @@
       "orientation": "landscape",
       "positions": {
         "artistNav": {
-          "y": 0.50,
-          "styles": { "height": "40%" }
+          "y": 0.3,
+          "styles": { "height": "44%" }
         }
       }
     },
@@ -51,8 +52,8 @@
       "maxWidth": 1023,
       "positions": {
         "artistNav": {
-          "y": 0.55,
-          "styles": { "height": "40%" }
+          "y": 0.1,
+          "styles": { "height": "32%" }
         }
       }
     },
@@ -60,16 +61,14 @@
       "minWidth": 1024,
       "positions": {
         "artistNav": {
-          "y": 0.50,
-          "styles": { "height": "45%" }
+          "y": 0.55,
+          "styles": { "height": "50%" }
         }
       }
     }
   },
 
-  "quadTree": {
-    "artistNav": { "enabled": false }
-  },
+  "quadTree": { "artistNav": { "enabled": false } },
 
   "theme": {
     "sidebarBackground": "#0F1D38",
