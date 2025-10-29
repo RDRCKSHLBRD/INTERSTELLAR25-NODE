@@ -15,11 +15,11 @@
       "relativeTo": ".landing-sidebar",
       "anchor": "m-l",
       "x": 0.05,
-      "y": 0.55,
+      "y": 0.35,
       "clamp": true,
       "styles": {
         "width": "90%",
-        "height": "30%",
+        "height": "50%",
         "padding": "12px 16px 16px"
       }
     }
@@ -53,7 +53,7 @@
       "positions": {
         "artistNav": {
           "y": 0.1,
-          "styles": { "height": "32%" }
+          "styles": { "height": "50%" }
         }
       }
     },
@@ -61,7 +61,7 @@
       "minWidth": 1024,
       "positions": {
         "artistNav": {
-          "y": 0.55,
+          "y": 0.45,
           "styles": { "height": "50%" }
         }
       }
