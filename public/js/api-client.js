@@ -26,6 +26,8 @@ class APIClient {
           'Content-Type': 'application/json',
           ...options.headers
         },
+        // 👇 PATCH 1: Add credentials: 'include' to send the session cookie
+        credentials: 'include', 
         ...options
       });
 

@@ -63,7 +63,12 @@ app.use(
       directives: {
         defaultSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'", "https://js.stripe.com"],
+        // 👇 CSP PATCH: Corrected array syntax and included the inline script hash.
+        scriptSrc: [
+          "'self'", 
+          "https://js.stripe.com",
+          "'sha256-LirTtLksfeCbNz2wk0GaS/SuK6zjbd3U6QCrbRECK5Y='" 
+        ],
         imgSrc: ["'self'", "https://storage.googleapis.com", "data:"],
         mediaSrc: ["'self'", "https://storage.googleapis.com"],
         connectSrc: ["'self'", "https://api.stripe.com", "https://checkout.stripe.com", "https://storage.googleapis.com"],
@@ -85,10 +90,8 @@ app.use(
      secure: isProd,               // HTTPS only in production
       httpOnly: true, // Prevent XSS attacks
       maxAge: config.session.maxAge, // 7 days from config
-      // Mobile/tablet + cross-site OAuth needs this:
-      sameSite: 'none'
-      // If API and pages live on different subdomains and you want one cookie:
-    // domain: '.yourdomain.tld'
+      // 👇 AUTH PATCH: Use 'lax' in dev for SameSite to ensure the cookie is sent.
+      sameSite: isProd ? 'none' : 'lax'
     },
     name: 'interstellar.sid' // keep; or switch to "__Secure-interstellar" if you add a Domain
   })
