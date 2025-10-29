@@ -35,17 +35,29 @@ export class RatioPosition {
    * @param {Object} viewport
    */
   apply(element, container, spec, viewport = null) {
-    if (!element || !spec) {
-      console.warn('⚠️ RatioPosition.apply: Missing element or spec');
-      return;
-    }
+    // We need to check if the element exists *before* trying to process the container, 
+    // and provide better diagnostics if it fails.
 
     const containerEl = typeof container === 'string'
       ? document.querySelector(container)
       : container;
+      
+    // 👇 PATCH: Diagnostic Check for Missing Element or Spec
+    if (!element || !spec) {
+      const containerId = containerEl ? containerEl.id : (typeof container === 'string' ? container : 'N/A Container');
+      const specSystem = spec ? (spec.system || 'cartesian') : 'N/A Spec';
+      
+      console.warn('⚠️ RatioPosition.apply: Missing element (el=null) or spec. Cannot position.', {
+        ContainerID: containerId,
+        ConfigSystem: specSystem,
+        TargetElementMissing: !element
+      });
+      return;
+    }
+    // END PATCH
 
     if (!containerEl) {
-      console.warn('⚠️ RatioPosition.apply: Container not found');
+      console.warn(`⚠️ RatioPosition.apply: Container not found. Tried to position element: ${element.id || element.className}`);
       return;
     }
 

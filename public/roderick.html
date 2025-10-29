@@ -9,19 +9,19 @@
   <script src="https://js.stripe.com/v3/"></script>
 </head>
 
-<body data-math="on">
+<body data-math="on" data-page="roderick">
   <header class="header-system" id="artistHeader">
-    <div class="Logo header-logo" id="brandLogo">
+    <div class="Logo header-logo" id="brandLogo" data-position="brandLogo">
       <img src="/images/IP_TAG24.svg" alt="Interstellar Packages Logo">
     </div>
 
-    <div class="artist-name-container" id="pageCrumbs">
+    <div class="artist-name-container" id="pageCrumbs" data-position="pageCrumbs">
       <span id="artist-name" class="artist-name">Loading...</span>
     </div>
 
     <div class="header-spacer"></div>
 
-    <nav class="Nav header-nav" id="topNav">
+    <nav class="Nav header-nav" id="topNav" data-position="topNav">
       <ul>
         <li><a href="filmography.html">Film</a></li>
         <li><a href="contact.html">Contact</a></li>
@@ -44,14 +44,14 @@
 
   <main id="artistMain">
     <div class="album-art" id="albumsRegion">
-      <div id="albumGrid"></div>
+      <div id="albumGrid" data-position="albumGrid"></div>
     </div>
 
     <aside class="sidebar" id="infoRegion">
       <details class="sidebar-details" open>
         <summary>Album Details</summary>
-        <div class="sidebar-content" id="albumInfo"></div>
-        <div id="songList"></div>
+        <div class="sidebar-content" id="albumInfo" data-position="albumInfo"></div>
+        <div id="songList" data-position="songList"></div>
       </details>
     </aside>
   </main>
@@ -60,7 +60,7 @@
     <details class="footer-details" open>
       <summary>Player</summary>
       <div class="foot-cont">
-        <div class="player" id="playerControls"></div>
+        <div class="player" id="playerControls" data-position="playerControls"></div>
         <p class="footTag">&copy; 2024/25 RDXENV</p>
       </div>
     </details>

@@ -136,6 +136,11 @@ function resolveQuadTree(IS){ return IS.QuadTreeSystem || IS.quadTree || IS.quad
       layoutAlbumGridWithQuadTree(cfg);
     }
 
+    // 👇 Structural Fix: Wait for the DOM to be ready before the first render() call.
+    if (document.readyState === 'loading') {
+        await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
+    }
+    
     addEventListener('resize', render);
     await applyPaintForPage(cfg);
     render();

@@ -8,6 +8,37 @@ import { ViewportState } from '../system/State.js';
 import { RatioLayoutEngine } from '../system/RatioLayoutEngine.js';
 import { RatioPosition } from '../system/RatioPosition.js';
 
+
+//JSON merge => 
+
+
+async function loadJSON(url) {
+  const r = await fetch(url, { cache: 'no-store' });
+  if (!r.ok) throw new Error(`${url} ${r.status}`);
+  return r.json();
+}
+
+function getPageName() {
+  const fromAttr = document.body.getAttribute('data-page');
+  if (fromAttr) return fromAttr;
+  const name = location.pathname.split('/').pop().replace('.html', '');
+  return name || 'landing';
+}
+
+function mergePositions(rootCfg, pageCfg) {
+  return {
+    ...rootCfg,
+    ...pageCfg,
+    positions: {
+      ...(rootCfg.positions || {}),
+      ...(pageCfg.positions || {})
+    }
+  };
+}
+
+
+
+
 class InterstellarSystem {
   constructor() {
     this.version = '1.0.0';
@@ -118,33 +149,37 @@ class InterstellarSystem {
    * Load configuration from JSON file
    */
   async loadConfig() {
+  try {
+    console.log('📦 Loading config from /config.json...');
+    const rootConfig = await loadJSON('/config.json');
+    console.log('✅ Config loaded from /config.json');
+
+    const pageName = getPageName();
+    let pageConfig = {};
     try {
-      console.log('📦 Loading config from /config.json...');
-
-      // Try loading from /config.json
-      const response = await fetch('/config.json');
-      if (!response.ok) {
-        throw new Error(`Config fetch failed: ${response.status}`);
-      }
-
-      const config = await response.json();
-      console.log('✅ Config loaded from /config.json');
-
-      // Merge with localStorage overrides
-      const stored = localStorage.getItem('interstellar-config');
-      if (stored) {
-        console.log('🔄 Merging localStorage overrides...');
-        const overrides = JSON.parse(stored);
-        return this.deepMerge(config, overrides);
-      }
-
-      return config;
-
-    } catch (error) {
-      console.warn('⚠️ Failed to load config.json, using defaults:', error.message);
-      return this.getDefaultConfig();
+      pageConfig = await loadJSON(`/config/pages/${pageName}.json`);
+      console.log(`✅ Page config loaded: /config/pages/${pageName}.json`);
+    } catch {
+      console.info(`ℹ️ No page config for "${pageName}" (optional)`);
     }
+
+    let merged = mergePositions(rootConfig, pageConfig);
+
+    const stored = localStorage.getItem('interstellar-config');
+    if (stored) {
+      console.log('🔄 Merging localStorage overrides...');
+      merged = this.deepMerge(merged, JSON.parse(stored));
+    }
+
+    console.info('🧭 Positions loaded:', Object.keys(merged.positions || {}));
+    return merged;
+
+  } catch (error) {
+    console.warn('⚠️ Failed to load config.json, using defaults:', error.message);
+    return this.getDefaultConfig();
   }
+}
+
 
   /**
    * Get default configuration (fallback)

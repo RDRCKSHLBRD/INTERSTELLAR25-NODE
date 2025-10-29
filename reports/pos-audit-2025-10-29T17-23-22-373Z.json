@@ -1,0 +1,150 @@
+{
+  "mode": "wire",
+  "counts": {
+    "posKeys": 8,
+    "dataPositions": 0,
+    "ids": 47,
+    "missingDataPos": 8,
+    "actionable": 8
+  },
+  "posKeys": [
+    "albumGrid",
+    "albumInfo",
+    "artistNav",
+    "brandLogo",
+    "pageCrumbs",
+    "playerControls",
+    "songList",
+    "topNav"
+  ],
+  "dataPos": [],
+  "ids": [
+    "albumGrid",
+    "albumInfo",
+    "albumsRegion",
+    "artist-name",
+    "artistControls",
+    "artistHeader",
+    "artistMain",
+    "artistNav",
+    "authModal",
+    "brandLogo",
+    "cartBtn",
+    "cartCount",
+    "charlotta-logo-link",
+    "domes-logo-link",
+    "download-zip",
+    "glass-logo-link",
+    "infoRegion",
+    "loginBtn",
+    "loginEmail",
+    "loginError",
+    "loginForm",
+    "loginFormElement",
+    "loginPassword",
+    "loginSubmit",
+    "logoutBtn",
+    "object-logo-link",
+    "pageCrumbs",
+    "playerControls",
+    "playerOverlay",
+    "preloader",
+    "registerEmail",
+    "registerError",
+    "registerFirstName",
+    "registerForm",
+    "registerFormElement",
+    "registerLastName",
+    "registerPassword",
+    "registerSubmit",
+    "registerSuccess",
+    "registerUsername",
+    "showLogin",
+    "showRegister",
+    "songList",
+    "topNav",
+    "userInfo",
+    "userName",
+    "userOverlay"
+  ],
+  "missingDataPos": [
+    "albumGrid",
+    "albumInfo",
+    "artistNav",
+    "brandLogo",
+    "pageCrumbs",
+    "playerControls",
+    "songList",
+    "topNav"
+  ],
+  "keysAsIds": [
+    "albumGrid",
+    "albumInfo",
+    "artistNav",
+    "brandLogo",
+    "pageCrumbs",
+    "playerControls",
+    "songList",
+    "topNav"
+  ],
+  "actionable": [
+    "albumGrid",
+    "albumInfo",
+    "artistNav",
+    "brandLogo",
+    "pageCrumbs",
+    "playerControls",
+    "songList",
+    "topNav"
+  ],
+  "idLocations": {
+    "albumGrid": [
+      {
+        "file": "public/roderick.html",
+        "line": 47
+      }
+    ],
+    "albumInfo": [
+      {
+        "file": "public/roderick.html",
+        "line": 53
+      }
+    ],
+    "artistNav": [
+      {
+        "file": "public/index.html",
+        "line": 42
+      }
+    ],
+    "brandLogo": [
+      {
+        "file": "public/roderick.html",
+        "line": 14
+      }
+    ],
+    "pageCrumbs": [
+      {
+        "file": "public/roderick.html",
+        "line": 18
+      }
+    ],
+    "playerControls": [
+      {
+        "file": "public/roderick.html",
+        "line": 63
+      }
+    ],
+    "songList": [
+      {
+        "file": "public/roderick.html",
+        "line": 54
+      }
+    ],
+    "topNav": [
+      {
+        "file": "public/roderick.html",
+        "line": 24
+      }
+    ]
+  }
+}

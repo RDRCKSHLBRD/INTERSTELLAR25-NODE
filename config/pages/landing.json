@@ -2,28 +2,20 @@
   "_page": "landing",
   "_loaded_by": "/public/js/landing.js",
   "_uses_global": "window.Interstellar (state, position, quadTree)",
-  
+
   "_comment": "Landing page config - Video (70%) + Artist sidebar (30%)",
-  
+
   "layout": {
     "mode": "split",
-    "videoSection": {
-      "flex": 0.75,
-      "minWidth": "60vw"
-    },
-    "sidebarSection": {
-      "flex": 0.2,
-      "minWidth": "20vw",
-      "maxWidth": "280px"
-    }
+    "videoSection": { "flex": 0.75, "minWidth": "60vw" },
+    "sidebarSection": { "flex": 0.2, "minWidth": "20vw", "maxWidth": "280px" }
   },
-  
+
   "positions": {
     "artistNav": {
-      "system": "cartesian",
-      "top": 0.15,
-      "left": 0,
-      "anchor": "top-left",
+      "x": 0.00,
+      "y": 0.15,
+      "anchor": "t-l",
       "clamp": true,
       "styles": {
         "height": "70%",
@@ -31,17 +23,15 @@
       }
     }
   },
-  
+
   "positionBreakpoints": {
     "mobile-portrait": {
       "maxWidth": 480,
       "orientation": "portrait",
       "positions": {
         "artistNav": {
-          "top": 0.6,
-          "styles": {
-            "height": "35%"
-          }
+          "y": 0.60,
+          "styles": { "height": "35%" }
         }
       }
     },
@@ -51,10 +41,8 @@
       "orientation": "landscape",
       "positions": {
         "artistNav": {
-          "top": 0.5,
-          "styles": {
-            "height": "40%"
-          }
+          "y": 0.50,
+          "styles": { "height": "40%" }
         }
       }
     },
@@ -63,10 +51,8 @@
       "maxWidth": 1023,
       "positions": {
         "artistNav": {
-          "top": 0.55,
-          "styles": {
-            "height": "40%"
-          }
+          "y": 0.55,
+          "styles": { "height": "40%" }
         }
       }
     },
@@ -74,26 +60,22 @@
       "minWidth": 1024,
       "positions": {
         "artistNav": {
-          "top": 0.5,
-          "styles": {
-            "height": "45%"
-          }
+          "y": 0.50,
+          "styles": { "height": "45%" }
         }
       }
     }
   },
-  
+
   "quadTree": {
-    "artistNav": {
-      "enabled": false
-    }
+    "artistNav": { "enabled": false }
   },
-  
+
   "theme": {
     "sidebarBackground": "#0F1D38",
     "videoObjectFit": "cover"
   },
-  
+
   "data": {
     "artistsSource": "/config/data/artists.json",
     "preloadVideo": true
