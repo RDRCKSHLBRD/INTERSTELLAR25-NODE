@@ -4,6 +4,11 @@
   "_uses_global": "window.Interstellar (state, position, layout, quadTree)",
   "_comment": "Roderick page config — math-first layout + positions, no heavy CSS.",
 
+
+  "preloader": { "enabled": false },
+
+
+
   "layout": {
     "regions": {
       "header":   { "ratio": 0.08 },
