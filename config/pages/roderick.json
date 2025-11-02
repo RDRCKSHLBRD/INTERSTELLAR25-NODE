@@ -10,16 +10,16 @@
 
 
   "layout": {
-    "regions": {
-      "header":   { "ratio": 0.08 },
-      "main":     { "ratio": 0.60 },
-      "controls": { "ratioRange": [0.24, 0.32] }
-    },
-    "mainSplit": {
-      "left":  { "ratio": 0.66 },
-      "right": { "ratio": 0.34, "minPx": 360 }
-    }
+  "regions": {
+    "header":   { "ratio": 0.08 },
+    "main":     { "ratio": 0.84 },   
+    "controls": { "ratio": 0.08 }   
   },
+  "mainSplit": {
+    "left":  { "ratio": 0.66 },
+    "right": { "ratio": 0.34, "minPx": 360 }
+  }
+},
 
   "positions": {
     "brandLogo":  { "system": "cartesian", "top": 0.50, "left": 0.02, "anchor": "center-left" },

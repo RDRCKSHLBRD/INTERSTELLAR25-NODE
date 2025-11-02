@@ -4,14 +4,14 @@
     "structure": "logo-artist-spacer-nav",
     "flexRatios": {
       "logo": 0.15,
-      "artist": 0.25,
-      "spacer": 0.4,
-      "nav": 0.2
+      "artist": 0.5,
+      "spacer": 0.3,
+      "nav": 0.25
     },
     "height": {
-      "desktop": 64,
+      "desktop": 44,
       "tablet": 56,
-      "mobile": 48
+      "mobile": 28
     },
     "padding": {
       "desktop": 20,
@@ -28,7 +28,7 @@
       "tablet": 16,
       "mobile": 14
     },
-    "fontWeight": 500,
+    "fontWeight": 200,
     "color": "#cadbda",
     "letterSpacing": 0.5
   },

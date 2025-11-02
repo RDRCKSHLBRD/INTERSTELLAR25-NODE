@@ -25,17 +25,22 @@ function getPageName() {
   return name || 'landing';
 }
 
-function mergePositions(rootCfg, pageCfg) {
-  return {
-    ...rootCfg,
-    ...pageCfg,
-    positions: {
-      ...(rootCfg.positions || {}),
-      ...(pageCfg.positions || {})
+function mergeConfigs(rootCfg, pageCfg) {
+  const merged = { ...rootCfg };
+  
+  for (const key in pageCfg) {
+    if (key === 'positions' || key === 'quadTree' || key === 'layout' || key === 'positionBreakpoints') {
+      merged[key] = {
+        ...(merged[key] || {}),
+        ...(pageCfg[key] || {})
+      };
+    } else {
+      merged[key] = pageCfg[key];
     }
-  };
+  }
+  
+  return merged;
 }
-
 
 
 
@@ -286,7 +291,7 @@ class InterstellarSystem {
 
       // Import QuadTree modules dynamically
       // Note: Check your actual file path - might be quadIndex.js (lowercase)
-      const { QuadTreeSystem } = await import('../system/quadtree/quadIndex.js');
+      const { QuadTreeSystem } = await import('../system/quadtree/QuadIndex.js');
       this.quadTree = new QuadTreeSystem(this.config.quadTree);
 
       console.log('✅ QuadTree initialized:', this.quadTree);
