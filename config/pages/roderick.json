@@ -70,8 +70,8 @@
       "columns": {
         "mobile":  { "max": 2 },
         "tablet":  { "max": 3 },
-        "desktop": { "max": 4 },
-        "ultra":   { "max": 6 }
+        "desktop": { "max": 6 },
+        "ultra":   { "max": 7 }
       },
       "minTilePx": 140,
       "maxTilePx": 280

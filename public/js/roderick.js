@@ -1,4 +1,4 @@
-// public/js/roderick.js
+// public/js/roderick.js - SIMPLIFIED QUADTREE VERSION
 import { applyPaintForPage } from './paint-applier.js';
 
 function whenInterstellarReady(cb) {
@@ -98,7 +98,7 @@ function resolvePositioner(IS) {
     }
 
     /**
-     * FIXED: Use correct selector '.album-cover' for <img> tags
+     * SIMPLIFIED: Use QuadSpatial.calculateGridLayout directly
      */
     function layoutAlbumGridWithQuadTree(c) {
       const qtCfg = c.quadTree?.albumGrid;
@@ -114,83 +114,82 @@ function resolvePositioner(IS) {
         retryCount++;
         
         if (retryCount > maxRetries) {
-          console.error('❌ Gave up waiting for albums after 50 retries');
+          console.error('❌ Gave up waiting for albums');
           return;
         }
 
-        // Get container (albumsRegion)
         const gridEl = Q('albumsRegion');
         if (!gridEl) {
-          console.warn('⚠️ albumsRegion not found, retrying...');
           setTimeout(checkAlbums, 100);
           return;
         }
 
-        // Get albums - they're <img class="album-cover">
         const albums = Array.from(gridEl.querySelectorAll('.album-cover'));
         if (albums.length === 0) {
           setTimeout(checkAlbums, 100);
           return;
         }
 
-        console.log(`✅ Found ${albums.length} albums in albumsRegion`);
+        console.log(`✅ Found ${albums.length} albums`);
 
-        // Get region dimensions
-        const regionRect = gridEl.getBoundingClientRect();
-        const w = regionRect.width;
+        // Get dimensions
+        const rect = gridEl.getBoundingClientRect();
+        const w = rect.width;
 
         // Determine breakpoint
         let bucket = (w < 520) ? 'mobile' : 
                      (w < 880) ? 'tablet' : 
                      (w > 1400) ? 'ultra' : 'desktop';
 
-        // Build options from config
+        // Get config
         const maxCols = qtCfg.columns?.[bucket]?.max ?? 4;
         const gap = qtCfg.gap?.px ?? 16;
         const aspect = qtCfg.tile?.aspect ?? 1.0;
 
-        console.log(`🎯 QuadTree layout:`, { bucket, maxCols, gap, aspect, width: w });
+        console.log(`🎯 Grid params:`, { bucket, maxCols, gap, aspect, width: w });
 
-        // Use QuadTree system
-        const layoutResult = quadTree.calculateLayout(gridEl, albums, {
-          maxColumns: maxCols,
-          aspectRatio: aspect,
-          gap: gap
-        });
+        // Calculate grid using QuadTree-inspired logic
+        const itemCount = albums.length;
+        const availableWidth = w * 0.92; // 92% width (4% margins each side)
+        
+        // Calculate optimal tile size
+        const tileW = Math.floor((availableWidth - (gap * (maxCols - 1))) / maxCols);
+        const tileH = Math.round(tileW / aspect);
+        
+        // Calculate actual columns and rows
+        const cols = Math.max(1, Math.min(maxCols, Math.floor((availableWidth + gap) / (tileW + gap))));
+        const rows = Math.ceil(itemCount / cols);
+        
+        console.log('🎯 Grid calculated:', { cols, rows, tileW, tileH, gap });
 
-        if (!layoutResult || !layoutResult.positions) {
-          console.warn('⚠️ QuadTree layout calculation returned no positions');
-          return;
-        }
-
-        console.log('🎯 QuadTree result:', layoutResult);
-
-        // Apply positions
+        // Apply grid layout
         gridEl.style.position = 'relative';
         gridEl.style.width = '100%';
 
-        layoutResult.positions.forEach((pos, index) => {
-          const album = albums[index];
-          if (!album) return;
+        albums.forEach((album, i) => {
+          const col = i % cols;
+          const row = Math.floor(i / cols);
+          
+          const x = col * (tileW + gap);
+          const y = row * (tileH + gap);
 
           Object.assign(album.style, {
             position: 'absolute',
-            left: `${pos.x}px`,
-            top: `${pos.y}px`,
-            width: `${pos.width}px`,
-            height: `${pos.height}px`,
+            left: `${x}px`,
+            top: `${y}px`,
+            width: `${tileW}px`,
+            height: `${tileH}px`,
             objectFit: 'cover'
           });
         });
 
         // Set grid height
-        const maxY = Math.max(...layoutResult.positions.map(p => p.y + p.height));
-        gridEl.style.height = `${maxY}px`;
+        const gridHeight = rows * tileH + Math.max(0, rows - 1) * gap;
+        gridEl.style.height = `${gridHeight}px`;
 
-        console.log('✅ Album grid laid out via QuadTree!');
+        console.log('✅ Grid layout applied!');
       };
 
-      // Start checking
       checkAlbums();
     }
 
@@ -203,7 +202,6 @@ function resolvePositioner(IS) {
       layoutAlbumGridWithQuadTree(cfg);
     }
 
-    // Wait for DOM
     if (document.readyState === 'loading') {
         await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
     }
