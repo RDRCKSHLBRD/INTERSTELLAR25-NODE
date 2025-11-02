@@ -30,10 +30,23 @@ function mergeConfigs(rootCfg, pageCfg) {
   
   for (const key in pageCfg) {
     if (key === 'positions' || key === 'quadTree' || key === 'layout' || key === 'positionBreakpoints') {
+      // Deep merge level 1
       merged[key] = {
         ...(merged[key] || {}),
         ...(pageCfg[key] || {})
       };
+      
+      // Extra deep merge for quadTree.albumGrid (level 2)
+      if (key === 'quadTree' && pageCfg.quadTree) {
+        for (const subKey in pageCfg.quadTree) {
+          if (typeof pageCfg.quadTree[subKey] === 'object') {
+            merged.quadTree[subKey] = {
+              ...(merged.quadTree?.[subKey] || {}),
+              ...pageCfg.quadTree[subKey]
+            };
+          }
+        }
+      }
     } else {
       merged[key] = pageCfg[key];
     }
@@ -168,7 +181,7 @@ class InterstellarSystem {
       console.info(`ℹ️ No page config for "${pageName}" (optional)`);
     }
 
-    let merged = mergePositions(rootConfig, pageConfig);
+    let merged = mergeConfigs(rootConfig, pageConfig);
 
     const stored = localStorage.getItem('interstellar-config');
     if (stored) {
