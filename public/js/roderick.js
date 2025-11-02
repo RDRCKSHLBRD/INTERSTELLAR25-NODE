@@ -2,12 +2,19 @@
 import { applyPaintForPage } from './paint-applier.js';
 
 function whenInterstellarReady(cb) {
-  if (window.Interstellar) return cb(window.Interstellar);
+  if (window.Interstellar?.quadTree) return cb(window.Interstellar);
   const t0 = performance.now();
   const timer = setInterval(() => {
-    if (window.Interstellar) { clearInterval(timer); cb(window.Interstellar); }
-    if (performance.now() - t0 > 3000) { clearInterval(timer); console.error('Interstellar not found'); }
-  }, 30);
+    if (window.Interstellar?.quadTree) { 
+      clearInterval(timer); 
+      console.log('✅ Interstellar + QuadTree ready');
+      cb(window.Interstellar); 
+    }
+    if (performance.now() - t0 > 5000) { 
+      clearInterval(timer); 
+      console.error('❌ Interstellar/QuadTree timeout'); 
+    }
+  }, 50);
 }
 
 function resolvePositioner(IS) {
@@ -28,8 +35,6 @@ function resolvePositioner(IS) {
   console.error('[roderick] RatioPosition not found'); return null;
 }
 
-function resolveQuadTree(IS){ return IS.QuadTreeSystem || IS.quadTree || IS.quadtree || null; }
-
 (async function init(){
   const res = await fetch('/config/pages/roderick.json', { cache: 'no-store' });
   if (!res.ok) throw new Error('roderick.json not found');
@@ -39,6 +44,7 @@ function resolveQuadTree(IS){ return IS.QuadTreeSystem || IS.quadTree || IS.quad
     const State = IS.State || IS.ViewportState || IS.state || null;
     const layoutEngine = IS.RatioLayoutEngine || IS.layoutEngine || null;
     const rp = resolvePositioner(IS);
+    const quadTree = IS.quadTree;
     const Q  = (id) => document.getElementById(id);
     const px = (n) => `${Math.round(n)}px`;
 
@@ -91,40 +97,101 @@ function resolveQuadTree(IS){ return IS.QuadTreeSystem || IS.quadTree || IS.quad
       if (P.playerControls) rp.apply(Q("playerControls"), Q("artistControls"), P.playerControls, State);
     }
 
+    /**
+     * FIXED: Use correct selector '.album-cover' for <img> tags
+     */
     function layoutAlbumGridWithQuadTree(c) {
       const qtCfg = c.quadTree?.albumGrid;
-      if (!qtCfg?.enabled) return;
-      const gridEl = Q('albumGrid'), region = Q('albumsRegion');
-      if (!gridEl || !region) return;
-      const r = region.getBoundingClientRect();
-      const w = r.width;
-      let bucket = (w < 520) ? 'mobile' : (w < 880) ? 'tablet' : (w > 1400) ? 'ultra' : 'desktop';
-      const maxCols = qtCfg.columns?.[bucket]?.max ?? 4;
-      const gap     = qtCfg.gap?.px ?? 16;
-      const aspect  = qtCfg.tile?.aspect ?? 1.0;
-      const minTile = qtCfg.minTilePx ?? 140;
-      const maxTile = qtCfg.maxTilePx ?? 280;
+      if (!qtCfg?.enabled || !quadTree) {
+        console.warn('⚠️ QuadTree not enabled or not available');
+        return;
+      }
 
-      const innerW = Math.max(0, w * 0.92);
-      const tileW  = Math.min(maxTile, Math.max(minTile, Math.floor((innerW - (maxCols - 1)*gap) / maxCols)));
-      const cols   = Math.max(1, Math.floor((innerW + gap) / (tileW + gap)));
-      const rows   = Math.ceil(gridEl.children.length / cols);
-      const tileH  = Math.round(tileW / aspect);
+      let retryCount = 0;
+      const maxRetries = 50;
 
-      Object.assign(gridEl.style, { position:"absolute", width:"100%" });
+      const checkAlbums = () => {
+        retryCount++;
+        
+        if (retryCount > maxRetries) {
+          console.error('❌ Gave up waiting for albums after 50 retries');
+          return;
+        }
 
-      Array.from(gridEl.children).forEach((child, i) => {
-        const cIx = i % cols, rIx = (i / cols) | 0;
-        Object.assign(child.style, {
-          position:"absolute",
-          left: `${cIx * (tileW + gap)}px`,
-          top:  `${rIx * (tileH + gap)}px`,
-          width: `${tileW}px`,
-          height:`${tileH}px`
+        // Get container (albumsRegion)
+        const gridEl = Q('albumsRegion');
+        if (!gridEl) {
+          console.warn('⚠️ albumsRegion not found, retrying...');
+          setTimeout(checkAlbums, 100);
+          return;
+        }
+
+        // Get albums - they're <img class="album-cover">
+        const albums = Array.from(gridEl.querySelectorAll('.album-cover'));
+        if (albums.length === 0) {
+          setTimeout(checkAlbums, 100);
+          return;
+        }
+
+        console.log(`✅ Found ${albums.length} albums in albumsRegion`);
+
+        // Get region dimensions
+        const regionRect = gridEl.getBoundingClientRect();
+        const w = regionRect.width;
+
+        // Determine breakpoint
+        let bucket = (w < 520) ? 'mobile' : 
+                     (w < 880) ? 'tablet' : 
+                     (w > 1400) ? 'ultra' : 'desktop';
+
+        // Build options from config
+        const maxCols = qtCfg.columns?.[bucket]?.max ?? 4;
+        const gap = qtCfg.gap?.px ?? 16;
+        const aspect = qtCfg.tile?.aspect ?? 1.0;
+
+        console.log(`🎯 QuadTree layout:`, { bucket, maxCols, gap, aspect, width: w });
+
+        // Use QuadTree system
+        const layoutResult = quadTree.calculateLayout(gridEl, albums, {
+          maxColumns: maxCols,
+          aspectRatio: aspect,
+          gap: gap
         });
-      });
 
-      gridEl.style.height = `${rows * tileH + Math.max(0, rows - 1) * gap}px`;
+        if (!layoutResult || !layoutResult.positions) {
+          console.warn('⚠️ QuadTree layout calculation returned no positions');
+          return;
+        }
+
+        console.log('🎯 QuadTree result:', layoutResult);
+
+        // Apply positions
+        gridEl.style.position = 'relative';
+        gridEl.style.width = '100%';
+
+        layoutResult.positions.forEach((pos, index) => {
+          const album = albums[index];
+          if (!album) return;
+
+          Object.assign(album.style, {
+            position: 'absolute',
+            left: `${pos.x}px`,
+            top: `${pos.y}px`,
+            width: `${pos.width}px`,
+            height: `${pos.height}px`,
+            objectFit: 'cover'
+          });
+        });
+
+        // Set grid height
+        const maxY = Math.max(...layoutResult.positions.map(p => p.y + p.height));
+        gridEl.style.height = `${maxY}px`;
+
+        console.log('✅ Album grid laid out via QuadTree!');
+      };
+
+      // Start checking
+      checkAlbums();
     }
 
     function render() {
@@ -136,7 +203,7 @@ function resolveQuadTree(IS){ return IS.QuadTreeSystem || IS.quadTree || IS.quad
       layoutAlbumGridWithQuadTree(cfg);
     }
 
-    // 👇 Structural Fix: Wait for the DOM to be ready before the first render() call.
+    // Wait for DOM
     if (document.readyState === 'loading') {
         await new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
     }
@@ -144,5 +211,7 @@ function resolveQuadTree(IS){ return IS.QuadTreeSystem || IS.quadTree || IS.quad
     addEventListener('resize', render);
     await applyPaintForPage(cfg);
     render();
+    
+    console.log('🎉 Roderick.js initialized');
   });
 })();
