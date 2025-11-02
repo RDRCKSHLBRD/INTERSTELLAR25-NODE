@@ -2,46 +2,85 @@
   "_page": "roderick",
   "_loaded_by": "/public/js/roderick.js",
   "_uses_global": "window.Interstellar (state, position, layout, quadTree)",
-  "_comment": "Roderick page config — math-first layout + positions, no heavy CSS.",
-
+  "_comment": "FIXED: Corrected positioning to keep elements on screen",
 
   "preloader": { "enabled": false },
 
-
-
   "layout": {
-  "regions": {
-    "header":   { "ratio": 0.08 },
-    "main":     { "ratio": 0.84 },   
-    "controls": { "ratio": 0.08 }   
+    "regions": {
+      "header":   { "ratio": 0.08 },
+      "main":     { "ratio": 0.84 },   
+      "controls": { "ratio": 0.08 }   
+    },
+    "mainSplit": {
+      "left":  { "ratio": 0.66 },
+      "right": { "ratio": 0.34, "minPx": 360 }
+    }
   },
-  "mainSplit": {
-    "left":  { "ratio": 0.66 },
-    "right": { "ratio": 0.34, "minPx": 360 }
-  }
-},
 
   "positions": {
-    "brandLogo":  { "system": "cartesian", "top": 0.50, "left": 0.02, "anchor": "center-left" },
-    "pageCrumbs": { "system": "cartesian", "top": 0.50, "left": 0.26, "anchor": "center-left" },
-    "topNav":     { "system": "cartesian", "top": 0.50, "left": 0.98, "anchor": "center-right" },
+    "_comment": "⭐ FIXED: Adjusted to prevent overflow",
+    
+    "brandLogo":  { 
+      "system": "cartesian", 
+      "top": 0.50, 
+      "left": 0.02, 
+      "anchor": "middle-left"
+    },
+    
+    "pageCrumbs": { 
+      "system": "cartesian", 
+      "top": 0.50, 
+      "left": 0.26, 
+      "anchor": "middle-left"
+    },
+    
+    "topNav": { 
+      "system": "cartesian", 
+      "top": 0.50, 
+      "left": 0.92,
+      "anchor": "middle-right",
+      "_comment": "Reduced from 0.98 to 0.92 to keep on screen"
+    },
 
-    "albumGrid":  { "system": "cartesian", "top": 0.04, "left": 0.04, "anchor": "top-left",
-                    "styles": { "width": "92%" } },
+    "albumGrid":  { 
+      "system": "cartesian", 
+      "top": 0.04, 
+      "left": 0.04, 
+      "anchor": "top-left",
+      "styles": { "width": "92%" }
+    },
 
-    "albumInfo":  { "system": "cartesian", "top": 0.04, "left": 0.04, "anchor": "top-left",
-                    "styles": { "width": "92%", "maxHeight": "40%" } },
+    "albumInfo":  { 
+      "system": "cartesian", 
+      "top": 0.04, 
+      "left": 0.04, 
+      "anchor": "top-left",
+      "styles": { "width": "92%", "maxHeight": "40%" }
+    },
 
-    "songList":   { "system": "cartesian", "top": 0.50, "left": 0.04, "anchor": "top-left" },
+    "songList":   { 
+      "system": "cartesian", 
+      "top": 0.50, 
+      "left": 0.04, 
+      "anchor": "top-left"
+    },
 
-    "playerControls": { "system": "cartesian", "top": 1.0, "left": 0.5, "anchor": "bottom-center",
-      "styles": { "width": "100%", "height": "var(--controls-height, 240px)" } }
+    "playerControls": { 
+      "system": "cartesian", 
+      "top": 0.50,
+      "left": 0.5, 
+      "anchor": "center",
+      "styles": { "width": "100%" },
+      "_comment": "Changed from bottom-center to center anchor"
+    }
   },
 
   "positionBreakpoints": {
     "mobile": {
       "maxWidth": 767,
       "positions": {
+        "topNav": { "left": 0.95 },
         "albumGrid": { "top": 0.12, "styles": { "width": "94%" } },
         "albumInfo": { "top": 0.55, "styles": { "width": "94%" } }
       }
@@ -49,6 +88,7 @@
     "tablet": {
       "minWidth": 768, "maxWidth": 1023,
       "positions": {
+        "topNav": { "left": 0.93 },
         "albumGrid": { "left": 0.08, "styles": { "width": "84%" } },
         "albumInfo": { "left": 0.08, "styles": { "width": "84%" } }
       }
@@ -56,6 +96,7 @@
     "desktop": {
       "minWidth": 1024,
       "positions": {
+        "topNav": { "left": 0.92 },
         "albumGrid": { "left": 0.12, "styles": { "width": "76%" } },
         "albumInfo": { "left": 0.12, "styles": { "width": "76%" } }
       }
