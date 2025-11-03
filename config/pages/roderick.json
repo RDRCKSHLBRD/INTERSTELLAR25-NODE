@@ -2,14 +2,14 @@
   "_page": "roderick",
   "_loaded_by": "/public/js/roderick.js",
   "_uses_global": "window.Interstellar (state, position, layout, quadTree)",
-  "_comment": "FIXED: Corrected positioning to keep elements on screen",
+  "_comment": "Mobile-first: Vertical stack on mobile, horizontal on desktop",
 
   "preloader": { "enabled": false },
 
   "layout": {
     "regions": {
-      "header":   { "ratio": 0.1 },
-      "main":     { "ratio": 0.82 },   
+      "header":   { "ratio": 0.12 },
+      "main":     { "ratio": 0.80 },   
       "controls": { "ratio": 0.08 }   
     },
     "mainSplit": {
@@ -19,7 +19,7 @@
   },
 
   "positions": {
-    "_comment": "⭐ FIXED: Adjusted to prevent overflow",
+    "_comment": "Desktop: horizontal layout",
     
     "brandLogo":  { 
       "system": "cartesian", 
@@ -39,8 +39,7 @@
       "system": "cartesian", 
       "top": 0.50, 
       "left": 0.92,
-      "anchor": "middle-right",
-      "_comment": "Reduced from 0.98 to 0.92 to keep on screen"
+      "anchor": "middle-right"
     },
 
     "albumGrid":  { 
@@ -71,8 +70,7 @@
       "top": 0.50,
       "left": 0.5, 
       "anchor": "center",
-      "styles": { "width": "100%" },
-      "_comment": "Changed from bottom-center to center anchor"
+      "styles": { "width": "100%" }
     }
   },
 
@@ -80,25 +78,97 @@
     "mobile": {
       "maxWidth": 767,
       "positions": {
-        "topNav": { "left": 0.95 },
-        "albumGrid": { "top": 0.12, "styles": { "width": "94%" } },
-        "albumInfo": { "top": 0.55, "styles": { "width": "94%" } }
+        "_comment": "Mobile: Vertical stack - Logo > Nav > Artist Name",
+        
+        "brandLogo": {
+          "system": "cartesian",
+          "top": 0.15,
+          "left": 0.50,
+          "anchor": "top-center",
+          "_comment": "Logo at top, centered"
+        },
+        
+        "topNav": {
+          "system": "cartesian",
+          "top": 0.50,
+          "left": 0.50,
+          "anchor": "middle-center",
+          "_comment": "Nav in middle, centered"
+        },
+        
+        "pageCrumbs": {
+          "system": "cartesian",
+          "top": 0.82,
+          "left": 0.50,
+          "anchor": "bottom-center",
+          "_comment": "Artist name at bottom, centered"
+        },
+        
+        "albumGrid": {
+          "system": "cartesian",
+          "top": 0.08,
+          "left": 0.50,
+          "anchor": "top-center",
+          "styles": { "width": "94%" },
+          "_comment": "Grid starts below header"
+        },
+        
+        "albumInfo": {
+          "system": "cartesian",
+          "top": 0.55,
+          "left": 0.50,
+          "anchor": "top-center",
+          "styles": { "width": "94%" },
+          "_comment": "Info section in lower half"
+        },
+        
+        "songList": {
+          "system": "cartesian",
+          "top": 0.75,
+          "left": 0.50,
+          "anchor": "top-center",
+          "styles": { "width": "94%" }
+        }
       }
     },
+    
     "tablet": {
       "minWidth": 768, "maxWidth": 1023,
       "positions": {
-        "topNav": { "left": 0.93 },
-        "albumGrid": { "left": 0.08, "styles": { "width": "84%" } },
-        "albumInfo": { "left": 0.08, "styles": { "width": "84%" } }
+        "topNav": { 
+          "system": "cartesian",
+          "left": 0.93 
+        },
+        "albumGrid": { 
+          "system": "cartesian",
+          "left": 0.08, 
+          "styles": { "width": "84%" } 
+        },
+        "albumInfo": { 
+          "system": "cartesian",
+          "left": 0.08, 
+          "styles": { "width": "84%" } 
+        }
       }
     },
+    
     "desktop": {
       "minWidth": 1024,
       "positions": {
-        "topNav": { "left": 0.92 },
-        "albumGrid": { "left": 0.12, "styles": { "width": "76%" } },
-        "albumInfo": { "left": 0.12, "styles": { "width": "76%" } }
+        "topNav": { 
+          "system": "cartesian",
+          "left": 0.92 
+        },
+        "albumGrid": { 
+          "system": "cartesian",
+          "left": 0.12, 
+          "styles": { "width": "76%" } 
+        },
+        "albumInfo": { 
+          "system": "cartesian",
+          "left": 0.12, 
+          "styles": { "width": "76%" } 
+        }
       }
     }
   },
