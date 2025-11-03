@@ -1,52 +1,183 @@
 /**
- * HEADER LAYOUT - Applies CSS variables from header.json
- * Variables are set by header.js, this CSS applies them
+ * HEADER LAYOUT - Hybrid Approach
+ * - Container POSITIONING: RatioPosition (JS calculates)
+ * - Internal ARRANGEMENT: Flexbox (for lists, buttons)
+ * - Aesthetic: Colors, fonts, transitions
  */
 
+/* Header container - RatioPosition sets height via JS */
 .header-system {
-  display: flex;
-  align-items: center;
-  height: var(--header-height);
-  padding: 0 var(--header-padding);
+  position: relative;
+  width: 100%;
+  z-index: 100;
+  /* No flexbox here - children positioned by RatioPosition */
 }
 
-/* Logo container - use flex ratio */
+/* Logo container - positioned by RatioPosition */
 .header-logo {
-  flex: var(--header-logo-flex) 1 0;
-  display: flex;
-  align-items: center;
+  display: inline-block;
+  /* RatioPosition will set position, top, left */
 }
 
 .header-logo img {
-  max-width: var(--header-logo-width);
+  width: var(--header-logo-width, 200px);
   height: auto;
+  display: block;
 }
 
-/* Artist name container - use flex ratio */
+/* Artist name container - positioned by RatioPosition */
 .artist-name-container {
-  flex: var(--header-artist-flex) 1 0;
-  display: flex;
-  align-items: center;
-  padding-left: var(--header-padding);
+  display: inline-block;
+  /* RatioPosition will set position, top, left */
 }
 
-/* Spacer - grows to fill space */
-.header-spacer {
-  flex: var(--header-spacer-flex) 1 0;
+.artist-name {
+  font-size: var(--artist-name-font-size, 18px);
+  font-weight: var(--artist-name-font-weight, 200);
+  color: var(--artist-name-color, #cadbda);
+  letter-spacing: var(--artist-name-letter-spacing, 0.5px);
+  white-space: nowrap;
 }
 
-/* Nav container - use flex ratio */
+/* Nav container - positioned by RatioPosition */
 .header-nav {
-  flex: var(--header-nav-flex) 1 0;
-  display: flex;
-  justify-content: flex-end;
+  display: inline-block;
+  /* RatioPosition will set position, top, left */
 }
 
+/* Nav INTERNAL arrangement - flex is perfect here! */
 .header-nav ul {
   display: flex;
-  gap: 24px;
+  align-items: center;
+  gap: var(--header-nav-gap, 24px);
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+.header-nav ul li {
+  display: flex;
   align-items: center;
+}
+
+.header-nav ul li a {
+  font-size: var(--header-nav-font-size, 16px);
+  color: var(--artist-name-color, #cadbda);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.header-nav ul li a:hover {
+  opacity: 0.7;
+}
+
+/* Button styling */
+.login-button,
+.logout-button {
+  background: none;
+  border: 1px solid var(--artist-name-color, #cadbda);
+  color: var(--artist-name-color, #cadbda);
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: var(--header-nav-font-size, 14px);
+  transition: all 0.2s;
+  border-radius: 2px;
+}
+
+.login-button:hover,
+.logout-button:hover {
+  background: var(--artist-name-color, #cadbda);
+  color: #1a1a1a;
+}
+
+/* Cart button - flex for internal arrangement */
+.cart-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: none;
+  border: 1px solid var(--artist-name-color, #cadbda);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cart-button:hover {
+  background: var(--artist-name-color, #cadbda);
+}
+
+.cart-button:hover .cart-icon {
+  filter: brightness(0.2);
+}
+
+.cart-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+.cart-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ff4444;
+  color: white;
+  border-radius: 50%;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* User info - flex for internal arrangement */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#userName {
+  color: var(--artist-name-color, #cadbda);
+  font-size: var(--header-nav-font-size, 14px);
+  font-weight: 300;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .header-logo img {
+    width: var(--header-logo-width, 140px);
+  }
+  
+  .header-nav ul {
+    gap: 12px;
+  }
+  
+  .login-button,
+  .logout-button,
+  .cart-button {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  
+  .cart-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .header-logo img {
+    width: var(--header-logo-width, 160px);
+  }
+  
+  .header-nav ul {
+    gap: 16px;
+  }
 }

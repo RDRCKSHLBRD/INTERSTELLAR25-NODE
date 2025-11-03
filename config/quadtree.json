@@ -1,8 +1,20 @@
 {
-  "_comment": "QuadTree-specific config - references root config.json",
+  "_comment": "QuadTree Configuration - Enhanced with MicroFunctions & Database Integration",
+  "_version": "1.0.1",
   "_extends": "../config.json",
   
+  "breakpoints": {
+    "mobile-sm": { "min": 0, "max": 479 },
+    "mobile": { "min": 480, "max": 767 },
+    "tablet": { "min": 768, "max": 1023 },
+    "desktop": { "min": 1024, "max": 1439 },
+    "desktop-lg": { "min": 1440, "max": 1919 },
+    "desktop-xl": { "min": 1920, "max": 9999 }
+  },
+  
   "elements": {
+    "_comment": "Element-specific configurations with min/max constraints",
+    
     "artistLink": {
       "mobile-sm": {
         "baseHeight": 40,
@@ -52,6 +64,176 @@
         "padding": 24,
         "gap": 20
       }
+    },
+    
+    "brandLogo": {
+      "_comment": "ADD THIS - Logo configurations",
+      "mobile-sm": {
+        "baseWidth": 140,
+        "minWidth": 120,
+        "maxWidth": 160,
+        "baseHeight": 40,
+        "aspectRatio": 3.5
+      },
+      "mobile": {
+        "baseWidth": 160,
+        "minWidth": 140,
+        "maxWidth": 180,
+        "baseHeight": 44,
+        "aspectRatio": 3.636
+      },
+      "tablet": {
+        "baseWidth": 180,
+        "minWidth": 160,
+        "maxWidth": 200,
+        "baseHeight": 48,
+        "aspectRatio": 3.75
+      },
+      "desktop": {
+        "baseWidth": 200,
+        "minWidth": 180,
+        "maxWidth": 220,
+        "baseHeight": 52,
+        "aspectRatio": 3.846
+      },
+      "desktop-lg": {
+        "baseWidth": 220,
+        "minWidth": 200,
+        "maxWidth": 240,
+        "baseHeight": 56,
+        "aspectRatio": 3.929
+      },
+      "desktop-xl": {
+        "baseWidth": 240,
+        "minWidth": 220,
+        "maxWidth": 260,
+        "baseHeight": 60,
+        "aspectRatio": 4.0
+      }
+    },
+    
+    "headerIcon": {
+      "_comment": "Cart, login, etc.",
+      "mobile-sm": {
+        "baseSize": 20,
+        "minSize": 18,
+        "maxSize": 22
+      },
+      "mobile": {
+        "baseSize": 22,
+        "minSize": 20,
+        "maxSize": 24
+      },
+      "tablet": {
+        "baseSize": 24,
+        "minSize": 22,
+        "maxSize": 26
+      },
+      "desktop": {
+        "baseSize": 24,
+        "minSize": 22,
+        "maxSize": 26
+      },
+      "desktop-lg": {
+        "baseSize": 26,
+        "minSize": 24,
+        "maxSize": 28
+      },
+      "desktop-xl": {
+        "baseSize": 28,
+        "minSize": 26,
+        "maxSize": 30
+      }
+    },
+    
+    "navButton": {
+      "_comment": "Navigation buttons (Film, Contact, etc.)",
+      "mobile-sm": {
+        "fontSize": 12,
+        "padding": 6,
+        "minWidth": 60
+      },
+      "mobile": {
+        "fontSize": 14,
+        "padding": 8,
+        "minWidth": 70
+      },
+      "tablet": {
+        "fontSize": 15,
+        "padding": 10,
+        "minWidth": 80
+      },
+      "desktop": {
+        "fontSize": 16,
+        "padding": 12,
+        "minWidth": 90
+      },
+      "desktop-lg": {
+        "fontSize": 17,
+        "padding": 14,
+        "minWidth": 100
+      },
+      "desktop-xl": {
+        "fontSize": 18,
+        "padding": 16,
+        "minWidth": 110
+      }
     }
+  },
+  
+  "baseSizes": {
+    "_comment": "Fallback sizes for container types (used when element not specified)",
+    "header": { "desktop": 200, "tablet": 160, "mobile": 140 },
+    "media": { "desktop": 200, "tablet": 180, "mobile": 160 },
+    "navigation": { "desktop": 120, "tablet": 100, "mobile": 80 },
+    "actions": { "desktop": 24, "tablet": 22, "mobile": 20 },
+    "hero": { "desktop": 300, "tablet": 250, "mobile": 200 },
+    "card": { "desktop": 250, "tablet": 200, "mobile": 150 },
+    "grid": { "desktop": 200, "tablet": 180, "mobile": 140 },
+    "text": { "desktop": 150, "tablet": 130, "mobile": 110 },
+    "content": { "desktop": 100, "tablet": 90, "mobile": 80 },
+    "generic": { "desktop": 100, "tablet": 90, "mobile": 80 }
+  },
+  
+  "scaleConstraints": {
+    "min": 0.5,
+    "max": 3.0,
+    "precision": 0.001
+  },
+  
+  "performance": {
+    "debounceDelay": 50,
+    "cacheSize": 50,
+    "maxCalculationTime": 16
+  },
+  
+  "microFunctionDefaults": {
+    "_comment": "Default parameters for microFunctions",
+    "headerLayout": {
+      "logoWidth": 200,
+      "artistNameWidth": 300,
+      "navWidth": 400,
+      "leftMargin": 0.02,
+      "rightMargin": 0.08
+    },
+    "goldenSplit": {
+      "largeFirst": true
+    },
+    "columnLayout": {
+      "defaultGap": 16
+    }
+  },
+  
+  "debug": {
+    "enabled": false,
+    "logLevel": "info",
+    "showOverlays": false
+  },
+  
+  "databaseSync": {
+    "enabled": false,
+    "apiEndpoint": "/api/config/quadtree",
+    "autoSync": false,
+    "syncIntervalMs": 30000
   }
 }

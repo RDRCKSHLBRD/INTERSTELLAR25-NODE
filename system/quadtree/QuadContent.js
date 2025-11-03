@@ -19,62 +19,58 @@ export class QuadContent {
 
 
 
-  // Replace the calculateContentScale method in QuadContent.js with this:
+  
 
 static calculateContentScale(container, spatialBounds, options = {}) {
   if (!container || !spatialBounds) {
     return this.getEmptyResult();
   }
   
-  // Determine container type and breakpoint FIRST
   const containerType = this.determineContainerType(container);
   const breakpoint = this.getCurrentBreakpoint();
   const isLandscape = window.innerWidth > window.innerHeight;
   
-  // Get container-specific base size with complete fallback chain
+  // NEW: Try element-specific config FIRST (your structure!)
+  const elementId = container.id || container.dataset.element || null;
   let baseSize = null;
+  let sizeConfig = null;
   
-  // 1. Try container-specific size for current breakpoint
-  baseSize = quadConfig.get(`baseSizes.${containerType}.${breakpoint}`);
-  
-  // 2. If not found, try fallback container types
-  if (!baseSize) {
-    const fallbackTypes = {
-      'media': 'header',      // Logo falls back to header
-      'navigation': 'header', // Nav falls back to header  
-      'generic': 'content'    // Generic falls back to content
-    };
-    
-    const fallbackType = fallbackTypes[containerType];
-    if (fallbackType) {
-      baseSize = quadConfig.get(`baseSizes.${fallbackType}.${breakpoint}`);
+  // PRIORITY 1: elements.{id}.{breakpoint} (YOUR STRUCTURE!)
+  if (elementId) {
+    sizeConfig = quadConfig.get(`elements.${elementId}.${breakpoint}`);
+    if (sizeConfig) {
+      baseSize = sizeConfig.baseWidth || sizeConfig.baseHeight || sizeConfig.baseSize;
     }
   }
   
-  // 3. Final fallback to scaling.baseSize or 100
+  // PRIORITY 2: baseSizes.{type}.{breakpoint} (fallback)
+  if (!baseSize) {
+    baseSize = quadConfig.get(`baseSizes.${containerType}.${breakpoint}`);
+  }
+  
+  // PRIORITY 3: Simplified breakpoint (desktop-lg → desktop)
+  if (!baseSize && breakpoint.includes('-')) {
+    const simple = breakpoint.split('-')[0]; // "desktop-lg" → "desktop"
+    baseSize = quadConfig.get(`baseSizes.${containerType}.${simple}`);
+  }
+  
+  // PRIORITY 4: Global fallback
   if (!baseSize) {
     baseSize = quadConfig.get('scaling.baseSize') || 100;
   }
   
-  // Apply landscape multiplier if in landscape mode
-  if (isLandscape && breakpoint !== 'desktop') {
-    const landscapeMultiplier = quadConfig.get(`breakpointOverrides.${breakpoint}.landscapeMultiplier`) || 1.0;
-    baseSize = baseSize * landscapeMultiplier;
-  }
-  
-  // Debug logging for development
-  if (quadConfig.get('debug.enabled')) {
-    console.log(`📐 ${containerType} (${breakpoint}${isLandscape ? ' landscape' : ''}): baseSize=${baseSize}`);
+  // Apply landscape multiplier
+  if (isLandscape && breakpoint.includes('mobile')) {
+    baseSize *= 0.8;
   }
   
   const {
-    minScale = quadConfig.get('scaleConstraints.min') || quadConfig.get('scaling.minScale') || 0.5,
-    maxScale = quadConfig.get('scaleConstraints.max') || quadConfig.get('scaling.maxScale') || 3.0,
+    minScale = quadConfig.get('scaleConstraints.min') || 0.5,
+    maxScale = quadConfig.get('scaleConstraints.max') || 3.0,
     aspectRatio = quadConfig.get('scaling.aspectRatio') || QUAD_CONSTANTS.ASPECT_16_9,
     contentType = 'auto'
   } = options;
   
-  // Calculate base scale from spatial bounds
   const baseScale = QuadMath.calculateScale(
     spatialBounds.absolute.width,
     spatialBounds.absolute.height,
@@ -82,7 +78,6 @@ static calculateContentScale(container, spatialBounds, options = {}) {
     aspectRatio
   );
   
-  // Apply content-specific adjustments
   const contentAdjustment = this.calculateContentAdjustment(
     container, 
     containerType, 
@@ -90,29 +85,30 @@ static calculateContentScale(container, spatialBounds, options = {}) {
     contentType
   );
   
-  // Calculate final scale with constraints
   const finalScale = QuadMath.clamp(
     baseScale * contentAdjustment.multiplier,
     minScale,
     maxScale
   );
   
-  // Generate CSS variables
   const cssVariables = this.generateCSSVariables(
     finalScale,
     spatialBounds,
     contentAdjustment,
-    breakpoint
+    breakpoint,
+    sizeConfig  // NEW: Pass element config
   );
   
   return {
     scale: finalScale,
     baseScale: baseScale,
-    baseSize: baseSize,           // Include the resolved base size
+    baseSize: baseSize,
+    elementId: elementId,           // NEW
+    elementConfig: sizeConfig,      // NEW
     adjustment: contentAdjustment,
     containerType: containerType,
     breakpoint: breakpoint,
-    isLandscape: isLandscape,     // Include orientation info
+    isLandscape: isLandscape,
     cssVariables: cssVariables,
     spatialData: {
       aspect: spatialBounds.math.aspect,
@@ -124,6 +120,11 @@ static calculateContentScale(container, spatialBounds, options = {}) {
 
   // In QuadContent.js, update determineContainerType method:
 static determineContainerType(container) {
+  // NEW: Check for explicit element type first
+  if (container.dataset.element) {
+    return container.dataset.element;
+  }
+  
   const classList = container.classList;
   
   if (classList.contains('qt-hero')) return 'hero';
@@ -132,13 +133,11 @@ static determineContainerType(container) {
   if (classList.contains('qt-text')) return 'text';
   if (classList.contains('qt-media')) return 'media';
   if (classList.contains('qt-nav')) return 'navigation';
-  
-  // ADD THESE LINES:
+  if (classList.contains('header-logo')) return 'logo';        // NEW
   if (classList.contains('header-icon-button')) return 'actions';
   if (classList.contains('header-actions-section')) return 'actions';
-  if (classList.contains('mathematical-icon')) return 'actions';
   
-  // Auto-detect based on content (existing code...)
+  // Auto-detect (existing logic)
   const hasImages = container.querySelectorAll('img, video').length > 0;
   const hasText = container.textContent.trim().length > 50;
   const hasMultipleChildren = container.children.length > 3;
@@ -242,29 +241,41 @@ static determineContainerType(container) {
    * @param {string} breakpoint 
    * @returns {Object} CSS variables
    */
-  static generateCSSVariables(scale, spatialBounds, adjustment, breakpoint) {
-    const scaledSize = scale * 100; // Base 100px
-    
-    return {
-      '--qt-scale': scale.toFixed(3),
-      '--qt-size': `${scaledSize.toFixed(1)}px`,
-      '--qt-width': `${spatialBounds.absolute.width}px`,
-      '--qt-height': `${spatialBounds.absolute.height}px`,
-      '--qt-aspect': spatialBounds.math.aspect.toFixed(3),
-      '--qt-breakpoint': `"${breakpoint}"`,
-      '--qt-adjustment': adjustment.multiplier.toFixed(3),
-      
-      // Responsive scaling
-      '--qt-font-size': `clamp(0.8rem, ${(scale * 1).toFixed(2)}rem, 2rem)`,
-      '--qt-spacing': `clamp(0.5rem, ${(scale * 1.5).toFixed(2)}rem, 3rem)`,
-      '--qt-border-radius': `clamp(4px, ${(scale * 8).toFixed(1)}px, 16px)`,
-      
-      // Layout helpers
-      '--qt-grid-gap': `clamp(8px, ${(scale * 16).toFixed(1)}px, 32px)`,
-      '--qt-padding': `clamp(12px, ${(scale * 24).toFixed(1)}px, 48px)`,
-      '--qt-margin': `clamp(8px, ${(scale * 16).toFixed(1)}px, 32px)`
-    };
+
+
+
+  static generateCSSVariables(scale, spatialBounds, adjustment, breakpoint, elementConfig = null) {
+  const scaledSize = scale * 100;
+  
+  const vars = {
+    '--qt-scale': scale.toFixed(3),
+    '--qt-size': `${scaledSize.toFixed(1)}px`,
+    '--qt-width': `${spatialBounds.absolute.width}px`,
+    '--qt-height': `${spatialBounds.absolute.height}px`,
+    '--qt-aspect': spatialBounds.math.aspect.toFixed(3),
+    '--qt-breakpoint': `"${breakpoint}"`,
+    '--qt-adjustment': adjustment.multiplier.toFixed(3),
+    '--qt-font-size': `clamp(0.8rem, ${(scale * 1).toFixed(2)}rem, 2rem)`,
+    '--qt-spacing': `clamp(0.5rem, ${(scale * 1.5).toFixed(2)}rem, 3rem)`,
+    '--qt-border-radius': `clamp(4px, ${(scale * 8).toFixed(1)}px, 16px)`,
+    '--qt-grid-gap': `clamp(8px, ${(scale * 16).toFixed(1)}px, 32px)`,
+    '--qt-padding': `clamp(12px, ${(scale * 24).toFixed(1)}px, 48px)`,
+    '--qt-margin': `clamp(8px, ${(scale * 16).toFixed(1)}px, 32px)`
+  };
+  
+  // NEW: Add element-specific properties from your config
+  if (elementConfig) {
+    if (elementConfig.fontSize) vars['--qt-font-size'] = `${elementConfig.fontSize}px`;
+    if (elementConfig.padding) vars['--qt-padding'] = `${elementConfig.padding}px`;
+    if (elementConfig.gap) vars['--qt-gap'] = `${elementConfig.gap}px`;
+    if (elementConfig.minWidth) vars['--qt-min-width'] = `${elementConfig.minWidth}px`;
+    if (elementConfig.maxWidth) vars['--qt-max-width'] = `${elementConfig.maxWidth}px`;
+    if (elementConfig.minHeight) vars['--qt-min-height'] = `${elementConfig.minHeight}px`;
+    if (elementConfig.maxHeight) vars['--qt-max-height'] = `${elementConfig.maxHeight}px`;
   }
+  
+  return vars;
+}
 
   /**
    * Apply CSS variables to container

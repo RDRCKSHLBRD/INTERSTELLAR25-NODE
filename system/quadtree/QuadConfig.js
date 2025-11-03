@@ -1,6 +1,7 @@
 /* ================================================================
    QUAD CONFIG - JSON Parameter Control System
    Manages mathematical constants via JSON configuration
+   NOW WITH DATABASE INTEGRATION
    ================================================================ */
 
 export class QuadConfig {
@@ -9,7 +10,7 @@ export class QuadConfig {
       breakpoints: {
         mobile: { min: 0, max: 767 },
         tablet: { min: 768, max: 1023 },
-        desktop: { min: 1024, max: Infinity }
+        desktop: { min: 1024, max: 9999 }
       },
       scaling: {
         baseSize: 100,
@@ -31,6 +32,11 @@ export class QuadConfig {
     
     this.isLoaded = false;
     this.loadPromise = this.loadConfig();
+    
+    // NEW: Database integration properties
+    this.apiEndpoint = null;
+    this.autoSyncEnabled = false;
+    this.syncInterval = null;
   }
 
   /**
@@ -149,7 +155,7 @@ export class QuadConfig {
       breakpoints: {
         mobile: { min: 0, max: 767 },
         tablet: { min: 768, max: 1023 },
-        desktop: { min: 1024, max: Infinity }
+        desktop: { min: 1024, max: 9999 }
       },
       scaling: {
         baseSize: 100,
@@ -179,9 +185,174 @@ export class QuadConfig {
   export() {
     return JSON.stringify(this.config, null, 2);
   }
+
+  // ================================================================
+  // NEW: DATABASE INTEGRATION METHODS
+  // ================================================================
+
+  /**
+   * Set API endpoint for database-driven configs
+   * @param {string} endpoint - API endpoint URL
+   */
+  setAPIEndpoint(endpoint) {
+    this.apiEndpoint = endpoint;
+    console.log(`🔗 QuadConfig API endpoint set: ${endpoint}`);
+  }
+
+  /**
+   * Load configuration from database via API
+   * @param {Object} params - Query parameters (page, artist, etc.)
+   * @returns {Promise} Loaded config
+   */
+  async loadFromDatabase(params = {}) {
+    if (!this.apiEndpoint) {
+      console.warn('⚠️ No API endpoint set. Use setAPIEndpoint() first.');
+      return this.config;
+    }
+
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const url = `${this.apiEndpoint}${queryString ? '?' + queryString : ''}`;
+
+      console.log(`📡 Loading config from database: ${url}`);
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const dbConfig = await response.json();
+
+      // Merge database config with existing
+      this.mergeConfig(dbConfig);
+
+      // Save to localStorage as cache
+      this.saveConfig();
+
+      console.log('✅ Database config loaded and merged');
+      return this.config;
+
+    } catch (error) {
+      console.error('❌ Failed to load config from database:', error.message);
+      // Fall back to existing config
+      return this.config;
+    }
+  }
+
+  /**
+   * Save configuration to database via API
+   * @param {Object} metadata - Additional metadata (user, page, timestamp)
+   * @returns {Promise} Save result
+   */
+  async saveToDatabase(metadata = {}) {
+    if (!this.apiEndpoint) {
+      console.warn('⚠️ No API endpoint set. Use setAPIEndpoint() first.');
+      return false;
+    }
+
+    try {
+      const payload = {
+        config: this.config,
+        metadata: {
+          timestamp: Date.now(),
+          version: '1.0',
+          ...metadata
+        }
+      };
+
+      const response = await fetch(this.apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ Config saved to database:', result);
+      return result;
+
+    } catch (error) {
+      console.error('❌ Failed to save config to database:', error.message);
+      return false;
+    }
+  }
+
+  /**
+   * Enable auto-sync with database
+   * @param {number} intervalMs - Sync interval in milliseconds
+   * @param {Object} params - Query parameters for loading
+   */
+  enableAutoSync(intervalMs = 30000, params = {}) {
+    if (this.autoSyncEnabled) {
+      console.warn('⚠️ Auto-sync already enabled');
+      return;
+    }
+
+    this.autoSyncEnabled = true;
+    this.syncInterval = setInterval(async () => {
+      console.log('🔄 Auto-syncing config from database...');
+      await this.loadFromDatabase(params);
+    }, intervalMs);
+
+    console.log(`✅ Auto-sync enabled (every ${intervalMs}ms)`);
+  }
+
+  /**
+   * Disable auto-sync
+   */
+  disableAutoSync() {
+    if (this.syncInterval) {
+      clearInterval(this.syncInterval);
+      this.autoSyncEnabled = false;
+      this.syncInterval = null;
+      console.log('🛑 Auto-sync disabled');
+    }
+  }
+
+  /**
+   * Load page-specific configuration
+   * @param {string} pageName - Page identifier (e.g., 'roderick', 'landing')
+   * @param {string|number} artistId - Optional artist ID
+   * @returns {Promise} Page config
+   */
+  async loadPageConfig(pageName, artistId = null) {
+    const params = { page: pageName };
+    if (artistId) params.artistId = artistId;
+
+    return this.loadFromDatabase(params);
+  }
 }
 
 // Global config instance
 export const quadConfig = new QuadConfig();
 
 console.log('⚙️ QuadConfig v1.0 loaded - JSON parameter control ready');
+
+/* ================================================================
+   DATABASE USAGE EXAMPLES:
+   
+   // Set API endpoint
+   quadConfig.setAPIEndpoint('/api/config/quadtree');
+   
+   // Load page-specific config from database
+   await quadConfig.loadPageConfig('roderick', 1);
+   
+   // Enable auto-sync (check for updates every 30 seconds)
+   quadConfig.enableAutoSync(30000, { page: 'roderick', artistId: 1 });
+   
+   // Save current config to database
+   await quadConfig.saveToDatabase({
+     page: 'roderick',
+     artistId: 1,
+     author: 'admin'
+   });
+   
+   // Disable auto-sync when done
+   quadConfig.disableAutoSync();
+   
+   ================================================================ */
