@@ -8,8 +8,8 @@
 
   "layout": {
     "regions": {
-      "header":   { "ratio": 0.08 },
-      "main":     { "ratio": 0.84 },   
+      "header":   { "ratio": 0.1 },
+      "main":     { "ratio": 0.82 },   
       "controls": { "ratio": 0.08 }   
     },
     "mainSplit": {
@@ -23,7 +23,7 @@
     
     "brandLogo":  { 
       "system": "cartesian", 
-      "top": 0.50, 
+      "top": 0.55, 
       "left": 0.02, 
       "anchor": "middle-left"
     },

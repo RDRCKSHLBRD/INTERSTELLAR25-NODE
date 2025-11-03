@@ -16,6 +16,7 @@
 /* Logo container - positioned by RatioPosition */
 .header-logo {
   display: inline-block;
+  
   /* RatioPosition will set position, top, left */
 }
 
