@@ -8,19 +8,31 @@
   <!-- Stripe -->
   <script src="https://js.stripe.com/v3/"></script>
 
-<link rel="stylesheet" href="/css/header-layout.css"></head>
+  <link rel="stylesheet" href="/css/header-layout.css">
+  
+  <style>
+    /* OVERFLOW PROTECTION - Prevent horizontal scroll */
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      max-width: 100vw;
+      width: 100%;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+  </style>
+</head>
 
 <body data-math="on" data-page="roderick">
   <header class="header-system" id="artistHeader">
+    <!-- CORRECT ORDER: Logo > Nav > Artist -->
+    
     <div class="Logo header-logo" id="brandLogo" data-position="brandLogo">
       <img src="/images/IP_TAG24.svg" alt="Interstellar Packages Logo">
     </div>
-
-    <div class="artist-name-container" id="pageCrumbs" data-position="pageCrumbs">
-      <span id="artist-name" class="artist-name">Loading...</span>
-    </div>
-
-    <div class="header-spacer"></div>
 
     <nav class="Nav header-nav" id="topNav" data-position="topNav">
       <ul>
@@ -41,6 +53,10 @@
         </li>
       </ul>
     </nav>
+
+    <div class="artist-name-container" id="artistName" data-position="artistName">
+      <span id="artist-name" class="artist-name">Loading...</span>
+    </div>
   </header>
 
   <main id="artistMain">
@@ -49,6 +65,7 @@
     </div>
 
     <aside class="sidebar" id="infoRegion">
+      <!-- Hidden on mobile, sidebar on desktop/tablet -->
       <details class="sidebar-details" open>
         <summary>Album Details</summary>
         <div class="sidebar-content" id="albumInfo" data-position="albumInfo"></div>
@@ -69,20 +86,15 @@
 
   <!-- System + app modules (order matters for ESM dependencies) -->
   <script type="module" src="/js/InterstellarSystem.js"></script>
-  <script type="module" src="/js/api-client.js"></script>     <!-- load FIRST -->
-  <script type="module" src="/js/ui-manager.js"></script>     <!-- then UI mgr -->
-  <script type="module" src="/js/main.js"></script>           <!-- then main -->
+  <script type="module" src="/js/api-client.js"></script>
+  <script type="module" src="/js/ui-manager.js"></script>
+  <script type="module" src="/js/main.js"></script>
   <script type="module" src="/js/header.js"></script>
 
   <!-- Legacy globals -->
   <script src="/js/auth.js"></script>
   <script src="/js/cart.js"></script>
   <script src="/js/player.js"></script>
-
-  <!-- Tiny reset since CSS is nuked -->
-  <script type="module">
-    document.addEventListener('DOMContentLoaded', () => { document.body.style.margin = '0'; });
-  </script>
 
   <!-- Paint first, then page controller -->
   <script type="module" src="/js/paint-applier.js"></script>

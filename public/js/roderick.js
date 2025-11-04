@@ -1,4 +1,4 @@
-// public/js/roderick.js - SIMPLIFIED QUADTREE VERSION
+// public/js/roderick.js - MOBILE/DESKTOP SEPARATION
 import { applyPaintForPage } from './paint-applier.js';
 
 function whenInterstellarReady(cb) {
@@ -48,27 +48,116 @@ function resolvePositioner(IS) {
     const Q  = (id) => document.getElementById(id);
     const px = (n) => `${Math.round(n)}px`;
 
+    // BREAKPOINT DETECTION
+    const MOBILE_MAX = 767;
+    const TABLET_MAX = 1023;
+    
+    function isMobile() { return innerWidth <= MOBILE_MAX; }
+    function isTablet() { return innerWidth > MOBILE_MAX && innerWidth <= TABLET_MAX; }
+    function isDesktop() { return innerWidth > TABLET_MAX; }
+
     function chooseControlsRatio(c) {
       const range = c.layout?.regions?.controls?.ratioRange;
       c.layout.regions.controls.ratio = range ? (range[0] + range[1]) / 2 : (c.layout.regions.controls.ratio ?? 0.24);
     }
 
-    function applyRegions(c) {
-      const vw = innerWidth, vh = innerHeight;
-      const headerR = c.layout?.regions?.header?.ratio ?? 0.08;
-      const mainR   = c.layout?.regions?.main?.ratio   ?? 0.60;
-      const ctrlR   = c.layout?.regions?.controls?.ratio ?? 0.24;
-
-      const headerH = vh * headerR, mainH = vh * mainR, ctrlH = vh * ctrlR;
-
+    /**
+     * MOBILE LAYOUT - Single column, no sidebar
+     */
+    function applyMobileLayout(c, headerH, mainH, ctrlH) {
+      const vw = innerWidth;
+      
+      console.log('📱 Applying MOBILE layout');
+      
       const header = Q("artistHeader");
       const main   = Q("artistMain");
       const ctrls  = Q("artistControls");
+      const albums = Q("albumsRegion");
+      const info   = Q("infoRegion");
 
-      if (header) Object.assign(header.style,{position:"absolute",left:"0",top:"0",width:px(vw),height:px(headerH)});
-      if (main)   Object.assign(main.style,  {position:"absolute",left:"0",top:px(headerH),width:px(vw),height:px(mainH)});
-      if (ctrls)  Object.assign(ctrls.style, {position:"absolute",left:"0",top:px(headerH+mainH),width:px(vw),height:px(ctrlH)});
+      // Header, Main, Controls (standard)
+      if (header) Object.assign(header.style, {
+        position: "absolute",
+        left: "0",
+        top: "0",
+        width: px(vw),
+        height: px(headerH)
+      });
+      
+      if (main) Object.assign(main.style, {
+        position: "absolute",
+        left: "0",
+        top: px(headerH),
+        width: px(vw),
+        height: px(mainH),
+        overflow: "hidden" // Prevent horizontal scroll
+      });
+      
+      if (ctrls) Object.assign(ctrls.style, {
+        position: "absolute",
+        left: "0",
+        top: px(headerH + mainH),
+        width: px(vw),
+        height: px(ctrlH)
+      });
 
+      // Albums: FULL WIDTH (no split!)
+      if (albums) Object.assign(albums.style, {
+        position: "absolute",
+        left: "0",
+        top: "0",
+        width: "100%",
+        height: px(mainH),
+        maxWidth: "100vw", // Safety constraint
+        overflow: "auto"   // Scrollable grid
+      });
+
+      // Info: HIDDEN on mobile (will be overlay/accordion)
+      if (info) Object.assign(info.style, {
+        display: "none"  // Hide completely on mobile
+      });
+    }
+
+    /**
+     * DESKTOP/TABLET LAYOUT - Two columns with sidebar
+     */
+    function applyDesktopLayout(c, headerH, mainH, ctrlH) {
+      const vw = innerWidth;
+      
+      console.log('🖥️  Applying DESKTOP/TABLET layout');
+      
+      const header = Q("artistHeader");
+      const main   = Q("artistMain");
+      const ctrls  = Q("artistControls");
+      const albums = Q("albumsRegion");
+      const info   = Q("infoRegion");
+
+      // Header, Main, Controls (standard)
+      if (header) Object.assign(header.style, {
+        position: "absolute",
+        left: "0",
+        top: "0",
+        width: px(vw),
+        height: px(headerH)
+      });
+      
+      if (main) Object.assign(main.style, {
+        position: "absolute",
+        left: "0",
+        top: px(headerH),
+        width: px(vw),
+        height: px(mainH)
+      });
+      
+      if (ctrls) Object.assign(ctrls.style, {
+        position: "absolute",
+        left: "0",
+        top: px(headerH + mainH),
+        width: px(vw),
+        height: px(ctrlH)
+      });
+
+      // TWO-COLUMN SPLIT
       const ms = c.layout?.mainSplit;
       const leftR  = ms?.left?.ratio  ?? 0.66;
       const rightR = ms?.right?.ratio ?? 0.34;
@@ -78,27 +167,70 @@ function resolvePositioner(IS) {
       const leftW  = Math.max(0, Math.round(mainW * leftR));
       const rightW = Math.max(minR, Math.round(mainW * rightR));
 
-      const albums = Q("albumsRegion");
-      const info   = Q("infoRegion");
-      if (albums) Object.assign(albums.style,{position:"absolute",left:"0",top:"0",width:px(leftW),height:px(mainH)});
-      if (info)   Object.assign(info.style,  {position:"absolute",left:px(leftW),top:"0",width:px(rightW),height:px(mainH)});
+      // Albums: LEFT COLUMN
+      if (albums) Object.assign(albums.style, {
+        position: "absolute",
+        left: "0",
+        top: "0",
+        width: px(leftW),
+        height: px(mainH),
+        overflow: "auto"
+      });
+
+      // Info: RIGHT COLUMN (sidebar)
+      if (info) Object.assign(info.style, {
+        display: "block",
+        position: "absolute",
+        left: px(leftW),
+        top: "0",
+        width: px(rightW),
+        height: px(mainH),
+        overflow: "auto"
+      });
+    }
+
+    /**
+     * MAIN REGION ROUTER - Decides mobile vs desktop
+     */
+    function applyRegions(c) {
+      const vw = innerWidth, vh = innerHeight;
+      const headerR = c.layout?.regions?.header?.ratio ?? 0.08;
+      const mainR   = c.layout?.regions?.main?.ratio   ?? 0.60;
+      const ctrlR   = c.layout?.regions?.controls?.ratio ?? 0.24;
+
+      const headerH = vh * headerR;
+      const mainH   = vh * mainR;
+      const ctrlH   = vh * ctrlR;
+
+      if (isMobile()) {
+        applyMobileLayout(c, headerH, mainH, ctrlH);
+      } else {
+        applyDesktopLayout(c, headerH, mainH, ctrlH);
+      }
     }
 
     function applyPositions(c) {
       if (!rp?.apply) return;
       const P = c.positions || {};
+      
+      // Header elements (all platforms)
       if (P.brandLogo)  rp.apply(Q("brandLogo"),  Q("artistHeader"), P.brandLogo,  State);
-      if (P.pageCrumbs) rp.apply(Q("pageCrumbs"), Q("artistHeader"), P.pageCrumbs, State);
+      if (P.artistName) rp.apply(Q("artistName"), Q("artistHeader"), P.artistName, State);
       if (P.topNav)     rp.apply(Q("topNav"),     Q("artistHeader"), P.topNav,     State);
-      if (P.albumGrid)  rp.apply(Q("albumGrid"),  Q("albumsRegion"), P.albumGrid,  State);
-      const albumInfoCfg = P.albumInfo || P.bioSection;
-      if (albumInfoCfg) rp.apply(Q("albumInfo"),  Q("infoRegion"),   albumInfoCfg, State);
-      if (P.songList)   rp.apply(Q("songList"),   Q("infoRegion"),   P.songList,   State);
+      
+      // Desktop/Tablet only: position sidebar contents
+      if (!isMobile()) {
+        const albumInfoCfg = P.albumInfo || P.bioSection;
+        if (albumInfoCfg) rp.apply(Q("albumInfo"),  Q("infoRegion"),   albumInfoCfg, State);
+        if (P.songList)   rp.apply(Q("songList"),   Q("infoRegion"),   P.songList,   State);
+      }
+      
+      // Player controls (all platforms)
       if (P.playerControls) rp.apply(Q("playerControls"), Q("artistControls"), P.playerControls, State);
     }
 
     /**
-     * SIMPLIFIED: Use QuadSpatial.calculateGridLayout directly
+     * QUADTREE GRID LAYOUT
      */
     function layoutAlbumGridWithQuadTree(c) {
       const qtCfg = c.quadTree?.albumGrid;
@@ -148,15 +280,13 @@ function resolvePositioner(IS) {
 
         console.log(`🎯 Grid params:`, { bucket, maxCols, gap, aspect, width: w });
 
-        // Calculate grid using QuadTree-inspired logic
+        // Calculate grid
         const itemCount = albums.length;
-        const availableWidth = w * 0.92; // 92% width (4% margins each side)
+        const availableWidth = w * 0.96; // 96% width for mobile safety
         
-        // Calculate optimal tile size
         const tileW = Math.floor((availableWidth - (gap * (maxCols - 1))) / maxCols);
         const tileH = Math.round(tileW / aspect);
         
-        // Calculate actual columns and rows
         const cols = Math.max(1, Math.min(maxCols, Math.floor((availableWidth + gap) / (tileW + gap))));
         const rows = Math.ceil(itemCount / cols);
         
@@ -165,6 +295,7 @@ function resolvePositioner(IS) {
         // Apply grid layout
         gridEl.style.position = 'relative';
         gridEl.style.width = '100%';
+        gridEl.style.maxWidth = '100%'; // Safety
 
         albums.forEach((album, i) => {
           const col = i % cols;
@@ -179,7 +310,8 @@ function resolvePositioner(IS) {
             top: `${y}px`,
             width: `${tileW}px`,
             height: `${tileH}px`,
-            objectFit: 'cover'
+            objectFit: 'cover',
+            maxWidth: '100%' // Safety
           });
         });
 

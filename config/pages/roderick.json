@@ -2,7 +2,7 @@
   "_page": "roderick",
   "_loaded_by": "/public/js/roderick.js",
   "_uses_global": "window.Interstellar (state, position, layout, quadTree)",
-  "_comment": "Mobile-first: Vertical stack on mobile, horizontal on desktop",
+  "_comment": "SEPARATED: Mobile (single column) vs Desktop (two columns)",
 
   "preloader": { "enabled": false },
 
@@ -13,8 +13,14 @@
       "controls": { "ratio": 0.08 }   
     },
     "mainSplit": {
+      "_comment": "Desktop/Tablet ONLY - ignored on mobile",
       "left":  { "ratio": 0.66 },
       "right": { "ratio": 0.34, "minPx": 360 }
+    },
+    "mobile": {
+      "_comment": "Mobile-specific: No split, full-width grid, sidebar hidden",
+      "albumsRegion": { "width": "100%", "overflow": "auto" },
+      "infoRegion": { "display": "none" }
     }
   },
 
@@ -28,11 +34,12 @@
       "anchor": "middle-left"
     },
     
-    "pageCrumbs": { 
+    "artistName": { 
       "system": "cartesian", 
       "top": 0.50, 
       "left": 0.26, 
-      "anchor": "middle-left"
+      "anchor": "middle-left",
+      "_comment": "RENAMED from pageCrumbs"
     },
     
     "topNav": { 
@@ -40,14 +47,6 @@
       "top": 0.50, 
       "left": 0.92,
       "anchor": "middle-right"
-    },
-
-    "albumGrid":  { 
-      "system": "cartesian", 
-      "top": 0.04, 
-      "left": 0.04, 
-      "anchor": "top-left",
-      "styles": { "width": "92%" }
     },
 
     "albumInfo":  { 
@@ -78,56 +77,28 @@
     "mobile": {
       "maxWidth": 767,
       "positions": {
-        "_comment": "Mobile: Vertical stack - Logo > Nav > Artist Name",
+        "_comment": "Mobile: Logo > Nav > Artist (CSS handles stacking)",
         
         "brandLogo": {
           "system": "cartesian",
           "top": 0.15,
           "left": 0.50,
-          "anchor": "top-center",
-          "_comment": "Logo at top, centered"
+          "anchor": "top-center"
         },
         
         "topNav": {
           "system": "cartesian",
           "top": 0.50,
           "left": 0.50,
-          "anchor": "middle-center",
-          "_comment": "Nav in middle, centered"
+          "anchor": "middle-center"
         },
         
-        "pageCrumbs": {
+        "artistName": {
           "system": "cartesian",
-          "top": 0.82,
+          "top": 0.85,
           "left": 0.50,
           "anchor": "bottom-center",
-          "_comment": "Artist name at bottom, centered"
-        },
-        
-        "albumGrid": {
-          "system": "cartesian",
-          "top": 0.08,
-          "left": 0.50,
-          "anchor": "top-center",
-          "styles": { "width": "94%" },
-          "_comment": "Grid starts below header"
-        },
-        
-        "albumInfo": {
-          "system": "cartesian",
-          "top": 0.55,
-          "left": 0.50,
-          "anchor": "top-center",
-          "styles": { "width": "94%" },
-          "_comment": "Info section in lower half"
-        },
-        
-        "songList": {
-          "system": "cartesian",
-          "top": 0.75,
-          "left": 0.50,
-          "anchor": "top-center",
-          "styles": { "width": "94%" }
+          "_comment": "RENAMED from pageCrumbs"
         }
       }
     },
@@ -138,11 +109,6 @@
         "topNav": { 
           "system": "cartesian",
           "left": 0.93 
-        },
-        "albumGrid": { 
-          "system": "cartesian",
-          "left": 0.08, 
-          "styles": { "width": "84%" } 
         },
         "albumInfo": { 
           "system": "cartesian",
@@ -158,11 +124,6 @@
         "topNav": { 
           "system": "cartesian",
           "left": 0.92 
-        },
-        "albumGrid": { 
-          "system": "cartesian",
-          "left": 0.12, 
-          "styles": { "width": "76%" } 
         },
         "albumInfo": { 
           "system": "cartesian",
@@ -206,6 +167,22 @@
       "player": "player",
       "footer": "footer",
       "badges": "badges"
+    }
+  },
+
+  "typography": {
+    "_comment": "Font/text size configuration - can be overridden by paint system",
+    "header": {
+      "logo": { "width": "200px" },
+      "artistName": { "fontSize": "18px", "fontWeight": "200", "letterSpacing": "0.5px" },
+      "nav": { "fontSize": "16px", "gap": "24px" }
+    },
+    "mobile": {
+      "header": {
+        "logo": { "width": "140px" },
+        "artistName": { "fontSize": "16px" },
+        "nav": { "fontSize": "14px", "gap": "12px" }
+      }
     }
   }
 }
