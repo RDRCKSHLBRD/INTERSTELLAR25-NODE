@@ -14,8 +14,8 @@
     },
     "mainSplit": {
       "_comment": "Desktop/Tablet ONLY - ignored on mobile",
-      "left":  { "ratio": 0.66 },
-      "right": { "ratio": 0.34, "minPx": 360 }
+      "left":  { "ratio": 0.75 },
+      "right": { "ratio": 0.25, "minPx": 360 }
     },
     "mobile": {
       "_comment": "Mobile-specific: No split, full-width grid, sidebar hidden",
