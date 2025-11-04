@@ -1,0 +1,136 @@
+{
+  "_comment": "Album Info Typography Configuration",
+  "_purpose": "Centralized typography settings for album information display",
+  
+  "albumInfo": {
+    "container": {
+      "display": "flex",
+      "flexDirection": "row",
+      "flexWrap": "wrap",
+      "padding": "5px",
+      "margin": "10px 0",
+      "borderTop": "1px solid #2b7f8c",
+      "background": "rgba(0, 0, 0, 0.05)",
+      "borderRadius": "4px"
+    },
+    
+    "title": {
+      "fontSize": "24px",
+      "fontSizeMobile": "20px",
+      "fontWeight": "bold",
+      "color": "#2b7f8c",
+      "marginBottom": "10px",
+      "borderBottom": "1px solid #2b7f8c",
+      "lineHeight": "1.2"
+    },
+    
+    "description": {
+      "fontSize": "1em",
+      "fontSizeMobile": "0.95em",
+      "fontWeight": "200",
+      "color": "#8ab7ce",
+      "lineHeight": "1.4",
+      "marginBottom": "0.8em"
+    },
+    
+    "credit": {
+      "fontSize": "0.9em",
+      "fontSizeMobile": "0.85em",
+      "fontWeight": "200",
+      "fontStyle": "italic",
+      "color": "#829D9E",
+      "borderTop": "1px solid #184551",
+      "paddingTop": "10px",
+      "marginBottom": "0.6em"
+    },
+    
+    "metadata": {
+      "catalogueNumber": {
+        "fontSize": "1em",
+        "fontSizeMobile": "0.9em",
+        "fontWeight": "bold",
+        "color": "#0AAAC3"
+      },
+      "releaseDate": {
+        "fontSize": "1em",
+        "fontSizeMobile": "0.9em",
+        "fontWeight": "200",
+        "color": "#0AAAC3"
+      },
+      "productionDate": {
+        "fontSize": "1em",
+        "fontSizeMobile": "0.9em",
+        "fontWeight": "200",
+        "color": "#7E8D9B"
+      }
+    },
+    
+    "songList": {
+      "item": {
+        "fontSize": "0.95em",
+        "fontSizeMobile": "0.9em",
+        "fontWeight": "200",
+        "color": "#cadbda",
+        "padding": "8px",
+        "paddingMobile": "6px"
+      },
+      "duration": {
+        "fontSize": "0.9em",
+        "fontSizeMobile": "0.85em",
+        "fontWeight": "200",
+        "fontFamily": "monospace",
+        "color": "#8ab7ce"
+      },
+      "playing": {
+        "fontWeight": "bold",
+        "backgroundColor": "#19606b",
+        "borderLeft": "3px solid #3AA0A0"
+      },
+      "hover": {
+        "backgroundColor": "#2b7f8c"
+      }
+    },
+    
+    "purchaseLink": {
+      "fontSize": "0.9em",
+      "fontSizeMobile": "0.95em",
+      "fontWeight": "500",
+      "color": "#fff",
+      "backgroundColor": "#2b7f8c",
+      "backgroundColorHover": "#19606b",
+      "padding": "5px 10px",
+      "paddingMobile": "8px 14px",
+      "borderRadius": "4px"
+    }
+  },
+  
+  "colorPalette": {
+    "_comment": "Album Info Color System",
+    "primary": "#2b7f8c",
+    "textLight": "#8ab7ce",
+    "textMuted": "#829D9E",
+    "metadataBright": "#0AAAC3",
+    "metadataMuted": "#7E8D9B",
+    "border": "#184551",
+    "background": "rgba(0, 0, 0, 0.05)",
+    "playingBg": "#19606b",
+    "playingBorder": "#3AA0A0",
+    "hoverBg": "#2b7f8c"
+  },
+  
+  "breakpoints": {
+    "mobile": {
+      "maxWidth": 767,
+      "scaleFactor": 0.85
+    },
+    "tablet": {
+      "minWidth": 768,
+      "maxWidth": 1023,
+      "scaleFactor": 0.92
+    },
+    "desktop": {
+      "minWidth": 1024,
+      "scaleFactor": 1.0
+    }
+  }
+}
