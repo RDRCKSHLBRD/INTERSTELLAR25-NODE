@@ -29,6 +29,7 @@ INSERT INTO products (cat_id, price, name, catalogue_id, description, active) VA
 ('01040122', 12.00, 'Apocrypha', '01040122', 'Digital download of Apocrypha', true),
 ('01040123', 12.00, 'Ambient Garden Two', '01040123', 'Digital download of Ambient Garden Two', true),
 ('01040124', 12.00, 'Utopian', '01040124', 'Digital download of Utopian', true),
+('01040125', 12.00, 'Signals', '01040125', 'Digital download of Signals', true),
 
 -- Physical Products  
 ('01020105', 25.00, 'Natura (Cassette)', '01040105', 'Physical cassette tape of Natura album', true);

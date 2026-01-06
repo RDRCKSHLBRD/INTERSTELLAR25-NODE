@@ -10,14 +10,14 @@
 -- Step 2  ▸  Seed reference data
 ------------------------------------------------------------
 \i migrations/artists.sql
-\i migrations/albums.sql
+\i migrations/albums_fixed.sql
 
 ------------------------------------------------------------
 -- Step 3  ▸  Seed songs (three parts)
 ------------------------------------------------------------
-\i migrations/songs.sql
-\i migrations/songs_part2.sql
-\i migrations/songs_part3.sql
+\i migrations/songs_fixed.sql
+\i migrations/songs_part2_fixed.sql
+\i migrations/songs_part3_fixed.sql
 
 ------------------------------------------------------------
 -- Step 4  ▸  Seed album-level products

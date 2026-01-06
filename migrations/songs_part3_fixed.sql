@@ -104,7 +104,24 @@ INSERT INTO songs (id, name, audio_url, duration, artist_id, album_id, track_id)
 ('2405', 'Mutual Sunrise', '/api/audio/UTOPIA/Mutual-Sunrise.mp3', '05:12', 1, 24, 5),
 ('2406', 'A distant Cloud says Hello', '/api/audio/UTOPIA/A-distant-Cloud-says-Hello.mp3', '06:08', 1, 24, 6),
 ('2407', 'Photographs', '/api/audio/UTOPIA/Photographs.mp3', '04:28', 1, 24, 7),
-('2408', 'Utopian', '/api/audio/UTOPIA/Utopian.mp3', '07:39', 1, 24, 8)
+('2408', 'Utopian', '/api/audio/UTOPIA/Utopian.mp3', '07:39', 1, 24, 8),
+
+
+-- Album 25: Signals
+('2501', 'Mathematics of the New Domain', '/api/audio/Signals/Mathematics-of-the-New-Domain.mp3', '04:45', 1, 25, 1),
+('2502', 'The Galactic Proxy', '/api/audio/Signals/The-Galactic-Proxy.mp3', '08:42', 1, 25, 2),
+('2503', 'Signal I', '/api/audio/Signals/Signal-I.mp3', '05:34', 1, 25, 3),
+('2504', 'No Coincidence', '/api/audio/Signals/No-Coincidence.mp3', '5:44', 1, 25, 4),
+('2505', 'Overture for Transmutation', '/api/audio/Signals/Overture-for-Transmutation.mp3', '06:21', 1, 25, 5),
+('2506', 'Inward Breath to the Multitudes', '/api/audio/Signals/Inward-Breath-to-the-Multitudes.mp3', '06:38', 1, 25, 6),
+('2507', 'You Choose your own Universe', '/api/audio/Signals/You-Choose-your-own-Universe.mp3', '09:18', 1, 25, 7),
+('2508', 'The Conclusion of Moments', '/api/audio/Signals/The-Conclusion-of-Moments.mp3', '07:18', 1, 25, 8),
+('2509', 'Signal II', '/api/audio/Signals/Signal-II.mp3', '04:51', 1, 25, 9),
+
+
+
+
+
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
   audio_url = EXCLUDED.audio_url,
