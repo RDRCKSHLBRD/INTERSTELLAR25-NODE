@@ -116,7 +116,7 @@ INSERT INTO songs (id, name, audio_url, duration, artist_id, album_id, track_id)
 ('2506', 'Inward Breath to the Multitudes', '/api/audio/Signals/Inward-Breath-to-the-Multitudes.mp3', '06:38', 1, 25, 6),
 ('2507', 'You Choose your own Universe', '/api/audio/Signals/You-Choose-your-own-Universe.mp3', '09:18', 1, 25, 7),
 ('2508', 'The Conclusion of Moments', '/api/audio/Signals/The-Conclusion-of-Moments.mp3', '07:18', 1, 25, 8),
-('2509', 'Signal II', '/api/audio/Signals/Signal-II.mp3', '04:51', 1, 25, 9),
+('2509', 'Signal II', '/api/audio/Signals/Signal-II.mp3', '04:51', 1, 25, 9)
 
 
 
