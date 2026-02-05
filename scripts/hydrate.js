@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..'); 
 const LAB_DIR = path.join(ROOT_DIR, 'public/uploads');
 
-// IGNORE LIST: Added 'public' to stop recursion
+// IGNORE LIST
 const IGNORE_DIRS = ['node_modules', '.git', 'dist', 'coverage', '.DS_Store', 'images', 'mp4', 'public'];
 const ALLOWED_EXTS = ['.js', '.mjs', '.cjs', '.json', '.html', '.css', '.sql', '.md', '.txt', '.sh', '.ejs'];
 
@@ -28,7 +28,7 @@ const codex = [];
 let fileCount = 0;
 
 function scanAndCopy(currentPath) {
-    // SAFETY LOCK: Double check we aren't scanning the lab
+    // SAFETY LOCK
     if (path.resolve(currentPath).startsWith(path.resolve(LAB_DIR))) {
         return;
     }
@@ -39,7 +39,7 @@ function scanAndCopy(currentPath) {
         const fullPath = path.join(currentPath, item);
         const stat = fs.statSync(fullPath);
         
-        // RELATIVE PATH FIX: No leading dot! (e.g. "src/server.js")
+        // CRITICAL FIX: relative path WITHOUT the leading dot
         const relativePath = path.relative(ROOT_DIR, fullPath).replace(/\\/g, '/');
 
         if (stat.isDirectory()) {
@@ -49,14 +49,12 @@ function scanAndCopy(currentPath) {
             const ext = path.extname(item);
             if (ALLOWED_EXTS.includes(ext)) {
                 
-                // A. Add to Map
                 codex.push({
-                    path: relativePath,
+                    path: relativePath, // No "./" here anymore
                     size_bytes: stat.size,
                     modified_ts: Math.floor(stat.mtimeMs / 1000)
                 });
 
-                // B. Copy to Lab
                 const destPath = path.join(LAB_DIR, relativePath);
                 const destDir = path.dirname(destPath);
                 
@@ -71,15 +69,11 @@ function scanAndCopy(currentPath) {
 // 2. Execute
 try {
     scanAndCopy(ROOT_DIR);
-    
-    // 3. Save Map
     const mapPath = path.join(LAB_DIR, 'INTERSTELLAR_CODEX_META.json');
     fs.writeFileSync(mapPath, JSON.stringify(codex, null, 2));
 
     console.log(`✅ HYDRATION COMPLETE.`);
-    console.log(`   - Map Size:     ${codex.length} nodes`);
     console.log(`   - Files Copied: ${fileCount}`);
-    console.log(`   - Location:     public/uploads/\n`);
 
 } catch (err) {
     console.error("❌ HYDRATION FAILED:", err);
