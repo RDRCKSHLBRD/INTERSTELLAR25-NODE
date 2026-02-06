@@ -14,7 +14,7 @@ const LAB_DIR = path.join(ROOT_DIR, 'public/uploads');
 const IGNORE_DIRS = ['node_modules', '.git', 'dist', 'coverage', '.DS_Store', 'images', 'mp4', 'public'];
 const ALLOWED_EXTS = ['.js', '.mjs', '.cjs', '.json', '.html', '.css', '.sql', '.md', '.txt', '.sh', '.ejs'];
 
-console.log(`\n🌊 GALAXY HYDRATION INITIATED (V3)`);
+console.log(`\n🌊 GALAXY HYDRATION INITIATED (V3-FINAL)`);
 console.log(`   SOURCE: ${ROOT_DIR}`);
 console.log(`   TARGET: ${LAB_DIR}\n`);
 
@@ -39,7 +39,8 @@ function scanAndCopy(currentPath) {
         const fullPath = path.join(currentPath, item);
         const stat = fs.statSync(fullPath);
         
-        // CRITICAL FIX: relative path WITHOUT the leading dot
+        // --- THE FIX IS HERE ---
+        // We removed the './' + ... 
         const relativePath = path.relative(ROOT_DIR, fullPath).replace(/\\/g, '/');
 
         if (stat.isDirectory()) {
@@ -50,7 +51,7 @@ function scanAndCopy(currentPath) {
             if (ALLOWED_EXTS.includes(ext)) {
                 
                 codex.push({
-                    path: relativePath, // No "./" here anymore
+                    path: relativePath,
                     size_bytes: stat.size,
                     modified_ts: Math.floor(stat.mtimeMs / 1000)
                 });
@@ -69,6 +70,8 @@ function scanAndCopy(currentPath) {
 // 2. Execute
 try {
     scanAndCopy(ROOT_DIR);
+    
+    // 3. Save Map
     const mapPath = path.join(LAB_DIR, 'INTERSTELLAR_CODEX_META.json');
     fs.writeFileSync(mapPath, JSON.stringify(codex, null, 2));
 
