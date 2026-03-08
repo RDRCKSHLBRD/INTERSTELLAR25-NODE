@@ -58,3 +58,9 @@ credentials/
 
 # Galaxy Codex (Generated Laboratory)
 public/uploads/
+
+
+# SQLite Flash DB (generated from Postgres, never commit)
+data/flash.db
+data/flash.db-wal
+data/flash.db-shm
