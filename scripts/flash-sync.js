@@ -1,23 +1,28 @@
 // ============================================================================
-// INTERSTELLAR PACKAGES — SQLite Flash Sync
+// INTERSTELLAR PACKAGES — SQLite Flash Sync  (V5)
 // scripts/flash-sync.js
 //
-// Dumps catalogue data (artists, albums, songs, products) from PostgreSQL
-// into a local SQLite file for fast, zero-latency reads on the application
-// layer. This is the "Flash update APP" from the system diagram.
+// Dumps catalogue data from PostgreSQL into a local SQLite file for
+// fast, zero-latency reads on the application layer.
+//
+// V5 additions:
+//   - palette (JSONB → TEXT) per album for CSS custom properties
+//   - layout_type per album (compact | standard | essay)
+//   - liner_notes table for extended per-track/per-album essays
 //
 // Usage:
 //   node scripts/flash-sync.js              # full sync
 //   node scripts/flash-sync.js --verify     # verify existing flash DB
-//   node scripts/flash-sync.js --dry-run    # show what would sync, don't write
+//   node scripts/flash-sync.js --dry-run    # preview, don't write
+//   node scripts/flash-sync.js --counts     # just show Postgres counts
 //
-// The output file (data/flash.db) is read-only at runtime.
-// Run this script whenever the catalogue changes in Postgres.
+// Output: data/flash.db (read-only at runtime)
+// Run manually whenever the catalogue changes in Postgres.
 // ============================================================================
 
 import { query, testConnection } from '../src/config/database.js';
 import Database from 'better-sqlite3';
-import { mkdirSync, existsSync } from 'fs';
+import { mkdirSync, existsSync, statSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -26,12 +31,10 @@ const __dirname = dirname(__filename);
 const FLASH_DB_PATH = join(__dirname, '..', 'data', 'flash.db');
 
 // ── SQLite Schema ───────────────────────────────────────────────
-// Mirrors the Postgres catalogue tables, but read-only and flat.
-// No user data, no carts, no purchases, no sessions.
-// This is ONLY the public-facing catalogue for browsing.
+// Mirrors Postgres catalogue tables. Read-only, no user/transaction data.
 
 const SCHEMA = `
-  -- Drop existing tables for clean rebuild
+  DROP TABLE IF EXISTS liner_notes;
   DROP TABLE IF EXISTS products;
   DROP TABLE IF EXISTS songs;
   DROP TABLE IF EXISTS albums;
@@ -57,6 +60,8 @@ const SCHEMA = `
     credit          TEXT,
     description     TEXT,
     tracks          INTEGER DEFAULT 0,
+    palette         TEXT,
+    layout_type     TEXT DEFAULT 'standard',
     created_at      TEXT,
     updated_at      TEXT
   );
@@ -81,40 +86,102 @@ const SCHEMA = `
     catalogue_id      TEXT,
     description       TEXT,
     stripe_product_id TEXT,
+    stripe_price_id   TEXT,
     active            INTEGER DEFAULT 1,
-    product_type      TEXT DEFAULT 'album',
-    song_id           INTEGER,
+    song_id           TEXT,
     created_at        TEXT,
     updated_at        TEXT
   );
 
-  -- Metadata: when was this flash DB built, from what source
+  CREATE TABLE liner_notes (
+    id          INTEGER PRIMARY KEY,
+    album_id    INTEGER NOT NULL REFERENCES albums(id),
+    section     TEXT NOT NULL,
+    source      TEXT,
+    body        TEXT NOT NULL,
+    sort_order  INTEGER DEFAULT 0,
+    created_at  TEXT,
+    updated_at  TEXT
+  );
+
   CREATE TABLE flash_meta (
     key   TEXT PRIMARY KEY,
     value TEXT
   );
 
-  -- Indexes for the queries the app actually runs
-  CREATE INDEX idx_albums_artist    ON albums(artist_id);
-  CREATE INDEX idx_albums_catalogue ON albums(catalogue);
-  CREATE INDEX idx_songs_album      ON songs(album_id);
-  CREATE INDEX idx_songs_artist     ON songs(artist_id);
-  CREATE INDEX idx_products_cat     ON products(cat_id);
-  CREATE INDEX idx_products_active  ON products(active);
+  CREATE INDEX idx_albums_artist     ON albums(artist_id);
+  CREATE INDEX idx_albums_catalogue  ON albums(catalogue);
+  CREATE INDEX idx_albums_layout     ON albums(layout_type);
+  CREATE INDEX idx_songs_album       ON songs(album_id);
+  CREATE INDEX idx_songs_artist      ON songs(artist_id);
+  CREATE INDEX idx_products_cat      ON products(cat_id);
+  CREATE INDEX idx_products_active   ON products(active);
+  CREATE INDEX idx_liner_notes_album ON liner_notes(album_id);
+  CREATE INDEX idx_liner_notes_sort  ON liner_notes(album_id, sort_order);
 `;
+
+// ── Table sync queries ──────────────────────────────────────────
+// Each: [tableName, v5Query, fallbackQuery]
+// fallbackQuery used when V5 migration hasn't run yet
+
+const SYNC_TABLES = [
+  ['artists',
+    'SELECT id, name, description, created_at, updated_at FROM artists ORDER BY id',
+    null],
+
+  ['albums',
+    `SELECT id, catalogue, name, cover_url, production_date, release_date,
+            artist_id, credit, description, tracks,
+            palette::text as palette, layout_type,
+            created_at, updated_at
+     FROM albums ORDER BY id`,
+    `SELECT id, catalogue, name, cover_url, production_date, release_date,
+            artist_id, credit, description, tracks,
+            NULL as palette, 'standard' as layout_type,
+            created_at, updated_at
+     FROM albums ORDER BY id`],
+
+  ['songs',
+    `SELECT id, name, audio_url, duration, artist_id, album_id, track_id,
+            created_at, updated_at
+     FROM songs ORDER BY album_id, track_id`,
+    null],
+
+  ['products',
+    `SELECT id, cat_id, price, name, catalogue_id, description,
+            stripe_product_id, stripe_price_id, active, song_id,
+            created_at, updated_at
+     FROM products ORDER BY id`,
+    null],
+
+  ['liner_notes',
+    `SELECT id, album_id, section, source, body, sort_order,
+            created_at, updated_at
+     FROM liner_notes ORDER BY album_id, sort_order`,
+    null],
+];
 
 // ── Sync Functions ──────────────────────────────────────────────
 
 async function syncTable(db, tableName, pgQuery) {
-  const result = await query(pgQuery);
+  let result;
+  try {
+    result = await query(pgQuery);
+  } catch (err) {
+    if (err.message.includes('does not exist') || err.message.includes('column')) {
+      console.log(`  ⚠️  ${tableName}: skipped (table/column not in Postgres yet)`);
+      return 0;
+    }
+    throw err;
+  }
+
   const rows = result.rows;
 
   if (rows.length === 0) {
-    console.log(`  ⚠️  ${tableName}: 0 rows (empty in Postgres)`);
+    console.log(`  ── ${tableName}: 0 rows`);
     return 0;
   }
 
-  // Build INSERT from the column names in the first row
   const cols = Object.keys(rows[0]);
   const placeholders = cols.map(() => '?').join(', ');
   const insertSQL = `INSERT INTO ${tableName} (${cols.join(', ')}) VALUES (${placeholders})`;
@@ -124,9 +191,10 @@ async function syncTable(db, tableName, pgQuery) {
     for (const item of items) {
       insert.run(...cols.map(c => {
         const val = item[c];
-        // SQLite: convert booleans to integers, dates to ISO strings
+        if (val === null || val === undefined) return null;
         if (typeof val === 'boolean') return val ? 1 : 0;
         if (val instanceof Date) return val.toISOString();
+        if (typeof val === 'object') return JSON.stringify(val);
         return val;
       }));
     }
@@ -137,155 +205,223 @@ async function syncTable(db, tableName, pgQuery) {
   return rows.length;
 }
 
+async function checkV5Schema() {
+  try {
+    await query('SELECT palette, layout_type FROM albums LIMIT 1');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function getTableCounts() {
+  const counts = {};
+  const tables = ['artists', 'albums', 'songs', 'products', 'liner_notes'];
+
+  for (const table of tables) {
+    try {
+      const r = await query(`SELECT COUNT(*) as count FROM ${table}`);
+      counts[table] = parseInt(r.rows[0].count);
+    } catch {
+      counts[table] = null;
+    }
+  }
+  return counts;
+}
+
+// ── Main sync ───────────────────────────────────────────────────
+
 async function runSync(dryRun = false) {
   console.log('╔══════════════════════════════════════════════════════════╗');
-  console.log('║  INTERSTELLAR — SQLite Flash Sync                      ║');
+  console.log('║  INTERSTELLAR — SQLite Flash Sync  V5                  ║');
   console.log('╚══════════════════════════════════════════════════════════╝');
   console.log('');
 
-  // 1. Test Postgres connection
+  // 1. Connect
   console.log('📡 Connecting to PostgreSQL...');
   const connected = await testConnection();
   if (!connected) {
-    console.error('❌ Cannot connect to PostgreSQL. Check your .env');
+    console.error('❌ Cannot connect to PostgreSQL. Is Cloud SQL proxy running?');
     process.exit(1);
   }
   console.log('  ✅ Connected');
   console.log('');
 
-  // 2. Count what we'd sync
-  const counts = {};
-  for (const table of ['artists', 'albums', 'songs', 'products']) {
-    const r = await query(`SELECT COUNT(*) as count FROM ${table}`);
-    counts[table] = parseInt(r.rows[0].count);
-  }
+  // 2. Report Postgres state
+  const counts = await getTableCounts();
+  const hasV5 = await checkV5Schema();
 
   console.log('📊 Postgres catalogue:');
-  console.log(`  Artists:  ${counts.artists}`);
-  console.log(`  Albums:   ${counts.albums}`);
-  console.log(`  Songs:    ${counts.songs}`);
-  console.log(`  Products: ${counts.products}`);
+  for (const [table, count] of Object.entries(counts)) {
+    const val = count === null ? '(missing)' : count;
+    console.log(`   ${table.padEnd(14)} ${val}`);
+  }
+  console.log('');
+  console.log(`   V5 schema:    ${hasV5 ? '✅ present' : '⚠️  not yet — run migration 009'}`);
   console.log('');
 
   if (dryRun) {
     console.log('🔍 DRY RUN — no changes written');
-    console.log(`  Would write to: ${FLASH_DB_PATH}`);
+    console.log(`   Would write to: ${FLASH_DB_PATH}`);
     return;
   }
 
-  // 3. Ensure data directory exists
+  // 3. Ensure data directory
   const dataDir = dirname(FLASH_DB_PATH);
   if (!existsSync(dataDir)) {
     mkdirSync(dataDir, { recursive: true });
     console.log(`📁 Created ${dataDir}`);
   }
 
-  // 4. Create fresh SQLite DB (overwrites existing)
-  console.log(`💾 Writing flash DB → ${FLASH_DB_PATH}`);
+  // 4. Create fresh SQLite
+  console.log(`💾 Writing → ${FLASH_DB_PATH}`);
   const db = new Database(FLASH_DB_PATH);
 
-  // Performance settings for bulk write
   db.pragma('journal_mode = WAL');
   db.pragma('synchronous = OFF');
 
-  // 5. Create schema
   db.exec(SCHEMA);
-  console.log('  ✅ Schema created');
+  console.log('   Schema created');
   console.log('');
 
-  // 6. Sync each table
-  console.log('📥 Syncing catalogue data...');
+  // 5. Sync tables
+  console.log('📥 Syncing...');
 
-  await syncTable(db, 'artists',
-    'SELECT id, name, description, created_at, updated_at FROM artists ORDER BY id'
-  );
+  let totalRows = 0;
+  for (const [tableName, v5Query, fallbackQuery] of SYNC_TABLES) {
+    const q = hasV5 ? v5Query : (fallbackQuery || v5Query);
+    totalRows += await syncTable(db, tableName, q);
+  }
 
-  await syncTable(db, 'albums',
-    `SELECT id, catalogue, name, cover_url, production_date, release_date,
-            artist_id, credit, description, tracks, created_at, updated_at
-     FROM albums ORDER BY id`
-  );
+  console.log('');
+  console.log(`   Total: ${totalRows} rows`);
+  console.log('');
 
-  await syncTable(db, 'songs',
-    `SELECT id, name, audio_url, duration, artist_id, album_id, track_id,
-            created_at, updated_at
-     FROM songs ORDER BY album_id, track_id`
-  );
-
-  await syncTable(db, 'products',
-    `SELECT id, cat_id, price, name, catalogue_id, description,
-            stripe_product_id, active, product_type, song_id,
-            created_at, updated_at
-     FROM products ORDER BY id`
-  );
-
-  // 7. Write metadata
+  // 6. Metadata
   const meta = db.prepare('INSERT INTO flash_meta (key, value) VALUES (?, ?)');
   meta.run('synced_at', new Date().toISOString());
   meta.run('source', 'PostgreSQL');
-  meta.run('artists_count', String(counts.artists));
-  meta.run('albums_count', String(counts.albums));
-  meta.run('songs_count', String(counts.songs));
-  meta.run('products_count', String(counts.products));
+  meta.run('v5_schema', hasV5 ? 'true' : 'false');
+  for (const [table, count] of Object.entries(counts)) {
+    if (count !== null) {
+      meta.run(`${table}_count`, String(count));
+    }
+  }
 
-  // 8. Switch to read-optimized settings
+  // 7. Optimize
   db.pragma('journal_mode = DELETE');
   db.pragma('synchronous = FULL');
-
   db.close();
 
-  console.log('');
+  const kb = (statSync(FLASH_DB_PATH).size / 1024).toFixed(1);
+
   console.log('✅ Flash sync complete');
-  console.log(`   ${FLASH_DB_PATH} ready for application reads`);
+  console.log(`   ${FLASH_DB_PATH} (${kb} KB)`);
 }
+
+// ── Verify ──────────────────────────────────────────────────────
 
 async function verifyFlash() {
   console.log('🔍 Verifying flash DB...');
   console.log('');
 
   if (!existsSync(FLASH_DB_PATH)) {
-    console.error(`❌ Flash DB not found at ${FLASH_DB_PATH}`);
+    console.error(`❌ Not found: ${FLASH_DB_PATH}`);
     console.log('   Run: node scripts/flash-sync.js');
     process.exit(1);
   }
+
+  const kb = (statSync(FLASH_DB_PATH).size / 1024).toFixed(1);
+  console.log(`📁 ${FLASH_DB_PATH} (${kb} KB)`);
+  console.log('');
 
   const db = new Database(FLASH_DB_PATH, { readonly: true });
 
   // Meta
   const metaRows = db.prepare('SELECT * FROM flash_meta').all();
-  console.log('📋 Flash DB metadata:');
+  console.log('📋 Metadata:');
   for (const row of metaRows) {
     console.log(`   ${row.key}: ${row.value}`);
   }
   console.log('');
 
   // Counts
-  const tables = ['artists', 'albums', 'songs', 'products'];
+  const tables = ['artists', 'albums', 'songs', 'products', 'liner_notes'];
   console.log('📊 Row counts:');
   for (const t of tables) {
-    const count = db.prepare(`SELECT COUNT(*) as count FROM ${t}`).get();
-    console.log(`   ${t}: ${count.count}`);
+    try {
+      const count = db.prepare(`SELECT COUNT(*) as count FROM ${t}`).get();
+      console.log(`   ${t.padEnd(14)} ${count.count}`);
+    } catch {
+      console.log(`   ${t.padEnd(14)} (missing)`);
+    }
   }
   console.log('');
 
-  // Sample: first 3 albums with song counts
+  // Albums detail
   const albums = db.prepare(`
-    SELECT a.id, a.name, a.catalogue, ar.name as artist_name,
+    SELECT a.id, a.name, a.catalogue, a.layout_type, a.palette,
+           ar.name as artist_name,
            (SELECT COUNT(*) FROM songs s WHERE s.album_id = a.id) as song_count
     FROM albums a
     JOIN artists ar ON a.artist_id = ar.id
     ORDER BY a.id
-    LIMIT 5
   `).all();
 
-  console.log('📀 Sample albums:');
+  console.log(`📀 Albums (${albums.length}):`);
   for (const a of albums) {
-    console.log(`   [${a.catalogue}] ${a.name} — ${a.artist_name} (${a.song_count} tracks)`);
+    const pal = a.palette ? '🎨' : '  ';
+    const layout = (a.layout_type || 'standard').padEnd(8);
+    console.log(`   ${pal} [${a.catalogue}] ${a.name} — ${layout} — ${a.song_count} trk`);
+  }
+  console.log('');
+
+  // Liner notes
+  try {
+    const noteCount = db.prepare('SELECT COUNT(*) as count FROM liner_notes').get();
+    if (noteCount.count > 0) {
+      const noteSummary = db.prepare(`
+        SELECT ln.album_id, a.name as album_name, COUNT(*) as sections
+        FROM liner_notes ln
+        JOIN albums a ON ln.album_id = a.id
+        GROUP BY ln.album_id
+      `).all();
+      console.log(`📝 Liner notes (${noteCount.count} sections):`);
+      for (const n of noteSummary) {
+        console.log(`   ${n.album_name}: ${n.sections} sections`);
+      }
+    } else {
+      console.log('📝 Liner notes: empty');
+    }
+  } catch {
+    console.log('📝 Liner notes: table missing');
   }
 
   db.close();
   console.log('');
-  console.log('✅ Flash DB looks good');
+  console.log('✅ Verified');
+}
+
+// ── Counts only ─────────────────────────────────────────────────
+
+async function showCounts() {
+  console.log('📡 Connecting...');
+  const connected = await testConnection();
+  if (!connected) {
+    console.error('❌ Cannot connect');
+    process.exit(1);
+  }
+
+  const counts = await getTableCounts();
+  const hasV5 = await checkV5Schema();
+
+  console.log('');
+  console.log('📊 Postgres:');
+  for (const [table, count] of Object.entries(counts)) {
+    const val = count === null ? '(missing)' : count;
+    console.log(`   ${table.padEnd(14)} ${val}`);
+  }
+  console.log(`   V5 schema:    ${hasV5 ? '✅' : '⚠️  missing'}`);
 }
 
 // ── CLI ─────────────────────────────────────────────────────────
@@ -294,6 +430,11 @@ const args = process.argv.slice(2);
 
 if (args.includes('--verify')) {
   verifyFlash();
+} else if (args.includes('--counts')) {
+  showCounts().then(() => process.exit(0)).catch(err => {
+    console.error('❌', err.message);
+    process.exit(1);
+  });
 } else if (args.includes('--dry-run')) {
   runSync(true).then(() => process.exit(0)).catch(err => {
     console.error('❌', err.message);

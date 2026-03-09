@@ -1,0 +1,73 @@
+{
+  "_meta": {
+    "description": "Per-album colour palettes extracted from Illustrator SVGs",
+    "updated": "2026-03-08",
+    "fields": {
+      "bg": "Panel/sidebar background colour",
+      "text": "Primary body text colour",
+      "accent": "Credits, secondary text colour",
+      "catalogue": "Catalogue number colour (smaller, darker)",
+      "trackTitle": "Track title colour (often brighter/contrasting)"
+    }
+  },
+  "00040101": {
+    "name": "Charlotta",
+    "layout": "standard",
+    "font": "Futura PT Book",
+    "palette": {
+      "bg": "#620b1f",
+      "text": "#ffc0d7",
+      "accent": "#e2547c",
+      "catalogue": "#93163c",
+      "trackTitle": "#fe264f"
+    }
+  },
+  "01040114": {
+    "name": "Amsterdam Concert",
+    "layout": "compact",
+    "font": "Futura PT Book",
+    "palette": {
+      "bg": "#0077d1",
+      "text": "#aed1fa",
+      "accent": "#00bea0",
+      "catalogue": "#00a9c8",
+      "trackTitle": "#94ffff"
+    }
+  },
+  "01040122": {
+    "name": "Apocrypha",
+    "layout": "essay",
+    "font": "Futura PT Book",
+    "palette": {
+      "bg": "#303536",
+      "text": "#c5cfdb",
+      "accent": "#89abc8",
+      "catalogue": "#5f7786",
+      "trackTitle": "#b8b29c"
+    }
+  },
+  "01040108": {
+    "name": "Ambient Garden One",
+    "layout": "essay",
+    "font": "Futura PT Book",
+    "palette": {
+      "bg": "#082233",
+      "text": "#9cd1ef",
+      "accent": "#98bbcf",
+      "catalogue": "#2f5681",
+      "trackTitle": "#cbdff4"
+    }
+  },
+  "01040123": {
+    "name": "Ambient Garden Two",
+    "layout": "essay",
+    "font": "Futura PT Book",
+    "palette": {
+      "bg": "#082430",
+      "text": "#cfeaf8",
+      "accent": "#48bacd",
+      "catalogue": "#006374",
+      "trackTitle": "#7fe8da"
+    }
+  }
+}

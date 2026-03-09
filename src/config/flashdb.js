@@ -1,18 +1,24 @@
 // ============================================================================
-// INTERSTELLAR PACKAGES — FlashDB (Read-Only Catalogue Cache)
+// INTERSTELLAR PACKAGES — FlashDB (Read-Only Catalogue Cache)  V5
 // src/config/flashdb.js
 //
 // Provides fast, synchronous reads against the local SQLite flash DB.
 // Used by the application layer for all browsing/catalogue queries.
 // Postgres is still used for writes: carts, purchases, auth, sessions.
 //
+// V5 additions:
+//   - palette JSON parsing on album reads
+//   - layout_type for template mode selection
+//   - getLinerNotes() for extended essay content
+//   - getAlbumFull / getArtistFull return parsed palettes + liner notes
+//
 // Usage:
 //   import flash from '../config/flashdb.js';
 //
-//   const albums = flash.getAlbumsByArtist(1);
-//   const album  = flash.getAlbumByCatalogue('00040101');
-//   const songs  = flash.getSongsByAlbum(1);
-//   const all    = flash.getAllArtists();
+//   const artist = flash.getArtistFull(1);        // artist + albums w/ palettes
+//   const album  = flash.getAlbumFullByCatalogue('00040101');  // full payload
+//   const notes  = flash.getLinerNotes(22);        // essay sections
+//   const ready  = flash.isReady();                // false if flash.db missing
 // ============================================================================
 
 import Database from 'better-sqlite3';
@@ -39,12 +45,24 @@ function getDB() {
   db = new Database(FLASH_DB_PATH, { readonly: true });
   db.pragma('journal_mode = WAL');
 
-  // Log flash DB info on first load
   const meta = db.prepare('SELECT * FROM flash_meta').all();
   const syncedAt = meta.find(m => m.key === 'synced_at');
-  console.log(`⚡ FlashDB loaded (synced: ${syncedAt?.value || 'unknown'})`);
+  const v5 = meta.find(m => m.key === 'v5_schema');
+  console.log(`⚡ FlashDB loaded (synced: ${syncedAt?.value || 'unknown'}, v5: ${v5?.value || 'false'})`);
 
   return db;
+}
+
+// ── Palette helper ──────────────────────────────────────────────
+// palette is stored as JSON text in SQLite, parse it into an object
+
+function parsePalette(paletteStr) {
+  if (!paletteStr) return {};
+  try {
+    return JSON.parse(paletteStr);
+  } catch {
+    return {};
+  }
 }
 
 // ── Artists ──────────────────────────────────────────────────────
@@ -66,7 +84,29 @@ function getArtist(id) {
   return d.prepare('SELECT * FROM artists WHERE id = ?').get(id);
 }
 
-// ── Albums ──────────────────────────────────────────────────────
+function getArtistFull(artistId) {
+  const artist = getArtist(artistId);
+  if (!artist) return null;
+
+  const d = getDB();
+  const albums = d.prepare(`
+    SELECT a.*, ar.name as artist_name,
+           (SELECT COUNT(*) FROM songs s WHERE s.album_id = a.id) as song_count
+    FROM albums a
+    JOIN artists ar ON a.artist_id = ar.id
+    WHERE a.artist_id = ?
+    ORDER BY a.release_date DESC
+  `).all(artistId);
+
+  const albumsWithPalette = albums.map(a => ({
+    ...a,
+    palette: parsePalette(a.palette)
+  }));
+
+  return { ...artist, albums: albumsWithPalette };
+}
+
+// ── Albums ───────────────────────────────────────────────────────
 
 function getAllAlbums() {
   const d = getDB();
@@ -113,7 +153,41 @@ function getAlbumByCatalogue(catalogue) {
   `).get(catalogue);
 }
 
-// ── Songs ───────────────────────────────────────────────────────
+function getAlbumFull(albumId) {
+  const album = getAlbum(albumId);
+  if (!album) return null;
+
+  const songs = getSongsByAlbum(albumId);
+  const product = getProductByCatalogue(album.catalogue);
+  const linerNotes = getLinerNotes(albumId);
+
+  return {
+    ...album,
+    palette: parsePalette(album.palette),
+    songs,
+    product,
+    linerNotes
+  };
+}
+
+function getAlbumFullByCatalogue(catalogue) {
+  const album = getAlbumByCatalogue(catalogue);
+  if (!album) return null;
+
+  const songs = getSongsByAlbum(album.id);
+  const product = getProductByCatalogue(album.catalogue);
+  const linerNotes = getLinerNotes(album.id);
+
+  return {
+    ...album,
+    palette: parsePalette(album.palette),
+    songs,
+    product,
+    linerNotes
+  };
+}
+
+// ── Songs ────────────────────────────────────────────────────────
 
 function getSongsByAlbum(albumId) {
   const d = getDB();
@@ -152,7 +226,7 @@ function getAllSongs() {
   `).all();
 }
 
-// ── Products ────────────────────────────────────────────────────
+// ── Products ─────────────────────────────────────────────────────
 
 function getActiveProducts() {
   const d = getDB();
@@ -166,49 +240,24 @@ function getProductByCatalogue(catId) {
   return d.prepare('SELECT * FROM products WHERE cat_id = ? AND active = 1').get(catId);
 }
 
-// ── Full album payload (album + songs + product) ────────────────
-// This is the single call for the liner notes / album detail page.
+// ── Liner Notes ──────────────────────────────────────────────────
 
-function getAlbumFull(albumId) {
-  const album = getAlbum(albumId);
-  if (!album) return null;
-
-  const songs = getSongsByAlbum(albumId);
-  const product = getProductByCatalogue(album.catalogue);
-
-  return { ...album, songs, product };
-}
-
-function getAlbumFullByCatalogue(catalogue) {
-  const album = getAlbumByCatalogue(catalogue);
-  if (!album) return null;
-
-  const songs = getSongsByAlbum(album.id);
-  const product = getProductByCatalogue(album.catalogue);
-
-  return { ...album, songs, product };
-}
-
-// ── Artist full payload (artist + albums with song counts) ──────
-
-function getArtistFull(artistId) {
-  const artist = getArtist(artistId);
-  if (!artist) return null;
-
+function getLinerNotes(albumId) {
   const d = getDB();
-  const albums = d.prepare(`
-    SELECT a.*, ar.name as artist_name,
-           (SELECT COUNT(*) FROM songs s WHERE s.album_id = a.id) as song_count
-    FROM albums a
-    JOIN artists ar ON a.artist_id = ar.id
-    WHERE a.artist_id = ?
-    ORDER BY a.release_date DESC
-  `).all(artistId);
-
-  return { ...artist, albums };
+  if (!d) return [];
+  try {
+    return d.prepare(`
+      SELECT * FROM liner_notes
+      WHERE album_id = ?
+      ORDER BY sort_order
+    `).all(albumId);
+  } catch {
+    // table might not exist in older flash DBs
+    return [];
+  }
 }
 
-// ── Meta ────────────────────────────────────────────────────────
+// ── Meta ─────────────────────────────────────────────────────────
 
 function getFlashMeta() {
   const d = getDB();
@@ -221,7 +270,7 @@ function isReady() {
   return getDB() !== null;
 }
 
-// ── Export ───────────────────────────────────────────────────────
+// ── Export ────────────────────────────────────────────────────────
 
 const flash = {
   // Artists
@@ -242,6 +291,8 @@ const flash = {
   // Products
   getActiveProducts,
   getProductByCatalogue,
+  // Liner Notes
+  getLinerNotes,
   // Meta
   getFlashMeta,
   isReady
