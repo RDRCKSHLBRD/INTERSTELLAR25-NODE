@@ -303,6 +303,15 @@ function applyPositions(c, rp, State) {
 }
 
 // ── Layout: QuadTree Album Grid ─────────────────────────────────
+// GRID MARGIN FIX — V5 Session 3
+// 
+// Problem:  paddingLeft on the grid container has no effect because tiles
+//           are position:absolute — they sit at left:0 regardless.
+// Fix:      Add the margin offset directly to each tile's left calculation.
+//           Remove the paddingLeft line entirely.
+//
+// FIND this function in public/js/roderick.js and replace it.
+
 function layoutAlbumGridWithQuadTree(c) {
   const qtCfg = c.quadTree?.albumGrid;
   if (!qtCfg?.enabled) {
@@ -324,25 +333,28 @@ function layoutAlbumGridWithQuadTree(c) {
   const gap     = qtCfg.gap?.px ?? 16;
   const aspect  = qtCfg.tile?.aspect ?? 1.0;
 
-  const margin = w * 0.02;
-  const availW = w * 0.92;
+  // ── Margin fix: symmetric left/right inset ──
+  const marginPct = 0.02;                      // 2% each side
+  const margin    = Math.round(w * marginPct);  // px offset for left edge
+  const availW    = w - (margin * 2);           // usable width after both margins
+
   const tileW  = Math.floor((availW - (gap * (maxCols - 1))) / maxCols);
   const tileH  = Math.round(tileW / aspect);
   const cols   = Math.max(1, Math.min(maxCols, Math.floor((availW + gap) / (tileW + gap))));
   const rows   = Math.ceil(covers.length / cols);
 
   gridEl.style.position = 'relative';
-  gridEl.style.width = '100%';
+  gridEl.style.width    = '100%';
   gridEl.style.maxWidth = '100%';
-  gridEl.style.paddingLeft = px(margin);
+  // NOTE: paddingLeft removed — has no effect on absolutely-positioned children
 
   covers.forEach((cover, i) => {
     const col = i % cols;
     const row = Math.floor(i / cols);
     Object.assign(cover.style, {
       position: 'absolute',
-      left: px(col * (tileW + gap)),
-      top:  px(row * (tileH + gap)),
+      left:   px(margin + col * (tileW + gap)),   // ← margin offset added here
+      top:    px(row * (tileH + gap)),
       width:  px(tileW),
       height: px(tileH),
       objectFit: 'cover',
@@ -351,7 +363,7 @@ function layoutAlbumGridWithQuadTree(c) {
   });
 
   gridEl.style.height = px(rows * tileH + Math.max(0, rows - 1) * gap);
-  console.log(`✅ Grid layout: ${cols}×${rows} tiles @ ${tileW}px`);
+  console.log(`✅ Grid layout: ${cols}×${rows} tiles @ ${tileW}px, margin=${margin}px`);
 }
 
 // ── Keyboard shortcuts ──────────────────────────────────────────
