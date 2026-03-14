@@ -1,29 +1,31 @@
-// src/routes/api/health.js
+// src/routes/api/health.js — V5 (flash-first, no Postgres probe when off)
 import express from 'express';
-import { query } from '../../config/database.js';
+import flash from '../../config/flashdb.js';
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', (req, res) => {
   try {
     const uptime = process.uptime();
     const timestamp = new Date().toISOString();
 
-    let dbStatus = 'unknown';
-    try {
-      const testResult = await query('SELECT NOW()');
-      if (testResult?.rows?.length) {
-        dbStatus = 'connected';
-      }
-    } catch (err) {
-      dbStatus = 'error';
+    // Flash layer status
+    const flashReady = flash.isReady();
+    let flashMeta = null;
+    if (flashReady) {
+      flashMeta = flash.getFlashMeta();
     }
 
     res.status(200).json({
-      status: 'ok',
-      uptime,
+      status: flashReady ? 'ok' : 'degraded',
+      uptime: Math.round(uptime),
       timestamp,
-      db: dbStatus
+      flash: {
+        ready: flashReady,
+        syncedAt: flashMeta?.synced_at || null,
+        v5: flashMeta?.v5_schema || null
+      },
+      postgres: 'off (flash-only mode)'
     });
   } catch (error) {
     console.error('Health check error:', error);
