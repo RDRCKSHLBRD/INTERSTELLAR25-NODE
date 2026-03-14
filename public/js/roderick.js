@@ -438,6 +438,10 @@ function setupKeyboard() {
     await applyPaintForPage(cfg);
     render();
 
+    // Reveal page after first render — no layout flash
+    document.body.style.opacity = '1';
+    document.body.style.transition = 'opacity 0.2s ease';
+
     console.log('🎉 Roderick.js V5 initialized');
   });
 })();
