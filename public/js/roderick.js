@@ -324,7 +324,8 @@ function layoutAlbumGridWithQuadTree(c) {
   const gap     = qtCfg.gap?.px ?? 16;
   const aspect  = qtCfg.tile?.aspect ?? 1.0;
 
-  const availW = w * 0.96;
+  const margin = w * 0.02;
+  const availW = w * 0.92;
   const tileW  = Math.floor((availW - (gap * (maxCols - 1))) / maxCols);
   const tileH  = Math.round(tileW / aspect);
   const cols   = Math.max(1, Math.min(maxCols, Math.floor((availW + gap) / (tileW + gap))));
@@ -333,6 +334,7 @@ function layoutAlbumGridWithQuadTree(c) {
   gridEl.style.position = 'relative';
   gridEl.style.width = '100%';
   gridEl.style.maxWidth = '100%';
+  gridEl.style.paddingLeft = px(margin);
 
   covers.forEach((cover, i) => {
     const col = i % cols;
@@ -384,6 +386,12 @@ function setupKeyboard() {
 
 // ── Init ────────────────────────────────────────────────────────
 (async function init() {
+  // Shim for player.js — it expects window.apiClient.getAlbum/getSong
+  window.apiClient = {
+    getAlbum: (id) => fetchJSON(`/api/albums/${id}`),
+    getSong:  (id) => fetchJSON(`/api/songs/${id}`)
+  };
+
   // Load page config
   const cfgRes = await fetch('/config/pages/roderick.json', { cache: 'no-store' });
   if (!cfgRes.ok) throw new Error('roderick.json not found');
