@@ -43,7 +43,7 @@ function getDB() {
   }
 
   db = new Database(FLASH_DB_PATH, { readonly: true });
-  db.pragma('journal_mode = WAL');
+  db.pragma('journal_mode');
 
   const meta = db.prepare('SELECT * FROM flash_meta').all();
   const syncedAt = meta.find(m => m.key === 'synced_at');

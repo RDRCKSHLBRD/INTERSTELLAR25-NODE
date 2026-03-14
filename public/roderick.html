@@ -5,40 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>INTERSTELLAR PACKAGES</title>
 
-  <!-- Stripe -->
-  <script src="https://js.stripe.com/v3/"></script>
-
   <link rel="stylesheet" href="/css/header-layout.css">
   <link rel="stylesheet" href="/css/album-info-styles.css">
-  
+
   <style>
-    /* OVERFLOW PROTECTION - Prevent horizontal scroll */
     html, body {
       margin: 0;
       padding: 0;
       overflow-x: hidden;
       max-width: 100vw;
       width: 100%;
+      background: #083D5E;
+      color: #cadbda;
+      font-family: Helvetica, sans-serif;
     }
-    
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
   </style>
 </head>
 
 <body data-math="on" data-page="roderick">
   <header class="header-system" id="artistHeader">
-    <!-- CORRECT ORDER: Logo > Nav > Artist -->
-    
     <div class="Logo header-logo" id="brandLogo" data-position="brandLogo">
       <img src="/images/IP_TAG24.svg" alt="Interstellar Packages Logo">
     </div>
 
     <nav class="Nav header-nav" id="topNav" data-position="topNav">
       <ul>
-        <li><a href="filmography.html">Film</a></li>
-        <li><a href="contact.html">Contact</a></li>
+        <li><a href="/filmography">Film</a></li>
+        <li><a href="/contact">Contact</a></li>
         <li class="loginSquare">
           <button id="loginBtn" class="login-button">Log In</button>
         </li>
@@ -56,17 +50,16 @@
     </nav>
 
     <div class="artist-name-container" id="artistName" data-position="artistName">
-      <span id="artist-name" class="artist-name">Loading...</span>
+      <span id="artist-name" class="artist-name">Roderick Shoolbraid</span>
     </div>
   </header>
 
   <main id="artistMain">
     <div class="album-art" id="albumsRegion">
-      <!-- Albums are added directly here by ui-manager.js -->
+      <!-- Albums built by roderick.js from flash API -->
     </div>
 
     <aside class="sidebar" id="infoRegion">
-      <!-- Hidden on mobile, sidebar on desktop/tablet -->
       <details class="sidebar-details" open>
         <summary>Album Details</summary>
         <div class="sidebar-content" id="albumInfo" data-position="albumInfo"></div>
@@ -85,31 +78,27 @@
     </details>
   </footer>
 
-  <!-- System + app modules (order matters for ESM dependencies) -->
+  <!-- RODUX System (order matters for ESM dependencies) -->
   <script type="module" src="/js/InterstellarSystem.js"></script>
-  <script type="module" src="/js/api-client.js"></script>
-  <script type="module" src="/js/ui-manager.js"></script>
-  <script type="module" src="/js/main.js"></script>
-  <script type="module" src="/js/header.js"></script>
 
-  <!-- Legacy globals -->
+  <!-- Legacy globals (player needs window.audioPlayer, auth/cart need Postgres) -->
   <script src="/js/auth.js"></script>
   <script src="/js/cart.js"></script>
   <script src="/js/player.js"></script>
 
-  <!-- Paint first, then page controller -->
+  <!-- V5: Paint + Page Controller (roderick.js owns everything) -->
   <script type="module" src="/js/paint-applier.js"></script>
+  <script type="module" src="/js/header.js"></script>
   <script type="module" src="/js/roderick.js"></script>
 
-  <!-- Overlays (hidden by default without CSS) -->
+  <!-- Overlays (hidden by default) -->
   <section id="playerOverlay" aria-hidden="true" style="display:none;"></section>
   <section id="userOverlay" aria-hidden="true" style="display:none;"></section>
 
-  <!-- Auth Modal (hidden by default without CSS) -->
+  <!-- Auth Modal -->
   <div id="authModal" class="auth-modal" style="display:none;">
     <div class="auth-modal-content">
       <span class="close"></span>
-
       <div id="loginForm" class="auth-form-container">
         <h2>Log In</h2>
         <div id="loginError" class="auth-error" style="display:none;"></div>
@@ -125,7 +114,6 @@
           Don't have an account? <a id="showRegister">Create one</a>
         </div>
       </div>
-
       <div id="registerForm" class="auth-form-container" style="display:none;">
         <h2>Create Account</h2>
         <div id="registerError" class="auth-error" style="display:none;"></div>
