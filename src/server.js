@@ -67,7 +67,8 @@ app.use(
         scriptSrc: [
           "'self'", 
           "https://js.stripe.com",
-          "'sha256-LirTtLksfeCbNz2wk0GaS/SuK6zjbd3U6QCrbRECK5Y='" 
+          "'sha256-LirTtLksfeCbNz2wk0GaS/SuK6zjbd3U6QCrbRECK5Y='",
+          "'sha256-Br3RkiR1HSnkHBrJH8w3DkMwu4XRRQKiOt2zWk9quFo='"
         ],
         imgSrc: ["'self'", "https://storage.googleapis.com", "data:"],
         mediaSrc: ["'self'", "https://storage.googleapis.com"],
@@ -266,8 +267,7 @@ const startServer = async () => {
     const dbConnected = await testConnection();
 
     if (!dbConnected) {
-      console.error('❌ Database connection failed. Please check your configuration.');
-      process.exit(1);
+      console.warn('⚠️  Postgres unavailable — running in flash-only mode (browse OK, writes disabled)');
     }
 
     const server = app.listen(config.port, "0.0.0.0", () => {
