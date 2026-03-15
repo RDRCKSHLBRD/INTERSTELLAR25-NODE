@@ -3,7 +3,7 @@
    The entire footer UI: collapsible <details>, player transport,
    nav links, cart, login, logo.
    
-   Icons: /images/CASS-*.svg (transport), IP-CART*.svg (cart)
+   Icons: /images/PLAYER-*.svg (transport), IP-CART*.svg (cart)
    player.js builds DOM inside #playerControls.
    
    position:fixed at bottom — not laid out by roderick.js.
@@ -28,13 +28,16 @@
 }
 
 .footer-details summary {
-  font-size: 11px; font-weight: 400;
+  font-size: 10px;
+  font-weight: 400;
   color: var(--ip-muted, #8ab7ce);
   letter-spacing: 0.5px;
-  padding: 6px 16px;
-  cursor: pointer; user-select: none;
+  padding: 4px 16px;
+  cursor: pointer;
+  user-select: none;
   list-style: none;
-  border-bottom: 1px solid rgba(43, 127, 140, 0.2);
+  border-bottom: 1px solid rgba(43, 127, 140, 0.15);
+  line-height: 1;
 }
 .footer-details summary::-webkit-details-marker { display: none; }
 .footer-details summary::before { content: '▸ '; }
@@ -42,27 +45,24 @@
 
 
 /* ── Footer Inner Bar ────────────────────────────────────────── */
-/* Wireframe: player | track/time | film | contact | login | cart | logo */
 .footer-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 6px 16px 8px;
-  gap: 12px;
-  min-height: 40px;
+  padding: 0;
+  min-height: 38px;
 }
 
 
-/* ── Player Zone (left) ──────────────────────────────────────── */
+/* ── Player Zone (left — takes available space) ──────────────── */
 .footer-player-zone {
   display: flex;
   align-items: center;
   flex: 1;
   min-width: 0;
-  gap: 8px;
+  padding: 6px 12px;
+  gap: 4px;
 }
 
-/* player.js creates its bar inside here */
 .player {
   display: flex;
   align-items: center;
@@ -72,72 +72,52 @@
 
 
 /* ── Player Transport Icons ──────────────────────────────────── */
-/* player.js creates buttons — we target them by [title] or add
-   classes via the player.js patch below. These override the
-   inline styles player.js sets on its buttons. */
-
 #playerControls button {
   background: none;
   border: none;
   outline: none;
   cursor: pointer;
-  width: 26px; height: 26px;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
   background-size: 18px 18px;
   background-repeat: no-repeat;
   background-position: center;
   border-radius: 2px;
   padding: 0;
-  font-size: 0;            /* hide emoji text */
-  color: transparent;       /* hide emoji text */
+  font-size: 0;
+  color: transparent;
+  overflow: hidden;
   transition: opacity 0.15s;
 }
 #playerControls button:hover { opacity: 0.7; }
 
-/* Map icons by title attribute (set by player.js) */
-#playerControls button[title="Previous"]        { background-image: url('/images/CASS-BACK_BLUE-5.svg'); }
-#playerControls button[title="Play"]            { background-image: url('/images/CASS-PLAY-v2.svg'); }
-#playerControls button[title="Next"]            { background-image: url('/images/CASS-FWD_BLUE-5.svg'); }
-#playerControls button[title="Stop"]            { background-image: url('/images/CASS-STOP.svg'); }
-#playerControls button[title="Loop"]            { background-image: url('/images/CASS-REPEAT_BLUE.svg'); }
-#playerControls button[title="Add Track to Cart"] { 
-  background-image: url('/images/IP-CART-add-v1.svg'); 
+/* Map icons by title — PLAYER-*.svg */
+#playerControls button[title="Previous"]         { background-image: url('/images/PLAYER-BACK_BLUE-5.svg'); }
+#playerControls button[title="Play"]             { background-image: url('/images/PLAYER-PLAY-v2.svg'); }
+#playerControls button[title="Next"]             { background-image: url('/images/PLAYER-FWD_BLUE-5.svg'); }
+#playerControls button[title="Stop"]             { background-image: url('/images/PLAYER-STOP.svg'); }
+#playerControls button[title="Loop"]             { background-image: url('/images/PLAYER-REPEAT_BLUE.svg'); }
+#playerControls button[title="Add Track to Cart"] {
+  background-image: url('/images/IP-CART-add-v1.svg');
   background-size: 20px 20px;
 }
 
-/* Loop active state */
+/* Loop active */
 #playerControls button[title="Loop"][data-active="true"] {
   background-color: rgba(43, 127, 140, 0.3);
   border: 1px solid rgba(43, 127, 140, 0.6);
-  border-radius: 2px;
-}
-
-/* Song title (created by player.js) */
-.PlayerSong,
-#playerControls span:first-child {
-  font-size: 12px; font-weight: 400;
-  color: var(--ip-fg, #cadbda);
-  white-space: nowrap; overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 200px;
-}
-
-/* Time display */
-#playerControls .time-display,
-#playerControls span[style*="monospace"] {
-  font-size: 11px; font-family: monospace;
-  color: var(--ip-muted, #8ab7ce);
-  white-space: nowrap;
 }
 
 
-/* ── Nav Zone (right side of footer) ─────────────────────────── */
+/* ── Nav Zone (right — flush against player, clear border) ──── */
 .footer-nav-zone {
   display: flex;
   align-items: center;
-  gap: 0;
   flex-shrink: 0;
   height: 100%;
+  margin-left: auto;
+  border-left: 1px solid rgba(43, 127, 140, 0.3);
 }
 
 .footer-nav-zone a,
@@ -145,14 +125,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  padding: 8px 16px;
+  padding: 10px 18px;
   color: var(--ip-fg, #cadbda);
   text-decoration: none;
-  font-size: 13px; font-weight: 300;
+  font-size: 13px;
+  font-weight: 300;
   white-space: nowrap;
-  background: none; border: none;
-  border-left: 1px solid rgba(43, 127, 140, 0.25);
+  background: none;
+  border: none;
+  border-right: 1px solid rgba(43, 127, 140, 0.2);
   cursor: pointer;
   font-family: inherit;
   transition: background 0.15s;
@@ -160,6 +141,9 @@
 .footer-nav-zone a:hover,
 .footer-nav-zone button:hover {
   background: rgba(43, 127, 140, 0.15);
+}
+.footer-nav-zone > :last-child {
+  border-right: none;
 }
 
 /* Cart button */
@@ -191,8 +175,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 12px;
-  border-left: 1px solid rgba(43, 127, 140, 0.25);
+  padding: 10px 14px;
+  border-right: 1px solid rgba(43, 127, 140, 0.2);
 }
 
 #userName {
@@ -208,7 +192,7 @@
   align-items: center;
   justify-content: center;
   padding: 4px 16px;
-  border-left: 1px solid rgba(43, 127, 140, 0.25);
+  border-left: 1px solid rgba(43, 127, 140, 0.2);
   flex-shrink: 0;
 }
 
@@ -220,53 +204,42 @@
 .footer-tag {
   font-size: 8px;
   color: #829D9E;
-  margin: 2px 0 0; white-space: nowrap;
+  margin: 2px 0 0;
+  white-space: nowrap;
   line-height: 1;
 }
 
 
 /* ── Responsive: Tablet ──────────────────────────────────────── */
 @media (max-width: 1023px) {
-  .footer-bar {
-    padding: 4px 12px 6px;
-    gap: 8px;
-  }
-
   .footer-nav-zone a,
   .footer-nav-zone button {
-    padding: 6px 12px;
+    padding: 8px 12px;
     font-size: 12px;
   }
 
   .footer-logo img { height: 16px; }
-
-  /* Hide skip-30 buttons on tablet */
-  #playerControls button[title*="30"] {
-    display: none;
-  }
+  .footer-logo { padding: 4px 10px; }
 }
 
 
 /* ── Responsive: Mobile ──────────────────────────────────────── */
 @media (max-width: 767px) {
 
-  /* Footer stacks: summary on top, then player, then nav */
   .footer-bar {
     flex-wrap: wrap;
-    padding: 4px 10px 6px;
-    gap: 6px;
   }
 
-  /* Player zone takes full width */
   .footer-player-zone {
     width: 100%;
     order: 1;
+    padding: 4px 10px;
   }
 
-  /* Nav zone takes full width, centered */
   .footer-nav-zone {
     width: 100%;
     justify-content: center;
+    border-left: none;
     border-top: 1px solid rgba(43, 127, 140, 0.2);
     order: 2;
   }
@@ -275,14 +248,9 @@
   .footer-nav-zone button {
     font-size: 11px;
     padding: 5px 8px;
-    border-left: none;
     border-right: 1px solid rgba(43, 127, 140, 0.15);
   }
-  .footer-nav-zone > :last-child {
-    border-right: none;
-  }
 
-  /* Logo below nav */
   .footer-logo {
     width: 100%;
     flex-direction: row;
@@ -290,25 +258,16 @@
     gap: 8px;
     border-left: none;
     border-top: 1px solid rgba(43, 127, 140, 0.15);
-    padding: 4px 10px;
+    padding: 3px 10px;
     order: 3;
   }
   .footer-logo img { height: 14px; }
 
-  /* Smaller transport buttons */
   #playerControls button {
     width: 22px; height: 22px;
     background-size: 14px 14px;
   }
 
-  /* Hide volume on mobile */
-  #playerControls .volume-control,
-  #playerControls div[style*="volume"],
-  #playerControls span[style*="🔊"] {
-    display: none;
-  }
-
-  /* Hide cart button in player on mobile (it's in nav zone) */
   #playerControls button[title="Add Track to Cart"] {
     display: none;
   }

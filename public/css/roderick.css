@@ -26,8 +26,6 @@ body {
 
 
 /* ── Main Region ─────────────────────────────────────────────── */
-/* roderick.js sets position/size via applyRegions() */
-
 #artistMain {
   position: absolute;
   overflow: hidden;
@@ -35,8 +33,6 @@ body {
 
 
 /* ── Albums Grid Region ──────────────────────────────────────── */
-/* Scrolls internally. Tiles positioned absolutely by QuadTree. */
-
 #albumsRegion {
   position: absolute;
   overflow-y: auto;
@@ -59,14 +55,15 @@ body {
 
 
 /* ── Sidebar ─────────────────────────────────────────────────── */
-
 #infoRegion {
   position: absolute;
   display: none;
   overflow-y: auto;
   overflow-x: hidden;
-  background: rgba(8, 61, 94, 0.97);
-  border-left: 1px solid rgba(43, 127, 140, 0.3);
+  /* Fully opaque so albums don't bleed through */
+  background: var(--ip-bg, #083D5E);
+  border-left: 1px solid rgba(43, 127, 140, 0.35);
+  z-index: 10;
 }
 
 #infoRegion.open { display: block; }
@@ -76,7 +73,7 @@ body {
   position: sticky; top: 0; z-index: 2;
   display: flex; justify-content: flex-end;
   padding: 8px 12px;
-  background: rgba(8, 61, 94, 0.95);
+  background: var(--ip-bg, #083D5E);
 }
 .sidebar-close button {
   background: none;

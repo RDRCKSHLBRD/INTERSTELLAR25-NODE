@@ -18,7 +18,8 @@
   background: var(--ip-bg, #083D5E);
 }
 
-/* ── Artist Name SVG ─────────────────────────────────────────── */
+
+/* ── Artist Name SVG (primary) ───────────────────────────────── */
 .artist-name-container {
   display: flex;
   align-items: center;
@@ -31,14 +32,15 @@
   display: block;
 }
 
-/* Text fallback — hidden when SVG loads */
+/* Text fallback — hidden by default, JS shows if SVG fails */
 .artist-name {
-  font-size: var(--artist-name-font-size, 18px);
+  font-size: var(--artist-name-font-size, 22px);
   font-weight: var(--artist-name-font-weight, 200);
-  color: var(--artist-name-color, #cadbda);
+  color: var(--ip-primary, #3AA0A0);
   letter-spacing: var(--artist-name-letter-spacing, 0.5px);
   white-space: nowrap;
 }
+
 
 /* ── Mobile ──────────────────────────────────────────────────── */
 @media (max-width: 767px) {
@@ -46,11 +48,13 @@
     justify-content: center;
     padding: 6px 12px;
   }
+
   #artist-name-svg {
-    height: 18px;
+    height: 20px;
   }
+
   .artist-name {
-    font-size: 14px;
+    font-size: 15px;
     text-align: center;
   }
 }
