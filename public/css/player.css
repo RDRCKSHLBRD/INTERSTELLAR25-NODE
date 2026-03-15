@@ -14,16 +14,16 @@
 /* ── Custom Property Defaults ────────────────────────────────── */
 :root {
   /* Footer chrome */
-  --footer-height:       46px;
+  --footer-height:       65px;
   --footer-bg:           #07212B;
   --footer-border:       1px solid rgba(43, 127, 140, 0.4);
   --footer-separator:    1px solid rgba(43, 127, 140, 0.25);
 
   /* Player zone */
-  --player-btn-size:     30px;
-  --player-icon-size:    20px;
-  --player-btn-gap:      3px;
-  --player-title-max-w:  220px;
+  --player-btn-size:     45px;
+  --player-icon-size:    40px;
+  --player-btn-gap:      4px;
+  --player-title-max-w:  500px;
   --player-title-font:   13px;
   --player-time-font:    12px;
   --player-time-min-w:   78px;
@@ -37,7 +37,7 @@
   --seek-fill-bg:        var(--ip-primary, #3AA0A0);
 
   /* Volume */
-  --vol-track-w:         50px;
+  --vol-track-w:         100px;
   --vol-track-h:         4px;
 
   /* Nav zone */
@@ -45,10 +45,10 @@
   --nav-padding:         10px 20px;
 
   /* Logo zone */
-  --logo-img-h:          24px;
-  --logo-tag-font:       9px;
+  --logo-img-h:          38px;
+  --logo-tag-font:       11px;
   --logo-tag-color:      #829D9E;
-  --logo-padding:        4px 20px;
+  --logo-padding:        4px 34px;
 
   /* Toggle */
   --toggle-font:         10px;
