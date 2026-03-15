@@ -1,523 +1,300 @@
-// public/js/player.js
-// Browser-compatible Audio Player
+// ============================================================================
+// public/js/player.js — V5 Session 3
+//
+// Custom audio player. No browser user-agent controls.
+// All UI built by DOM creation, styled inline from paint tokens.
+// Exposes window.audioPlayer for global access.
+//
+// Layout: horizontal bar — [prev][play/pause][next] [stop] [progress] [time] [vol] [loop] [cart]
+// ============================================================================
 
-/**
- * Fixed Audio Player for Current Data Structure
- * Handles the actual API response format
- */
 class AudioPlayer {
   constructor() {
-    this.currentAudio = null;
+    this.audio = null;
     this.currentSong = null;
     this.currentAlbum = null;
     this.isLooping = false;
-    this.playerContainer = null;
+    this.volume = 0.8;
+    this.container = null;
+    this.els = {};
+    this.built = false;
   }
 
-  /**
-   * Initialize the player with song and album data
-   */
-  async playSong(songId, albumId) {
-    try {
-      console.log(`🎵 Playing song ${songId} from album ${albumId}`);
+  // ── Build player DOM (once) ──────────────────────────────────
+  build() {
+    this.container = document.getElementById('playerControls');
+    if (!this.container || this.built) return;
+    this.built = true;
 
-      // Get album data first (which should include songs)
-      let album = null;
+    // Audio element (hidden)
+    this.audio = document.createElement('audio');
+    this.audio.preload = 'metadata';
+    this.container.appendChild(this.audio);
 
-      // Try to get album from API if apiClient is available
-      if (window.apiClient) {
-        album = await window.apiClient.getAlbum(albumId);
-      }
-
-      // Fallback to global data if no API client
-      if (!album && window.data && window.data.albums) {
-        album = window.data.albums[albumId];
-      }
-
-      if (!album) {
-        throw new Error('Album not found');
-      }
-
-      // Find the song in the album's songs array
-      let song = null;
-      if (album.songs && Array.isArray(album.songs)) {
-        song = album.songs.find(s => s.id === songId);
-      }
-
-      // If not found in album, try to get from global data
-      if (!song && window.data && window.data.songs) {
-        song = window.data.songs[songId];
-      }
-
-      // If still not found, try direct API call
-      if (!song && window.apiClient) {
-        try {
-          song = await window.apiClient.getSong(songId);
-        } catch (error) {
-          console.warn('Direct song API call failed:', error);
-        }
-      }
-
-      if (!song) {
-        throw new Error(`Song ${songId} not found`);
-      }
-
-      console.log('🎵 Song found:', song);
-      console.log('📀 Album data:', album);
-
-      this.currentSong = song;
-      this.currentAlbum = album;
-
-      this.setupPlayer();
-      this.loadAudio();
-
-    } catch (error) {
-      console.error('Failed to play song:', error);
-      this.showError(`Failed to load song: ${error.message}`);
-    }
-  }
-
-  /**
-   * Set up the player UI
-   */
-  setupPlayer() {
-    this.playerContainer = document.querySelector('.player');
-    if (!this.playerContainer) {
-      console.error('Player container not found');
-      return;
-    }
-
-    this.playerContainer.innerHTML = ''; // Clear previous content
-    this.createPlayerUI();
-    this.attachEventListeners();
-  }
-
-  /**
-   * Create the player user interface
-   */
-  createPlayerUI() {
-    // Now Playing Title
-    const nowPlaying = document.createElement('p');
-    nowPlaying.textContent = this.currentSong.name;
-    nowPlaying.classList.add('PlayerSong');
-    this.playerContainer.appendChild(nowPlaying);
-
-    // Audio element
-    const audio = document.createElement('audio');
-    audio.src = this.currentSong.audio_url;
-    audio.id = 'audio-player';
-    audio.preload = 'metadata';
-    this.playerContainer.appendChild(audio);
-    this.currentAudio = audio;
-
-    // Custom controls container
-    const controls = document.createElement('div');
-    controls.classList.add('custom-audio-controls');
-
-    // Control buttons
-    const buttons = [
-      { id: 'play', class: 'play', title: 'Play', },
-      { id: 'pause', class: 'pause', title: 'Pause', },
-      { id: 'stop', class: 'stop', title: 'Stop', },
-      { id: 'back-30', class: 'back30', title: 'Back 30s', },
-      { id: 'forward-30', class: 'forward30', title: 'Forward 30s', },
-      { id: 'prev-track', class: 'back', title: 'Previous Track', },
-      { id: 'next-track', class: 'next', title: 'Next Track', },
-      { id: 'loop', class: 'loop', title: 'Loop', },
-
-
-    ];
-
-    buttons.forEach(btn => {
-      const button = document.createElement('button');
-      button.id = btn.id;
-      button.classList.add(btn.class);
-      button.title = btn.title;
-      button.textContent = btn.text;
-      button.setAttribute('aria-label', btn.title);
-      controls.appendChild(button);
+    // Player bar
+    const bar = document.createElement('div');
+    Object.assign(bar.style, {
+      display: 'flex', alignItems: 'center', gap: '8px',
+      width: '100%', padding: '4px 12px', fontFamily: 'Helvetica, sans-serif'
     });
 
-    // Volume control
-    const volumeControl = document.createElement('div');
-    volumeControl.classList.add('volume-control');
+    // Song title
+    this.els.title = this._el('span', {
+      fontSize: '12px', fontWeight: '400', color: '#cadbda',
+      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+      maxWidth: '180px', minWidth: '60px'
+    }, '—');
+    bar.appendChild(this.els.title);
 
-    const volumeLabel = document.createElement('label');
+    // Separator
+    bar.appendChild(this._el('span', { color: 'rgba(138,183,206,0.3)', margin: '0 2px' }, '|'));
 
-    volumeLabel.className = 'volume-label';
-    volumeControl.appendChild(volumeLabel);
+    // Transport buttons
+    const btns = [
+      { key: 'prev',  label: '⏮', title: 'Previous',   fn: () => this.previousTrack() },
+      { key: 'play',  label: '▶',  title: 'Play',       fn: () => this.togglePlay() },
+      { key: 'next',  label: '⏭', title: 'Next',       fn: () => this.nextTrack() },
+      { key: 'stop',  label: '■',  title: 'Stop',       fn: () => this.stop() },
+    ];
 
-    const volumeSlider = document.createElement('input');
-    volumeSlider.type = 'range';
-    volumeSlider.id = 'volume-slider';
-    volumeSlider.min = 0;
-    volumeSlider.max = 1;
-    volumeSlider.step = 0.01;
-    volumeSlider.value = 1;
-    volumeSlider.setAttribute('aria-label', 'Volume control');
-    volumeControl.appendChild(volumeSlider);
+    btns.forEach(b => {
+      const btn = this._btn(b.label, b.title, b.fn);
+      this.els[b.key] = btn;
+      bar.appendChild(btn);
+    });
 
-    controls.appendChild(volumeControl);
+    // Progress bar
+    const progWrap = document.createElement('div');
+    Object.assign(progWrap.style, {
+      flex: '1', height: '6px', background: 'rgba(138,183,206,0.15)',
+      borderRadius: '3px', cursor: 'pointer', position: 'relative',
+      minWidth: '80px'
+    });
+    this.els.progFill = document.createElement('div');
+    Object.assign(this.els.progFill.style, {
+      height: '100%', width: '0%', background: '#3AA0A0',
+      borderRadius: '3px', transition: 'width 0.1s linear', pointerEvents: 'none'
+    });
+    progWrap.appendChild(this.els.progFill);
+    progWrap.addEventListener('click', (e) => this._seekTo(e, progWrap));
+    bar.appendChild(progWrap);
 
-    // Progress container
-    const progressContainer = document.createElement('div');
-    progressContainer.classList.add('progress-container');
-    progressContainer.setAttribute('role', 'progressbar');
-    progressContainer.setAttribute('aria-label', 'Song progress');
+    // Time
+    this.els.time = this._el('span', {
+      fontSize: '11px', fontFamily: 'monospace', color: '#8ab7ce',
+      whiteSpace: 'nowrap', minWidth: '70px', textAlign: 'center'
+    }, '0:00 / 0:00');
+    bar.appendChild(this.els.time);
 
-    const progressBar = document.createElement('div');
-    progressBar.classList.add('progress-bar');
-    progressContainer.appendChild(progressBar);
+    // Volume
+    const volWrap = document.createElement('div');
+    Object.assign(volWrap.style, { display: 'flex', alignItems: 'center', gap: '4px' });
+    volWrap.appendChild(this._el('span', { fontSize: '11px', color: '#8ab7ce' }, '🔊'));
 
-    controls.appendChild(progressContainer);
+    const volTrack = document.createElement('div');
+    Object.assign(volTrack.style, {
+      width: '50px', height: '4px', background: 'rgba(138,183,206,0.15)',
+      borderRadius: '2px', cursor: 'pointer', position: 'relative'
+    });
+    this.els.volFill = document.createElement('div');
+    Object.assign(this.els.volFill.style, {
+      height: '100%', width: '80%', background: '#3AA0A0',
+      borderRadius: '2px', pointerEvents: 'none'
+    });
+    volTrack.appendChild(this.els.volFill);
+    volTrack.addEventListener('click', (e) => this._setVolume(e, volTrack));
+    volWrap.appendChild(volTrack);
+    bar.appendChild(volWrap);
 
-    // Time display
-    const timeDisplay = document.createElement('div');
-    timeDisplay.classList.add('time-display');
+    // Loop button
+    this.els.loop = this._btn('↻', 'Loop', () => this.toggleLoop());
+    bar.appendChild(this.els.loop);
 
-    const currentTime = document.createElement('span');
-    currentTime.id = 'current-time';
-    currentTime.textContent = '0:00';
-    timeDisplay.appendChild(currentTime);
-
-    const separator = document.createElement('span');
-    separator.textContent = ' / ';
-    timeDisplay.appendChild(separator);
-
-    const duration = document.createElement('span');
-    duration.id = 'duration';
-    duration.textContent = '0:00';
-    timeDisplay.appendChild(duration);
-
-    controls.appendChild(timeDisplay);
-
-    // ── Add-to-cart (one-off, after the time read-out) ──────────────────────
-    const addCartBtn = document.createElement('button');
-    addCartBtn.id = 'add-song-cart';
-    addCartBtn.className = 'addCart';
-    addCartBtn.title = 'Add Track to Cart';
-    addCartBtn.setAttribute('aria-label', addCartBtn.title);
-
-    addCartBtn.addEventListener('click', () => {
+    // Add to cart button
+    this.els.cart = this._btn('🛒', 'Add Track to Cart', () => {
       if (window.cartManager && this.currentSong) {
         window.cartManager.addSongToCart(this.currentSong.id, this.currentSong);
       }
     });
+    bar.appendChild(this.els.cart);
 
-    controls.appendChild(addCartBtn);
-
-
-    // Append controls to player
-    this.playerContainer.appendChild(controls);
-  }
-
-  /**
-   * Attach event listeners to player controls
-   */
-  attachEventListeners() {
-    const audio = this.currentAudio;
-
-    // Control button events
-    document.getElementById('play').addEventListener('click', () => this.play());
-    document.getElementById('pause').addEventListener('click', () => this.pause());
-    document.getElementById('stop').addEventListener('click', () => this.stop());
-    document.getElementById('forward-30').addEventListener('click', () => this.seekForward(30));
-    document.getElementById('back-30').addEventListener('click', () => this.seekBackward(30));
-    document.getElementById('next-track').addEventListener('click', () => this.nextTrack());
-    document.getElementById('prev-track').addEventListener('click', () => this.previousTrack());
-    document.getElementById('loop').addEventListener('click', () => this.toggleLoop());
-    
-
-
-    // Volume control
-    const volumeSlider = document.getElementById('volume-slider');
-    volumeSlider.addEventListener('input', (e) => {
-      audio.volume = e.target.value;
-    });
-
-    // Progress bar click to seek
-    const progressContainer = document.querySelector('.progress-container');
-    progressContainer.addEventListener('click', (e) => this.seekToPosition(e));
+    this.container.appendChild(bar);
 
     // Audio events
-    audio.addEventListener('loadedmetadata', () => this.onLoadedMetadata());
-    audio.addEventListener('timeupdate', () => this.onTimeUpdate());
-    audio.addEventListener('ended', () => this.onEnded());
-    audio.addEventListener('error', (e) => this.onError(e));
-    audio.addEventListener('loadstart', () => this.onLoadStart());
-    audio.addEventListener('canplay', () => this.onCanPlay());
+    this.audio.addEventListener('loadedmetadata', () => this._updateDuration());
+    this.audio.addEventListener('timeupdate', () => this._updateProgress());
+    this.audio.addEventListener('ended', () => this._onEnded());
+    this.audio.addEventListener('error', () => this._showError('Audio playback error'));
+
+    // Set initial volume
+    this.audio.volume = this.volume;
   }
 
-  /**
-   * Enhanced autoplay with fallback (matches original)
-   */
-  async loadAudio() {
-    if (this.currentAudio) {
-      this.currentAudio.load();
-
-      // Try autoplay, handle if blocked
-      try {
-        await this.play();
-      } catch (error) {
-        console.log('Autoplay blocked, user interaction required');
-        // Show play button as active state
-        this.updatePlayButton(true);
-      }
-    }
+  // ── DOM helpers ──────────────────────────────────────────────
+  _el(tag, styles, text) {
+    const el = document.createElement(tag);
+    if (styles) Object.assign(el.style, styles);
+    if (text) el.textContent = text;
+    return el;
   }
 
-  /**
-   * Play audio
-   */
-  async play() {
-    if (!this.currentAudio) return;
+  _btn(label, title, fn) {
+    const btn = document.createElement('button');
+    btn.textContent = label;
+    btn.title = title;
+    btn.setAttribute('aria-label', title);
+    Object.assign(btn.style, {
+      background: 'none', border: 'none', color: '#cadbda',
+      fontSize: '14px', cursor: 'pointer', padding: '2px 5px',
+      borderRadius: '2px', transition: 'color 0.15s, background 0.15s',
+      lineHeight: '1'
+    });
+    btn.addEventListener('mouseenter', () => { btn.style.color = '#3AA0A0'; });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.color = btn.dataset.active === 'true' ? '#3AA0A0' : '#cadbda';
+    });
+    btn.addEventListener('click', fn);
+    return btn;
+  }
 
+  // ── Playback ─────────────────────────────────────────────────
+  async playSong(songId, albumId) {
     try {
-      await this.currentAudio.play();
-      this.updatePlayButton(false);
-    } catch (error) {
-      console.error('Playback failed:', error);
-      this.showError('Playback failed. Please try again.');
+      if (!this.built) this.build();
+
+      let album = window.apiClient ? await window.apiClient.getAlbum(albumId) : null;
+      if (!album) throw new Error('Album not found');
+
+      let song = album.songs?.find(s => s.id === songId);
+      if (!song && window.apiClient) {
+        try { song = await window.apiClient.getSong(songId); } catch {}
+      }
+      if (!song) throw new Error(`Song ${songId} not found`);
+
+      this.currentSong = song;
+      this.currentAlbum = album;
+
+      this.els.title.textContent = song.name;
+      this.audio.src = song.audio_url;
+      this.audio.load();
+
+      try {
+        await this.audio.play();
+        this._updatePlayBtn(true);
+      } catch {
+        this._updatePlayBtn(false);
+      }
+    } catch (err) {
+      console.error('Failed to play:', err);
+      this._showError(err.message);
     }
   }
 
-  /**
-   * Pause audio
-   */
-  pause() {
-    if (this.currentAudio && !this.currentAudio.paused) {
-      this.currentAudio.pause();
-      this.updatePlayButton(true);
+  togglePlay() {
+    if (!this.audio?.src) return;
+    if (this.audio.paused) {
+      this.audio.play().then(() => this._updatePlayBtn(true));
+    } else {
+      this.audio.pause();
+      this._updatePlayBtn(false);
     }
   }
 
-  /**
-   * Stop audio
-   */
+  play()  { if (this.audio) this.audio.play().then(() => this._updatePlayBtn(true)); }
+  pause() { if (this.audio) { this.audio.pause(); this._updatePlayBtn(false); } }
+
   stop() {
-    if (this.currentAudio) {
-      this.currentAudio.pause();
-      this.currentAudio.currentTime = 0;
-      this.updatePlayButton(true);
+    if (this.audio) {
+      this.audio.pause();
+      this.audio.currentTime = 0;
+      this._updatePlayBtn(false);
+      this._updateProgress();
     }
   }
 
-  /**
-   * Seek forward by specified seconds
-   */
-  seekForward(seconds) {
-    if (this.currentAudio) {
-      this.currentAudio.currentTime = Math.min(
-        this.currentAudio.currentTime + seconds,
-        this.currentAudio.duration
-      );
+  async nextTrack() {
+    if (!this.currentAlbum?.songs || !this.currentSong) return;
+    const songs = this.currentAlbum.songs;
+    const idx = songs.findIndex(s => s.id === this.currentSong.id);
+    if (idx !== -1 && idx + 1 < songs.length) {
+      await this.playSong(songs[idx + 1].id, this.currentAlbum.id);
     }
   }
 
-  /**
-   * Seek backward by specified seconds
-   */
-  seekBackward(seconds) {
-    if (this.currentAudio) {
-      this.currentAudio.currentTime = Math.max(
-        this.currentAudio.currentTime - seconds,
-        0
-      );
+  async previousTrack() {
+    if (!this.currentAlbum?.songs || !this.currentSong) return;
+    const songs = this.currentAlbum.songs;
+    const idx = songs.findIndex(s => s.id === this.currentSong.id);
+    if (idx > 0) {
+      await this.playSong(songs[idx - 1].id, this.currentAlbum.id);
     }
   }
 
-  /**
-   * Toggle loop mode
-   */
   toggleLoop() {
     this.isLooping = !this.isLooping;
-    const loopButton = document.getElementById('loop');
-    loopButton.classList.toggle('active', this.isLooping);
-    loopButton.setAttribute('aria-pressed', this.isLooping);
-    console.log(`🔄 Loop ${this.isLooping ? 'enabled' : 'disabled'}`);
+    this.els.loop.dataset.active = this.isLooping ? 'true' : 'false';
+    this.els.loop.style.color = this.isLooping ? '#3AA0A0' : '#cadbda';
   }
 
-  /**
-   * Play next track in album
-   */
-  async nextTrack() {
-    if (!this.currentAlbum || !this.currentSong) {
-      console.log('No album or song for next track');
-      return;
-    }
-
-    const songs = this.currentAlbum.songs;
-    if (!songs || !Array.isArray(songs)) {
-      console.log('No songs array in current album');
-      return;
-    }
-
-    const currentIndex = songs.findIndex(song => song.id === this.currentSong.id);
-
-    if (currentIndex !== -1 && currentIndex + 1 < songs.length) {
-      const nextSong = songs[currentIndex + 1];
-      console.log(`⏭️ Playing next track: ${nextSong.name}`);
-      await this.playSong(nextSong.id, this.currentAlbum.id);
-    } else {
-      console.log('Already at last track');
-    }
+  // ── Internal UI updates ──────────────────────────────────────
+  _updatePlayBtn(playing) {
+    if (this.els.play) this.els.play.textContent = playing ? '⏸' : '▶';
   }
 
-  /**
-   * Play previous track in album
-   */
-  async previousTrack() {
-    if (!this.currentAlbum || !this.currentSong) {
-      console.log('No album or song for previous track');
-      return;
-    }
-
-    const songs = this.currentAlbum.songs;
-    if (!songs || !Array.isArray(songs)) {
-      console.log('No songs array in current album');
-      return;
-    }
-
-    const currentIndex = songs.findIndex(song => song.id === this.currentSong.id);
-
-    if (currentIndex > 0) {
-      const prevSong = songs[currentIndex - 1];
-      console.log(`⏮️ Playing previous track: ${prevSong.name}`);
-      await this.playSong(prevSong.id, this.currentAlbum.id);
-    } else {
-      console.log('Already at first track');
-    }
+  _updateDuration() {
+    this._updateProgress();
   }
 
-  /**
-   * Seek to specific position on progress bar
-   */
-  seekToPosition(event) {
-    if (!this.currentAudio) return;
-
-    const progressContainer = event.currentTarget;
-    const rect = progressContainer.getBoundingClientRect();
-    const offsetX = event.clientX - rect.left;
-    const clickRatio = offsetX / rect.width;
-
-    this.currentAudio.currentTime = clickRatio * this.currentAudio.duration;
+  _updateProgress() {
+    if (!this.audio) return;
+    const cur = this.audio.currentTime || 0;
+    const dur = this.audio.duration || 0;
+    const pct = dur > 0 ? (cur / dur) * 100 : 0;
+    if (this.els.progFill) this.els.progFill.style.width = `${pct}%`;
+    if (this.els.time) this.els.time.textContent = `${this._fmt(cur)} / ${this._fmt(dur)}`;
   }
 
-  /**
-   * Update play button state
-   */
-  updatePlayButton(showPlay) {
-    const playButton = document.getElementById('play');
-    const pauseButton = document.getElementById('pause');
-
-    if (playButton && pauseButton) {
-      if (showPlay) {
-        playButton.style.display = 'inline-block';
-        pauseButton.style.display = 'none';
-      } else {
-        playButton.style.display = 'none';
-        pauseButton.style.display = 'inline-block';
-      }
-    }
-  }
-
-  /**
-   * Audio event handlers
-   */
-  onLoadedMetadata() {
-    const durationElement = document.getElementById('duration');
-    if (durationElement && this.currentAudio) {
-      durationElement.textContent = this.formatTime(this.currentAudio.duration);
-    }
-  }
-
-  onTimeUpdate() {
-    if (!this.currentAudio) return;
-
-    const progressBar = document.querySelector('.progress-bar');
-    const currentTimeElement = document.getElementById('current-time');
-
-    if (progressBar) {
-      const progressPercent = (this.currentAudio.currentTime / this.currentAudio.duration) * 100;
-      progressBar.style.width = `${progressPercent}%`;
-    }
-
-    if (currentTimeElement) {
-      currentTimeElement.textContent = this.formatTime(this.currentAudio.currentTime);
-    }
-  }
-
-  onEnded() {
+  _onEnded() {
     if (this.isLooping) {
-      this.currentAudio.currentTime = 0;
-      this.play();
+      this.audio.currentTime = 0;
+      this.audio.play();
     } else {
       this.nextTrack();
     }
   }
 
-  onError(event) {
-    console.error('Audio error:', event);
-    this.showError('Audio playback error. Please try again.');
+  _seekTo(e, wrap) {
+    if (!this.audio?.duration) return;
+    const rect = wrap.getBoundingClientRect();
+    const ratio = (e.clientX - rect.left) / rect.width;
+    this.audio.currentTime = ratio * this.audio.duration;
   }
 
-  onLoadStart() {
-    console.log('🔄 Loading audio...');
+  _setVolume(e, wrap) {
+    const rect = wrap.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    this.volume = ratio;
+    this.audio.volume = ratio;
+    if (this.els.volFill) this.els.volFill.style.width = `${ratio * 100}%`;
   }
 
-  onCanPlay() {
-    console.log('✅ Audio ready to play');
+  _fmt(s) {
+    if (isNaN(s)) return '0:00';
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return `${m}:${sec < 10 ? '0' : ''}${sec}`;
   }
 
-  /**
-   * Format time in MM:SS format
-   */
-  formatTime(seconds) {
-    if (isNaN(seconds)) return '0:00';
-
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  _showError(msg) {
+    console.error('🎵 Player error:', msg);
   }
 
-  /**
-   * Show error message
-   */
-  showError(message) {
-    // Use global showError if available, otherwise create simple alert
-    if (window.showError) {
-      window.showError(message);
-    } else {
-      console.error(message);
-      // Create simple error display
-      const errorDiv = document.createElement('div');
-      errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#f44336;color:white;padding:10px;border-radius:4px;z-index:10000;';
-      errorDiv.textContent = message;
-      document.body.appendChild(errorDiv);
-      setTimeout(() => errorDiv.remove(), 3000);
-    }
-  }
-
-  /**
-   * Cleanup when changing songs
-   */
-  cleanup() {
-    if (this.currentAudio) {
-      this.currentAudio.pause();
-      this.currentAudio.src = '';
-      this.currentAudio = null;
-    }
-  }
-
-  /**
-   * Get current playback state
-   */
   getState() {
     return {
-      isPlaying: this.currentAudio && !this.currentAudio.paused,
-      currentTime: this.currentAudio ? this.currentAudio.currentTime : 0,
-      duration: this.currentAudio ? this.currentAudio.duration : 0,
-      volume: this.currentAudio ? this.currentAudio.volume : 1,
+      isPlaying: this.audio && !this.audio.paused,
+      currentTime: this.audio?.currentTime || 0,
+      duration: this.audio?.duration || 0,
+      volume: this.volume,
       isLooping: this.isLooping,
       currentSong: this.currentSong,
       currentAlbum: this.currentAlbum
@@ -525,13 +302,14 @@ class AudioPlayer {
   }
 }
 
-// Global player instance
+// Global instance
 const audioPlayer = new AudioPlayer();
-
-// Global function for compatibility with existing code
-window.playSong = function (songId, albumId) {
-  audioPlayer.playSong(songId, albumId);
-};
-
-// Make available globally
 window.audioPlayer = audioPlayer;
+window.playSong = (songId, albumId) => audioPlayer.playSong(songId, albumId);
+
+// Build immediately when container exists
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => audioPlayer.build());
+} else {
+  audioPlayer.build();
+}
