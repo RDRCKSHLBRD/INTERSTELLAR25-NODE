@@ -4,24 +4,28 @@
       "id": "roderick",
       "name": "Roderick Shoolbraid",
       "page": "roderick.html",
+      "svg": "/images/IP-ART-RODERICKSHOOLBRAID-candyFloss.svg",
       "order": 1
     },
     {
       "id": "rodux",
       "name": "Rodux",
       "page": "rodux.html",
+      "svg": "/images/IP-ART-RODUX_candyFloss.svg",
       "order": 2
     },
     {
       "id": "betacarotine",
       "name": "Betacarotine",
       "page": "betacarotine.html",
+      "svg": "/images/IP-ART-BETACAROTINE-candyFloss.svg",
       "order": 3
     },
     {
       "id": "3ofCups",
       "name": "3 of Cups",
       "page": "3ofcups.html",
+      "svg": "/images/IP-ART-3OFCUPS-candyfloss.svg",
       "order": 4
     }
   ]

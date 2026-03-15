@@ -1,234 +1,195 @@
-/**
- * Landing Page - Loads artists and positions elements
- * Uses modular config: /config/pages/landing.json + /config/data/artists.json
- */
+// ============================================================================
+// public/js/landing.js — V6 (Starfield + Artist SVG Nav)
+//
+// Procedural SVG starfield with three depth layers, drift, twinkle,
+// and shooting stars. Loads artist name SVGs from artists.json.
+// ============================================================================
 
-function waitForInterstellar() {
-  return new Promise((resolve) => {
-    if (window.Interstellar?.isInitialized) return resolve();
-    window.addEventListener('system:ready', resolve, { once: true });
-    setTimeout(() => resolve(), 3000); // fallback
-  });
-}
+// ════════════════════════════════════════════════════
+// STARFIELD
+// ════════════════════════════════════════════════════
 
-/** Merge page positions with breakpoint overrides for current viewport */
-function mergeBreakpointSpec(baseSpec, breakpoints, viewport) {
-  if (!breakpoints) return { ...baseSpec };
+(function () {
+    const svg = document.getElementById('starfield');
+    if (!svg) return;
 
-  const v = {
-    width: viewport.width,
-    height: viewport.height,
-    orientation: viewport.orientation
-  };
+    const w = window.innerWidth;
+    const h = window.innerHeight;
 
-  let merged = { ...baseSpec };
-  for (const [, bp] of Object.entries(breakpoints)) {
-    const ok =
-      (bp.minWidth  == null || v.width  >= bp.minWidth)  &&
-      (bp.maxWidth  == null || v.width  <= bp.maxWidth)  &&
-      (bp.minHeight == null || v.height >= bp.minHeight) &&
-      (bp.maxHeight == null || v.height <= bp.maxHeight) &&
-      (bp.orientation == null || v.orientation === bp.orientation);
+    svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
 
-    if (!ok) continue;
+    // Deterministic seed
+    let seed = 42;
+    function rand() {
+        seed = (seed * 16807 + 0) % 2147483647;
+        return seed / 2147483647;
+    }
 
-    const ov = bp.positions?.artistNav;
-    if (!ov) continue;
+    const layers = [
+        { count: 280, rMin: 0.3, rMax: 0.8, opacity: 0.12, drift: 120, cls: 'far'  },
+        { count: 140, rMin: 0.5, rMax: 1.2, opacity: 0.30, drift: 80,  cls: 'mid'  },
+        { count: 45,  rMin: 0.8, rMax: 1.8, opacity: 0.65, drift: 45,  cls: 'near' },
+    ];
 
-    // allow x/y aliases in overrides
-    const mapped = { ...ov };
-    if (mapped.y != null && mapped.top  == null) mapped.top  = mapped.y;
-    if (mapped.x != null && mapped.left == null) mapped.left = mapped.x;
-    delete mapped.y; delete mapped.x;
+    layers.forEach((layer) => {
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', layer.cls);
 
-    merged = { ...merged, ...mapped, styles: { ...merged.styles, ...mapped.styles } };
-  }
-  return merged;
-}
+        for (let i = 0; i < layer.count; i++) {
+            const cx = rand() * w;
+            const cy = rand() * h;
+            const r  = layer.rMin + rand() * (layer.rMax - layer.rMin);
 
-async function loadArtists() {
-  try {
-    const r = await fetch('/config/data/artists.json');
-    if (!r.ok) throw new Error(`Failed to load artists: ${r.status}`);
-    const data = await r.json();
-    console.log('✅ Artists loaded:', data.artists?.length || 0);
-    return data.artists || [];
-  } catch (err) {
-    console.error('❌ Failed to load artists:', err);
-    return [];
-  }
-}
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', cx.toFixed(1));
+            circle.setAttribute('cy', cy.toFixed(1));
+            circle.setAttribute('r',  r.toFixed(2));
+            circle.setAttribute('fill', '#cadbda');
+            circle.setAttribute('opacity', (layer.opacity * (0.5 + rand() * 0.5)).toFixed(3));
 
-function renderArtists(artists) {
-  const nav = document.getElementById('artistNav');
-  if (!nav) {
-    console.warn('⚠️ #artistNav element not found in HTML');
-    return;
-  }
-  nav.innerHTML = '';
+            // Twinkle
+            if (rand() > 0.6) {
+                const dur = (3 + rand() * 6).toFixed(1);
+                const delay = (rand() * 8).toFixed(1);
+                const minO = (layer.opacity * 0.2).toFixed(3);
+                const maxO = (layer.opacity * (0.7 + rand() * 0.3)).toFixed(3);
 
-  const sorted = artists.sort((a, b) => (a.order || 0) - (b.order || 0));
-  sorted.forEach((artist) => {
-    const link = document.createElement('a');
-    link.href = `/${artist.page || artist.id + '.html'}`;
-    link.className = 'artist-link';
-    link.textContent = artist.name;
-    link.dataset.artistId = artist.id;
-    link.addEventListener('click', () => {
-      console.log('🎵 Navigating to artist:', artist.name);
-    });
-    nav.appendChild(link);
-  });
+                const anim = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+                anim.setAttribute('attributeName', 'opacity');
+                anim.setAttribute('values', `${maxO};${minO};${maxO}`);
+                anim.setAttribute('dur', `${dur}s`);
+                anim.setAttribute('begin', `${delay}s`);
+                anim.setAttribute('repeatCount', 'indefinite');
+                circle.appendChild(anim);
+            }
 
-  console.log(`✅ Rendered ${sorted.length} artist links`);
-}
-
-/** Directly set video/sidebar frames from config (no layout CSS dependency) */
-function applyDirectLayout(viewport, pageConfig) {
-  const videoEl   = document.querySelector('.landing-video');
-  const sidebarEl = document.querySelector('.landing-sidebar');
-  if (!videoEl || !sidebarEl) {
-    console.warn('⚠️ Video or sidebar element not found');
-    return;
-  }
-
-  if (viewport.mode === 'split') {
-    const videoFlex   = pageConfig.layout?.videoSection?.flex   ?? 0.7;
-    const sidebarFlex = pageConfig.layout?.sidebarSection?.flex ?? 0.3;
-    const sidebarMaxWidth = pageConfig.layout?.sidebarSection?.maxWidth
-      ? parseInt(pageConfig.layout.sidebarSection.maxWidth)
-      : 400;
-
-    const videoWidth   = window.innerWidth * videoFlex;
-    const sidebarWidth = Math.min(window.innerWidth * sidebarFlex, sidebarMaxWidth);
-
-    // video
-    Object.assign(videoEl.style, {
-      position: 'absolute', left: '0', top: '0',
-      width: `${videoWidth}px`, height: '100vh'
-    });
-
-    // sidebar
-    Object.assign(sidebarEl.style, {
-      position: 'absolute', right: '0', top: '0',
-      width: `${sidebarWidth}px`, height: '100vh'
-    });
-
-    console.log('✅ Direct layout applied (SPLIT):',
-      { videoWidth: `${videoWidth.toFixed(2)}px`,
-        sidebarWidth: `${sidebarWidth.toFixed(2)}px`,
-        maxWidth: `${sidebarMaxWidth}px` });
-  } else {
-    // reset to CSS for stack
-    Object.assign(videoEl.style,  { position:'', left:'', top:'', width:'', height:'', boxSizing:'border-box' });
-    Object.assign(sidebarEl.style,{ position:'', right:'', top:'', width:'', height:'', boxSizing:'border-box' });
-    console.log('✅ Layout reset to CSS (STACK)');
-  }
-}
-
-async function initLanding() {
-  try {
-    console.log('🚀 Initializing landing page...');
-    await waitForInterstellar();
-    console.log('✅ Interstellar system ready');
-
-    const { state, position, quadTree } = window.Interstellar;
-
-    // load page config
-    let pageConfig;
-    try {
-      const r = await fetch('/config/pages/landing.json');
-      if (!r.ok) throw new Error(`Config not found: ${r.status}`);
-      pageConfig = await r.json();
-      console.log('✅ Landing page config loaded');
-
-      // expose some vars for CSS fallbacks
-      if (pageConfig.layout) {
-        const root = document.documentElement;
-        if (pageConfig.layout.videoSection)
-          root.style.setProperty('--video-flex', pageConfig.layout.videoSection.flex ?? 0.7);
-        if (pageConfig.layout.sidebarSection) {
-          root.style.setProperty('--sidebar-flex', pageConfig.layout.sidebarSection.flex ?? 0.3);
-          root.style.setProperty('--sidebar-max-width', pageConfig.layout.sidebarSection.maxWidth ?? '400px');
+            g.appendChild(circle);
         }
-        console.log('✅ Layout CSS variables applied');
-      }
-    } catch (err) {
-      console.warn('⚠️ landing.json missing; using defaults');
-      pageConfig = { positions: {}, layout: {} };
-    }
 
-    // compute viewport
-    const viewport = state.calculate({
-      width: window.innerWidth,
-      height: window.innerHeight,
-      dpr: window.devicePixelRatio || 1
+        // Slow drift
+        const driftX = (rand() - 0.5) * layer.drift;
+        const driftY = (rand() - 0.5) * layer.drift * 0.6;
+        const dur = (60 + rand() * 40).toFixed(0);
+
+        const animTransform = document.createElementNS('http://www.w3.org/2000/svg', 'animateTransform');
+        animTransform.setAttribute('attributeName', 'transform');
+        animTransform.setAttribute('type', 'translate');
+        animTransform.setAttribute('values', `0,0; ${driftX.toFixed(1)},${driftY.toFixed(1)}; 0,0`);
+        animTransform.setAttribute('dur', `${dur}s`);
+        animTransform.setAttribute('repeatCount', 'indefinite');
+        g.appendChild(animTransform);
+
+        svg.appendChild(g);
     });
-    console.log('✅ Viewport calculated:', viewport.mode);
 
-    document.body.setAttribute('data-mode', viewport.mode);
-    document.body.setAttribute('data-orientation', viewport.orientation);
+    // Shooting stars
+    function shootingStar() {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        const startX = Math.random() * w * 0.8;
+        const startY = Math.random() * h * 0.4;
+        const len = 60 + Math.random() * 120;
+        const angle = 0.3 + Math.random() * 0.4;
 
-    // frame layout
-    applyDirectLayout(viewport, pageConfig);
+        line.setAttribute('x1', startX);
+        line.setAttribute('y1', startY);
+        line.setAttribute('x2', startX + len * Math.cos(angle));
+        line.setAttribute('y2', startY + len * Math.sin(angle));
+        line.setAttribute('stroke', '#cadbda');
+        line.setAttribute('stroke-width', '0.8');
+        line.setAttribute('stroke-linecap', 'round');
+        line.setAttribute('opacity', '0');
 
-    // data + render
-    const artists = await loadArtists();
-    renderArtists(artists);
+        const animOpacity = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+        animOpacity.setAttribute('attributeName', 'opacity');
+        animOpacity.setAttribute('values', '0;0.7;0.7;0');
+        animOpacity.setAttribute('dur', '1.2s');
+        animOpacity.setAttribute('fill', 'freeze');
+        line.appendChild(animOpacity);
 
-    // position artist nav (MERGED SPEC)
-    const container = document.querySelector('.landing-sidebar');
-    const artistNav = document.getElementById('artistNav');
+        const trail = document.createElementNS('http://www.w3.org/2000/svg', 'animateTransform');
+        trail.setAttribute('attributeName', 'transform');
+        trail.setAttribute('type', 'translate');
+        trail.setAttribute('from', '0 0');
+        trail.setAttribute('to', `${(len * 0.5).toFixed(0)} ${(len * 0.3).toFixed(0)}`);
+        trail.setAttribute('dur', '1.2s');
+        trail.setAttribute('fill', 'freeze');
+        line.appendChild(trail);
 
-    if (artistNav && pageConfig.positions?.artistNav) {
-      // tip: set "anchor":"m-l" in JSON if you want y to be the vertical center
-      const mergedSpec = mergeBreakpointSpec(
-        pageConfig.positions.artistNav,
-        pageConfig.positionBreakpoints,
-        viewport
-      );
-      position.apply(artistNav, mergedSpec, container, viewport);
-      console.log('✅ Artist nav positioned (merged spec):', mergedSpec);
+        svg.appendChild(line);
+        setTimeout(() => line.remove(), 1400);
     }
 
-    // optional: QuadTree
-    if (artistNav && pageConfig.quadTree?.artistNav?.enabled && quadTree) {
-      quadTree.observe(artistNav, pageConfig.quadTree.artistNav);
-      console.log('✅ QuadTree observer attached to artistNav');
+    function scheduleShootingStar() {
+        const delay = 4000 + Math.random() * 8000;
+        setTimeout(() => {
+            shootingStar();
+            scheduleShootingStar();
+        }, delay);
     }
+    scheduleShootingStar();
 
-    // resize handler
+    // Resize
+    let resizeTimer;
     window.addEventListener('resize', () => {
-      const vp = state.calculate({
-        width: window.innerWidth,
-        height: window.innerHeight,
-        dpr: window.devicePixelRatio || 1
-      });
-
-      document.body.setAttribute('data-mode', vp.mode);
-      document.body.setAttribute('data-orientation', vp.orientation);
-
-      applyDirectLayout(vp, pageConfig);
-
-      if (artistNav && pageConfig.positions?.artistNav && container) {
-        const mergedSpec = mergeBreakpointSpec(
-          pageConfig.positions.artistNav,
-          pageConfig.positionBreakpoints,
-          vp
-        );
-        position.apply(artistNav, mergedSpec, container, vp);
-      }
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            svg.setAttribute('viewBox', `0 0 ${window.innerWidth} ${window.innerHeight}`);
+        }, 200);
     });
+})();
 
-    console.log('🎉 Landing page initialized successfully!');
-  } catch (error) {
-    console.error('❌ Landing page initialization failed:', error);
-  }
-}
+// ════════════════════════════════════════════════════
+// ARTIST NAV — loads SVGs from artists.json
+// ════════════════════════════════════════════════════
 
-// boot
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initLanding);
-} else {
-  initLanding();
-}
+(async function () {
+    const nav = document.getElementById('artistNav');
+    const logo = document.getElementById('ipLogo');
+    if (!nav) return;
+
+    try {
+        const res = await fetch('/config/data/artists.json');
+        if (!res.ok) throw new Error(res.status);
+        const data = await res.json();
+        const artists = (data.artists || []).sort((a, b) => (a.order || 0) - (b.order || 0));
+
+        artists.forEach((artist) => {
+            const a = document.createElement('a');
+            a.href = `/${artist.page || artist.id + '.html'}`;
+            a.className = 'artist-link';
+            a.dataset.artistId = artist.id;
+
+            if (artist.svg) {
+                const img = document.createElement('img');
+                img.src = artist.svg;
+                img.alt = artist.name;
+                img.draggable = false;
+                a.appendChild(img);
+            } else {
+                a.textContent = artist.name;
+                a.className += ' artist-link--text';
+            }
+
+            nav.appendChild(a);
+        });
+
+        // Staggered reveal
+        const links = nav.querySelectorAll('.artist-link');
+        links.forEach((link, i) => {
+            setTimeout(() => {
+                link.classList.add('visible');
+            }, 600 + i * 200);
+        });
+
+        // Reveal logo after all artists
+        if (logo) {
+            setTimeout(() => {
+                logo.classList.add('visible');
+            }, 600 + links.length * 200 + 400);
+        }
+
+    } catch (err) {
+        console.error('Failed to load artists:', err);
+    }
+})();

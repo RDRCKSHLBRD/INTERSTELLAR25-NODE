@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interstellar Packages</title>
     <style>
-        /* ── RESET ─────────────────────────────────────── */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* ── PALETTE (from paint.json) ─────────────────── */
         :root {
             --bg:         #083D5E;
             --bg-deep:    #041e30;
@@ -16,10 +14,6 @@
             --muted:      #8ab7ce;
             --primary:    #3AA0A0;
             --primaryHi:  #2b7f8c;
-            --ink:        #1D4450;
-            --star-dim:   rgba(202, 219, 218, 0.15);
-            --star-mid:   rgba(202, 219, 218, 0.4);
-            --star-bright: rgba(202, 219, 218, 0.9);
         }
 
         body {
@@ -31,7 +25,6 @@
             width: 100vw;
         }
 
-        /* ── STARFIELD CANVAS ──────────────────────────── */
         #starfield {
             position: fixed;
             top: 0; left: 0;
@@ -39,7 +32,6 @@
             z-index: 0;
         }
 
-        /* ── NEBULA GLOW (subtle radial atmosphere) ────── */
         .nebula {
             position: fixed;
             top: 0; left: 0;
@@ -51,7 +43,6 @@
                 radial-gradient(ellipse 60% 50% at 75% 20%, rgba(43, 127, 140, 0.04) 0%, transparent 60%);
         }
 
-        /* ── CONTENT LAYER ─────────────────────────────── */
         .landing-shell {
             position: relative;
             z-index: 2;
@@ -62,45 +53,70 @@
             align-items: center;
         }
 
-        /* ── ARTIST NAV ────────────────────────────────── */
         .artist-nav {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            opacity: 0;
-            transform: translateY(12px);
-            animation: fadeIn 1.2s ease-out 0.8s forwards;
+            align-items: center;
+            gap: 20px;
         }
 
         .artist-link {
             display: block;
-            padding: 14px 48px;
-            color: var(--muted);
             text-decoration: none;
+            padding: 10px 24px;
+            border: 1px solid transparent;
+            border-radius: 2px;
+            transition: border-color 0.4s ease, transform 0.3s ease;
+            opacity: 0;
+            transform: translateY(16px);
+        }
+
+        .artist-link.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out,
+                        border-color 0.4s ease;
+        }
+
+        .artist-link:hover {
+            border-color: var(--primaryHi);
+           
+        }
+
+        .artist-link img {
+            display: block;
+            height: 20px;
+            width: auto;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .artist-link:hover img {
+            opacity: 1;
+        }
+
+        /* Text fallback for artists without SVG */
+        .artist-link--text {
+            color: var(--muted);
             font-size: 15px;
             font-weight: 300;
             letter-spacing: 2.5px;
             text-transform: uppercase;
-            text-align: center;
-            border: 1px solid transparent;
-            border-radius: 2px;
-            transition: color 0.3s, border-color 0.3s, letter-spacing 0.3s;
         }
 
-        .artist-link:hover {
-            color: var(--fg);
-            border-color: var(--primaryHi);
-            letter-spacing: 4px;
-        }
-
-        /* ── LOGO (bottom-right) ───────────────────────── */
         .ip-logo {
             position: fixed;
             bottom: 28px;
             right: 32px;
             z-index: 3;
             opacity: 0;
-            animation: fadeIn 1.6s ease-out 1.4s forwards;
+            transform: translateY(8px);
+            transition: opacity 1s ease-out, transform 1s ease-out;
+        }
+
+        .ip-logo.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .ip-logo img {
@@ -113,225 +129,29 @@
             opacity: 0.7;
         }
 
-        /* ── ANIMATIONS ────────────────────────────────── */
-        @keyframes fadeIn {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ── RESPONSIVE ────────────────────────────────── */
         @media (max-width: 600px) {
-            .artist-link {
-                padding: 12px 32px;
-                font-size: 13px;
-                letter-spacing: 2px;
-            }
-            .artist-link:hover {
-                letter-spacing: 3px;
-            }
-            .ip-logo {
-                bottom: 16px;
-                right: 20px;
-            }
-            .ip-logo img {
-                height: 24px;
-            }
+            .artist-nav { gap: 14px; }
+            .artist-link { padding: 8px 16px; }
+            .artist-link img { height: 20px; }
+            .ip-logo { bottom: 16px; right: 20px; }
+            .ip-logo img { height: 24px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- STARFIELD — procedural SVG dots -->
     <svg id="starfield" xmlns="http://www.w3.org/2000/svg"></svg>
-
-    <!-- NEBULA ATMOSPHERE -->
     <div class="nebula"></div>
 
-    <!-- CONTENT -->
     <div class="landing-shell">
-        <nav class="artist-nav" id="artistNav">
-            <!-- loaded from /config/data/artists.json -->
-        </nav>
+        <nav class="artist-nav" id="artistNav"></nav>
     </div>
 
-    <!-- LOGO — bottom right -->
-    <div class="ip-logo">
+    <div class="ip-logo" id="ipLogo">
         <img src="/images/IP_TAG24.svg" alt="Interstellar Packages">
     </div>
 
-    <script>
-    // ════════════════════════════════════════════════════
-    // STARFIELD — procedural SVG star generation
-    // Three depth layers with independent drift animations
-    // ════════════════════════════════════════════════════
+    <script src="/js/landing.js"></script>
 
-    (function () {
-        const svg = document.getElementById('starfield');
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-
-        svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-        svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
-
-        // Deterministic seed for consistent star positions per session
-        let seed = 42;
-        function rand() {
-            seed = (seed * 16807 + 0) % 2147483647;
-            return seed / 2147483647;
-        }
-
-        const layers = [
-            { count: 280, rMin: 0.3, rMax: 0.8, opacity: 0.12, drift: 120, cls: 'far'    },
-            { count: 140, rMin: 0.5, rMax: 1.2, opacity: 0.30, drift: 80,  cls: 'mid'    },
-            { count: 45,  rMin: 0.8, rMax: 1.8, opacity: 0.65, drift: 45,  cls: 'near'   },
-        ];
-
-        // Build SVG style block for animations
-        let styleStr = '';
-        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-
-        layers.forEach((layer, li) => {
-            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            g.setAttribute('class', layer.cls);
-
-            for (let i = 0; i < layer.count; i++) {
-                const cx = rand() * w;
-                const cy = rand() * h;
-                const r  = layer.rMin + rand() * (layer.rMax - layer.rMin);
-
-                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                circle.setAttribute('cx', cx.toFixed(1));
-                circle.setAttribute('cy', cy.toFixed(1));
-                circle.setAttribute('r',  r.toFixed(2));
-                circle.setAttribute('fill', '#cadbda');
-                circle.setAttribute('opacity', (layer.opacity * (0.5 + rand() * 0.5)).toFixed(3));
-
-                // Twinkle: random opacity pulse
-                if (rand() > 0.6) {
-                    const dur = (3 + rand() * 6).toFixed(1);
-                    const delay = (rand() * 8).toFixed(1);
-                    const minO = (layer.opacity * 0.2).toFixed(3);
-                    const maxO = (layer.opacity * (0.7 + rand() * 0.3)).toFixed(3);
-
-                    const anim = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
-                    anim.setAttribute('attributeName', 'opacity');
-                    anim.setAttribute('values', `${maxO};${minO};${maxO}`);
-                    anim.setAttribute('dur', `${dur}s`);
-                    anim.setAttribute('begin', `${delay}s`);
-                    anim.setAttribute('repeatCount', 'indefinite');
-                    circle.appendChild(anim);
-                }
-
-                g.appendChild(circle);
-            }
-
-            // Slow drift — the whole layer translates
-            const driftX = (rand() - 0.5) * layer.drift;
-            const driftY = (rand() - 0.5) * layer.drift * 0.6;
-            const dur = (60 + rand() * 40).toFixed(0);
-
-            const animTransform = document.createElementNS('http://www.w3.org/2000/svg', 'animateTransform');
-            animTransform.setAttribute('attributeName', 'transform');
-            animTransform.setAttribute('type', 'translate');
-            animTransform.setAttribute('values', `0,0; ${driftX.toFixed(1)},${driftY.toFixed(1)}; 0,0`);
-            animTransform.setAttribute('dur', `${dur}s`);
-            animTransform.setAttribute('repeatCount', 'indefinite');
-            g.appendChild(animTransform);
-
-            svg.appendChild(g);
-        });
-
-        // Occasional shooting star
-        function shootingStar() {
-            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            const startX = Math.random() * w * 0.8;
-            const startY = Math.random() * h * 0.4;
-            const len = 60 + Math.random() * 120;
-            const angle = 0.3 + Math.random() * 0.4; // shallow angle
-
-            line.setAttribute('x1', startX);
-            line.setAttribute('y1', startY);
-            line.setAttribute('x2', startX + len * Math.cos(angle));
-            line.setAttribute('y2', startY + len * Math.sin(angle));
-            line.setAttribute('stroke', '#cadbda');
-            line.setAttribute('stroke-width', '0.8');
-            line.setAttribute('stroke-linecap', 'round');
-            line.setAttribute('opacity', '0');
-
-            // Fade in, streak, fade out
-            const animOpacity = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
-            animOpacity.setAttribute('attributeName', 'opacity');
-            animOpacity.setAttribute('values', '0;0.7;0.7;0');
-            animOpacity.setAttribute('dur', '1.2s');
-            animOpacity.setAttribute('fill', 'freeze');
-            line.appendChild(animOpacity);
-
-            const trail = document.createElementNS('http://www.w3.org/2000/svg', 'animateTransform');
-            trail.setAttribute('attributeName', 'transform');
-            trail.setAttribute('type', 'translate');
-            trail.setAttribute('from', '0 0');
-            trail.setAttribute('to', `${(len * 0.5).toFixed(0)} ${(len * 0.3).toFixed(0)}`);
-            trail.setAttribute('dur', '1.2s');
-            trail.setAttribute('fill', 'freeze');
-            line.appendChild(trail);
-
-            svg.appendChild(line);
-
-            // Cleanup after animation
-            setTimeout(() => line.remove(), 1400);
-        }
-
-        // Random shooting stars every 4–12 seconds
-        function scheduleShootingStar() {
-            const delay = 4000 + Math.random() * 8000;
-            setTimeout(() => {
-                shootingStar();
-                scheduleShootingStar();
-            }, delay);
-        }
-        scheduleShootingStar();
-
-        // Handle resize
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                const nw = window.innerWidth;
-                const nh = window.innerHeight;
-                svg.setAttribute('viewBox', `0 0 ${nw} ${nh}`);
-            }, 200);
-        });
-    })();
-
-    // ════════════════════════════════════════════════════
-    // ARTIST NAV — loads from /config/data/artists.json
-    // ════════════════════════════════════════════════════
-
-    (async function () {
-        const nav = document.getElementById('artistNav');
-        if (!nav) return;
-
-        try {
-            const res = await fetch('/config/data/artists.json');
-            if (!res.ok) throw new Error(res.status);
-            const data = await res.json();
-            const artists = (data.artists || []).sort((a, b) => (a.order || 0) - (b.order || 0));
-
-            artists.forEach((artist, i) => {
-                const a = document.createElement('a');
-                a.href = `/${artist.page || artist.id + '.html'}`;
-                a.className = 'artist-link';
-                a.textContent = artist.name;
-                a.dataset.artistId = artist.id;
-                // Stagger entrance
-                a.style.animationDelay = `${0.8 + i * 0.15}s`;
-                a.style.opacity = '0';
-                a.style.animation = `fadeIn 0.8s ease-out ${0.8 + i * 0.15}s forwards`;
-                nav.appendChild(a);
-            });
-        } catch (err) {
-            console.error('Failed to load artists:', err);
-        }
-    })();
-    </script>
 </body>
 </html>
