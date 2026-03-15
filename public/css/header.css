@@ -27,7 +27,7 @@
 }
 
 #artist-name-svg {
-  height: calc(var(--header-height, 44px) * 0.55);
+  height: calc(var(--header-height, 24px) * 0.35);
   width: auto;
   display: block;
 }
