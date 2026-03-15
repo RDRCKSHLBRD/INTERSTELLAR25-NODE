@@ -2,29 +2,30 @@
   "_page": "roderick",
   "_loaded_by": "/public/js/roderick.js",
   "_uses_global": "window.Interstellar (state, position, layout, quadTree)",
-  "_session": "V5 Session 3 — thin header, sticky player, sidebar on click",
+  "_session": "V5 Session 3 — RODUX-driven layout, no inline CSS",
 
   "preloader": { "enabled": false },
 
   "layout": {
     "regions": {
-      "header":   { "ratio": 0.06 },
+      "header":   { "ratio": 0.06, "_note": "thin fixed bar" },
       "main":     { "ratio": 0.88 },
-      "controls": { "ratio": 0.06 }
+      "controls": { "ratio": 0.06, "_note": "player bar, always visible" }
     },
     "mainSplit": {
-      "_comment": "Desktop/Tablet only — sidebar appears on album click",
-      "left":  { "ratio": 0.72 },
-      "right": { "ratio": 0.28, "minPx": 340 }
+      "_comment": "Desktop/Tablet: grid + sidebar when album selected",
+      "left":  { "ratio": 0.74 },
+      "right": { "ratio": 0.26, "minPx": 320 }
     },
     "mobile": {
+      "_comment": "Mobile: sidebar overlays, grid is full width",
       "albumsRegion": { "width": "100%", "overflow": "auto" },
-      "infoRegion": { "display": "none" }
+      "infoRegion": { "display": "none", "_note": "CSS overlay via .open class" }
     }
   },
 
   "positions": {
-    "_comment": "Desktop: thin horizontal bar — logo | artist svg | spacer | nav",
+    "_comment": "Desktop: horizontal header — logo | artist | nav",
 
     "brandLogo": {
       "system": "cartesian",
@@ -43,7 +44,7 @@
     "topNav": {
       "system": "cartesian",
       "top": 0.50,
-      "left": 0.96,
+      "left": 0.98,
       "anchor": "middle-right"
     }
   },
@@ -54,21 +55,22 @@
       "positions": {
         "brandLogo": {
           "system": "cartesian",
-          "top": 0.15,
-          "left": 0.50,
-          "anchor": "top-center"
+          "top": 0.50,
+          "left": 0.02,
+          "anchor": "middle-left"
         },
         "topNav": {
           "system": "cartesian",
           "top": 0.50,
-          "left": 0.50,
-          "anchor": "middle-center"
+          "left": 0.98,
+          "anchor": "middle-right"
         },
         "artistName": {
           "system": "cartesian",
-          "top": 0.85,
-          "left": 0.50,
-          "anchor": "bottom-center"
+          "top": 0.50,
+          "left": 0.30,
+          "anchor": "middle-left",
+          "styles": { "fontSize": "14px" }
         }
       }
     },
@@ -76,13 +78,11 @@
     "tablet": {
       "minWidth": 768, "maxWidth": 1023,
       "positions": {
-        "topNav": {
-          "system": "cartesian",
-          "left": 0.95
-        },
         "artistName": {
-          "system": "cartesian",
           "left": 0.18
+        },
+        "topNav": {
+          "left": 0.97
         }
       }
     },
@@ -91,8 +91,7 @@
       "minWidth": 1024,
       "positions": {
         "topNav": {
-          "system": "cartesian",
-          "left": 0.96
+          "left": 0.98
         }
       }
     }
@@ -106,11 +105,11 @@
       "columns": {
         "mobile":  { "max": 2 },
         "tablet":  { "max": 4 },
-        "desktop": { "max": 6 },
-        "ultra":   { "max": 7 }
+        "desktop": { "max": 7 },
+        "ultra":   { "max": 8 }
       },
-      "minTilePx": 140,
-      "maxTilePx": 280
+      "minTilePx": 120,
+      "maxTilePx": 260
     }
   },
 
@@ -129,19 +128,6 @@
       "player": "player",
       "footer": "footer",
       "badges": "badges"
-    }
-  },
-
-  "typography": {
-    "header": {
-      "logo": { "width": "180px" },
-      "nav": { "fontSize": "14px", "gap": "20px" }
-    },
-    "mobile": {
-      "header": {
-        "logo": { "width": "130px" },
-        "nav": { "fontSize": "12px", "gap": "10px" }
-      }
     }
   }
 }

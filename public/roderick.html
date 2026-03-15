@@ -4,201 +4,63 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>INTERSTELLAR PACKAGES</title>
-
-  <link rel="stylesheet" href="/css/header-layout.css">
-  <link rel="stylesheet" href="/css/player-bar.css">
-
-  <style>
-    /* ── Bare minimum: reset + bg/fg + footer fixed ── */
-    html { margin: 0; padding: 0; overflow-x: hidden; }
-    body {
-      margin: 0; padding: 0;
-      background: #083D5E; color: #cadbda;
-      font-family: Helvetica, sans-serif;
-      opacity: 0;
-      overflow: hidden;       /* page doesn't scroll — regions are positioned */
-      height: 100vh;
-    }
-    * { box-sizing: border-box; }
-
-    /* Header — positioned by roderick.js applyRegions */
-    .header-system { position: absolute; left: 0; top: 0; z-index: 100; overflow: hidden; }
-
-    /* Main — positioned by roderick.js applyRegions */
-    #artistMain { position: absolute; overflow: hidden; }
-
-    /* Albums region — scrolls internally */
-    #albumsRegion { position: absolute; overflow-y: auto; overflow-x: hidden; }
-
-    /* Sidebar — hidden until .open */
-    #infoRegion {
-      position: absolute;
-      display: none;
-      overflow-y: auto;
-      background: rgba(8, 61, 94, 0.97);
-      border-left: 1px solid rgba(43, 127, 140, 0.3);
-    }
-    #infoRegion.open { display: block; }
-
-    /* Footer — styled by player-bar.css (fixed bottom) */
-
-    /* ── Album cover tiles (positioned by QuadTree) ── */
-    .album-cover { cursor: pointer; border-radius: 2px; }
-    .album-cover.selected {
-      box-shadow: 0 0 0 2px #3AA0A0, 0 4px 16px rgba(58,160,160,0.3);
-      z-index: 3;
-    }
-
-    /* ── Sidebar content (built by roderick.js) ── */
-    .sidebar-close {
-      position: sticky; top: 0; z-index: 2;
-      display: flex; justify-content: flex-end;
-      padding: 8px 12px;
-      background: rgba(8, 61, 94, 0.95);
-    }
-    .sidebar-close button {
-      background: none; border: 1px solid rgba(202,219,218,0.3);
-      color: #cadbda; font-size: 13px; padding: 4px 10px;
-      cursor: pointer; border-radius: 2px;
-    }
-    .sidebar-close button:hover { background: rgba(202,219,218,0.1); }
-
-    .sidebar-inner { padding: 16px 20px; }
-
-    .sidebar-album-cover {
-      width: 100%; max-width: 280px;
-      border-radius: 2px; margin: 0 auto 16px; display: block;
-    }
-    .sidebar-album-title {
-      font-size: 18px; font-weight: 600; color: #3AA0A0;
-      margin: 0 0 12px; padding-bottom: 8px;
-      border-bottom: 1px solid rgba(43,127,140,0.4); line-height: 1.25;
-    }
-
-    /* Collapsible sections */
-    .sidebar-section { margin-bottom: 4px; }
-    .sidebar-section summary {
-      font-size: 11px; font-weight: 600; color: #8ab7ce;
-      text-transform: uppercase; letter-spacing: 1px;
-      padding: 8px 0; cursor: pointer; user-select: none;
-      list-style: none;
-    }
-    .sidebar-section summary::before { content: '▸ '; }
-    .sidebar-section[open] summary::before { content: '▾ '; }
-    .sidebar-section summary::-webkit-details-marker { display: none; }
-
-    .sidebar-description {
-      font-size: 13px; font-weight: 200; color: #8ab7ce;
-      line-height: 1.55; margin: 0 0 8px;
-    }
-    .sidebar-credits {
-      font-size: 12px; font-weight: 200; font-style: italic;
-      color: #829D9E; line-height: 1.45; margin: 0 0 8px;
-    }
-    .sidebar-meta {
-      display: flex; flex-wrap: wrap; gap: 12px;
-      font-size: 11px; font-weight: 200;
-      padding: 8px 0; border-top: 1px solid rgba(43,127,140,0.2);
-    }
-    .sidebar-meta .cat { color: #0AAAC3; font-weight: 600; font-family: monospace; font-size: 12px; }
-    .sidebar-meta span { color: #7E8D9B; }
-
-    /* Song list */
-    .sidebar-songs { list-style: none; padding: 0; margin: 0; }
-    .sidebar-songs li {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 6px 8px; font-size: 13px; font-weight: 200; color: #cadbda;
-      cursor: pointer; border-bottom: 1px solid rgba(224,224,224,0.08);
-      transition: background 0.15s;
-    }
-    .sidebar-songs li:hover { background: rgba(43,127,140,0.25); }
-    .sidebar-songs li.playing {
-      background: #19606b; font-weight: 500; border-left: 3px solid #3AA0A0;
-    }
-    .sidebar-songs li:last-child { border-bottom: none; }
-    .song-dur { color: #8ab7ce; font-family: monospace; font-size: 12px; margin-left: 8px; flex-shrink: 0; }
-
-    /* ── Footer/Player — handled by player-bar.css ── */
-
-    /* ── Mobile sidebar overlay ── */
-    @media (max-width: 767px) {
-      #infoRegion.open {
-        position: fixed; top: 0; right: 0;
-        width: 85vw; max-width: 380px; height: 100vh;
-        z-index: 200;
-        box-shadow: -4px 0 24px rgba(0,0,0,0.5);
-      }
-      .mobile-overlay {
-        position: fixed; inset: 0;
-        background: rgba(0,0,0,0.5); z-index: 199;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="/css/roderick-styles.css">
 </head>
 
 <body data-math="on" data-page="roderick">
 
-  <header class="header-system" id="artistHeader">
-    <div class="Logo header-logo" id="brandLogo" data-position="brandLogo">
-      <img src="/images/IP_TAG24.svg" alt="Interstellar Packages Logo">
+  <!-- ── HEADER: thin fixed bar ──────────────────────────────── -->
+  <header class="ip-header" id="artistHeader">
+    <div class="ip-header__logo" id="brandLogo" data-position="brandLogo">
+      <img src="/images/IP_TAG24.svg" alt="Interstellar Packages">
     </div>
 
-    <nav class="Nav header-nav" id="topNav" data-position="topNav">
-      <ul>
-        <li><a href="/filmography">Film</a></li>
-        <li><a href="/contact">Contact</a></li>
-        <li class="loginSquare">
-          <button id="loginBtn" class="login-button">Log In</button>
-        </li>
-        <li id="userInfo" class="user-info" style="display:none;">
-          <span id="userName"></span>
-          <button id="logoutBtn" class="logout-button">Logout</button>
-        </li>
-        <li class="cartSquare">
-          <button id="cartBtn" class="cart-button">
-            <img src="/images/IP-CART25-m1.svg" alt="Shopping Cart" class="cart-icon">
-            <span id="cartCount" class="cart-count" style="display:none;">0</span>
-          </button>
-        </li>
-      </ul>
+    <div class="ip-header__artist" id="artistName" data-position="artistName">
+      <span id="artist-name">Roderick Shoolbraid</span>
+    </div>
+
+    <nav class="ip-header__nav" id="topNav" data-position="topNav">
+      <a href="/filmography">Film</a>
+      <a href="/contact">Contact</a>
+      <button id="loginBtn" class="ip-btn ip-btn--outline">Log In</button>
+      <span id="userInfo" class="ip-header__user" style="display:none;">
+        <span id="userName"></span>
+        <button id="logoutBtn" class="ip-btn ip-btn--outline">Logout</button>
+      </span>
+      <button id="cartBtn" class="ip-btn ip-btn--outline ip-btn--cart">
+        <img src="/images/IP-CART25-m1.svg" alt="Cart" class="ip-cart-icon">
+        <span id="cartCount" class="ip-cart-count" style="display:none;">0</span>
+      </button>
     </nav>
-
-    <div class="artist-name-container" id="artistName" data-position="artistName">
-      <span id="artist-name" class="artist-name">Roderick Shoolbraid</span>
-    </div>
   </header>
 
-  <main id="artistMain">
-    <div id="albumsRegion">
-      <!-- Albums built by roderick.js -->
-    </div>
-    <aside id="infoRegion">
-      <!-- Built by roderick.js on album click -->
+  <!-- ── MAIN: album grid + sidebar ──────────────────────────── -->
+  <main class="ip-main" id="artistMain">
+    <section class="ip-grid" id="albumsRegion">
+      <!-- Album covers built by roderick.js -->
+    </section>
+
+    <aside class="ip-sidebar" id="infoRegion">
+      <!-- Populated on album click -->
     </aside>
   </main>
 
-  <footer id="artistControls">
-    <details class="footer-details" open>
-      <summary>Player</summary>
-      <div class="foot-cont">
-        <div class="player" id="playerControls" data-position="playerControls"></div>
-        <p class="footTag">&copy; 2024/25/26 RDXENV</p>
-      </div>
-    </details>
+  <!-- ── Mobile overlay (behind sidebar) ─────────────────────── -->
+  <div class="ip-overlay" id="mobileOverlay"></div>
+
+  <!-- ── PLAYER: fixed bottom bar ────────────────────────────── -->
+  <footer class="ip-player-bar" id="artistControls">
+    <div class="ip-player" id="playerControls">
+      <!-- player.js builds its UI here -->
+    </div>
+    <span class="ip-player-bar__tag">&copy; 2024/25/26 RDXENV</span>
   </footer>
 
-  <!-- Mobile overlay -->
-  <div id="mobileOverlay" class="mobile-overlay" style="display:none;"></div>
-
-  <!-- RODUX System -->
+  <!-- ── Scripts ─────────────────────────────────────────────── -->
   <script type="module" src="/js/InterstellarSystem.js"></script>
-
-  <!-- Legacy globals -->
   <script src="/js/auth.js"></script>
   <script src="/js/cart.js"></script>
   <script src="/js/player.js"></script>
-
-  <!-- V5 -->
   <script type="module" src="/js/paint-applier.js"></script>
   <script type="module" src="/js/header.js"></script>
   <script type="module" src="/js/roderick.js"></script>
@@ -208,44 +70,41 @@
   <section id="userOverlay" aria-hidden="true" style="display:none;"></section>
 
   <!-- Auth Modal -->
-  <div id="authModal" class="auth-modal" style="display:none;">
-    <div class="auth-modal-content">
+  <div id="authModal" class="ip-modal" style="display:none;">
+    <div class="ip-modal__content">
       <span class="close"></span>
-      <div id="loginForm" class="auth-form-container">
+      <div id="loginForm" class="ip-modal__form">
         <h2>Log In</h2>
-        <div id="loginError" class="auth-error" style="display:none;"></div>
-        <form class="auth-form" id="loginFormElement">
+        <div id="loginError" class="ip-modal__error" style="display:none;"></div>
+        <form id="loginFormElement">
           <input type="email" id="loginEmail" placeholder="Email" required>
-          <div class="password-input-container">
+          <div class="ip-modal__pw">
             <input type="password" id="loginPassword" placeholder="Password" required>
             <div class="password-toggle-icon" data-target="loginPassword"></div>
           </div>
-          <button type="submit" id="loginSubmit">Log In</button>
+          <button type="submit" id="loginSubmit" class="ip-btn">Log In</button>
         </form>
-        <div class="form-toggle">
-          Don't have an account? <a id="showRegister">Create one</a>
-        </div>
+        <p class="ip-modal__toggle">Don't have an account? <a id="showRegister">Create one</a></p>
       </div>
-      <div id="registerForm" class="auth-form-container" style="display:none;">
+      <div id="registerForm" class="ip-modal__form" style="display:none;">
         <h2>Create Account</h2>
-        <div id="registerError" class="auth-error" style="display:none;"></div>
-        <div id="registerSuccess" class="auth-success" style="display:none;"></div>
-        <form class="auth-form" id="registerFormElement">
+        <div id="registerError" class="ip-modal__error" style="display:none;"></div>
+        <div id="registerSuccess" class="ip-modal__success" style="display:none;"></div>
+        <form id="registerFormElement">
           <input type="text" id="registerUsername" placeholder="Username" required>
           <input type="text" id="registerFirstName" placeholder="First Name">
           <input type="text" id="registerLastName" placeholder="Last Name">
           <input type="email" id="registerEmail" placeholder="Email" required>
-          <div class="password-input-container">
-            <input type="password" id="registerPassword" placeholder="Password (min 6 characters)" required>
+          <div class="ip-modal__pw">
+            <input type="password" id="registerPassword" placeholder="Password (min 6 chars)" required>
             <div class="password-toggle-icon" data-target="registerPassword"></div>
           </div>
-          <button type="submit" id="registerSubmit">Create Account</button>
+          <button type="submit" id="registerSubmit" class="ip-btn">Create Account</button>
         </form>
-        <div class="form-toggle">
-          Already have an account? <a id="showLogin">Log in</a>
-        </div>
+        <p class="ip-modal__toggle">Already have an account? <a id="showLogin">Log in</a></p>
       </div>
     </div>
   </div>
+
 </body>
 </html>
