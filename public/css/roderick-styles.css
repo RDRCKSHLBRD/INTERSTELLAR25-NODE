@@ -1,0 +1,572 @@
+/* ================================================================
+   RODERICK PAGE — V5 Session 4 · roderick-styles.css
+   
+   SINGLE structural CSS for the Roderick artist page.
+   Replaces: header-layout.css, inline <style>, roderick-page.css
+   
+   Colour/typography values come from CSS vars set by:
+     paint-applier.js   → --ip-bg, --ip-fg, --ip-ink, component tokens
+     RatioLayoutEngine   → --header-height, --vw, --vh
+     header.js           → --header-logo-width, --artist-name-*, --header-nav-*
+   
+   Layout pipeline (roderick.js):
+     roderick.json → applyRegions()   [header/main sizing]
+                   → applyPositions() [RatioPosition for header elements]
+                   → layoutGrid()     [QuadTree for album tiles]
+   
+   Footer (#artistControls) is position:fixed — not laid out by JS.
+   Player internals styled by player-bar.css (kept separate).
+   ================================================================ */
+
+
+/* ── Reset ────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; overflow-x: hidden; }
+
+body {
+  background: var(--ip-bg, #083D5E);
+  color: var(--ip-fg, #cadbda);
+  font-family: Helvetica, sans-serif;
+  opacity: 0;                 /* roderick.js reveals after first render */
+  overflow: hidden;           /* page doesn't scroll — regions scroll internally */
+  height: 100vh;
+}
+
+
+/* ── Header — thin top bar, artist name only ─────────────────── */
+/* roderick.js positions this absolutely via applyRegions()       */
+
+.header-system {
+  position: absolute;
+  left: 0; top: 0;
+  z-index: 100;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--header-padding, 20px);
+  background: var(--ip-bg, #083D5E);
+}
+
+/* Artist name — the only header element in wireframe layout */
+.artist-name-container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.artist-name {
+  font-size: var(--artist-name-font-size, 18px);
+  font-weight: var(--artist-name-font-weight, 200);
+  color: var(--artist-name-color, #cadbda);
+  letter-spacing: var(--artist-name-letter-spacing, 0.5px);
+  white-space: nowrap;
+}
+
+/* Brand logo — hidden by default in wireframe layout,           */
+/* but kept in DOM for accessibility / SEO. Show via config.     */
+.header-logo {
+  display: none;
+}
+.header-logo img {
+  width: var(--header-logo-width, 180px);
+  height: auto;
+  display: block;
+}
+
+/* Header nav — HIDDEN here, moved to footer in wireframe layout */
+.header-nav {
+  display: none;
+}
+
+
+/* ── Main — fills between header and footer ──────────────────── */
+/* roderick.js sets position/size via applyRegions()              */
+
+#artistMain {
+  position: absolute;
+  overflow: hidden;
+}
+
+
+/* ── Albums Grid Region ──────────────────────────────────────── */
+/* Scrolls internally. Tiles positioned by QuadTree.             */
+
+#albumsRegion {
+  position: absolute;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 16px;     /* breathing room at grid bottom */
+}
+
+.album-cover {
+  cursor: pointer;
+  border-radius: 2px;
+  transition: opacity 0.3s ease, box-shadow 0.15s ease;
+}
+
+.album-cover.selected {
+  box-shadow: 0 0 0 2px var(--ip-primary, #3AA0A0),
+              0 4px 16px rgba(58, 160, 160, 0.3);
+  z-index: 3;
+}
+
+
+/* ── Sidebar — hidden until album click ──────────────────────── */
+
+#infoRegion {
+  position: absolute;
+  display: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: rgba(8, 61, 94, 0.97);
+  border-left: 1px solid rgba(43, 127, 140, 0.3);
+}
+
+#infoRegion.open {
+  display: block;
+}
+
+.sidebar-close {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 12px;
+  background: rgba(8, 61, 94, 0.95);
+}
+
+.sidebar-close button {
+  background: none;
+  border: 1px solid rgba(202, 219, 218, 0.3);
+  color: var(--ip-fg, #cadbda);
+  font-size: 13px;
+  padding: 4px 10px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.15s;
+}
+.sidebar-close button:hover {
+  background: rgba(202, 219, 218, 0.1);
+}
+
+.sidebar-inner {
+  padding: 16px 20px;
+}
+
+.sidebar-album-cover {
+  width: 100%;
+  max-width: 280px;
+  border-radius: 2px;
+  margin: 0 auto 16px;
+  display: block;
+}
+
+.sidebar-album-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ip-primary, #3AA0A0);
+  margin: 0 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(43, 127, 140, 0.4);
+  line-height: 1.25;
+}
+
+/* Collapsible sections */
+.sidebar-section { margin-bottom: 4px; }
+
+.sidebar-section summary {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ip-muted, #8ab7ce);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 0;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+.sidebar-section summary::before { content: '▸ '; }
+.sidebar-section[open] summary::before { content: '▾ '; }
+.sidebar-section summary::-webkit-details-marker { display: none; }
+
+.sidebar-description {
+  font-size: 13px;
+  font-weight: 200;
+  color: var(--ip-muted, #8ab7ce);
+  line-height: 1.55;
+  margin: 0 0 8px;
+}
+
+.sidebar-credits {
+  font-size: 12px;
+  font-weight: 200;
+  font-style: italic;
+  color: #829D9E;
+  line-height: 1.45;
+  margin: 0 0 8px;
+}
+
+.sidebar-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 200;
+  padding: 8px 0;
+  border-top: 1px solid rgba(43, 127, 140, 0.2);
+}
+.sidebar-meta .cat {
+  color: #0AAAC3;
+  font-weight: 600;
+  font-family: monospace;
+  font-size: 12px;
+}
+.sidebar-meta span { color: #7E8D9B; }
+
+/* Song list */
+.sidebar-songs { list-style: none; padding: 0; margin: 0; }
+
+.sidebar-songs li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  font-size: 13px;
+  font-weight: 200;
+  color: var(--ip-fg, #cadbda);
+  cursor: pointer;
+  border-bottom: 1px solid rgba(224, 224, 224, 0.08);
+  transition: background 0.15s;
+}
+.sidebar-songs li:hover {
+  background: rgba(43, 127, 140, 0.25);
+}
+.sidebar-songs li.playing {
+  background: #19606b;
+  font-weight: 500;
+  border-left: 3px solid var(--ip-primary, #3AA0A0);
+}
+.sidebar-songs li:last-child { border-bottom: none; }
+
+.song-dur {
+  color: var(--ip-muted, #8ab7ce);
+  font-family: monospace;
+  font-size: 12px;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+
+/* ── Footer / Player Bar ─────────────────────────────────────── */
+/* Wireframe: player + nav + logo all in one fixed-bottom bar.    */
+/* player-bar.css handles player internals (.custom-audio-controls, */
+/* .progress-container, etc). This file handles the bar layout.    */
+
+#artistControls {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 150;
+  background: var(--ip-bg, #083D5E);
+  border-top: 1px solid rgba(43, 127, 140, 0.4);
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  font-family: Helvetica, sans-serif;
+}
+
+/* Left zone: player label + transport + track info */
+.footer-player-zone {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  padding: 6px 16px;
+  gap: 12px;
+}
+
+.footer-player-label {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ip-muted, #8ab7ce);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Player controls container (player.js builds inside here) */
+.player {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Right zone: nav items + logo */
+.footer-nav-zone {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.footer-nav-zone a,
+.footer-nav-zone button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 8px 16px;
+  color: var(--ip-fg, #cadbda);
+  text-decoration: none;
+  font-size: var(--header-nav-font-size, 13px);
+  font-weight: 300;
+  white-space: nowrap;
+  background: none;
+  border: none;
+  border-left: 1px solid rgba(43, 127, 140, 0.25);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.footer-nav-zone a:hover,
+.footer-nav-zone button:hover {
+  background: rgba(43, 127, 140, 0.15);
+}
+
+/* Cart button in footer */
+.footer-nav-zone .cart-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cart-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.cart-count {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  background: var(--badge-cart-bg, #8D2016);
+  color: var(--badge-cart-fg, #EAE9DF);
+  border-radius: 50%;
+  min-width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 0 3px;
+}
+
+/* User info in footer */
+.footer-user-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-left: 1px solid rgba(43, 127, 140, 0.25);
+}
+
+#userName {
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--ip-fg, #cadbda);
+}
+
+/* Logo zone (right edge) */
+.footer-logo {
+  display: flex;
+  align-items: center;
+  padding: 6px 16px;
+  border-left: 1px solid rgba(43, 127, 140, 0.25);
+}
+
+.footer-logo img {
+  height: 22px;
+  width: auto;
+  display: block;
+  opacity: 0.7;
+}
+
+.footer-tag {
+  font-size: 9px;
+  color: #829D9E;
+  margin: 0;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+
+/* ── Mobile sidebar overlay ──────────────────────────────────── */
+.mobile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 199;
+}
+
+
+/* ── Auth Modal ──────────────────────────────────────────────── */
+.auth-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-modal-content {
+  background: var(--ip-bg, #083D5E);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 24px;
+  max-width: 380px;
+  width: 90%;
+}
+
+.auth-form input {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: inherit;
+  border-radius: 2px;
+  font-family: inherit;
+}
+
+.auth-form button[type="submit"] {
+  width: 100%;
+  padding: 8px;
+  background: rgba(58, 160, 160, 0.3);
+  border: 1px solid rgba(58, 160, 160, 0.5);
+  color: inherit;
+  cursor: pointer;
+  border-radius: 2px;
+  font-family: inherit;
+}
+
+.password-input-container {
+  position: relative;
+}
+
+.form-toggle {
+  margin-top: 12px;
+  font-size: 13px;
+  opacity: 0.7;
+}
+.form-toggle a {
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.auth-error {
+  padding: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  border-radius: 2px;
+  background: rgba(220, 53, 69, 0.2);
+  border: 1px solid rgba(220, 53, 69, 0.4);
+}
+
+.auth-success {
+  padding: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  border-radius: 2px;
+  background: rgba(40, 167, 69, 0.2);
+  border: 1px solid rgba(40, 167, 69, 0.4);
+}
+
+
+/* ── Responsive: Mobile ──────────────────────────────────────── */
+@media (max-width: 767px) {
+
+  /* Header stacks vertically on mobile */
+  .header-system {
+    position: relative;
+    height: auto;
+    padding: 8px 12px;
+    justify-content: center;
+  }
+
+  .artist-name {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  /* Sidebar overlays full-screen on mobile */
+  #infoRegion.open {
+    position: fixed;
+    top: 0; right: 0;
+    width: 85vw;
+    max-width: 380px;
+    height: 100vh;
+    z-index: 200;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Footer: stack player above nav */
+  #artistControls {
+    flex-wrap: wrap;
+    min-height: auto;
+  }
+
+  .footer-player-zone {
+    width: 100%;
+    padding: 4px 12px;
+  }
+
+  .footer-nav-zone {
+    width: 100%;
+    justify-content: center;
+    border-top: 1px solid rgba(43, 127, 140, 0.2);
+  }
+
+  .footer-nav-zone a,
+  .footer-nav-zone button {
+    font-size: 11px;
+    padding: 6px 10px;
+    border-left: none;
+    border-right: 1px solid rgba(43, 127, 140, 0.15);
+  }
+
+  .footer-logo {
+    border-left: none;
+    padding: 4px 10px;
+  }
+
+  .footer-logo img { height: 16px; }
+
+  /* Grid needs bottom padding for taller mobile footer */
+  #albumsRegion {
+    padding-bottom: 100px;
+  }
+}
+
+
+/* ── Responsive: Tablet ──────────────────────────────────────── */
+@media (min-width: 768px) and (max-width: 1023px) {
+
+  .footer-nav-zone a,
+  .footer-nav-zone button {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .footer-logo img { height: 18px; }
+}
