@@ -1,41 +1,37 @@
 /* ================================================================
-   PLAYER / FOOTER BAR — player.css  V6
+   PLAYER / FOOTER BAR — player.css  V6.1
    
    RODUX principle: CSS is the rendering engine.
-   All sizing/spacing via --footer-* and --player-* custom properties
-   set by footer.json → paint-applier or InterstellarSystem.
+   All sizing/spacing via --footer-* and --player-* custom properties.
+   JS (player.js) builds DOM with classnames only. No inline styles.
    
-   JS (player.js) only: builds DOM with classnames, wires events.
-   No inline styles from JS.
-   
-   Regions:  [toggle] → [player-zone | nav-zone | logo-zone]
-   Player:   [title | transport | seek | time | volume | loop | cart]
-   
-   #artistControls is position:fixed — not managed by roderick.js.
+   Regions:  [toggle] -> [player-zone | nav-zone | logo-zone]
+   Player:   [title | sep | transport | seek | time | volume | loop | cart]
+   Transport: [prev | skip-back | play/pause | skip-fwd | next | stop]
    ================================================================ */
 
 
 /* ── Custom Property Defaults ────────────────────────────────── */
 :root {
   /* Footer chrome */
-  --footer-height:       42px;
-  --footer-bg:           var(--ip-bg, #083D5E);
+  --footer-height:       46px;
+  --footer-bg:           #07212B;
   --footer-border:       1px solid rgba(43, 127, 140, 0.4);
-  --footer-separator:    1px solid rgba(43, 127, 140, 0.2);
+  --footer-separator:    1px solid rgba(43, 127, 140, 0.25);
 
   /* Player zone */
-  --player-btn-size:     26px;
-  --player-icon-size:    18px;
-  --player-btn-gap:      2px;
-  --player-title-max-w:  180px;
-  --player-title-font:   12px;
-  --player-time-font:    11px;
-  --player-time-min-w:   70px;
+  --player-btn-size:     30px;
+  --player-icon-size:    20px;
+  --player-btn-gap:      3px;
+  --player-title-max-w:  220px;
+  --player-title-font:   13px;
+  --player-time-font:    12px;
+  --player-time-min-w:   78px;
 
   /* Seek bar */
   --seek-height:         6px;
   --seek-radius:         3px;
-  --seek-max-w:          320px;
+  --seek-max-w:          200px;
   --seek-min-w:          80px;
   --seek-track-bg:       rgba(138, 183, 206, 0.15);
   --seek-fill-bg:        var(--ip-primary, #3AA0A0);
@@ -45,13 +41,14 @@
   --vol-track-h:         4px;
 
   /* Nav zone */
-  --nav-font:            13px;
-  --nav-padding:         10px 18px;
+  --nav-font:            14px;
+  --nav-padding:         10px 20px;
 
   /* Logo zone */
-  --logo-img-h:          20px;
-  --logo-tag-font:       8px;
+  --logo-img-h:          24px;
+  --logo-tag-font:       9px;
   --logo-tag-color:      #829D9E;
+  --logo-padding:        4px 20px;
 
   /* Toggle */
   --toggle-font:         10px;
@@ -90,8 +87,8 @@
   line-height: 1;
 }
 .footer-details summary::-webkit-details-marker { display: none; }
-.footer-details summary::before  { content: '▸ '; }
-.footer-details[open] summary::before { content: '▾ '; }
+.footer-details summary::before  { content: '> '; }
+.footer-details[open] summary::before { content: 'v '; }
 
 
 /* ── Footer Bar — the main horizontal strip ──────────────────── */
@@ -114,17 +111,16 @@
   flex: 1 1 auto;
   min-width: 0;
   height: 100%;
-  padding: 0 12px;
-  gap: 6px;
+  padding: 0 14px;
+  gap: 8px;
 }
 
-/* The .player div wraps transport + seek + time + vol */
 .player {
   display: flex;
   align-items: center;
   flex: 1 1 auto;
   min-width: 0;
-  gap: 6px;
+  gap: 8px;
   height: 100%;
 }
 
@@ -138,8 +134,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: var(--player-title-max-w);
-  min-width: 40px;
-  flex-shrink: 1;
+  min-width: 60px;
+  flex-shrink: 0;
 }
 
 .player-separator {
@@ -178,12 +174,14 @@
 .player-transport button:hover { opacity: 0.7; }
 
 /* Icon mapping — SVG transport icons */
-.player-transport .btn-prev  { background-image: url('/images/PLAYER-BACK_BLUE-5.svg'); }
-.player-transport .btn-play  { background-image: url('/images/PLAYER-PLAY-v2.svg'); }
-.player-transport .btn-pause { background-image: url('/images/PLAYER-PAUSE.svg'); }
-.player-transport .btn-next  { background-image: url('/images/PLAYER-FWD_BLUE-5.svg'); }
-.player-transport .btn-stop  { background-image: url('/images/PLAYER-STOP.svg'); }
-.player-transport .btn-loop  { background-image: url('/images/PLAYER-REPEAT_BLUE.svg'); }
+.player-transport .btn-prev      { background-image: url('/images/PLAYER-BACK_BLUE-5.svg'); }
+.player-transport .btn-skip-back { background-image: url('/images/PLAYER-bkwd30_BLUE.svg'); }
+.player-transport .btn-play      { background-image: url('/images/PLAYER-PLAY-v2.svg'); }
+.player-transport .btn-pause     { background-image: url('/images/PLAYER-PAUSE.svg'); }
+.player-transport .btn-skip-fwd  { background-image: url('/images/PLAYER-fwd30_BLUE.svg'); }
+.player-transport .btn-next      { background-image: url('/images/PLAYER-FWD_BLUE-5.svg'); }
+.player-transport .btn-stop      { background-image: url('/images/PLAYER-STOP.svg'); }
+.player-transport .btn-loop      { background-image: url('/images/PLAYER-REPEAT_BLUE.svg'); }
 
 .player-transport .btn-loop[data-active="true"] {
   background-color: rgba(43, 127, 140, 0.3);
@@ -192,7 +190,7 @@
 
 .player-transport .btn-cart {
   background-image: url('/images/IP-CART-add-v1.svg');
-  background-size: 20px 20px;
+  background-size: 22px 22px;
 }
 
 
@@ -239,10 +237,15 @@
   flex-shrink: 0;
 }
 
+/* Volume icon — needs PLAYER-VOLUME.svg in /images/ */
 .player-volume-icon {
-  font-size: 11px;
-  color: var(--ip-muted, #8ab7ce);
-  line-height: 1;
+  width: 16px;
+  height: 16px;
+  background-image: url('/images/IP-MUSIC-2teal.svg');
+  background-size: 14px 14px;
+  background-repeat: no-repeat;
+  background-position: center;
+  flex-shrink: 0;
 }
 
 .player-volume-track {
@@ -311,7 +314,7 @@
 }
 
 .cart-icon {
-  width: 18px; height: 18px; display: block;
+  width: 20px; height: 20px; display: block;
 }
 
 .cart-count {
@@ -350,7 +353,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4px 16px;
+  padding: var(--logo-padding);
   border-left: var(--footer-separator);
   flex-shrink: 0;
   height: 100%;
@@ -360,7 +363,7 @@
   height: var(--logo-img-h);
   width: auto;
   display: block;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .footer-tag {
@@ -373,23 +376,22 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   RESPONSIVE — TABLET (768–1023)
+   RESPONSIVE — TABLET (768-1023)
    ══════════════════════════════════════════════════════════════ */
 @media (max-width: 1023px) {
   :root {
-    --footer-height:      40px;
-    --player-btn-size:    24px;
-    --player-icon-size:   16px;
-    --player-title-max-w: 140px;
-    --player-title-font:  11px;
-    --seek-max-w:         220px;
+    --footer-height:      44px;
+    --player-btn-size:    28px;
+    --player-icon-size:   18px;
+    --player-title-max-w: 160px;
+    --player-title-font:  12px;
+    --seek-max-w:         160px;
     --vol-track-w:        40px;
-    --nav-font:           12px;
-    --nav-padding:        8px 12px;
-    --logo-img-h:         16px;
+    --nav-font:           13px;
+    --nav-padding:        8px 14px;
+    --logo-img-h:         20px;
+    --logo-padding:       4px 14px;
   }
-
-  .footer-logo { padding: 4px 10px; }
 }
 
 
@@ -400,16 +402,18 @@
 @media (max-width: 767px) {
   :root {
     --footer-height:      auto;
-    --player-btn-size:    22px;
-    --player-icon-size:   14px;
-    --player-title-max-w: 100px;
-    --player-title-font:  11px;
+    --player-btn-size:    26px;
+    --player-icon-size:   16px;
+    --player-title-max-w: 120px;
+    --player-title-font:  12px;
+    --player-time-font:   11px;
     --seek-max-w:         none;
     --seek-min-w:         60px;
     --vol-track-w:        0px;
-    --nav-font:           11px;
-    --nav-padding:        5px 8px;
-    --logo-img-h:         14px;
+    --nav-font:           12px;
+    --nav-padding:        6px 10px;
+    --logo-img-h:         16px;
+    --logo-padding:       3px 10px;
   }
 
   .footer-bar {
@@ -423,8 +427,12 @@
     padding: 4px 10px;
   }
 
-  /* Hide volume on mobile — screen too narrow */
+  /* Hide volume on mobile */
   .player-volume { display: none; }
+
+  /* Hide skip-30 on mobile to save space */
+  .player-transport .btn-skip-back,
+  .player-transport .btn-skip-fwd { display: none; }
 
   .footer-nav-zone {
     width: 100%;
@@ -446,7 +454,7 @@
     gap: 8px;
     border-left: none;
     border-top: 1px solid rgba(43, 127, 140, 0.15);
-    padding: 3px 10px;
+    padding: var(--logo-padding);
     order: 3;
   }
 

@@ -59,7 +59,17 @@ body.ready { opacity: 1; }
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  min-height: var(--grid-content-h, auto);
+  /* position:relative so absolute covers are positioned within,
+     and the container can scroll via min-height */
+}
+
+/* Inner scroll surface — absolute children don't expand parent,
+   so we force min-height from the calculated grid content height */
+#albumsRegion::after {
+  content: '';
+  display: block;
+  height: var(--grid-content-h, 0px);
+  pointer-events: none;
 }
 
 /* Individual album cover — positioned by per-element CSS vars */
@@ -109,11 +119,11 @@ body.ready { opacity: 1; }
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  background: var(--ip-bg, #083D5E);
+  background: #07212B;
   border-left: 1px solid rgba(43, 127, 140, 0.35);
   z-index: 10;
 
-  /* Hidden by default — no display:none, use visibility for transitions */
+  /* Hidden by default */
   visibility: hidden;
   opacity: 0;
   transition: opacity 0.2s ease, visibility 0.2s;
@@ -129,7 +139,7 @@ body.ready { opacity: 1; }
   position: sticky; top: 0; z-index: 2;
   display: flex; justify-content: flex-end;
   padding: 8px 12px;
-  background: var(--ip-bg, #083D5E);
+  background: #07212B;
 }
 .sidebar-close button {
   background: none;
@@ -242,10 +252,10 @@ body.ready { opacity: 1; }
     position: fixed;
     top: 0; right: 0;
     left: auto;
-    width: 85vw; max-width: 380px;
+    width: 100vw;
     height: 100vh;
     z-index: 200;
-    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
+    box-shadow: none;
   }
 
   /* Grid always full width on mobile */

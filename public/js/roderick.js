@@ -1,5 +1,5 @@
 // ============================================================================
-// public/js/roderick.js — V6 (RODUX Stack / CSS-Var-Driven Layout)
+// public/js/roderick.js — V6.1 (RODUX Stack / CSS-Var-Driven Layout)
 //
 // Single controller for the Roderick Shoolbraid artist page.
 // Owns: data fetch, DOM creation, region layout, QuadTree grid,
@@ -14,7 +14,7 @@
 // No Object.assign(el.style, ...) anywhere.
 // ============================================================================
 
-import { applyPaintForPage } from './paint-applier.js';
+// V6.1: Colors defined in CSS :root defaults. No paint-applier needed.
 
 // ── Helpers ─────────────────────────────────────────────────────
 const Q  = (id) => document.getElementById(id);
@@ -429,7 +429,6 @@ function setupKeyboard() {
       resizeTimer = setTimeout(render, 80);
     });
 
-    await applyPaintForPage(cfg);
     render();
 
     // Reveal

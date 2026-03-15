@@ -1,20 +1,22 @@
 /* ================================================================
-   HEADER — header.css
+   HEADER — header.css  V6.1
    Thin top bar. Artist name SVG only. No nav, no logo.
    
-   Positioned absolutely by roderick.js applyRegions().
+   Sized by --header-height (set by roderick.js).
    Colours from paint-applier.js CSS vars.
-   Sizing from header.js + header.json CSS vars.
    ================================================================ */
 
 .header-system {
   position: absolute;
   left: 0; top: 0;
+  width: 100%;
+  height: var(--header-height, 44px);
   z-index: 100;
   overflow: hidden;
   display: flex;
   align-items: center;
   padding: 0 var(--header-padding, 20px);
+  padding-top: 6px;
   background: var(--ip-bg, #083D5E);
 }
 
@@ -27,7 +29,7 @@
 }
 
 #artist-name-svg {
-  height: calc(var(--header-height, 24px) * 0.35);
+  height: calc(var(--header-height, 44px) * 0.55);
   width: auto;
   display: block;
 }
@@ -46,7 +48,8 @@
 @media (max-width: 767px) {
   .header-system {
     justify-content: center;
-    padding: 6px 12px;
+    padding: 4px 12px;
+    padding-top: 4px;
   }
 
   #artist-name-svg {

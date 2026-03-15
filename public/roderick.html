@@ -12,26 +12,26 @@
 
 <body data-math="on" data-page="roderick">
 
-  <!-- ── HEADER: artist name SVG only ────────────────────────── -->
+  <!-- HEADER: artist name SVG only -->
   <header class="header-system" id="artistHeader">
     <div class="artist-name-container" id="artistName" data-position="artistName">
       <img id="artist-name-svg"
-           src="/images/IP-ART-RODERICKSHOOLBRAID-candyFloss.svg"
+           src="/images/IP-ART-RODERICKSHOOLVRAID-flowerVase.svg"
            alt="Roderick Shoolbraid">
       <span id="artist-name" class="artist-name" style="display:none;">Roderick Shoolbraid</span>
     </div>
   </header>
 
-  <!-- ── MAIN: album grid + sidebar ──────────────────────────── -->
+  <!-- MAIN: album grid + sidebar -->
   <main id="artistMain">
     <div id="albumsRegion"></div>
     <aside id="infoRegion"></aside>
   </main>
 
-  <!-- ── Mobile overlay (behind sidebar) ─────────────────────── -->
-  <div id="mobileOverlay" class="mobile-overlay" style="display:none;"></div>
+  <!-- Mobile overlay (behind sidebar) -->
+  <div id="mobileOverlay" class="mobile-overlay"></div>
 
-  <!-- ── FOOTER: the UI — player + nav + logo ────────────────── -->
+  <!-- FOOTER: the UI — player + nav + logo -->
   <footer id="artistControls">
     <details class="footer-details" open>
       <summary>Player</summary>
@@ -69,17 +69,15 @@
     </details>
   </footer>
 
-  <!-- ── RODUX System ────────────────────────────────────────── -->
+  <!-- RODUX System -->
   <script type="module" src="/js/InterstellarSystem.js"></script>
 
-  <!-- Legacy globals -->
+  <!-- Auth + Cart (non-module, global) -->
   <script src="/js/auth.js"></script>
   <script src="/js/cart.js"></script>
   <script src="/js/player.js"></script>
 
-  <!-- V5 modules -->
-  <script type="module" src="/js/paint-applier.js"></script>
-  <script type="module" src="/js/header.js"></script>
+  <!-- V6 page controller -->
   <script type="module" src="/js/roderick.js"></script>
 
   <!-- Overlays -->

@@ -48,10 +48,12 @@ class AudioPlayer {
     transport.className = 'player-transport';
 
     const buttons = [
-      { key: 'prev', cls: 'btn-prev', title: 'Previous',        fn: () => this.previousTrack() },
-      { key: 'play', cls: 'btn-play', title: 'Play',            fn: () => this.togglePlay() },
-      { key: 'next', cls: 'btn-next', title: 'Next',            fn: () => this.nextTrack() },
-      { key: 'stop', cls: 'btn-stop', title: 'Stop',            fn: () => this.stop() },
+      { key: 'prev',     cls: 'btn-prev',      title: 'Previous',    fn: () => this.previousTrack() },
+      { key: 'skipBack', cls: 'btn-skip-back',  title: 'Back 30s',   fn: () => this.skip(-30) },
+      { key: 'play',     cls: 'btn-play',       title: 'Play',       fn: () => this.togglePlay() },
+      { key: 'skipFwd',  cls: 'btn-skip-fwd',   title: 'Forward 30s', fn: () => this.skip(30) },
+      { key: 'next',     cls: 'btn-next',       title: 'Next',       fn: () => this.nextTrack() },
+      { key: 'stop',     cls: 'btn-stop',       title: 'Stop',       fn: () => this.stop() },
     ];
 
     buttons.forEach(b => {
@@ -89,7 +91,6 @@ class AudioPlayer {
 
     const volIcon = document.createElement('span');
     volIcon.className = 'player-volume-icon';
-    volIcon.textContent = '🔊';
     vol.appendChild(volIcon);
 
     const volTrack = document.createElement('div');
@@ -186,6 +187,11 @@ class AudioPlayer {
       this._updatePlayBtn(false);
       this._updateProgress();
     }
+  }
+
+  skip(seconds) {
+    if (!this.audio?.duration) return;
+    this.audio.currentTime = Math.max(0, Math.min(this.audio.duration, this.audio.currentTime + seconds));
   }
 
   async nextTrack() {
