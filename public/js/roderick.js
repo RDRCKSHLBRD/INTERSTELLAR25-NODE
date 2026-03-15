@@ -1,16 +1,23 @@
 // ============================================================================
-// public/js/roderick.js — V5 Session 3 (RODUX Stack / Flash Layer)
+// public/js/roderick.js — V5 Session 3b (RODUX Stack / Flash Layer)
 //
-// Page controller for the Roderick Shoolbraid artist page.
-// Owns: data fetch, DOM creation, QuadTree grid, album detail sidebar, player.
+// Single controller for the Roderick Shoolbraid artist page.
+// Owns: data fetch, DOM creation, region layout, QuadTree grid,
+//       album detail sidebar, player wiring.
 //
 // Layout pipeline:
-//   StateJS → RatioLayoutEngine (CSS vars for regions)
-//           → RatioPosition (header elements, sidebar elements)
-//           → QuadTree (album grid tile positions)
-//           → paint-applier (colours, typography from paint.json)
+//   roderick.json → applyRegions()  [header/main sizing, absolute pos]
+//                 → applyPositions() [RatioPosition for header elements]
+//                 → layoutGrid()     [QuadTree for album tiles]
 //
-// NO inline CSS Grid. NO inline styles on HTML. Everything from JSON config.
+// Footer (#artistControls) is position:fixed in CSS — not laid out by JS.
+// albumsRegion has overflow-y:auto so grid content scrolls.
+// Sidebar hidden until album click, then RODUX positions it.
+//
+// Session 3b fixes:
+//   - ResizeObserver guarded to prevent layout thrashing loop
+//   - HTML and JS aligned (no CSS Grid, pure absolute positioning)
+//   - No hover scale on album covers
 // ============================================================================
 
 import { applyPaintForPage } from './paint-applier.js';
@@ -24,7 +31,13 @@ const TABLET_MAX = 1023;
 function isMobile()  { return innerWidth <= MOBILE_MAX; }
 function isDesktop() { return innerWidth > TABLET_MAX; }
 
-// ── Data fetch (flash-backed API) ───────────────────────────────
+// Footer is position:fixed — measure its actual height
+function footerHeight() {
+  const f = Q('artistControls');
+  return f ? f.offsetHeight : 40;
+}
+
+// ── Data fetch ──────────────────────────────────────────────────
 async function fetchJSON(endpoint) {
   const res = await fetch(endpoint, { credentials: 'include' });
   if (!res.ok) throw new Error(`${endpoint}: ${res.status}`);
@@ -39,25 +52,49 @@ let albums = [];
 let currentAlbum = null;
 let cfg = null;
 let sidebarOpen = false;
+let _layoutInProgress = false;  // guard against ResizeObserver loop
 
-// ── Wait for Interstellar system ────────────────────────────────
-function whenReady(cb) {
-  if (window.Interstellar?.position) return cb(window.Interstellar);
+// ── Wait for Interstellar + QuadTree ────────────────────────────
+function whenInterstellarReady(cb) {
+  if (window.Interstellar?.quadTree) return cb(window.Interstellar);
   const t0 = performance.now();
   const timer = setInterval(() => {
-    if (window.Interstellar?.position) {
+    if (window.Interstellar?.quadTree) {
       clearInterval(timer);
-      console.log('✅ Interstellar ready');
+      console.log('✅ Interstellar + QuadTree ready');
       cb(window.Interstellar);
     }
     if (performance.now() - t0 > 5000) {
       clearInterval(timer);
-      console.error('❌ Interstellar timeout');
+      console.error('❌ Interstellar/QuadTree timeout');
     }
   }, 50);
 }
 
-// ── Album Grid: DOM Creation ────────────────────────────────────
+function resolvePositioner(IS) {
+  const keys = ['RatioPosition','ratioPosition','positioner','position','pos','positionEngine']
+    .filter(k => k in IS);
+  for (const k of keys) {
+    const v = IS[k];
+    if (v && typeof v.apply === 'function') return v;
+    if (typeof v === 'function' && v?.prototype?.apply) {
+      try {
+        const inst = new v({ useCSSTransform: false, roundToPixel: true });
+        if (inst.apply) return inst;
+      } catch {}
+    }
+  }
+  for (const [, v] of Object.entries(IS)) {
+    if (v && typeof v.apply === 'function') return v;
+  }
+  console.error('[roderick] RatioPosition not found');
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOM CREATION
+// ═══════════════════════════════════════════════════════════════
+
 function buildAlbumGrid(albumsData) {
   const gridEl = Q('albumsRegion');
   if (!gridEl) return;
@@ -71,6 +108,7 @@ function buildAlbumGrid(albumsData) {
     img.dataset.catalogue = album.catalogue || '';
     img.className = 'album-cover';
 
+    // Fade in on load
     img.style.opacity = '0';
     img.style.transition = 'opacity 0.3s ease';
     img.addEventListener('load', () => { img.style.opacity = '1'; });
@@ -78,6 +116,7 @@ function buildAlbumGrid(albumsData) {
       img.src = '/images/default-album-cover.png';
       img.style.opacity = '1';
     });
+
     img.addEventListener('click', () => onAlbumClick(album, img));
     gridEl.appendChild(img);
   });
@@ -85,7 +124,10 @@ function buildAlbumGrid(albumsData) {
   console.log(`✅ Built ${albumsData.length} album covers`);
 }
 
-// ── Album Click → Sidebar ────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// ALBUM CLICK → SIDEBAR
+// ═══════════════════════════════════════════════════════════════
+
 async function onAlbumClick(album, imgEl) {
   const allCovers = document.querySelectorAll('.album-cover');
   const wasSelected = imgEl.classList.contains('selected');
@@ -110,7 +152,7 @@ async function onAlbumClick(album, imgEl) {
   }
 }
 
-// ── Sidebar: Render ─────────────────────────────────────────────
+// ── Sidebar Render ──────────────────────────────────────────────
 function renderSidebar(album, coverUrl) {
   const sidebar = Q('infoRegion');
   if (!sidebar) return;
@@ -132,7 +174,7 @@ function renderSidebar(album, coverUrl) {
 
   sidebar.innerHTML = `
     <div class="sidebar-close">
-      <button id="sidebarCloseBtn">✕</button>
+      <button id="sidebarCloseBtn">✕ Close</button>
     </div>
     <div class="sidebar-inner">
       <img class="sidebar-album-cover" src="${coverUrl || album.cover_url || ''}" alt="${album.name}">
@@ -152,11 +194,11 @@ function renderSidebar(album, coverUrl) {
 
       <div class="sidebar-meta">
         ${album.catalogue ? `<span class="cat">${album.catalogue}</span>` : ''}
-        ${album.production_date ? `<span class="date">${album.production_date}</span>` : ''}
-        ${album.release_date ? `<span class="released">${album.release_date}</span>` : ''}
+        ${album.production_date ? `<span>${album.production_date}</span>` : ''}
+        ${album.release_date ? `<span>${album.release_date}</span>` : ''}
       </div>
 
-      ${(album.songs?.length > 0) ? `
+      ${(album.songs && album.songs.length > 0) ? `
       <details class="sidebar-section" open>
         <summary>Tracks (${album.songs.length})</summary>
         <ul class="sidebar-songs">${songsHTML}</ul>
@@ -164,7 +206,7 @@ function renderSidebar(album, coverUrl) {
     </div>
   `;
 
-  // Wire close button
+  // Wire close
   Q('sidebarCloseBtn')?.addEventListener('click', () => {
     document.querySelectorAll('.album-cover').forEach(c => c.classList.remove('selected'));
     closeSidebar();
@@ -174,10 +216,10 @@ function renderSidebar(album, coverUrl) {
   // Wire song clicks
   sidebar.querySelectorAll('.sidebar-songs li').forEach(li => {
     li.addEventListener('click', () => {
-      const songId = li.dataset.songId;
-      const albumId = li.dataset.albumId;
+      const songId = parseInt(li.dataset.songId);
+      const albumId = parseInt(li.dataset.albumId);
       if (window.audioPlayer) {
-        window.audioPlayer.playSong(parseInt(songId), parseInt(albumId));
+        window.audioPlayer.playSong(songId, albumId);
       }
       sidebar.querySelectorAll('.sidebar-songs li').forEach(l => l.classList.remove('playing'));
       li.classList.add('playing');
@@ -185,13 +227,12 @@ function renderSidebar(album, coverUrl) {
   });
 }
 
-// ── Sidebar: Open / Close ───────────────────────────────────────
 function openSidebar() {
-  sidebarOpen = true;
   const sidebar = Q('infoRegion');
   const overlay = Q('mobileOverlay');
-
   if (sidebar) sidebar.classList.add('open');
+  sidebarOpen = true;
+
   if (isMobile() && overlay) {
     overlay.style.display = 'block';
     overlay.onclick = () => {
@@ -201,111 +242,113 @@ function openSidebar() {
     };
   }
 
-  // Re-layout regions (sidebar takes space from grid on desktop)
-  requestAnimationFrame(render);
+  // Re-layout everything (main split changes)
+  render();
 }
 
 function closeSidebar() {
-  sidebarOpen = false;
   const sidebar = Q('infoRegion');
   const overlay = Q('mobileOverlay');
-
   if (sidebar) sidebar.classList.remove('open');
   if (overlay) overlay.style.display = 'none';
+  sidebarOpen = false;
 
-  requestAnimationFrame(render);
+  render();
 }
 
-// ── Layout: Regions (RODUX — RatioEngine drives CSS vars, we size containers) ──
+// ═══════════════════════════════════════════════════════════════
+// LAYOUT — RODUX Region Positioning
+// ═══════════════════════════════════════════════════════════════
+
 function applyRegions() {
   if (!cfg) return;
-
   const vw = innerWidth;
   const vh = innerHeight;
+  const fh = footerHeight();
 
-  // Header and footer heights come from RatioLayoutEngine CSS vars
-  // but we need to measure them for main area calculation
-  const header = Q('artistHeader');
-  const footer = Q('artistControls');
-  const main   = Q('artistMain');
+  const headerR = cfg.layout?.regions?.header?.ratio ?? 0.06;
+  const headerH = Math.round(vh * headerR);
+  const mainH   = vh - headerH - fh;
+
+  const header   = Q('artistHeader');
+  const main     = Q('artistMain');
   const albumsEl = Q('albumsRegion');
-  const info   = Q('infoRegion');
+  const info     = Q('infoRegion');
 
-  const headerH = header?.offsetHeight || 44;
-  const footerH = footer?.offsetHeight || 40;
-  const mainH   = vh - headerH - footerH;
+  // Header
+  if (header) {
+    Object.assign(header.style, {
+      position: 'absolute', left: '0', top: '0',
+      width: px(vw), height: px(headerH)
+    });
+    document.documentElement.style.setProperty('--header-height', px(headerH));
+  }
 
+  // Main
   if (main) {
-    main.style.height = px(mainH);
+    Object.assign(main.style, {
+      position: 'absolute', left: '0', top: px(headerH),
+      width: px(vw), height: px(mainH)
+    });
   }
 
   if (isMobile()) {
-    // Mobile: full-width grid, sidebar overlays
-    if (albumsEl) {
-      Object.assign(albumsEl.style, {
+    // Mobile: full width grid, sidebar overlays separately
+    if (albumsEl) Object.assign(albumsEl.style, {
+      left: '0', top: '0',
+      width: px(vw), height: px(mainH)
+    });
+    if (info && !sidebarOpen) info.style.display = 'none';
+  } else {
+    // Desktop/Tablet
+    const ms     = cfg.layout?.mainSplit;
+    const leftR  = ms?.left?.ratio  ?? 0.75;
+    const rightR = ms?.right?.ratio ?? 0.25;
+    const minR   = ms?.right?.minPx ?? 320;
+
+    if (sidebarOpen) {
+      const rightW = Math.max(minR, Math.round(vw * rightR));
+      const leftW  = vw - rightW;
+
+      if (albumsEl) Object.assign(albumsEl.style, {
+        left: '0', top: '0',
+        width: px(leftW), height: px(mainH)
+      });
+      if (info) Object.assign(info.style, {
+        display: 'block',
+        left: px(leftW), top: '0',
+        width: px(rightW), height: px(mainH)
+      });
+    } else {
+      // No sidebar — grid takes full width
+      if (albumsEl) Object.assign(albumsEl.style, {
         left: '0', top: '0',
         width: px(vw), height: px(mainH)
       });
     }
-    if (info) {
-      // Mobile sidebar is position:fixed via CSS, no JS sizing needed
-    }
-  } else {
-    // Desktop/Tablet: grid + sidebar split
-    const ms = cfg.layout?.mainSplit;
-    const rightMinPx = ms?.right?.minPx ?? 340;
-    const leftRatio  = ms?.left?.ratio  ?? 0.75;
-
-    let gridW, sidebarW;
-
-    if (sidebarOpen) {
-      sidebarW = Math.max(rightMinPx, Math.round(vw * (ms?.right?.ratio ?? 0.25)));
-      gridW    = vw - sidebarW;
-    } else {
-      gridW    = vw;
-      sidebarW = 0;
-    }
-
-    if (albumsEl) {
-      Object.assign(albumsEl.style, {
-        left: '0', top: '0',
-        width: px(gridW), height: px(mainH)
-      });
-    }
-    if (info) {
-      Object.assign(info.style, {
-        left: px(gridW), top: '0',
-        width: px(sidebarW), height: px(mainH)
-      });
-    }
   }
 }
 
-// ── Layout: Header positions (RatioPosition) ────────────────────
-function applyHeaderPositions(IS) {
-  if (!IS?.position?.apply || !cfg) return;
-  const rp = IS.position;
-  const State = IS.state || null;
+// ── Header Positions (RatioPosition) ────────────────────────────
+function applyPositions(rp, State) {
+  if (!rp?.apply || !cfg) return;
   const P = cfg.positions || {};
+  const header = Q('artistHeader');
 
-  // Apply breakpoint-specific positions if available
-  const bp = isMobile() ? 'mobile' : (innerWidth <= TABLET_MAX ? 'tablet' : 'desktop');
-  const bpOverrides = cfg.positionBreakpoints?.[bp]?.positions || {};
-
-  // Merge base positions with breakpoint overrides
-  const pos = (key) => ({ ...P[key], ...bpOverrides[key] });
-
-  if (P.brandLogo)  rp.apply(Q('brandLogo'),  Q('artistHeader'), pos('brandLogo'),  State);
-  if (P.artistName) rp.apply(Q('artistName'), Q('artistHeader'), pos('artistName'), State);
-  if (P.topNav)     rp.apply(Q('topNav'),     Q('artistHeader'), pos('topNav'),     State);
+  if (P.brandLogo)  rp.apply(Q('brandLogo'),  header, P.brandLogo,  State);
+  if (P.artistName) rp.apply(Q('artistName'), header, P.artistName, State);
+  if (P.topNav)     rp.apply(Q('topNav'),     header, P.topNav,     State);
 }
 
-// ── Layout: QuadTree Album Grid ─────────────────────────────────
+// ── QuadTree Album Grid ─────────────────────────────────────────
 function layoutGrid() {
   if (!cfg) return;
 
   const qtCfg = cfg.quadTree?.albumGrid;
-  if (!qtCfg?.enabled) return;
+  if (!qtCfg?.enabled) {
+    console.warn('⚠️ QuadTree albumGrid not enabled');
+    return;
+  }
 
   const gridEl = Q('albumsRegion');
   if (!gridEl) return;
@@ -317,10 +360,11 @@ function layoutGrid() {
   if (w <= 0) return;
 
   const bucket = (w < 520) ? 'mobile' : (w < 880) ? 'tablet' : (w > 1400) ? 'ultra' : 'desktop';
-  const maxCols = qtCfg.columns?.[bucket]?.max ?? 6;
+  const maxCols = qtCfg.columns?.[bucket]?.max ?? 4;
   const gap     = qtCfg.gap?.px ?? 16;
   const aspect  = qtCfg.tile?.aspect ?? 1.0;
 
+  // Symmetric margin
   const marginPct = 0.02;
   const margin    = Math.round(w * marginPct);
   const availW    = w - (margin * 2);
@@ -345,9 +389,33 @@ function layoutGrid() {
     });
   });
 
-  // Set content height so container scrolls
-  gridEl.style.height = px(rows * tileH + Math.max(0, rows - 1) * gap + 16);
+  // Set min-height so scrolling works inside the albumsRegion
+  const contentH = rows * tileH + Math.max(0, rows - 1) * gap + 16;
+  gridEl.style.minHeight = `${contentH}px`;
+
   console.log(`✅ Grid: ${cols}×${rows} @ ${tileW}px, margin=${margin}px`);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+
+let _rp = null;
+let _State = null;
+
+function render() {
+  if (_layoutInProgress) return;  // prevent re-entrant calls from ResizeObserver
+  _layoutInProgress = true;
+
+  try {
+    _State?.measure?.();
+    applyRegions();
+    applyPositions(_rp, _State);
+    layoutGrid();
+  } finally {
+    // Release guard after a frame so ResizeObserver doesn't re-trigger immediately
+    requestAnimationFrame(() => { _layoutInProgress = false; });
+  }
 }
 
 // ── Keyboard ────────────────────────────────────────────────────
@@ -361,8 +429,14 @@ function setupKeyboard() {
           window.audioPlayer.currentAudio.paused ? window.audioPlayer.play() : window.audioPlayer.pause();
         }
         break;
-      case 'ArrowRight': e.preventDefault(); window.audioPlayer?.nextTrack(); break;
-      case 'ArrowLeft':  e.preventDefault(); window.audioPlayer?.previousTrack(); break;
+      case 'ArrowRight':
+        e.preventDefault();
+        window.audioPlayer?.nextTrack();
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        window.audioPlayer?.previousTrack();
+        break;
       case 'Escape':
         e.preventDefault();
         document.querySelectorAll('.album-cover').forEach(c => c.classList.remove('selected'));
@@ -373,20 +447,10 @@ function setupKeyboard() {
   });
 }
 
-// ── Render (called on init + resize) ────────────────────────────
-let _IS = null;
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
 
-function render() {
-  if (_IS) {
-    _IS.state?.measure?.();
-    _IS.layout?.apply?.();
-  }
-  applyRegions();
-  applyHeaderPositions(_IS);
-  layoutGrid();
-}
-
-// ── Init ────────────────────────────────────────────────────────
 (async function init() {
   // Shim for player.js
   window.apiClient = {
@@ -399,7 +463,7 @@ function render() {
   if (!cfgRes.ok) throw new Error('roderick.json not found');
   cfg = await cfgRes.json();
 
-  // Fetch album data
+  // Fetch albums from flash
   try {
     albums = await fetchJSON('/api/albums');
     console.log(`📡 Loaded ${albums.length} albums from flash`);
@@ -412,11 +476,19 @@ function render() {
 
   albums.sort((a, b) => a.id - b.id);
   buildAlbumGrid(albums);
+
+  // Artist name
+  const artistNameEl = Q('artist-name');
+  if (artistNameEl && albums.length > 0) {
+    artistNameEl.textContent = albums[0].artist_name || 'Roderick Shoolbraid';
+  }
+
   setupKeyboard();
 
   // Wait for RODUX stack
-  whenReady(async (IS) => {
-    _IS = IS;
+  whenInterstellarReady(async (IS) => {
+    _State = IS.State || IS.ViewportState || IS.state || null;
+    _rp = resolvePositioner(IS);
 
     if (document.readyState === 'loading') {
       await new Promise(r => document.addEventListener('DOMContentLoaded', r, { once: true }));
@@ -426,8 +498,11 @@ function render() {
     let resizeTimer;
     addEventListener('resize', () => {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(render, 60);
+      resizeTimer = setTimeout(render, 80);
     });
+
+    // NO ResizeObserver — render() already handles everything via resize + sidebar open/close.
+    // The ResizeObserver was causing infinite layout loops.
 
     await applyPaintForPage(cfg);
     render();
@@ -436,6 +511,6 @@ function render() {
     document.body.style.opacity = '1';
     document.body.style.transition = 'opacity 0.2s ease';
 
-    console.log('🎉 Roderick.js V5 Session 3 initialized');
+    console.log('🎉 roderick.js V5 Session 3b initialized');
   });
 })();
