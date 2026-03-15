@@ -1,37 +1,30 @@
 // ============================================================================
-// public/js/roderick.js — V5 Session 3b (RODUX Stack / Flash Layer)
+// public/js/roderick.js — V6 (RODUX Stack / CSS-Var-Driven Layout)
 //
 // Single controller for the Roderick Shoolbraid artist page.
 // Owns: data fetch, DOM creation, region layout, QuadTree grid,
 //       album detail sidebar, player wiring.
 //
-// Layout pipeline:
-//   roderick.json → applyRegions()  [header/main sizing, absolute pos]
-//                 → applyPositions() [RatioPosition for header elements]
-//                 → layoutGrid()     [QuadTree for album tiles]
+// V6 PRINCIPLE: JS sets CSS custom properties, CSS does all rendering.
+//   roderick.json → setRegionVars()  [--header-h, --main-top, --main-h, etc.]
+//                 → layoutGrid()     [--grid-cols, --tile-w, --tile-h, --grid-gap, --grid-margin]
 //
-// Footer (#artistControls) is position:fixed in CSS — not laid out by JS.
-// albumsRegion has overflow-y:auto so grid content scrolls.
-// Sidebar hidden until album click, then RODUX positions it.
-//
-// Session 3b fixes:
-//   - ResizeObserver guarded to prevent layout thrashing loop
-//   - HTML and JS aligned (no CSS Grid, pure absolute positioning)
-//   - No hover scale on album covers
+// Footer (#artistControls) is position:fixed in CSS — not laid out here.
+// Sidebar uses .open class toggle — CSS handles positioning/sizing.
+// No Object.assign(el.style, ...) anywhere.
 // ============================================================================
 
 import { applyPaintForPage } from './paint-applier.js';
 
 // ── Helpers ─────────────────────────────────────────────────────
 const Q  = (id) => document.getElementById(id);
-const px = (n) => `${Math.round(n)}px`;
 
 const MOBILE_MAX = 767;
 const TABLET_MAX = 1023;
 function isMobile()  { return innerWidth <= MOBILE_MAX; }
 function isDesktop() { return innerWidth > TABLET_MAX; }
 
-// Footer is position:fixed — measure its actual height
+// Footer is position:fixed — measure its actual rendered height
 function footerHeight() {
   const f = Q('artistControls');
   return f ? f.offsetHeight : 40;
@@ -52,7 +45,7 @@ let albums = [];
 let currentAlbum = null;
 let cfg = null;
 let sidebarOpen = false;
-let _layoutInProgress = false;  // guard against ResizeObserver loop
+let _layoutInProgress = false;
 
 // ── Wait for Interstellar + QuadTree ────────────────────────────
 function whenInterstellarReady(cb) {
@@ -71,25 +64,6 @@ function whenInterstellarReady(cb) {
   }, 50);
 }
 
-function resolvePositioner(IS) {
-  const keys = ['RatioPosition','ratioPosition','positioner','position','pos','positionEngine']
-    .filter(k => k in IS);
-  for (const k of keys) {
-    const v = IS[k];
-    if (v && typeof v.apply === 'function') return v;
-    if (typeof v === 'function' && v?.prototype?.apply) {
-      try {
-        const inst = new v({ useCSSTransform: false, roundToPixel: true });
-        if (inst.apply) return inst;
-      } catch {}
-    }
-  }
-  for (const [, v] of Object.entries(IS)) {
-    if (v && typeof v.apply === 'function') return v;
-  }
-  console.error('[roderick] RatioPosition not found');
-  return null;
-}
 
 // ═══════════════════════════════════════════════════════════════
 // DOM CREATION
@@ -108,13 +82,10 @@ function buildAlbumGrid(albumsData) {
     img.dataset.catalogue = album.catalogue || '';
     img.className = 'album-cover';
 
-    // Fade in on load
-    img.style.opacity = '0';
-    img.style.transition = 'opacity 0.3s ease';
-    img.addEventListener('load', () => { img.style.opacity = '1'; });
+    img.addEventListener('load',  () => { img.classList.add('loaded'); });
     img.addEventListener('error', () => {
       img.src = '/images/default-album-cover.png';
-      img.style.opacity = '1';
+      img.classList.add('loaded');
     });
 
     img.addEventListener('click', () => onAlbumClick(album, img));
@@ -123,6 +94,7 @@ function buildAlbumGrid(albumsData) {
 
   console.log(`✅ Built ${albumsData.length} album covers`);
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // ALBUM CLICK → SIDEBAR
@@ -151,6 +123,7 @@ async function onAlbumClick(album, imgEl) {
     console.error('Failed to load album detail:', err);
   }
 }
+
 
 // ── Sidebar Render ──────────────────────────────────────────────
 function renderSidebar(album, coverUrl) {
@@ -231,10 +204,11 @@ function openSidebar() {
   const sidebar = Q('infoRegion');
   const overlay = Q('mobileOverlay');
   if (sidebar) sidebar.classList.add('open');
+  document.body.classList.add('sidebar-open');
   sidebarOpen = true;
 
   if (isMobile() && overlay) {
-    overlay.style.display = 'block';
+    overlay.classList.add('visible');
     overlay.onclick = () => {
       document.querySelectorAll('.album-cover').forEach(c => c.classList.remove('selected'));
       closeSidebar();
@@ -242,7 +216,7 @@ function openSidebar() {
     };
   }
 
-  // Re-layout everything (main split changes)
+  // Recalculate layout vars (sidebar changes grid width)
   render();
 }
 
@@ -250,18 +224,24 @@ function closeSidebar() {
   const sidebar = Q('infoRegion');
   const overlay = Q('mobileOverlay');
   if (sidebar) sidebar.classList.remove('open');
-  if (overlay) overlay.style.display = 'none';
+  if (overlay) overlay.classList.remove('visible');
+  document.body.classList.remove('sidebar-open');
   sidebarOpen = false;
 
   render();
 }
 
+
 // ═══════════════════════════════════════════════════════════════
-// LAYOUT — RODUX Region Positioning
+// LAYOUT — CSS Custom Property Pipeline
+//
+// Instead of el.style.left = '340px', we set CSS vars on :root
+// and let CSS rules consume them. This is the RODUX way.
 // ═══════════════════════════════════════════════════════════════
 
-function applyRegions() {
+function setRegionVars() {
   if (!cfg) return;
+  const root = document.documentElement;
   const vw = innerWidth;
   const vh = innerHeight;
   const fh = footerHeight();
@@ -270,75 +250,34 @@ function applyRegions() {
   const headerH = Math.round(vh * headerR);
   const mainH   = vh - headerH - fh;
 
-  const header   = Q('artistHeader');
-  const main     = Q('artistMain');
-  const albumsEl = Q('albumsRegion');
-  const info     = Q('infoRegion');
+  // ── Core region vars ─────────────────────────────────────────
+  root.style.setProperty('--header-height', `${headerH}px`);
+  root.style.setProperty('--main-top',      `${headerH}px`);
+  root.style.setProperty('--main-height',   `${mainH}px`);
+  root.style.setProperty('--vw',            `${vw}px`);
 
-  // Header
-  if (header) {
-    Object.assign(header.style, {
-      position: 'absolute', left: '0', top: '0',
-      width: px(vw), height: px(headerH)
-    });
-    document.documentElement.style.setProperty('--header-height', px(headerH));
-  }
-
-  // Main
-  if (main) {
-    Object.assign(main.style, {
-      position: 'absolute', left: '0', top: px(headerH),
-      width: px(vw), height: px(mainH)
-    });
-  }
-
-  if (isMobile()) {
-    // Mobile: full width grid, sidebar overlays separately
-    if (albumsEl) Object.assign(albumsEl.style, {
-      left: '0', top: '0',
-      width: px(vw), height: px(mainH)
-    });
-    if (info && !sidebarOpen) info.style.display = 'none';
-  } else {
-    // Desktop/Tablet
+  // ── Sidebar split vars ───────────────────────────────────────
+  if (!isMobile() && sidebarOpen) {
     const ms     = cfg.layout?.mainSplit;
-    const leftR  = ms?.left?.ratio  ?? 0.75;
     const rightR = ms?.right?.ratio ?? 0.25;
     const minR   = ms?.right?.minPx ?? 320;
+    const rightW = Math.max(minR, Math.round(vw * rightR));
+    const leftW  = vw - rightW;
 
-    if (sidebarOpen) {
-      const rightW = Math.max(minR, Math.round(vw * rightR));
-      const leftW  = vw - rightW;
-
-      if (albumsEl) Object.assign(albumsEl.style, {
-        left: '0', top: '0',
-        width: px(leftW), height: px(mainH)
-      });
-      if (info) Object.assign(info.style, {
-        display: 'block',
-        left: px(leftW), top: '0',
-        width: px(rightW), height: px(mainH)
-      });
-    } else {
-      // No sidebar — grid takes full width
-      if (albumsEl) Object.assign(albumsEl.style, {
-        left: '0', top: '0',
-        width: px(vw), height: px(mainH)
-      });
-    }
+    root.style.setProperty('--albums-width',  `${leftW}px`);
+    root.style.setProperty('--sidebar-width', `${rightW}px`);
+    root.style.setProperty('--sidebar-left',  `${leftW}px`);
+  } else {
+    root.style.setProperty('--albums-width',  `${vw}px`);
+    root.style.setProperty('--sidebar-width', '0px');
+    root.style.setProperty('--sidebar-left',  `${vw}px`);
   }
+
+  // ── Breakpoint data attribute ────────────────────────────────
+  const bp = isMobile() ? 'mobile' : isDesktop() ? 'desktop' : 'tablet';
+  root.dataset.breakpoint = bp;
 }
 
-// ── Header Positions (RatioPosition) ────────────────────────────
-function applyPositions(rp, State) {
-  if (!rp?.apply || !cfg) return;
-  const P = cfg.positions || {};
-  const header = Q('artistHeader');
-
-  if (P.brandLogo)  rp.apply(Q('brandLogo'),  header, P.brandLogo,  State);
-  if (P.artistName) rp.apply(Q('artistName'), header, P.artistName, State);
-  if (P.topNav)     rp.apply(Q('topNav'),     header, P.topNav,     State);
-}
 
 // ── QuadTree Album Grid ─────────────────────────────────────────
 function layoutGrid() {
@@ -374,49 +313,46 @@ function layoutGrid() {
   const cols   = Math.max(1, Math.min(maxCols, Math.floor((availW + gap) / (tileW + gap))));
   const rows   = Math.ceil(covers.length / cols);
 
-  gridEl.style.position = 'relative';
+  // Set grid vars on the grid element itself
+  const gs = gridEl.style;
+  gs.setProperty('--grid-cols',   cols);
+  gs.setProperty('--grid-tile-w', `${tileW}px`);
+  gs.setProperty('--grid-tile-h', `${tileH}px`);
+  gs.setProperty('--grid-gap',    `${gap}px`);
+  gs.setProperty('--grid-margin', `${margin}px`);
+  gs.setProperty('--grid-content-h', `${rows * tileH + Math.max(0, rows - 1) * gap + 16}px`);
 
+  // Position each cover via absolute + calculated offsets
+  // (This is still JS because QuadTree computes per-item positions)
   covers.forEach((cover, i) => {
     const col = i % cols;
     const row = Math.floor(i / cols);
-    Object.assign(cover.style, {
-      position: 'absolute',
-      left:   px(margin + col * (tileW + gap)),
-      top:    px(row * (tileH + gap)),
-      width:  px(tileW),
-      height: px(tileH),
-      objectFit: 'cover',
-    });
+    cover.style.setProperty('--col-offset', `${margin + col * (tileW + gap)}px`);
+    cover.style.setProperty('--row-offset', `${row * (tileH + gap)}px`);
+    cover.style.setProperty('--tile-w',     `${tileW}px`);
+    cover.style.setProperty('--tile-h',     `${tileH}px`);
   });
-
-  // Set min-height so scrolling works inside the albumsRegion
-  const contentH = rows * tileH + Math.max(0, rows - 1) * gap + 16;
-  gridEl.style.minHeight = `${contentH}px`;
 
   console.log(`✅ Grid: ${cols}×${rows} @ ${tileW}px, margin=${margin}px`);
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // RENDER
 // ═══════════════════════════════════════════════════════════════
 
-let _rp = null;
-let _State = null;
-
 function render() {
-  if (_layoutInProgress) return;  // prevent re-entrant calls from ResizeObserver
+  if (_layoutInProgress) return;
   _layoutInProgress = true;
 
   try {
-    _State?.measure?.();
-    applyRegions();
-    applyPositions(_rp, _State);
+    setRegionVars();
     layoutGrid();
   } finally {
-    // Release guard after a frame so ResizeObserver doesn't re-trigger immediately
     requestAnimationFrame(() => { _layoutInProgress = false; });
   }
 }
+
 
 // ── Keyboard ────────────────────────────────────────────────────
 function setupKeyboard() {
@@ -425,8 +361,8 @@ function setupKeyboard() {
     switch (e.key) {
       case ' ':
         e.preventDefault();
-        if (window.audioPlayer?.currentAudio) {
-          window.audioPlayer.currentAudio.paused ? window.audioPlayer.play() : window.audioPlayer.pause();
+        if (window.audioPlayer?.audio) {
+          window.audioPlayer.audio.paused ? window.audioPlayer.play() : window.audioPlayer.pause();
         }
         break;
       case 'ArrowRight':
@@ -446,6 +382,7 @@ function setupKeyboard() {
     }
   });
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // INIT
@@ -470,26 +407,17 @@ function setupKeyboard() {
   } catch (err) {
     console.error('❌ Failed to load albums:', err);
     const gridEl = Q('albumsRegion');
-    if (gridEl) gridEl.innerHTML = '<p style="padding:20px;">Failed to load music collection.</p>';
+    if (gridEl) gridEl.innerHTML = '<p class="load-error">Failed to load music collection.</p>';
     return;
   }
 
   albums.sort((a, b) => a.id - b.id);
   buildAlbumGrid(albums);
 
-  // Artist name
-  const artistNameEl = Q('artist-name');
-  if (artistNameEl && albums.length > 0) {
-    artistNameEl.textContent = albums[0].artist_name || 'Roderick Shoolbraid';
-  }
-
   setupKeyboard();
 
   // Wait for RODUX stack
   whenInterstellarReady(async (IS) => {
-    _State = IS.State || IS.ViewportState || IS.state || null;
-    _rp = resolvePositioner(IS);
-
     if (document.readyState === 'loading') {
       await new Promise(r => document.addEventListener('DOMContentLoaded', r, { once: true }));
     }
@@ -501,16 +429,12 @@ function setupKeyboard() {
       resizeTimer = setTimeout(render, 80);
     });
 
-    // NO ResizeObserver — render() already handles everything via resize + sidebar open/close.
-    // The ResizeObserver was causing infinite layout loops.
-
     await applyPaintForPage(cfg);
     render();
 
     // Reveal
-    document.body.style.opacity = '1';
-    document.body.style.transition = 'opacity 0.2s ease';
+    document.body.classList.add('ready');
 
-    console.log('🎉 roderick.js V5 Session 3b initialized');
+    console.log('🎉 roderick.js V6 initialized');
   });
 })();

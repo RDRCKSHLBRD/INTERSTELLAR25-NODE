@@ -1,0 +1,75 @@
+{
+  "_component": "footer",
+  "_comment": "Footer/Player bar config — RODUX stack (RatioEngine → CSS vars → CSS rules)",
+  "_version": "6.0",
+
+  "layout": {
+    "_comment": "Horizontal regions as ratios of footer width. Player zone gets remainder.",
+    "regions": {
+      "player":  { "flex": 1, "minPx": 280 },
+      "nav":     { "shrink": 0 },
+      "logo":    { "shrink": 0, "widthPx": 80 }
+    },
+    "height": {
+      "desktop": 42,
+      "tablet": 40,
+      "mobile": 38
+    },
+    "border": "1px solid rgba(43, 127, 140, 0.4)"
+  },
+
+  "player": {
+    "_comment": "Internal player layout — transport | seek | time",
+    "transport": {
+      "buttonSize": { "desktop": 26, "tablet": 24, "mobile": 22 },
+      "iconSize":   { "desktop": 18, "tablet": 16, "mobile": 14 },
+      "gap":        { "desktop": 2,  "tablet": 2,  "mobile": 1 }
+    },
+    "seek": {
+      "height":    6,
+      "radius":    3,
+      "maxWidth":  320,
+      "minWidth":  80,
+      "trackBg":   "rgba(138, 183, 206, 0.15)",
+      "fillColor": "#3AA0A0"
+    },
+    "title": {
+      "maxWidth":  { "desktop": 180, "tablet": 140, "mobile": 100 },
+      "fontSize":  { "desktop": 12,  "tablet": 11,  "mobile": 11 }
+    },
+    "time": {
+      "fontSize":  11,
+      "fontFamily": "monospace",
+      "minWidth":  70
+    },
+    "volume": {
+      "trackWidth": { "desktop": 50, "tablet": 40, "mobile": 0 },
+      "trackHeight": 4
+    }
+  },
+
+  "nav": {
+    "items": ["film", "contact", "login", "cart"],
+    "fontSize":  { "desktop": 13, "tablet": 12, "mobile": 11 },
+    "padding":   { "desktop": "10px 18px", "tablet": "8px 12px", "mobile": "5px 8px" },
+    "separator": "1px solid rgba(43, 127, 140, 0.2)"
+  },
+
+  "logo": {
+    "imgHeight": { "desktop": 20, "tablet": 16, "mobile": 14 },
+    "tagFontSize": 8,
+    "tagColor": "#829D9E"
+  },
+
+  "toggle": {
+    "fontSize": 10,
+    "color": "#8ab7ce",
+    "padding": "4px 16px"
+  },
+
+  "mobile": {
+    "_comment": "Below 768px: player full-width row 1, nav row 2, logo row 3",
+    "stackBreakpoint": 767,
+    "layout": "stacked"
+  }
+}

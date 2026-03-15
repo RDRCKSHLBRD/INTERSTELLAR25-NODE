@@ -1,13 +1,15 @@
 /* ================================================================
-   RODERICK PAGE — roderick.css
-   Page structure: reset, body, main region, album grid,
-   sidebar, auth modal, mobile overlay.
+   RODERICK PAGE — roderick.css  V6
+   
+   RODUX principle: CSS custom properties drive all layout.
+   roderick.js sets: --header-height, --main-top, --main-height,
+                     --albums-width, --sidebar-width, --sidebar-left
+   layoutGrid sets:  --grid-cols, --grid-tile-w, --grid-tile-h,
+                     --grid-gap, --grid-margin, --grid-content-h
+   Per-cover:        --col-offset, --row-offset, --tile-w, --tile-h
    
    Does NOT contain header styles (see header.css)
    Does NOT contain footer/player styles (see player.css)
-   
-   Layout by roderick.js: applyRegions() + layoutGrid()
-   Colours from paint-applier.js CSS vars.
    ================================================================ */
 
 
@@ -19,15 +21,31 @@ body {
   background: var(--ip-bg, #083D5E);
   color: var(--ip-fg, #cadbda);
   font-family: Helvetica, sans-serif;
-  opacity: 0;               /* roderick.js reveals after first render */
-  overflow: hidden;          /* page doesn't scroll — regions do */
+  opacity: 0;                        /* revealed by .ready class */
+  overflow: hidden;
   height: 100vh;
+  transition: opacity 0.2s ease;
 }
 
+body.ready { opacity: 1; }
 
-/* ── Main Region ─────────────────────────────────────────────── */
+
+/* ═══════════════════════════════════════════════════════════════
+   REGIONS — driven by --header-height, --main-top, --main-height
+   JS sets these vars; CSS positions everything.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Header ──────────────────────────────────────────────────── */
+/* (positioned by header.css, sized by --header-height) */
+
+
+/* ── Main ────────────────────────────────────────────────────── */
 #artistMain {
   position: absolute;
+  left: 0;
+  top: var(--main-top, 44px);
+  width: 100%;
+  height: var(--main-height, calc(100vh - 44px - 42px));
   overflow: hidden;
 }
 
@@ -35,15 +53,33 @@ body {
 /* ── Albums Grid Region ──────────────────────────────────────── */
 #albumsRegion {
   position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--albums-width, 100%);
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-bottom: 16px;
+  min-height: var(--grid-content-h, auto);
 }
 
+/* Individual album cover — positioned by per-element CSS vars */
 .album-cover {
+  position: absolute;
+  left: var(--col-offset, 0);
+  top: var(--row-offset, 0);
+  width: var(--tile-w, 200px);
+  height: var(--tile-h, 200px);
+  object-fit: cover;
   cursor: pointer;
   border-radius: 2px;
+
+  /* Fade-in on load */
+  opacity: 0;
   transition: opacity 0.3s ease, box-shadow 0.15s ease;
+}
+
+.album-cover.loaded {
+  opacity: 1;
 }
 
 .album-cover.selected {
@@ -53,20 +89,40 @@ body {
   z-index: 3;
 }
 
+.load-error {
+  padding: 20px;
+  color: var(--ip-muted, #8ab7ce);
+}
 
-/* ── Sidebar ─────────────────────────────────────────────────── */
+
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR — desktop: absolute split; mobile: fixed overlay
+   Driven by --sidebar-width, --sidebar-left
+   Toggle: .open class (added/removed by JS)
+   ═══════════════════════════════════════════════════════════════ */
+
 #infoRegion {
   position: absolute;
-  display: none;
+  left: var(--sidebar-left, 100%);
+  top: 0;
+  width: var(--sidebar-width, 0);
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  /* Fully opaque so albums don't bleed through */
   background: var(--ip-bg, #083D5E);
   border-left: 1px solid rgba(43, 127, 140, 0.35);
   z-index: 10;
+
+  /* Hidden by default — no display:none, use visibility for transitions */
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease, visibility 0.2s;
 }
 
-#infoRegion.open { display: block; }
+#infoRegion.open {
+  visibility: visible;
+  opacity: 1;
+}
 
 /* Close button — sticky top */
 .sidebar-close {
@@ -164,24 +220,45 @@ body {
 }
 
 
-/* ── Mobile Overlay ──────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE OVERLAY
+   ═══════════════════════════════════════════════════════════════ */
+
 .mobile-overlay {
   position: fixed; inset: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 199;
+  display: none;
 }
+.mobile-overlay.visible { display: block; }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE — sidebar as fixed slide-in panel
+   ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 767px) {
   #infoRegion.open {
-    position: fixed; top: 0; right: 0;
-    width: 85vw; max-width: 380px; height: 100vh;
+    /* Override the CSS-var positioning for mobile */
+    position: fixed;
+    top: 0; right: 0;
+    left: auto;
+    width: 85vw; max-width: 380px;
+    height: 100vh;
     z-index: 200;
     box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Grid always full width on mobile */
+  #albumsRegion {
+    width: 100% !important;
   }
 }
 
 
-/* ── Auth Modal ──────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   AUTH MODAL
+   ═══════════════════════════════════════════════════════════════ */
+
 .auth-modal {
   position: fixed; inset: 0;
   background: rgba(0, 0, 0, 0.6);

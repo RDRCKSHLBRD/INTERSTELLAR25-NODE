@@ -1,13 +1,63 @@
 /* ================================================================
-   PLAYER / FOOTER BAR — player.css
-   The entire footer UI: collapsible <details>, player transport,
-   nav links, cart, login, logo.
+   PLAYER / FOOTER BAR — player.css  V6
    
-   Icons: /images/PLAYER-*.svg (transport), IP-CART*.svg (cart)
-   player.js builds DOM inside #playerControls.
+   RODUX principle: CSS is the rendering engine.
+   All sizing/spacing via --footer-* and --player-* custom properties
+   set by footer.json → paint-applier or InterstellarSystem.
    
-   position:fixed at bottom — not laid out by roderick.js.
+   JS (player.js) only: builds DOM with classnames, wires events.
+   No inline styles from JS.
+   
+   Regions:  [toggle] → [player-zone | nav-zone | logo-zone]
+   Player:   [title | transport | seek | time | volume | loop | cart]
+   
+   #artistControls is position:fixed — not managed by roderick.js.
    ================================================================ */
+
+
+/* ── Custom Property Defaults ────────────────────────────────── */
+:root {
+  /* Footer chrome */
+  --footer-height:       42px;
+  --footer-bg:           var(--ip-bg, #083D5E);
+  --footer-border:       1px solid rgba(43, 127, 140, 0.4);
+  --footer-separator:    1px solid rgba(43, 127, 140, 0.2);
+
+  /* Player zone */
+  --player-btn-size:     26px;
+  --player-icon-size:    18px;
+  --player-btn-gap:      2px;
+  --player-title-max-w:  180px;
+  --player-title-font:   12px;
+  --player-time-font:    11px;
+  --player-time-min-w:   70px;
+
+  /* Seek bar */
+  --seek-height:         6px;
+  --seek-radius:         3px;
+  --seek-max-w:          320px;
+  --seek-min-w:          80px;
+  --seek-track-bg:       rgba(138, 183, 206, 0.15);
+  --seek-fill-bg:        var(--ip-primary, #3AA0A0);
+
+  /* Volume */
+  --vol-track-w:         50px;
+  --vol-track-h:         4px;
+
+  /* Nav zone */
+  --nav-font:            13px;
+  --nav-padding:         10px 18px;
+
+  /* Logo zone */
+  --logo-img-h:          20px;
+  --logo-tag-font:       8px;
+  --logo-tag-color:      #829D9E;
+
+  /* Toggle */
+  --toggle-font:         10px;
+  --toggle-color:        var(--ip-muted, #8ab7ce);
+  --toggle-padding:      4px 16px;
+}
 
 
 /* ── Footer Container ────────────────────────────────────────── */
@@ -15,8 +65,8 @@
   position: fixed;
   bottom: 0; left: 0; right: 0;
   z-index: 150;
-  background: var(--ip-bg, #083D5E);
-  border-top: 1px solid rgba(43, 127, 140, 0.4);
+  background: var(--footer-bg);
+  border-top: var(--footer-border);
   padding: 0;
   font-family: Helvetica, sans-serif;
 }
@@ -28,11 +78,11 @@
 }
 
 .footer-details summary {
-  font-size: 10px;
+  font-size: var(--toggle-font);
   font-weight: 400;
-  color: var(--ip-muted, #8ab7ce);
+  color: var(--toggle-color);
   letter-spacing: 0.5px;
-  padding: 4px 16px;
+  padding: var(--toggle-padding);
   cursor: pointer;
   user-select: none;
   list-style: none;
@@ -40,47 +90,82 @@
   line-height: 1;
 }
 .footer-details summary::-webkit-details-marker { display: none; }
-.footer-details summary::before { content: '▸ '; }
+.footer-details summary::before  { content: '▸ '; }
 .footer-details[open] summary::before { content: '▾ '; }
 
 
-/* ── Footer Inner Bar ────────────────────────────────────────── */
+/* ── Footer Bar — the main horizontal strip ──────────────────── */
 .footer-bar {
   display: flex;
   align-items: center;
+  height: var(--footer-height);
   padding: 0;
-  min-height: 38px;
+  overflow: hidden;
 }
 
 
-/* ── Player Zone (left — takes available space) ──────────────── */
+/* ══════════════════════════════════════════════════════════════
+   PLAYER ZONE — left, takes remaining space
+   ══════════════════════════════════════════════════════════════ */
+
 .footer-player-zone {
   display: flex;
   align-items: center;
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
-  padding: 6px 12px;
-  gap: 4px;
+  height: 100%;
+  padding: 0 12px;
+  gap: 6px;
 }
 
+/* The .player div wraps transport + seek + time + vol */
 .player {
   display: flex;
   align-items: center;
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
+  gap: 6px;
+  height: 100%;
 }
 
 
-/* ── Player Transport Icons ──────────────────────────────────── */
-#playerControls button {
+/* ── Song Title ──────────────────────────────────────────────── */
+.player-title {
+  font-size: var(--player-title-font);
+  font-weight: 400;
+  color: var(--ip-fg, #cadbda);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: var(--player-title-max-w);
+  min-width: 40px;
+  flex-shrink: 1;
+}
+
+.player-separator {
+  color: rgba(138, 183, 206, 0.3);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+
+/* ── Transport Buttons ───────────────────────────────────────── */
+.player-transport {
+  display: flex;
+  align-items: center;
+  gap: var(--player-btn-gap);
+  flex-shrink: 0;
+}
+
+.player-transport button {
   background: none;
   border: none;
   outline: none;
   cursor: pointer;
-  width: 26px;
-  height: 26px;
+  width: var(--player-btn-size);
+  height: var(--player-btn-size);
   flex-shrink: 0;
-  background-size: 18px 18px;
+  background-size: var(--player-icon-size) var(--player-icon-size);
   background-repeat: no-repeat;
   background-position: center;
   border-radius: 2px;
@@ -90,34 +175,104 @@
   overflow: hidden;
   transition: opacity 0.15s;
 }
-#playerControls button:hover { opacity: 0.7; }
+.player-transport button:hover { opacity: 0.7; }
 
-/* Map icons by title — PLAYER-*.svg */
-#playerControls button[title="Previous"]         { background-image: url('/images/PLAYER-BACK_BLUE-5.svg'); }
-#playerControls button[title="Play"]             { background-image: url('/images/PLAYER-PLAY-v2.svg'); }
-#playerControls button[title="Next"]             { background-image: url('/images/PLAYER-FWD_BLUE-5.svg'); }
-#playerControls button[title="Stop"]             { background-image: url('/images/PLAYER-STOP.svg'); }
-#playerControls button[title="Loop"]             { background-image: url('/images/PLAYER-REPEAT_BLUE.svg'); }
-#playerControls button[title="Add Track to Cart"] {
-  background-image: url('/images/IP-CART-add-v1.svg');
-  background-size: 20px 20px;
-}
+/* Icon mapping — SVG transport icons */
+.player-transport .btn-prev  { background-image: url('/images/PLAYER-BACK_BLUE-5.svg'); }
+.player-transport .btn-play  { background-image: url('/images/PLAYER-PLAY-v2.svg'); }
+.player-transport .btn-pause { background-image: url('/images/PLAYER-PAUSE.svg'); }
+.player-transport .btn-next  { background-image: url('/images/PLAYER-FWD_BLUE-5.svg'); }
+.player-transport .btn-stop  { background-image: url('/images/PLAYER-STOP.svg'); }
+.player-transport .btn-loop  { background-image: url('/images/PLAYER-REPEAT_BLUE.svg'); }
 
-/* Loop active */
-#playerControls button[title="Loop"][data-active="true"] {
+.player-transport .btn-loop[data-active="true"] {
   background-color: rgba(43, 127, 140, 0.3);
   border: 1px solid rgba(43, 127, 140, 0.6);
 }
 
+.player-transport .btn-cart {
+  background-image: url('/images/IP-CART-add-v1.svg');
+  background-size: 20px 20px;
+}
 
-/* ── Nav Zone (right — flush against player, clear border) ──── */
+
+/* ── Seek Bar ────────────────────────────────────────────────── */
+.player-seek {
+  flex: 1 1 auto;
+  max-width: var(--seek-max-w);
+  min-width: var(--seek-min-w);
+  height: var(--seek-height);
+  background: var(--seek-track-bg);
+  border-radius: var(--seek-radius);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 1;
+}
+
+.player-seek-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--seek-fill-bg);
+  border-radius: var(--seek-radius);
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+
+/* ── Time Display ────────────────────────────────────────────── */
+.player-time {
+  font-size: var(--player-time-font);
+  font-family: monospace;
+  color: var(--ip-muted, #8ab7ce);
+  white-space: nowrap;
+  min-width: var(--player-time-min-w);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+
+/* ── Volume ──────────────────────────────────────────────────── */
+.player-volume {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.player-volume-icon {
+  font-size: 11px;
+  color: var(--ip-muted, #8ab7ce);
+  line-height: 1;
+}
+
+.player-volume-track {
+  width: var(--vol-track-w);
+  height: var(--vol-track-h);
+  background: var(--seek-track-bg);
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+}
+
+.player-volume-fill {
+  height: 100%;
+  width: 80%;
+  background: var(--seek-fill-bg);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   NAV ZONE — right side, fixed width
+   ══════════════════════════════════════════════════════════════ */
+
 .footer-nav-zone {
   display: flex;
   align-items: center;
   flex-shrink: 0;
   height: 100%;
-  margin-left: auto;
-  border-left: 1px solid rgba(43, 127, 140, 0.3);
+  border-left: var(--footer-separator);
 }
 
 .footer-nav-zone a,
@@ -125,17 +280,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 18px;
+  padding: var(--nav-padding);
   color: var(--ip-fg, #cadbda);
   text-decoration: none;
-  font-size: 13px;
+  font-size: var(--nav-font);
   font-weight: 300;
   white-space: nowrap;
   background: none;
   border: none;
-  border-right: 1px solid rgba(43, 127, 140, 0.2);
+  border-right: var(--footer-separator);
   cursor: pointer;
   font-family: inherit;
+  height: 100%;
   transition: background 0.15s;
 }
 .footer-nav-zone a:hover,
@@ -176,7 +332,7 @@
   align-items: center;
   gap: 6px;
   padding: 10px 14px;
-  border-right: 1px solid rgba(43, 127, 140, 0.2);
+  border-right: var(--footer-separator);
 }
 
 #userName {
@@ -185,49 +341,80 @@
 }
 
 
-/* ── Logo Zone (right edge) ──────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════
+   LOGO ZONE — far right edge
+   ══════════════════════════════════════════════════════════════ */
+
 .footer-logo {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 4px 16px;
-  border-left: 1px solid rgba(43, 127, 140, 0.2);
+  border-left: var(--footer-separator);
   flex-shrink: 0;
+  height: 100%;
 }
 
 .footer-logo img {
-  height: 20px; width: auto;
-  display: block; opacity: 0.7;
+  height: var(--logo-img-h);
+  width: auto;
+  display: block;
+  opacity: 0.7;
 }
 
 .footer-tag {
-  font-size: 8px;
-  color: #829D9E;
+  font-size: var(--logo-tag-font);
+  color: var(--logo-tag-color);
   margin: 2px 0 0;
   white-space: nowrap;
   line-height: 1;
 }
 
 
-/* ── Responsive: Tablet ──────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE — TABLET (768–1023)
+   ══════════════════════════════════════════════════════════════ */
 @media (max-width: 1023px) {
-  .footer-nav-zone a,
-  .footer-nav-zone button {
-    padding: 8px 12px;
-    font-size: 12px;
+  :root {
+    --footer-height:      40px;
+    --player-btn-size:    24px;
+    --player-icon-size:   16px;
+    --player-title-max-w: 140px;
+    --player-title-font:  11px;
+    --seek-max-w:         220px;
+    --vol-track-w:        40px;
+    --nav-font:           12px;
+    --nav-padding:        8px 12px;
+    --logo-img-h:         16px;
   }
 
-  .footer-logo img { height: 16px; }
   .footer-logo { padding: 4px 10px; }
 }
 
 
-/* ── Responsive: Mobile ──────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE — MOBILE (<768)
+   Stacked layout: player row 1, nav row 2, logo row 3
+   ══════════════════════════════════════════════════════════════ */
 @media (max-width: 767px) {
+  :root {
+    --footer-height:      auto;
+    --player-btn-size:    22px;
+    --player-icon-size:   14px;
+    --player-title-max-w: 100px;
+    --player-title-font:  11px;
+    --seek-max-w:         none;
+    --seek-min-w:         60px;
+    --vol-track-w:        0px;
+    --nav-font:           11px;
+    --nav-padding:        5px 8px;
+    --logo-img-h:         14px;
+  }
 
   .footer-bar {
     flex-wrap: wrap;
+    height: auto;
   }
 
   .footer-player-zone {
@@ -236,18 +423,19 @@
     padding: 4px 10px;
   }
 
+  /* Hide volume on mobile — screen too narrow */
+  .player-volume { display: none; }
+
   .footer-nav-zone {
     width: 100%;
     justify-content: center;
     border-left: none;
-    border-top: 1px solid rgba(43, 127, 140, 0.2);
+    border-top: var(--footer-separator);
     order: 2;
   }
 
   .footer-nav-zone a,
   .footer-nav-zone button {
-    font-size: 11px;
-    padding: 5px 8px;
     border-right: 1px solid rgba(43, 127, 140, 0.15);
   }
 
@@ -261,14 +449,7 @@
     padding: 3px 10px;
     order: 3;
   }
-  .footer-logo img { height: 14px; }
 
-  #playerControls button {
-    width: 22px; height: 22px;
-    background-size: 14px 14px;
-  }
-
-  #playerControls button[title="Add Track to Cart"] {
-    display: none;
-  }
+  /* Hide cart-add in transport on mobile */
+  .player-transport .btn-cart { display: none; }
 }
