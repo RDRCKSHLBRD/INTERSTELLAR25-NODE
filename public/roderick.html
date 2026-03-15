@@ -5,70 +5,74 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>INTERSTELLAR PACKAGES</title>
 
-  <!-- V5 Session 4: single structural CSS + player internals -->
-  <link rel="stylesheet" href="/css/roderick-styles.css">
-  <link rel="stylesheet" href="/css/player-bar.css">
+  <link rel="stylesheet" href="/css/header.css">
+  <link rel="stylesheet" href="/css/roderick.css">
+  <link rel="stylesheet" href="/css/player.css">
 </head>
 
 <body data-math="on" data-page="roderick">
 
-  <!-- ── HEADER: artist name only (wireframe layout) ─────────── -->
+  <!-- ── HEADER: artist name SVG only ────────────────────────── -->
   <header class="header-system" id="artistHeader">
-    <div class="header-logo" id="brandLogo" data-position="brandLogo">
-      <img src="/images/IP_TAG24.svg" alt="Interstellar Packages Logo">
-    </div>
-
     <div class="artist-name-container" id="artistName" data-position="artistName">
-      <span id="artist-name" class="artist-name">Roderick Shoolbraid</span>
+      <img id="artist-name-svg"
+           src="/images/IP-ART-RODERICKSHOOLVRAID-flowerVase.svg"
+           alt="Roderick Shoolbraid">
+      <span id="artist-name" class="artist-name" style="display:none;">Roderick Shoolbraid</span>
     </div>
   </header>
 
   <!-- ── MAIN: album grid + sidebar ──────────────────────────── -->
   <main id="artistMain">
-    <div id="albumsRegion">
-      <!-- Album covers built by roderick.js -->
-    </div>
-    <aside id="infoRegion">
-      <!-- Built by roderick.js on album click -->
-    </aside>
+    <div id="albumsRegion"></div>
+    <aside id="infoRegion"></aside>
   </main>
 
   <!-- ── Mobile overlay (behind sidebar) ─────────────────────── -->
   <div id="mobileOverlay" class="mobile-overlay" style="display:none;"></div>
 
-  <!-- ── FOOTER: player + nav + logo (wireframe layout) ──────── -->
+  <!-- ── FOOTER: the UI — player + nav + logo ────────────────── -->
   <footer id="artistControls">
-    <div class="footer-player-zone">
-      <span class="footer-player-label">player</span>
-      <div class="player" id="playerControls" data-position="playerControls">
-        <!-- player.js builds transport / progress / volume here -->
+    <details class="footer-details" open>
+      <summary>Player</summary>
+      <div class="footer-bar">
+
+        <!-- Player zone -->
+        <div class="footer-player-zone">
+          <div class="player" id="playerControls" data-position="playerControls">
+            <!-- player.js builds transport / progress / volume here -->
+          </div>
+        </div>
+
+        <!-- Nav zone -->
+        <nav class="footer-nav-zone" id="topNav">
+          <a href="/filmography">film</a>
+          <a href="/contact">contact</a>
+          <button id="loginBtn">log in</button>
+          <span id="userInfo" class="footer-user-info" style="display:none;">
+            <span id="userName"></span>
+            <button id="logoutBtn">logout</button>
+          </span>
+          <button id="cartBtn" class="cart-button">
+            <img src="/images/IP-CART25-m1.svg" alt="Cart" class="cart-icon">
+            <span id="cartCount" class="cart-count" style="display:none;">0</span>
+          </button>
+        </nav>
+
+        <!-- Logo zone -->
+        <div class="footer-logo">
+          <img src="/images/IP_TAG24.svg" alt="Interstellar Packages">
+          <span class="footer-tag">rdxenv 24/25/26</span>
+        </div>
+
       </div>
-    </div>
-
-    <nav class="footer-nav-zone" id="topNav" data-position="topNav">
-      <a href="/filmography">film</a>
-      <a href="/contact">contact</a>
-      <button id="loginBtn" class="login-button">log in</button>
-      <span id="userInfo" class="footer-user-info" style="display:none;">
-        <span id="userName"></span>
-        <button id="logoutBtn" class="logout-button">logout</button>
-      </span>
-      <button id="cartBtn" class="cart-button">
-        <img src="/images/IP-CART25-m1.svg" alt="Cart" class="cart-icon">
-        <span id="cartCount" class="cart-count" style="display:none;">0</span>
-      </button>
-    </nav>
-
-    <div class="footer-logo">
-      <img src="/images/IP_TAG24.svg" alt="Interstellar Packages">
-      <span class="footer-tag">&copy; rdxenv 24/25/26</span>
-    </div>
+    </details>
   </footer>
 
   <!-- ── RODUX System ────────────────────────────────────────── -->
   <script type="module" src="/js/InterstellarSystem.js"></script>
 
-  <!-- Legacy globals (auth, cart, player) -->
+  <!-- Legacy globals -->
   <script src="/js/auth.js"></script>
   <script src="/js/cart.js"></script>
   <script src="/js/player.js"></script>

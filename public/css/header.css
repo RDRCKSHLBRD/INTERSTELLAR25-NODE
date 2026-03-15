@@ -1,0 +1,56 @@
+/* ================================================================
+   HEADER — header.css
+   Thin top bar. Artist name SVG only. No nav, no logo.
+   
+   Positioned absolutely by roderick.js applyRegions().
+   Colours from paint-applier.js CSS vars.
+   Sizing from header.js + header.json CSS vars.
+   ================================================================ */
+
+.header-system {
+  position: absolute;
+  left: 0; top: 0;
+  z-index: 100;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--header-padding, 20px);
+  background: var(--ip-bg, #083D5E);
+}
+
+/* ── Artist Name SVG ─────────────────────────────────────────── */
+.artist-name-container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+#artist-name-svg {
+  height: calc(var(--header-height, 44px) * 0.55);
+  width: auto;
+  display: block;
+}
+
+/* Text fallback — hidden when SVG loads */
+.artist-name {
+  font-size: var(--artist-name-font-size, 18px);
+  font-weight: var(--artist-name-font-weight, 200);
+  color: var(--artist-name-color, #cadbda);
+  letter-spacing: var(--artist-name-letter-spacing, 0.5px);
+  white-space: nowrap;
+}
+
+/* ── Mobile ──────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .header-system {
+    justify-content: center;
+    padding: 6px 12px;
+  }
+  #artist-name-svg {
+    height: 18px;
+  }
+  .artist-name {
+    font-size: 14px;
+    text-align: center;
+  }
+}

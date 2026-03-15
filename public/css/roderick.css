@@ -1,0 +1,240 @@
+/* ================================================================
+   RODERICK PAGE — roderick.css
+   Page structure: reset, body, main region, album grid,
+   sidebar, auth modal, mobile overlay.
+   
+   Does NOT contain header styles (see header.css)
+   Does NOT contain footer/player styles (see player.css)
+   
+   Layout by roderick.js: applyRegions() + layoutGrid()
+   Colours from paint-applier.js CSS vars.
+   ================================================================ */
+
+
+/* ── Reset ────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; overflow-x: hidden; }
+
+body {
+  background: var(--ip-bg, #083D5E);
+  color: var(--ip-fg, #cadbda);
+  font-family: Helvetica, sans-serif;
+  opacity: 0;               /* roderick.js reveals after first render */
+  overflow: hidden;          /* page doesn't scroll — regions do */
+  height: 100vh;
+}
+
+
+/* ── Main Region ─────────────────────────────────────────────── */
+/* roderick.js sets position/size via applyRegions() */
+
+#artistMain {
+  position: absolute;
+  overflow: hidden;
+}
+
+
+/* ── Albums Grid Region ──────────────────────────────────────── */
+/* Scrolls internally. Tiles positioned absolutely by QuadTree. */
+
+#albumsRegion {
+  position: absolute;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 16px;
+}
+
+.album-cover {
+  cursor: pointer;
+  border-radius: 2px;
+  transition: opacity 0.3s ease, box-shadow 0.15s ease;
+}
+
+.album-cover.selected {
+  box-shadow:
+    0 0 0 2px var(--ip-primary, #3AA0A0),
+    0 4px 16px rgba(58, 160, 160, 0.3);
+  z-index: 3;
+}
+
+
+/* ── Sidebar ─────────────────────────────────────────────────── */
+
+#infoRegion {
+  position: absolute;
+  display: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: rgba(8, 61, 94, 0.97);
+  border-left: 1px solid rgba(43, 127, 140, 0.3);
+}
+
+#infoRegion.open { display: block; }
+
+/* Close button — sticky top */
+.sidebar-close {
+  position: sticky; top: 0; z-index: 2;
+  display: flex; justify-content: flex-end;
+  padding: 8px 12px;
+  background: rgba(8, 61, 94, 0.95);
+}
+.sidebar-close button {
+  background: none;
+  border: 1px solid rgba(202, 219, 218, 0.3);
+  color: var(--ip-fg, #cadbda);
+  font-size: 13px; padding: 4px 10px;
+  cursor: pointer; border-radius: 2px;
+  transition: background 0.15s;
+}
+.sidebar-close button:hover {
+  background: rgba(202, 219, 218, 0.1);
+}
+
+/* Inner content */
+.sidebar-inner { padding: 16px 20px; }
+
+.sidebar-album-cover {
+  width: 100%; max-width: 280px;
+  border-radius: 2px;
+  margin: 0 auto 16px; display: block;
+}
+
+.sidebar-album-title {
+  font-size: 18px; font-weight: 600;
+  color: var(--ip-primary, #3AA0A0);
+  margin: 0 0 12px; padding-bottom: 8px;
+  border-bottom: 1px solid rgba(43, 127, 140, 0.4);
+  line-height: 1.25;
+}
+
+/* Collapsible sections */
+.sidebar-section { margin-bottom: 4px; }
+.sidebar-section summary {
+  font-size: 11px; font-weight: 600;
+  color: var(--ip-muted, #8ab7ce);
+  text-transform: uppercase; letter-spacing: 1px;
+  padding: 8px 0; cursor: pointer; user-select: none;
+  list-style: none;
+}
+.sidebar-section summary::before { content: '▸ '; }
+.sidebar-section[open] summary::before { content: '▾ '; }
+.sidebar-section summary::-webkit-details-marker { display: none; }
+
+.sidebar-description {
+  font-size: 13px; font-weight: 200;
+  color: var(--ip-muted, #8ab7ce);
+  line-height: 1.55; margin: 0 0 8px;
+}
+
+.sidebar-credits {
+  font-size: 12px; font-weight: 200; font-style: italic;
+  color: #829D9E; line-height: 1.45; margin: 0 0 8px;
+}
+
+.sidebar-meta {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  font-size: 11px; font-weight: 200;
+  padding: 8px 0;
+  border-top: 1px solid rgba(43, 127, 140, 0.2);
+}
+.sidebar-meta .cat {
+  color: #0AAAC3; font-weight: 600;
+  font-family: monospace; font-size: 12px;
+}
+.sidebar-meta span { color: #7E8D9B; }
+
+/* Song list */
+.sidebar-songs { list-style: none; padding: 0; margin: 0; }
+.sidebar-songs li {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 8px; font-size: 13px; font-weight: 200;
+  color: var(--ip-fg, #cadbda);
+  cursor: pointer;
+  border-bottom: 1px solid rgba(224, 224, 224, 0.08);
+  transition: background 0.15s;
+}
+.sidebar-songs li:hover { background: rgba(43, 127, 140, 0.25); }
+.sidebar-songs li.playing {
+  background: #19606b; font-weight: 500;
+  border-left: 3px solid var(--ip-primary, #3AA0A0);
+}
+.sidebar-songs li:last-child { border-bottom: none; }
+
+.song-dur {
+  color: var(--ip-muted, #8ab7ce);
+  font-family: monospace; font-size: 12px;
+  margin-left: 8px; flex-shrink: 0;
+}
+
+
+/* ── Mobile Overlay ──────────────────────────────────────────── */
+.mobile-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 199;
+}
+
+@media (max-width: 767px) {
+  #infoRegion.open {
+    position: fixed; top: 0; right: 0;
+    width: 85vw; max-width: 380px; height: 100vh;
+    z-index: 200;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+
+/* ── Auth Modal ──────────────────────────────────────────────── */
+.auth-modal {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.auth-modal-content {
+  background: var(--ip-bg, #083D5E);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px; padding: 24px;
+  max-width: 380px; width: 90%;
+}
+
+.auth-form input {
+  display: block; width: 100%;
+  margin-bottom: 10px; padding: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: inherit; border-radius: 2px;
+  font-family: inherit;
+}
+
+.auth-form button[type="submit"] {
+  width: 100%; padding: 8px;
+  background: rgba(58, 160, 160, 0.3);
+  border: 1px solid rgba(58, 160, 160, 0.5);
+  color: inherit; cursor: pointer;
+  border-radius: 2px; font-family: inherit;
+}
+
+.password-input-container { position: relative; }
+
+.form-toggle {
+  margin-top: 12px; font-size: 13px; opacity: 0.7;
+}
+.form-toggle a {
+  color: inherit; text-decoration: underline; cursor: pointer;
+}
+
+.auth-error {
+  padding: 8px; margin-bottom: 10px; font-size: 13px;
+  border-radius: 2px;
+  background: rgba(220, 53, 69, 0.2);
+  border: 1px solid rgba(220, 53, 69, 0.4);
+}
+
+.auth-success {
+  padding: 8px; margin-bottom: 10px; font-size: 13px;
+  border-radius: 2px;
+  background: rgba(40, 167, 69, 0.2);
+  border: 1px solid rgba(40, 167, 69, 0.4);
+}
