@@ -1,53 +1,50 @@
 {
   "_page": "roderick",
-  "_version": "5.3",
   "_loaded_by": "/public/js/roderick.js",
   "_uses_global": "window.Interstellar (state, position, layout, quadTree)",
+  "_session": "V5 Session 3 — thin header, sticky player, sidebar on click",
 
   "preloader": { "enabled": false },
 
   "layout": {
     "regions": {
-      "header":   { "ratio": 0.05, "sticky": true },
-      "main":     { "ratio": 0.87, "overflow": "auto" },
-      "controls": { "ratio": 0.08, "sticky": "bottom" }
+      "header":   { "ratio": 0.06 },
+      "main":     { "ratio": 0.88 },
+      "controls": { "ratio": 0.06 }
     },
     "mainSplit": {
-      "_comment": "Desktop/Tablet — sidebar appears on album click",
+      "_comment": "Desktop/Tablet only — sidebar appears on album click",
       "left":  { "ratio": 0.72 },
-      "right": { "ratio": 0.28, "minPx": 320, "hidden": true }
+      "right": { "ratio": 0.28, "minPx": 340 }
     },
     "mobile": {
       "albumsRegion": { "width": "100%", "overflow": "auto" },
-      "infoRegion": { "display": "none", "overlay": true }
+      "infoRegion": { "display": "none" }
     }
   },
 
   "positions": {
+    "_comment": "Desktop: thin horizontal bar — logo | artist svg | spacer | nav",
+
     "brandLogo": {
       "system": "cartesian",
       "top": 0.50,
       "left": 0.01,
       "anchor": "middle-left"
     },
+
     "artistName": {
       "system": "cartesian",
       "top": 0.50,
       "left": 0.16,
       "anchor": "middle-left"
     },
+
     "topNav": {
       "system": "cartesian",
       "top": 0.50,
-      "left": 0.98,
+      "left": 0.96,
       "anchor": "middle-right"
-    },
-    "playerControls": {
-      "system": "cartesian",
-      "top": 0.50,
-      "left": 0.50,
-      "anchor": "center",
-      "styles": { "width": "100%" }
     }
   },
 
@@ -57,39 +54,45 @@
       "positions": {
         "brandLogo": {
           "system": "cartesian",
-          "top": 0.50,
-          "left": 0.02,
-          "anchor": "middle-left"
-        },
-        "artistName": {
-          "system": "cartesian",
-          "top": 0.50,
-          "left": 0.30,
-          "anchor": "middle-left"
+          "top": 0.15,
+          "left": 0.50,
+          "anchor": "top-center"
         },
         "topNav": {
           "system": "cartesian",
           "top": 0.50,
-          "left": 0.98,
-          "anchor": "middle-right"
+          "left": 0.50,
+          "anchor": "middle-center"
+        },
+        "artistName": {
+          "system": "cartesian",
+          "top": 0.85,
+          "left": 0.50,
+          "anchor": "bottom-center"
         }
       }
     },
+
     "tablet": {
       "minWidth": 768, "maxWidth": 1023,
       "positions": {
         "topNav": {
           "system": "cartesian",
-          "left": 0.97
+          "left": 0.95
+        },
+        "artistName": {
+          "system": "cartesian",
+          "left": 0.18
         }
       }
     },
+
     "desktop": {
       "minWidth": 1024,
       "positions": {
         "topNav": {
           "system": "cartesian",
-          "left": 0.98
+          "left": 0.96
         }
       }
     }
@@ -98,42 +101,17 @@
   "quadTree": {
     "albumGrid": {
       "enabled": true,
-      "tile":    { "aspect": 1.0 },
-      "gap":     { "px": 12 },
-      "margin":  { "pct": 0.015 },
+      "tile":   { "aspect": 1.0 },
+      "gap":    { "px": 16 },
       "columns": {
         "mobile":  { "max": 2 },
         "tablet":  { "max": 4 },
         "desktop": { "max": 6 },
-        "ultra":   { "max": 8 }
+        "ultra":   { "max": 7 }
       },
-      "minTilePx": 120,
-      "maxTilePx": 240
+      "minTilePx": 140,
+      "maxTilePx": 280
     }
-  },
-
-  "sidebar": {
-    "_comment": "Album detail sidebar — driven by roderick.js, paint from paint.json",
-    "typography": {
-      "title":       { "fontSize": "17px", "fontWeight": "600" },
-      "description": { "fontSize": "12.5px", "fontWeight": "200", "lineHeight": "1.55" },
-      "credit":      { "fontSize": "11.5px", "fontWeight": "200" },
-      "meta":        { "fontSize": "11px" },
-      "track":       { "fontSize": "12.5px", "fontWeight": "200" },
-      "duration":    { "fontSize": "11.5px", "fontFamily": "monospace" },
-      "section":     { "fontSize": "10px", "fontWeight": "600", "letterSpacing": "1px", "textTransform": "uppercase" }
-    },
-    "cover": { "maxWidth": "260px" }
-  },
-
-  "player": {
-    "_comment": "Custom player component — no user-agent controls",
-    "layout": "horizontal",
-    "buttons": ["prev", "play", "next", "stop", "loop"],
-    "showVolume": true,
-    "showProgress": true,
-    "showTime": true,
-    "showAddToCart": true
   },
 
   "data": {
@@ -156,14 +134,12 @@
 
   "typography": {
     "header": {
-      "logo": { "width": "160px" },
-      "artistName": { "fontSize": "15px", "fontWeight": "200", "letterSpacing": "0.5px" },
-      "nav": { "fontSize": "13px", "gap": "16px" }
+      "logo": { "width": "180px" },
+      "nav": { "fontSize": "14px", "gap": "20px" }
     },
     "mobile": {
       "header": {
-        "logo": { "width": "100px" },
-        "artistName": { "fontSize": "13px" },
+        "logo": { "width": "130px" },
         "nav": { "fontSize": "12px", "gap": "10px" }
       }
     }
