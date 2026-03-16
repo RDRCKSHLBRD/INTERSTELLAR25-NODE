@@ -45,8 +45,9 @@ body.ready { opacity: 1; }
   left: 0;
   top: var(--main-top, 44px);
   width: 100%;
-  height: var(--main-height, calc(100vh - 44px - 42px));
-  overflow: hidden;
+  height: var(--main-height, calc(100vh - 44px - 65px));
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 

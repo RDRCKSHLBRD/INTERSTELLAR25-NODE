@@ -48,7 +48,7 @@
   --logo-img-h:          38px;
   --logo-tag-font:       11px;
   --logo-tag-color:      #829D9E;
-  --logo-padding:        4px 34px;
+  --logo-padding:        8px 34px 4px;
 
   /* Toggle */
   --toggle-font:         10px;
@@ -72,6 +72,7 @@
 /* ── Collapsible Toggle ──────────────────────────────────────── */
 .footer-details {
   margin: 0;
+  padding-top: 5px;
 }
 
 .footer-details summary {
@@ -80,6 +81,7 @@
   color: var(--toggle-color);
   letter-spacing: 0.5px;
   padding: var(--toggle-padding);
+  padding-top: 5px;
   cursor: pointer;
   user-select: none;
   list-style: none;
@@ -96,8 +98,9 @@
   display: flex;
   align-items: center;
   height: var(--footer-height);
-  padding: 0;
-  overflow: hidden;
+  padding-top: 10px;
+  padding-bottom: 15px;
+  
 }
 
 
@@ -122,6 +125,14 @@
   min-width: 0;
   gap: 8px;
   height: 100%;
+}
+
+.footer-nav-zone .cart-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: visible;
 }
 
 
@@ -353,6 +364,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding-top: 5px;
   padding: var(--logo-padding);
   border-left: var(--footer-separator);
   flex-shrink: 0;
@@ -363,7 +375,7 @@
   height: var(--logo-img-h);
   width: auto;
   display: block;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 .footer-tag {
@@ -372,6 +384,7 @@
   margin: 2px 0 0;
   white-space: nowrap;
   line-height: 1;
+  padding-bottom: 5px;
 }
 
 
