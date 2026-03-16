@@ -364,7 +364,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-top: 5px;
+ 
   padding: var(--logo-padding);
   border-left: var(--footer-separator);
   flex-shrink: 0;
