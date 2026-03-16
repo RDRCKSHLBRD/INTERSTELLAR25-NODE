@@ -1,5 +1,5 @@
 /* ================================================================
-   PLAYER / FOOTER BAR — player.css  V6.1
+   PLAYER / FOOTER BAR — player.css  V6.2
    
    RODUX principle: CSS is the rendering engine.
    All sizing/spacing via --footer-* and --player-* custom properties.
@@ -8,13 +8,15 @@
    Regions:  [toggle] -> [player-zone | nav-zone | logo-zone]
    Player:   [title | sep | transport | seek | time | volume | loop | cart]
    Transport: [prev | skip-back | play/pause | skip-fwd | next | stop]
+   
+   V6.2: User cell stack, playlist link, PLAYER I/O toggle, 75px footer
    ================================================================ */
 
 
 /* ── Custom Property Defaults ────────────────────────────────── */
 :root {
   /* Footer chrome */
-  --footer-height:       65px;
+  --footer-height:       75px;
   --footer-bg:           #07212B;
   --footer-border:       1px solid rgba(43, 127, 140, 0.4);
   --footer-separator:    1px solid rgba(43, 127, 140, 0.25);
@@ -48,12 +50,21 @@
   --logo-img-h:          38px;
   --logo-tag-font:       11px;
   --logo-tag-color:      #829D9E;
-  --logo-padding:        8px 34px 4px;
+  --logo-padding:        12px 34px 4px;
 
   /* Toggle */
-  --toggle-font:         10px;
+  --toggle-font:         12px;
   --toggle-color:        var(--ip-muted, #8ab7ce);
-  --toggle-padding:      4px 16px;
+  --toggle-padding:      5px 16px;
+
+  /* User cell */
+  --user-icon-size:      20px;
+  --user-name-font:      11px;
+  --user-name-color:     var(--ip-fg, #cadbda);
+  --user-logout-font:    9px;
+  --user-logout-color:   #829D9E;
+  --user-cell-padding:   6px 16px;
+  --user-cell-gap:       2px;
 }
 
 
@@ -72,25 +83,24 @@
 /* ── Collapsible Toggle ──────────────────────────────────────── */
 .footer-details {
   margin: 0;
-  padding-top: 5px;
 }
 
 .footer-details summary {
   font-size: var(--toggle-font);
-  font-weight: 400;
+  font-weight: 500;
   color: var(--toggle-color);
-  letter-spacing: 0.5px;
+  letter-spacing: 1.5px;
   padding: var(--toggle-padding);
-  padding-top: 5px;
   cursor: pointer;
   user-select: none;
   list-style: none;
   border-bottom: 1px solid rgba(43, 127, 140, 0.15);
   line-height: 1;
+  text-transform: uppercase;
 }
 .footer-details summary::-webkit-details-marker { display: none; }
-.footer-details summary::before  { content: '> '; }
-.footer-details[open] summary::before { content: 'v '; }
+.footer-details summary::before  { content: '▸ '; font-size: 10px; }
+.footer-details[open] summary::before { content: '▾ '; font-size: 10px; }
 
 
 /* ── Footer Bar — the main horizontal strip ──────────────────── */
@@ -98,9 +108,7 @@
   display: flex;
   align-items: center;
   height: var(--footer-height);
-  padding-top: 10px;
-  padding-bottom: 15px;
-  
+  padding: 0;
 }
 
 
@@ -125,14 +133,6 @@
   min-width: 0;
   gap: 8px;
   height: 100%;
-}
-
-.footer-nav-zone .cart-button {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  overflow: visible;
 }
 
 
@@ -248,7 +248,6 @@
   flex-shrink: 0;
 }
 
-/* Volume icon — needs PLAYER-VOLUME.svg in /images/ */
 .player-volume-icon {
   width: 16px;
   height: 16px;
@@ -287,10 +286,11 @@
   flex-shrink: 0;
   height: 100%;
   border-left: var(--footer-separator);
+  overflow: visible;
 }
 
 .footer-nav-zone a,
-.footer-nav-zone button {
+.footer-nav-zone button.nav-login-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -308,20 +308,121 @@
   height: 100%;
   transition: background 0.15s;
 }
+
 .footer-nav-zone a:hover,
-.footer-nav-zone button:hover {
+.footer-nav-zone button.nav-login-btn:hover {
   background: rgba(43, 127, 140, 0.15);
 }
-.footer-nav-zone > :last-child {
-  border-right: none;
+
+
+/* ══════════════════════════════════════════════════════════════
+   USER CELL — vertical micro-stack (icon / name / logout)
+   Shows when logged in, hidden when logged out.
+   Can overflow above footer if needed.
+   ══════════════════════════════════════════════════════════════ */
+
+.user-cell {
+  display: none;  /* hidden by default, shown by auth.js */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--user-cell-gap);
+  padding: var(--user-cell-padding);
+  border-right: var(--footer-separator);
+  height: 100%;
+  min-width: 60px;
+  overflow: visible;
+  position: relative;
 }
 
-/* Cart button */
+.user-cell.active {
+  display: flex;
+}
+
+.user-cell-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  /* override nav-zone a styles */
+  height: auto !important;
+  border-right: none !important;
+}
+
+.user-icon-img {
+  width: var(--user-icon-size);
+  height: var(--user-icon-size);
+  opacity: 0.8;
+  transition: opacity 0.15s ease;
+}
+
+.user-cell-icon:hover .user-icon-img {
+  opacity: 1;
+}
+
+.user-cell-name {
+  font-size: var(--user-name-font);
+  font-weight: 400;
+  color: var(--user-name-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+  line-height: 1;
+  text-align: center;
+}
+
+.user-cell-logout {
+  font-size: var(--user-logout-font);
+  font-weight: 300;
+  color: var(--user-logout-color);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 1px 4px;
+  letter-spacing: 0.5px;
+  text-transform: lowercase;
+  line-height: 1;
+  transition: color 0.15s ease;
+  /* override nav-zone button styles */
+  height: auto !important;
+  border-right: none !important;
+  font-family: inherit;
+}
+
+.user-cell-logout:hover {
+  color: var(--ip-fg, #cadbda);
+}
+
+/* Login button — hidden when user cell is active */
+.nav-login-btn {
+  /* inherits nav-zone a/button styles */
+}
+
+.nav-login-btn.hidden {
+  display: none;
+}
+
+
+/* ── Cart Button (in footer nav) ────────────────────────────── */
 .footer-nav-zone .cart-button {
   position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
+  padding: var(--nav-padding);
+  overflow: visible;
+  background: none;
+  border: none;
+  cursor: pointer;
+  height: 100%;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.footer-nav-zone .cart-button:hover {
+  background: rgba(43, 127, 140, 0.15);
 }
 
 .cart-icon {
@@ -340,18 +441,8 @@
   padding: 0 3px;
 }
 
-/* User info */
-.footer-user-info {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 14px;
-  border-right: var(--footer-separator);
-}
-
-#userName {
-  font-size: 12px; font-weight: 300;
-  color: var(--ip-fg, #cadbda);
+.cart-count.hidden {
+  display: none;
 }
 
 
@@ -364,7 +455,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
- 
   padding: var(--logo-padding);
   border-left: var(--footer-separator);
   flex-shrink: 0;
@@ -384,7 +474,6 @@
   margin: 2px 0 0;
   white-space: nowrap;
   line-height: 1;
-  padding-bottom: 5px;
 }
 
 
@@ -393,7 +482,7 @@
    ══════════════════════════════════════════════════════════════ */
 @media (max-width: 1023px) {
   :root {
-    --footer-height:      44px;
+    --footer-height:      56px;
     --player-btn-size:    28px;
     --player-icon-size:   18px;
     --player-title-max-w: 160px;
@@ -404,6 +493,10 @@
     --nav-padding:        8px 14px;
     --logo-img-h:         20px;
     --logo-padding:       4px 14px;
+    --user-icon-size:     16px;
+    --user-name-font:     10px;
+    --user-logout-font:   8px;
+    --user-cell-padding:  4px 10px;
   }
 }
 
@@ -427,6 +520,9 @@
     --nav-padding:        6px 10px;
     --logo-img-h:         16px;
     --logo-padding:       3px 10px;
+    --user-icon-size:     14px;
+    --user-name-font:     9px;
+    --user-cell-padding:  4px 8px;
   }
 
   .footer-bar {
@@ -440,10 +536,8 @@
     padding: 4px 10px;
   }
 
-  /* Hide volume on mobile */
   .player-volume { display: none; }
 
-  /* Hide skip-30 on mobile to save space */
   .player-transport .btn-skip-back,
   .player-transport .btn-skip-fwd { display: none; }
 
@@ -456,7 +550,14 @@
   }
 
   .footer-nav-zone a,
-  .footer-nav-zone button {
+  .footer-nav-zone button.nav-login-btn {
+    border-right: 1px solid rgba(43, 127, 140, 0.15);
+  }
+
+  /* User cell goes horizontal on mobile */
+  .user-cell.active {
+    flex-direction: row;
+    gap: 6px;
     border-right: 1px solid rgba(43, 127, 140, 0.15);
   }
 
@@ -471,6 +572,5 @@
     order: 3;
   }
 
-  /* Hide cart-add in transport on mobile */
   .player-transport .btn-cart { display: none; }
 }

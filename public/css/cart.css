@@ -547,10 +547,19 @@
   position: fixed;
   inset: 0;
   z-index: calc(var(--cart-z) + 50);
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   background: var(--modal-overlay-bg);
+}
+
+.auth-modal.modal-visible {
+  display: flex;
+}
+
+/* Utility: hide form sections/errors via class */
+.form-hidden {
+  display: none !important;
 }
 
 .auth-modal-content {

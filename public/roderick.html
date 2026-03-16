@@ -9,8 +9,6 @@
   <link rel="stylesheet" href="/css/roderick.css">
   <link rel="stylesheet" href="/css/player.css">
   <link rel="stylesheet" href="/css/cart.css">
-  <script src="https://js.stripe.com/v3/"></script>
-
 </head>
 
 <body data-math="on" data-page="roderick">
@@ -37,7 +35,7 @@
   <!-- FOOTER: the UI — player + nav + logo -->
   <footer id="artistControls">
     <details class="footer-details" open>
-      <summary>Player</summary>
+      <summary>PLAYER I/O</summary>
       <div class="footer-bar">
 
         <!-- Player zone -->
@@ -49,13 +47,20 @@
 
         <!-- Nav zone -->
         <nav class="footer-nav-zone" id="topNav">
+          <a href="/playlists">playlists</a>
           <a href="/filmography">film</a>
           <a href="/contact">contact</a>
-          <button id="loginBtn">log in</button>
-          <span id="userInfo" class="footer-user-info" style="display:none;">
-            <span id="userName"></span>
-            <button id="logoutBtn">logout</button>
-          </span>
+
+          <!-- Auth cell: login OR user stack -->
+          <button id="loginBtn" class="nav-login-btn">log in</button>
+          <div id="userCell" class="user-cell">
+            <a href="/account" class="user-cell-icon" title="Account">
+              <img src="/images/IP-USER-candyFloss.svg" alt="Account" class="user-icon-img">
+            </a>
+            <span id="userName" class="user-cell-name"></span>
+            <button id="logoutBtn" class="user-cell-logout">logout</button>
+          </div>
+
           <button id="cartBtn" class="cart-button">
             <img src="/images/IP-CART25-m1.svg" alt="Cart" class="cart-icon">
             <span id="cartCount" class="cart-count hidden">0</span>
@@ -88,12 +93,12 @@
   <section id="userOverlay" aria-hidden="true" style="display:none;"></section>
 
   <!-- Auth Modal -->
-  <div id="authModal" class="auth-modal" style="display:none;">
+  <div id="authModal" class="auth-modal">
     <div class="auth-modal-content">
       <span class="close"></span>
       <div id="loginForm" class="auth-form-container">
         <h2>Log In</h2>
-        <div id="loginError" class="auth-error" style="display:none;"></div>
+        <div id="loginError" class="auth-error form-hidden"></div>
         <form class="auth-form" id="loginFormElement">
           <input type="email" id="loginEmail" placeholder="Email" required>
           <div class="password-input-container">
@@ -106,10 +111,10 @@
           Don't have an account? <a id="showRegister">Create one</a>
         </div>
       </div>
-      <div id="registerForm" class="auth-form-container" style="display:none;">
+      <div id="registerForm" class="auth-form-container form-hidden">
         <h2>Create Account</h2>
-        <div id="registerError" class="auth-error" style="display:none;"></div>
-        <div id="registerSuccess" class="auth-success" style="display:none;"></div>
+        <div id="registerError" class="auth-error form-hidden"></div>
+        <div id="registerSuccess" class="auth-success form-hidden"></div>
         <form class="auth-form" id="registerFormElement">
           <input type="text" id="registerUsername" placeholder="Username" required>
           <input type="text" id="registerFirstName" placeholder="First Name">
