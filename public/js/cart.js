@@ -1,5 +1,6 @@
-// cart.js - Database-Driven Shopping Cart Manager
-// Keeps your existing great UI, but uses database instead of localStorage
+// cart.js V6 — Database-Driven Shopping Cart Manager
+// RODUX principle: JS builds DOM with classnames only. No inline styles.
+// CSS (cart.css) is the rendering engine.
 
 class CartManager {
   constructor() {
@@ -11,13 +12,13 @@ class CartManager {
     };
     this.isVisible = false;
     this.cartSidebar = null;
+    this.backdrop = null;
     this.isLoggedIn = false;
     this.userId = null;
     this.sessionId = localStorage.getItem('interstellar.sessionId') || this.generateSessionId();
     localStorage.setItem('interstellar.sessionId', this.sessionId);
 
-
-    console.log('🛒 Database-driven CartManager initialized');
+    console.log('🛒 CartManager V6 initialized');
     this.init();
   }
 
@@ -26,59 +27,52 @@ class CartManager {
   }
 
   async init() {
-    // Wait for DOM to be ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.setupEventListeners());
     } else {
       this.setupEventListeners();
     }
 
-    // Check auth status and load cart
     await this.checkAuthStatus();
     await this.loadCartFromDatabase();
     this.updateCartCount();
   }
 
+  // ── Auth ────────────────────────────────────────────────────
+
   async checkAuthStatus() {
     try {
-      // Check if authManager is available
       if (window.authManager && window.authManager.isLoggedIn()) {
         this.isLoggedIn = true;
         this.userId = window.authManager.getCurrentUser()?.id;
-        console.log('👤 User logged in:', window.authManager.getCurrentUser()?.user_name);
-      } else {
-        // Fallback - check auth directly
-        const response = await fetch('/api/auth/me', {
-          credentials: 'include'
-        });
+        return;
+      }
 
-        if (response.ok) {
-          const userData = await response.json();
-          if (userData.success && userData.user) {
-            this.isLoggedIn = true;
-            this.userId = userData.user.id;
-            console.log('👤 User logged in:', userData.user.user_name);
-          }
-        } else {
-          this.isLoggedIn = false;
-          this.userId = null;
-          console.log('👤 Anonymous user');
+      const response = await fetch('/api/auth/me', { credentials: 'include' });
+
+      if (response.ok) {
+        const userData = await response.json();
+        if (userData.success && userData.user) {
+          this.isLoggedIn = true;
+          this.userId = userData.user.id;
         }
+      } else {
+        this.isLoggedIn = false;
+        this.userId = null;
       }
     } catch (error) {
-      console.log('👤 Auth check failed, using anonymous mode');
       this.isLoggedIn = false;
     }
   }
 
+  // ── Events ──────────────────────────────────────────────────
+
   setupEventListeners() {
-    // Cart button click
     const cartBtn = document.getElementById('cartBtn');
     if (cartBtn) {
       cartBtn.addEventListener('click', () => this.toggleCartSidebar());
     }
 
-    // Listen for user login/logout events
     window.addEventListener('userLoggedIn', async (e) => {
       this.isLoggedIn = true;
       this.userId = e.detail.user.id;
@@ -93,86 +87,61 @@ class CartManager {
       await this.loadCartFromDatabase();
       this.updateCartCount();
     });
+
+    // ESC to close sidebar
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.isVisible) {
+        this.hideCartSidebar();
+      }
+    });
   }
 
-async loadCartFromDatabase() {
-  try {
-    console.log('🔗 Loading cart...');
-    
-    // Check if user is logged in first
-    let cartUrl = '/api/cart/session'; // default to session cart
-    let logContext = '👤 Anonymous user';
-    
+  // ── Database ────────────────────────────────────────────────
+
+  async loadCartFromDatabase() {
     try {
-      const authResponse = await fetch('/api/auth/me', {
-        credentials: 'include'
-      });
-      
-      if (authResponse.ok) {
-        const userData = await authResponse.json();
-        if (userData.success && userData.user && userData.user.id) {
-          // User is logged in - use user cart
-          cartUrl = `/api/cart/${userData.user.id}`;
-          logContext = `👤 User: ${userData.user.id} (${userData.user.user_name})`;
-          this.isLoggedIn = true;
-          this.userId = userData.user.id;
+      let cartUrl = '/api/cart/session';
+
+      try {
+        const authResponse = await fetch('/api/auth/me', { credentials: 'include' });
+        if (authResponse.ok) {
+          const userData = await authResponse.json();
+          if (userData.success && userData.user && userData.user.id) {
+            cartUrl = `/api/cart/${userData.user.id}`;
+            this.isLoggedIn = true;
+            this.userId = userData.user.id;
+          }
         }
+      } catch (_) { /* session cart fallback */ }
+
+      const headers = { 'Content-Type': 'application/json' };
+      if (!this.isLoggedIn) {
+        headers['x-session-id'] = this.sessionId;
       }
-    } catch (authError) {
-      console.log('🔍 Auth check failed, using session cart');
-    }
-    
-    console.log(`${logContext} - loading cart from: ${cartUrl}`);
-    
-    const headers = {
-      'Content-Type': 'application/json'
-    };
-    
-    // Add session ID header for session-based requests
-    if (!this.isLoggedIn) {
-      headers['x-session-id'] = this.sessionId;
-    }
-    
-    console.log('📡 Making cart request to:', cartUrl);
-    console.log('📝 With headers:', headers);
 
-    const response = await fetch(cartUrl, {
-      headers,
-      credentials: 'include'
-    });
+      const response = await fetch(cartUrl, { headers, credentials: 'include' });
 
-    console.log('📊 Cart response status:', response.status);
+      if (response.ok) {
+        const data = await response.json();
+        const cartItems = Array.isArray(data) ? data : (data.cart || data.items || []);
 
-    if (response.ok) {
-      const data = await response.json();
-
-      // Handle the server response - it returns an array directly
-      const cartItems = Array.isArray(data) ? data : (data.cart || data.items || []);
-
-      this.cart = {
-        items: cartItems,
-        itemCount: cartItems.length,
-        totalAmount: cartItems.reduce((sum, item) => sum + (parseFloat(item.price || 0) * (item.quantity || 1)), 0),
-        cartId: null
-      };
-
-      console.log('🛒 Cart loaded from database:', this.cart);
-      console.log('📊 Cart structure check:', this.cart);
-      
-    } else {
-      const errorText = await response.text();
-      console.log('⚠️ Cart load failed:', response.status, errorText);
-      console.log('🛒 No existing cart found, starting fresh');
+        this.cart = {
+          items: cartItems,
+          itemCount: cartItems.length,
+          totalAmount: cartItems.reduce((sum, item) =>
+            sum + (parseFloat(item.price || 0) * (item.quantity || 1)), 0),
+          cartId: null
+        };
+      } else {
+        this.cart = { items: [], itemCount: 0, totalAmount: 0, cartId: null };
+      }
+    } catch (error) {
+      console.error('❌ Failed to load cart:', error);
       this.cart = { items: [], itemCount: 0, totalAmount: 0, cartId: null };
     }
-  } catch (error) {
-    console.error('❌ Failed to load cart from database:', error);
-    this.cart = { items: [], itemCount: 0, totalAmount: 0, cartId: null };
   }
-}
 
-
-
+  // ── Sidebar Toggle ──────────────────────────────────────────
 
   toggleCartSidebar() {
     if (this.isVisible) {
@@ -183,7 +152,6 @@ async loadCartFromDatabase() {
   }
 
   async showCartSidebar() {
-    // Refresh cart data before showing
     await this.loadCartFromDatabase();
     this.createCartSidebar();
     this.isVisible = true;
@@ -191,24 +159,40 @@ async loadCartFromDatabase() {
 
   hideCartSidebar() {
     if (this.cartSidebar) {
-      this.cartSidebar.style.right = '-100%';
-      setTimeout(() => {
-        if (this.cartSidebar && this.cartSidebar.parentNode) {
-          this.cartSidebar.remove();
-        }
-        this.cartSidebar = null;
-      }, 300);
+      this.cartSidebar.classList.remove('open');
     }
+    if (this.backdrop) {
+      this.backdrop.classList.remove('visible');
+    }
+
+    setTimeout(() => {
+      if (this.cartSidebar && this.cartSidebar.parentNode) {
+        this.cartSidebar.remove();
+      }
+      if (this.backdrop && this.backdrop.parentNode) {
+        this.backdrop.remove();
+      }
+      this.cartSidebar = null;
+      this.backdrop = null;
+    }, 300);
+
     this.isVisible = false;
   }
 
-  createCartSidebar() {
-    // Remove existing sidebar if any
-    if (this.cartSidebar) {
-      this.cartSidebar.remove();
-    }
+  // ── Sidebar Build ───────────────────────────────────────────
 
-    // Create cart sidebar with your existing great design
+  createCartSidebar() {
+    // Clean up any existing sidebar
+    if (this.cartSidebar) this.cartSidebar.remove();
+    if (this.backdrop) this.backdrop.remove();
+
+    // Backdrop
+    this.backdrop = document.createElement('div');
+    this.backdrop.className = 'cart-backdrop';
+    this.backdrop.addEventListener('click', () => this.hideCartSidebar());
+    document.body.appendChild(this.backdrop);
+
+    // Sidebar
     this.cartSidebar = document.createElement('div');
     this.cartSidebar.className = 'cart-sidebar';
     this.cartSidebar.innerHTML = `
@@ -224,7 +208,8 @@ async loadCartFromDatabase() {
           <div class="cart-total">
             <strong>Total: $${(this.cart.totalAmount || 0).toFixed(2)}</strong>
           </div>
-          <button class="checkout-btn" id="checkoutBtn" ${!this.cart.items || this.cart.items.length === 0 ? 'disabled' : ''}>
+          <button class="checkout-btn" id="checkoutBtn"
+            ${!this.cart.items || this.cart.items.length === 0 ? 'disabled' : ''}>
             Checkout
           </button>
         </div>
@@ -233,136 +218,119 @@ async loadCartFromDatabase() {
 
     document.body.appendChild(this.cartSidebar);
 
-    // Add event listeners
+    // Events
     document.getElementById('cartClose').addEventListener('click', () => this.hideCartSidebar());
     document.getElementById('checkoutBtn').addEventListener('click', () => this.handleCheckout());
 
-    // Attach cart item event listeners
-    const cartItems = document.getElementById('cartItems');
-    this.attachCartItemEventListeners(cartItems);
+    const cartItemsEl = document.getElementById('cartItems');
+    this.attachCartItemEventListeners(cartItemsEl);
 
-    // Animate in
-    setTimeout(() => {
-      this.cartSidebar.style.right = '0';
-    }, 10);
+    // Trigger open on next frame (allows CSS transition)
+    requestAnimationFrame(() => {
+      this.cartSidebar.classList.add('open');
+      this.backdrop.classList.add('visible');
+    });
   }
 
+  // ── Render Items ────────────────────────────────────────────
 
-
-// Updated renderCartItems method for cart.js
-// Shows song name + album name with proper styling
-
-renderCartItems() {
-  console.log('🔍 Rendering cart items. Cart data:', this.cart);
-
-  // Handle different possible cart structures
-  let items = [];
-  if (this.cart.items && Array.isArray(this.cart.items)) {
-    items = this.cart.items;
-  } else if (Array.isArray(this.cart)) {
-    items = this.cart;
-  } else if (this.cart.data && Array.isArray(this.cart.data)) {
-    items = this.cart.data;
-  }
-
-  console.log('📦 Cart items to render:', items);
-
-  if (!items || items.length === 0) {
-    return '<div class="cart-empty">Your cart is empty</div>';
-  }
-
-  return items.map(item => {
-    console.log('🛍️ Rendering item:', item);
-
-    // ✅ NEW: Handle both song and album products
-    const productType = item.product_type || (item.song_id ? 'song' : 'album');
-    const primaryName = item.product_name || item.name || 'Unknown Item';
-    const albumName = item.album_name;
-    const coverUrl = item.cover_url || '/images/default-album-cover.png';
-
-    const price = item.price || item.product?.price || 15.00;
-    const quantity = item.quantity || 1;
-    const itemId = item.id || item.cart_item_id;
-
-    // ✅ NEW: Create display title with styling
-    let displayTitle;
-    if (productType === 'song' && albumName && albumName !== primaryName) {
-      displayTitle = `
-        <h4 class="cart-item-title">
-          <span class="song-name">${primaryName}</span>
-          <span class="album-subtitle">from ${albumName}</span>
-        </h4>
-      `;
-    } else {
-      displayTitle = `<h4 class="cart-item-title">${primaryName}</h4>`;
+  renderCartItems() {
+    let items = [];
+    if (this.cart.items && Array.isArray(this.cart.items)) {
+      items = this.cart.items;
+    } else if (Array.isArray(this.cart)) {
+      items = this.cart;
+    } else if (this.cart.data && Array.isArray(this.cart.data)) {
+      items = this.cart.data;
     }
 
-    return `
-      <div class="cart-item" data-item-id="${itemId}" data-product-type="${productType}">
-        <img src="${coverUrl}" 
-             alt="${primaryName}" 
-             class="cart-item-image">
-        <div class="cart-item-details">
-          ${displayTitle}
-          <p class="cart-item-price">$${parseFloat(price).toFixed(2)}</p>
-          <div class="cart-item-controls">
-            <button class="quantity-btn decrease-btn" data-item-id="${itemId}" data-action="decrease">-</button>
-            <span class="quantity">${quantity}</span>
-            <button class="quantity-btn increase-btn" data-item-id="${itemId}" data-action="increase">+</button>
-            <button class="remove-btn" data-item-id="${itemId}" data-action="remove">Remove</button>
+    if (!items || items.length === 0) {
+      return '<div class="cart-empty">Your cart is empty</div>';
+    }
+
+    return items.map(item => {
+      const productType = item.product_type || (item.song_id ? 'song' : 'album');
+      const primaryName = item.product_name || item.name || 'Unknown Item';
+      const albumName = item.album_name;
+      const coverUrl = item.cover_url || '/images/default-album-cover.png';
+      const price = item.price || item.product?.price || 15.00;
+      const quantity = item.quantity || 1;
+      const itemId = item.id || item.cart_item_id;
+
+      let displayTitle;
+      if (productType === 'song' && albumName && albumName !== primaryName) {
+        displayTitle = `
+          <h4 class="cart-item-title">
+            <span class="song-name">${primaryName}</span>
+            <span class="album-subtitle">from ${albumName}</span>
+          </h4>
+        `;
+      } else {
+        displayTitle = `<h4 class="cart-item-title">${primaryName}</h4>`;
+      }
+
+      return `
+        <div class="cart-item" data-item-id="${itemId}" data-product-type="${productType}">
+          <img src="${coverUrl}"
+               alt="${primaryName}"
+               class="cart-item-image">
+          <div class="cart-item-details">
+            ${displayTitle}
+            <p class="cart-item-price">$${parseFloat(price).toFixed(2)}</p>
+            <div class="cart-item-controls">
+              <button class="quantity-btn decrease-btn"
+                      data-item-id="${itemId}" data-action="decrease">−</button>
+              <span class="quantity">${quantity}</span>
+              <button class="quantity-btn increase-btn"
+                      data-item-id="${itemId}" data-action="increase">+</button>
+              <button class="remove-btn"
+                      data-item-id="${itemId}" data-action="remove">Remove</button>
+            </div>
           </div>
         </div>
-      </div>
-    `;
-  }).join('');
-}
+      `;
+    }).join('');
+  }
 
+  // ── Item Event Delegation ───────────────────────────────────
 
+  attachCartItemEventListeners(cartItemsEl) {
+    cartItemsEl.addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
 
-  attachCartItemEventListeners(cartItems) {
-    // Handle all cart item buttons with event delegation (keeping your existing pattern)
-    cartItems.addEventListener('click', async (e) => {
-      const itemId = parseInt(e.target.dataset.itemId);
-      const action = e.target.dataset.action;
-
+      const itemId = parseInt(btn.dataset.itemId);
+      const action = btn.dataset.action;
       if (!itemId || !action) return;
 
-      // Disable button during operation
-      e.target.disabled = true;
+      btn.disabled = true;
 
       try {
         switch (action) {
-          case 'decrease':
-            const currentItem = this.cart.items.find(item => item.id === itemId);
-            if (currentItem) {
-              await this.updateQuantityInDatabase(itemId, currentItem.quantity - 1);
-            }
+          case 'decrease': {
+            const item = this.cart.items.find(i => i.id === itemId);
+            if (item) await this.updateQuantityInDatabase(itemId, item.quantity - 1);
             break;
-
-          case 'increase':
-            const existingItem = this.cart.items.find(item => item.id === itemId);
-            if (existingItem) {
-              await this.updateQuantityInDatabase(itemId, existingItem.quantity + 1);
-            }
+          }
+          case 'increase': {
+            const item = this.cart.items.find(i => i.id === itemId);
+            if (item) await this.updateQuantityInDatabase(itemId, item.quantity + 1);
             break;
-
+          }
           case 'remove':
             await this.removeFromCartDatabase(itemId);
             break;
         }
       } finally {
-        e.target.disabled = false;
+        btn.disabled = false;
       }
     });
   }
 
+  // ── Add to Cart (Album) ─────────────────────────────────────
+
   async addToCart(albumId, albumName, coverUrl, price = 15.00) {
     try {
-      console.log('🛒 Adding album to cart:', albumId);
-      console.log('🔑 Session ID:', this.sessionId);
-      console.log('👤 User ID:', this.userId);
-
-      // Get product info for this album from API
       const productResponse = await fetch(`/api/cart/product/album/${albumId}`);
 
       if (!productResponse.ok) {
@@ -370,21 +338,8 @@ renderCartItems() {
       }
 
       const productData = await productResponse.json();
-      console.log('📦 Product data:', productData);
 
-      // Add to cart via API
-      const cartData = {
-        productId: productData.product.id,
-        quantity: 1
-      };
-
-      if (this.isLoggedIn && this.userId) {
-        cartData.userId = this.userId;
-        console.log('🔐 Adding with userId:', this.userId);
-      } else {
-        cartData.sessionId = this.sessionId;
-        console.log('🔗 Adding with sessionId:', this.sessionId);
-      }
+      const cartData = { productId: productData.product.id, quantity: 1 };
 
       const response = await fetch('/api/cart/add', {
         method: 'POST',
@@ -397,64 +352,130 @@ renderCartItems() {
       });
 
       if (response.ok) {
-        const result = await response.json();
-        console.log('✅ Added to cart:', result.message);
-        console.log('📋 Add response data:', result);
+        this.showNotification(`${albumName} added to cart.`);
 
-        // Show success message
-        this.showCartNotification(`${albumName} added to cart.`);
-
-        // Wait a moment then reload cart to get updated data
         setTimeout(async () => {
-          console.log('🔄 Reloading cart after add...');
           await this.loadCartFromDatabase();
           this.updateCartCount();
-
-          // Update sidebar if open
-          if (this.isVisible) {
-            this.updateCartSidebarContent();
-          }
+          if (this.isVisible) this.updateCartSidebarContent();
         }, 500);
 
         return true;
       } else {
         const error = await response.json();
-        console.error('❌ Add to cart API error:', error);
         throw new Error(error.error || 'Failed to add to cart');
       }
     } catch (error) {
       console.error('❌ Add to cart failed:', error);
-      this.showCartNotification(error.message, 'error');
+      this.showNotification(error.message, 'error');
       return false;
     }
   }
+
+  // ── Add to Cart (Song) ──────────────────────────────────────
+
+  async addSongToCart(songId, songMeta = null) {
+    let song = songMeta;
+    if (!song) {
+      try {
+        const cleanId = String(songId).replace(/^0+/, '');
+        song = await window.apiClient.getSong(cleanId);
+      } catch (error) {
+        console.error('Failed to fetch song:', error);
+      }
+    }
+
+    if (!song) {
+      this.showNotification('Song not found', 'error');
+      return;
+    }
+
+    let productId = null;
+    let productPrice = song.price ?? 1.29;
+
+    try {
+      const res = await fetch(`/api/cart/product/song/${song.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        productId = data.product?.id ?? null;
+        productPrice = data.product?.price ?? productPrice;
+      }
+    } catch (_) { /* no product found */ }
+
+    if (!productId) {
+      this.showNotification('Song purchases not available yet', 'error');
+      return;
+    }
+
+    await this.addSongToCartDatabase(song, productId, productPrice);
+  }
+
+  async addSongToCartDatabase(song, productId, price) {
+    try {
+      const cartData = { productId, quantity: 1 };
+
+      const response = await fetch('/api/cart/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-session-id': this.sessionId
+        },
+        credentials: 'include',
+        body: JSON.stringify(cartData)
+      });
+
+      if (response.ok) {
+        this.showNotification(`${song.name} added to cart.`);
+
+        setTimeout(async () => {
+          await this.loadCartFromDatabase();
+          this.updateCartCount();
+          if (this.isVisible) this.updateCartSidebarContent();
+        }, 500);
+      } else {
+        throw new Error('Failed to add song to cart');
+      }
+    } catch (error) {
+      console.error('❌ Add song to cart failed:', error);
+      this.showNotification('Failed to add song to cart', 'error');
+    }
+  }
+
+  // ── Public Album/Song Helpers ───────────────────────────────
+
+  async addAlbumToCart(albumId) {
+    try {
+      const album = await window.apiClient.getAlbum(albumId);
+      if (album) {
+        await this.addToCart(albumId, album.name, album.cover_url);
+      } else {
+        this.showNotification('Album not found', 'error');
+      }
+    } catch (error) {
+      this.showNotification('Failed to add album to cart. Please try again.', 'error');
+    }
+  }
+
+  // ── Remove / Update ─────────────────────────────────────────
 
   async removeFromCartDatabase(cartItemId) {
     try {
       const response = await fetch(`/api/cart/remove/${cartItemId}`, {
         method: 'DELETE',
-        headers: {
-          'x-session-id': this.sessionId
-        },
+        headers: { 'x-session-id': this.sessionId },
         credentials: 'include'
       });
 
       if (response.ok) {
-        console.log('✅ Item removed from cart');
         await this.loadCartFromDatabase();
         this.updateCartCount();
-
-        // Update sidebar if open
-        if (this.isVisible) {
-          this.updateCartSidebarContent();
-        }
+        if (this.isVisible) this.updateCartSidebarContent();
         return true;
       } else {
         throw new Error('Failed to remove item');
       }
     } catch (error) {
-      console.error('❌ Remove from cart failed:', error);
-      this.showCartNotification('Failed to remove item', 'error');
+      this.showNotification('Failed to remove item', 'error');
       return false;
     }
   }
@@ -466,49 +487,40 @@ renderCartItems() {
     }
 
     try {
-      // FIX: Changed URL to include cartItemId and method to PATCH
       const response = await fetch(`/api/cart/update/${cartItemId}`, {
-        method: 'PATCH',  // Changed from PUT to PATCH
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'x-session-id': this.sessionId
         },
         credentials: 'include',
-        body: JSON.stringify({
-          quantity: newQuantity  // Removed cartItemId from body since it's in URL
-        })
+        body: JSON.stringify({ quantity: newQuantity })
       });
 
       if (response.ok) {
-        console.log('✅ Cart quantity updated');
         await this.loadCartFromDatabase();
         this.updateCartCount();
-
-        // Update sidebar if open
-        if (this.isVisible) {
-          this.updateCartSidebarContent();
-        }
+        if (this.isVisible) this.updateCartSidebarContent();
         return true;
       } else {
         throw new Error('Failed to update quantity');
       }
     } catch (error) {
-      console.error('❌ Update quantity failed:', error);
-      this.showCartNotification('Failed to update quantity', 'error');
+      this.showNotification('Failed to update quantity', 'error');
       return false;
     }
   }
 
+  // ── Sidebar Content Refresh ─────────────────────────────────
+
   updateCartSidebarContent() {
-    const cartItems = document.getElementById('cartItems');
+    const cartItemsEl = document.getElementById('cartItems');
     const cartTotal = document.querySelector('.cart-total');
     const checkoutBtn = document.getElementById('checkoutBtn');
 
-    if (cartItems) {
-      cartItems.innerHTML = this.renderCartItems();
-
-      // Re-attach event listeners after updating content
-      this.attachCartItemEventListeners(cartItems);
+    if (cartItemsEl) {
+      cartItemsEl.innerHTML = this.renderCartItems();
+      this.attachCartItemEventListeners(cartItemsEl);
     }
 
     if (cartTotal) {
@@ -520,6 +532,19 @@ renderCartItems() {
     }
   }
 
+  // ── Cart Count Badge ────────────────────────────────────────
+
+  updateCartCount() {
+    const cartCount = document.getElementById('cartCount');
+    const count = this.cart.itemCount || 0;
+
+    if (cartCount) {
+      cartCount.textContent = count;
+      // V6: class toggle, not style.display
+      cartCount.classList.toggle('hidden', count === 0);
+    }
+  }
+
   getCartTotal() {
     return this.cart.totalAmount || 0;
   }
@@ -528,19 +553,9 @@ renderCartItems() {
     return this.cart.itemCount || 0;
   }
 
-  updateCartCount() {
-    const cartCount = document.getElementById('cartCount');
-    const count = this.getCartItemCount();
-
-    if (cartCount) {
-      cartCount.textContent = count;
-      cartCount.style.display = count > 0 ? 'flex' : 'none';
-    }
-  }
+  // ── Clear Cart ──────────────────────────────────────────────
 
   async clearCart() {
-    // This would need a clear cart API endpoint
-    // For now, remove items one by one
     if (this.cart.items) {
       for (const item of this.cart.items) {
         await this.removeFromCartDatabase(item.id);
@@ -548,342 +563,142 @@ renderCartItems() {
     }
   }
 
-async handleCheckout() {
-  if (!this.cart.items || this.cart.items.length === 0) return;
+  // ── Checkout ────────────────────────────────────────────────
 
-  try {
-    // Get Stripe publishable key from server
-    const configResponse = await fetch('/api/config');
-    const config = await configResponse.json();
-    
-    // Prepare checkout data
-    const checkoutData = {
-      isLoggedIn: this.isLoggedIn,
-      userId: this.userId,
-      sessionId: this.sessionId,
-      cartItems: this.cart.items
-    };
+  async handleCheckout() {
+    if (!this.cart.items || this.cart.items.length === 0) return;
 
-    // For guest purchases, collect email
-    if (!this.isLoggedIn) {
-      const guestEmail = await this.collectGuestEmail();
-      
-      if (!guestEmail) {
-        console.log('Guest checkout cancelled - no email provided');
+    try {
+      const configResponse = await fetch('/api/config');
+      const config = await configResponse.json();
+
+      const checkoutData = {
+        isLoggedIn: this.isLoggedIn,
+        userId: this.userId,
+        sessionId: this.sessionId,
+        cartItems: this.cart.items
+      };
+
+      if (!this.isLoggedIn) {
+        const guestEmail = await this.collectGuestEmail();
+        if (!guestEmail) return;
+        checkoutData.guestEmail = guestEmail;
+        checkoutData.purchaseType = 'guest';
+      } else {
+        checkoutData.purchaseType = 'user';
+      }
+
+      const response = await fetch('/api/purchase/create-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(checkoutData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        this.showNotification(`Checkout failed: ${errorData}`, 'error');
         return;
       }
-      
-      checkoutData.guestEmail = guestEmail;
-      checkoutData.purchaseType = 'guest';
-      console.log('Guest email collected:', guestEmail);
-    } else {
-      checkoutData.purchaseType = 'user';
+
+      const data = await response.json();
+
+      if (data.id) {
+        const stripe = Stripe(config.stripePublishableKey);
+        await stripe.redirectToCheckout({ sessionId: data.id });
+      } else {
+        this.showNotification('Could not start checkout.', 'error');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      this.showNotification('Checkout failed. Try again.', 'error');
     }
-
-    console.log('Checkout cart payload:', checkoutData);
-
-    const response = await fetch('/api/purchase/create-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(checkoutData)
-    });
-
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('Checkout failed:', response.status, errorData);
-      this.showCartNotification(`Checkout failed: ${errorData}`, 'error');
-      return;
-    }
-
-    const data = await response.json();
-
-    if (data.id) {
-      const stripe = Stripe(config.stripePublishableKey);
-      await stripe.redirectToCheckout({ sessionId: data.id });
-    } else {
-      this.showCartNotification('Could not start checkout.', 'error');
-    }
-  } catch (error) {
-    console.error('Checkout error:', error);
-    this.showCartNotification('Checkout failed. Try again.', 'error');
   }
-}
 
-// ✅ NEW: Email collection method for guests (CSS handled by additional-styles.css)
-async collectGuestEmail() {
-  return new Promise((resolve) => {
-    // Create modal for email collection
-    const modal = document.createElement('div');
-    modal.className = 'guest-email-modal';
-    modal.innerHTML = `
-      <div class="modal-overlay">
+  // ── Guest Email Modal ───────────────────────────────────────
+
+  collectGuestEmail() {
+    return new Promise((resolve) => {
+      const modal = document.createElement('div');
+      modal.className = 'guest-email-modal';
+      modal.innerHTML = `
+        <div class="modal-overlay"></div>
         <div class="modal-content">
           <h3>Complete Your Purchase</h3>
-          <p>Please enter your email address to receive your download links:</p>
+          <p>Enter your email to receive download links:</p>
           <input type="email" id="guestEmailInput" placeholder="your@email.com" required>
           <div class="modal-buttons">
             <button id="emailSubmitBtn">Continue to Payment</button>
             <button id="emailCancelBtn">Cancel</button>
           </div>
         </div>
-      </div>
-    `;
+      `;
 
-    document.body.appendChild(modal);
+      document.body.appendChild(modal);
 
-    const emailInput = document.getElementById('guestEmailInput');
-    const submitBtn = document.getElementById('emailSubmitBtn');
-    const cancelBtn = document.getElementById('emailCancelBtn');
+      // Activate on next frame (CSS transition)
+      requestAnimationFrame(() => modal.classList.add('active'));
 
-    // Focus on input
-    emailInput.focus();
+      const emailInput = document.getElementById('guestEmailInput');
+      const submitBtn = document.getElementById('emailSubmitBtn');
+      const cancelBtn = document.getElementById('emailCancelBtn');
 
-    // Handle submit
-    const handleSubmit = () => {
-      const email = emailInput.value.trim();
-      if (!email || !email.includes('@')) {
-        emailInput.classList.add('error');
-        emailInput.placeholder = 'Please enter a valid email';
-        return;
-      }
-      
-      modal.remove();
-      resolve(email);
-    };
+      emailInput.focus();
 
-    // Handle cancel
-    const handleCancel = () => {
-      modal.remove();
-      resolve(null);
-    };
-
-    // Event listeners
-    submitBtn.addEventListener('click', handleSubmit);
-    cancelBtn.addEventListener('click', handleCancel);
-    emailInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') handleSubmit();
-    });
-
-    // Click outside to cancel
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) handleCancel();
-    });
-
-    // Clear error state when user types
-    emailInput.addEventListener('input', () => {
-      emailInput.classList.remove('error');
-      if (emailInput.placeholder === 'Please enter a valid email') {
-        emailInput.placeholder = 'your@email.com';
-      }
-    });
-  });
-}
-
-
-  showCartNotification(message, type = 'success') {
-    const notification = document.createElement('div');
-    notification.className = 'cart-notification';
-    notification.innerHTML = `<span>${message}</span>`;
-
-    // Style based on type
-    notification.style.backgroundColor = type === 'error' ? '#dc3545' : '#083644';
-    notification.style.color = '#bfd4d6';
-    notification.style.position = 'fixed';
-    notification.style.top = '20px';
-    notification.style.right = '20px';
-    notification.style.padding = '12px 16px';
-
-    notification.style.zIndex = '10000';
-    notification.style.fontWeight = '200';
-
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.remove();
-      }
-    }, 3000);
-  }
-
-  // Public method to add album to cart from UI
-  async addAlbumToCart(albumId) {
-    try {
-      // Get album data from API
-      const album = await window.apiClient.getAlbum(albumId);
-      if (album) {
-        await this.addToCart(albumId, album.name, album.cover_url);
-      } else {
-        console.error('Album not found:', albumId);
-        this.showCartNotification('Album not found', 'error');
-      }
-    } catch (error) {
-      console.error('Failed to add album to cart:', error);
-      this.showCartNotification('Failed to add album to cart. Please try again.', 'error');
-    }
-  }
-
-
-  /**
-  * Add a single song to the cart.
-  *
-  * @param {string|number} songId     – e.g. "0601" or 601
-  * @param {object|null}   songMeta   – optional song object we already have
-  */
-  async addSongToCart(songId, songMeta = null) {
-    console.log('🛒 Adding song to cart:', songId);
-
-    /* ── 1. Resolve the song object ─────────────────────────────────── */
-    let song = songMeta;
-    if (!song) {
-      try {
-        // Accept both "0601" and 601
-        const cleanId = String(songId).replace(/^0+/, '');
-        song = await window.apiClient.getSong(cleanId);
-      } catch (error) {
-        console.error('Failed to fetch song:', error);
-      }
-    }
-
-    if (!song) {
-      console.error('[Cart] Song not found:', songId);
-      this.showCartNotification('Song not found', 'error');
-      return;
-    }
-
-    console.log('🎵 Song found:', song);
-
-    /* ── 2. Get (or invent) a product for this song ─────────────────── */
-    let productId = null;
-    let productPrice = song.price ?? 1.29;
-
-    try {
-      // THIS WAS THE BUG - use song.id, not song as albumId
-      const res = await fetch(`/api/cart/product/song/${song.id}`);
-      if (res.ok) {
-        const data = await res.json();
-        productId = data.product?.id ?? null;
-        productPrice = data.product?.price ?? productPrice;
-        console.log('✅ Found product for song:', data.product);
-      } else {
-        console.log('⚠️ No product found for song, will use virtual product');
-      }
-    } catch (error) {
-      console.error('❌ Error fetching song product:', error);
-    }
-
-    if (!productId) {
-      // Backend song-product route not ready yet → skip cart for now
-      console.warn('[Cart] No product found for song', song.id);
-      this.showCartNotification('Song purchases not available yet', 'error');
-      return;
-    }
-
-    /* ── 3. Call addToCart with SONG data, not album data ──────────── */
-    try {
-      console.log('🛒 Adding song to cart via addToCart...');
-
-      // Create a simplified addToCart call specifically for songs
-      await this.addSongToCartDatabase(song, productId, productPrice);
-
-    } catch (error) {
-      console.error('❌ Failed to add song to cart:', error);
-      this.showCartNotification('Failed to add song to cart', 'error');
-    }
-  }
-
-  /**
-   * Add song directly to cart database (bypassing the album-focused addToCart method)
-   */
-  async addSongToCartDatabase(song, productId, price) {
-    try {
-      console.log('🛒 Adding song to cart database:', song.name);
-      console.log('🔑 Session ID:', this.sessionId);
-      console.log('👤 User ID:', this.userId);
-      console.log('📦 Product ID:', productId);
-
-      const cartData = {
-        productId: productId,
-        quantity: 1
+      const cleanup = (value) => {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 200);
+        resolve(value);
       };
 
-      if (this.isLoggedIn && this.userId) {
-        cartData.userId = this.userId;
-        console.log('🔐 Adding with userId:', this.userId);
-      } else {
-        cartData.sessionId = this.sessionId;
-        console.log('🔗 Adding with sessionId:', this.sessionId);
-      }
-
-      const response = await fetch('/api/cart/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-session-id': this.sessionId
-        },
-        credentials: 'include',
-        body: JSON.stringify(cartData)
+      submitBtn.addEventListener('click', () => {
+        const email = emailInput.value.trim();
+        if (!email || !email.includes('@')) {
+          emailInput.classList.add('input-error');
+          emailInput.placeholder = 'Please enter a valid email';
+          return;
+        }
+        cleanup(email);
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log('✅ Song added to cart:', result.message);
+      cancelBtn.addEventListener('click', () => cleanup(null));
 
-        // Show success message
-        this.showCartNotification(`${song.name} added to cart.`);
+      emailInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') submitBtn.click();
+      });
 
-        // Reload cart to get updated data
-        setTimeout(async () => {
-          console.log('🔄 Reloading cart after song add...');
-          await this.loadCartFromDatabase();
-          this.updateCartCount();
+      emailInput.addEventListener('input', () => {
+        emailInput.classList.remove('input-error');
+        if (emailInput.placeholder === 'Please enter a valid email') {
+          emailInput.placeholder = 'your@email.com';
+        }
+      });
 
-          // Update sidebar if open
-          if (this.isVisible) {
-            this.updateCartSidebarContent();
-          }
-        }, 500);
-
-        return true;
-      } else {
-        const error = await response.json();
-        console.error('❌ Add song to cart API error:', error);
-        throw new Error(error.error || 'Failed to add song to cart');
-      }
-    } catch (error) {
-      console.error('❌ Add song to cart database failed:', error);
-      this.showCartNotification(error.message, 'error');
-      return false;
-    }
+      // Click overlay to cancel
+      modal.querySelector('.modal-overlay').addEventListener('click', () => cleanup(null));
+    });
   }
 
+  // ── Notification ────────────────────────────────────────────
 
-// ALSO ADD this method to refresh cart after login:
-async refreshCartAfterLogin() {
-  console.log('🔄 Refreshing cart after login...');
-  await this.checkAuthStatus();
-  await this.loadCartFromDatabase();
-  this.updateCartCount();
-  
-  // Update sidebar if open
-  if (this.isVisible) {
-    this.updateCartSidebarContent();
+  showNotification(message, type = 'success') {
+    const el = document.createElement('div');
+    el.className = 'cart-notification';
+    if (type === 'error') el.classList.add('error');
+    el.innerHTML = `<span>${message}</span>`;
+
+    document.body.appendChild(el);
+
+    // Activate on next frame (CSS transition)
+    requestAnimationFrame(() => el.classList.add('visible'));
+
+    setTimeout(() => {
+      el.classList.remove('visible');
+      setTimeout(() => el.remove(), 300);
+    }, 3000);
   }
 }
 
-
-
-
-  // Get cart data for other components
-  getCartData() {
-    return this.cart;
-  }
-}
-
-// Initialize cart manager
+// ── Init ────────────────────────────────────────────────────
 const cartManager = new CartManager();
-
-// Make available globally
 window.cartManager = cartManager;

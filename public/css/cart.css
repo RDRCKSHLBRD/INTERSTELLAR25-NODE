@@ -1,0 +1,763 @@
+/* ================================================================
+   CART SIDEBAR + NOTIFICATIONS — cart.css  V6
+   
+   RODUX principle: CSS is the rendering engine.
+   All sizing/spacing via --cart-* custom properties.
+   JS (cart.js) builds DOM with classnames only. No inline styles.
+   
+   Components:
+     .cart-sidebar        — slide-in panel (right edge)
+     .cart-item           — album/song line item
+     .cart-notification   — toast message (top-right)
+     .guest-email-modal   — checkout email collection
+     .auth-modal          — login/register overlay
+   ================================================================ */
+
+
+/* ── Custom Property Defaults ────────────────────────────────── */
+:root {
+  /* Sidebar chrome */
+  --cart-width:            340px;
+  --cart-bg:               #07212B;
+  --cart-border:           1px solid rgba(43, 127, 140, 0.35);
+  --cart-z:                200;
+  --cart-slide-speed:      0.3s;
+
+  /* Cart header */
+  --cart-header-h:         50px;
+  --cart-header-bg:        rgba(8, 54, 68, 0.6);
+  --cart-header-font:      15px;
+  --cart-header-weight:    400;
+  --cart-header-color:     #cadbda;
+
+  /* Cart items */
+  --cart-item-padding:     12px 16px;
+  --cart-item-gap:         10px;
+  --cart-item-border:      1px solid rgba(43, 127, 140, 0.15);
+  --cart-thumb-size:       56px;
+  --cart-thumb-radius:     3px;
+  --cart-title-font:       14px;
+  --cart-title-color:      #cadbda;
+  --cart-subtitle-font:    11px;
+  --cart-subtitle-color:   #8ab7ce;
+  --cart-price-font:       13px;
+  --cart-price-color:      #3AA0A0;
+
+  /* Quantity controls */
+  --cart-qty-btn-size:     26px;
+  --cart-qty-font:         13px;
+  --cart-qty-bg:           rgba(43, 127, 140, 0.15);
+  --cart-qty-hover-bg:     rgba(43, 127, 140, 0.3);
+  --cart-qty-color:        #cadbda;
+  --cart-remove-color:     #8ab7ce;
+  --cart-remove-hover:     #dc3545;
+
+  /* Cart footer */
+  --cart-footer-h:         auto;
+  --cart-footer-bg:        rgba(8, 54, 68, 0.6);
+  --cart-footer-padding:   14px 16px;
+  --cart-total-font:       15px;
+  --cart-total-color:      #cadbda;
+
+  /* Checkout button */
+  --cart-checkout-bg:      #3AA0A0;
+  --cart-checkout-hover:   #2b7f8c;
+  --cart-checkout-color:   #07212B;
+  --cart-checkout-font:    14px;
+  --cart-checkout-weight:  500;
+  --cart-checkout-radius:  4px;
+  --cart-checkout-h:       42px;
+
+  /* Notification toast */
+  --notif-bg:              #083644;
+  --notif-error-bg:        #dc3545;
+  --notif-color:           #bfd4d6;
+  --notif-font:            13px;
+  --notif-weight:          300;
+  --notif-padding:         12px 18px;
+  --notif-radius:          4px;
+  --notif-z:               10000;
+  --notif-speed:           0.3s;
+
+  /* Guest email modal */
+  --modal-overlay-bg:      rgba(4, 30, 48, 0.85);
+  --modal-bg:              #0a3a4a;
+  --modal-border:          1px solid rgba(43, 127, 140, 0.3);
+  --modal-radius:          6px;
+  --modal-width:           380px;
+  --modal-padding:         28px 24px;
+  --modal-heading-font:    18px;
+  --modal-heading-color:   #cadbda;
+  --modal-text-font:       14px;
+  --modal-text-color:      #8ab7ce;
+  --modal-input-bg:        rgba(7, 33, 43, 0.8);
+  --modal-input-border:    1px solid rgba(43, 127, 140, 0.35);
+  --modal-input-focus:     rgba(58, 160, 160, 0.5);
+  --modal-input-color:     #cadbda;
+  --modal-input-font:      14px;
+  --modal-input-radius:    4px;
+  --modal-input-h:         42px;
+
+  /* Empty state */
+  --cart-empty-font:       14px;
+  --cart-empty-color:      #8ab7ce;
+
+  /* Close button */
+  --cart-close-size:       28px;
+  --cart-close-color:      #8ab7ce;
+  --cart-close-hover:      #cadbda;
+}
+
+
+/* ── Sidebar Container ──────────────────────────────────────── */
+.cart-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--cart-width);
+  max-width: 92vw;
+  background: var(--cart-bg);
+  border-left: var(--cart-border);
+  z-index: var(--cart-z);
+  display: flex;
+  flex-direction: column;
+  font-family: Helvetica, sans-serif;
+  transform: translateX(100%);
+  transition: transform var(--cart-slide-speed) ease;
+}
+
+.cart-sidebar.open {
+  transform: translateX(0);
+}
+
+
+/* ── Cart Header ────────────────────────────────────────────── */
+.cart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--cart-header-h);
+  min-height: var(--cart-header-h);
+  padding: 0 16px;
+  background: var(--cart-header-bg);
+  border-bottom: var(--cart-border);
+}
+
+.cart-header h3 {
+  font-size: var(--cart-header-font);
+  font-weight: var(--cart-header-weight);
+  color: var(--cart-header-color);
+  letter-spacing: 0.4px;
+  margin: 0;
+}
+
+.cart-close {
+  width: var(--cart-close-size);
+  height: var(--cart-close-size);
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: relative;
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.cart-close:hover {
+  opacity: 1;
+}
+
+/* × via pseudo-elements */
+.cart-close::before,
+.cart-close::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 1.5px;
+  background: var(--cart-close-color);
+  transition: background 0.15s ease;
+}
+.cart-close::before { transform: translate(-50%, -50%) rotate(45deg); }
+.cart-close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
+
+.cart-close:hover::before,
+.cart-close:hover::after {
+  background: var(--cart-close-hover);
+}
+
+
+/* ── Cart Content (scrollable) ──────────────────────────────── */
+.cart-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.cart-items {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* scrollbar */
+.cart-items::-webkit-scrollbar { width: 4px; }
+.cart-items::-webkit-scrollbar-track { background: transparent; }
+.cart-items::-webkit-scrollbar-thumb {
+  background: rgba(43, 127, 140, 0.3);
+  border-radius: 2px;
+}
+
+
+/* ── Cart Item ──────────────────────────────────────────────── */
+.cart-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cart-item-gap);
+  padding: var(--cart-item-padding);
+  border-bottom: var(--cart-item-border);
+  transition: background 0.15s ease;
+}
+
+.cart-item:hover {
+  background: rgba(43, 127, 140, 0.06);
+}
+
+.cart-item-image {
+  width: var(--cart-thumb-size);
+  height: var(--cart-thumb-size);
+  border-radius: var(--cart-thumb-radius);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.cart-item-details {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cart-item-title {
+  font-size: var(--cart-title-font);
+  font-weight: 400;
+  color: var(--cart-title-color);
+  margin: 0 0 2px;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cart-item-title .song-name {
+  display: block;
+  font-weight: 400;
+  color: var(--cart-title-color);
+}
+
+.cart-item-title .album-subtitle {
+  display: block;
+  font-size: var(--cart-subtitle-font);
+  font-weight: 300;
+  color: var(--cart-subtitle-color);
+  letter-spacing: 0.3px;
+  margin-top: 1px;
+}
+
+.cart-item-price {
+  font-size: var(--cart-price-font);
+  color: var(--cart-price-color);
+  margin: 4px 0 6px;
+  font-weight: 400;
+}
+
+.cart-item-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.quantity-btn {
+  width: var(--cart-qty-btn-size);
+  height: var(--cart-qty-btn-size);
+  border: none;
+  border-radius: 3px;
+  background: var(--cart-qty-bg);
+  color: var(--cart-qty-color);
+  font-size: var(--cart-qty-font);
+  font-weight: 400;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+  line-height: 1;
+}
+
+.quantity-btn:hover {
+  background: var(--cart-qty-hover-bg);
+}
+
+.quantity-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.cart-item-controls .quantity {
+  font-size: var(--cart-qty-font);
+  color: var(--cart-qty-color);
+  min-width: 20px;
+  text-align: center;
+}
+
+.remove-btn {
+  border: none;
+  background: none;
+  color: var(--cart-remove-color);
+  font-size: 12px;
+  font-weight: 300;
+  cursor: pointer;
+  padding: 2px 6px;
+  margin-left: auto;
+  letter-spacing: 0.3px;
+  transition: color 0.15s ease;
+}
+
+.remove-btn:hover {
+  color: var(--cart-remove-hover);
+}
+
+
+/* ── Cart Empty ─────────────────────────────────────────────── */
+.cart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  font-size: var(--cart-empty-font);
+  color: var(--cart-empty-color);
+  font-weight: 300;
+  letter-spacing: 0.3px;
+}
+
+
+/* ── Cart Footer ────────────────────────────────────────────── */
+.cart-footer {
+  padding: var(--cart-footer-padding);
+  background: var(--cart-footer-bg);
+  border-top: var(--cart-border);
+}
+
+.cart-total {
+  font-size: var(--cart-total-font);
+  color: var(--cart-total-color);
+  font-weight: 400;
+  margin-bottom: 12px;
+}
+
+.checkout-btn {
+  width: 100%;
+  height: var(--cart-checkout-h);
+  border: none;
+  border-radius: var(--cart-checkout-radius);
+  background: var(--cart-checkout-bg);
+  color: var(--cart-checkout-color);
+  font-size: var(--cart-checkout-font);
+  font-weight: var(--cart-checkout-weight);
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.checkout-btn:hover {
+  background: var(--cart-checkout-hover);
+}
+
+.checkout-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+
+/* ── Cart Backdrop (mobile) ─────────────────────────────────── */
+.cart-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 30, 48, 0.6);
+  z-index: calc(var(--cart-z) - 1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--cart-slide-speed) ease;
+}
+
+.cart-backdrop.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+/* ── Notification Toast ─────────────────────────────────────── */
+.cart-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: var(--notif-padding);
+  background: var(--notif-bg);
+  color: var(--notif-color);
+  font-size: var(--notif-font);
+  font-weight: var(--notif-weight);
+  font-family: Helvetica, sans-serif;
+  border-radius: var(--notif-radius);
+  z-index: var(--notif-z);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity var(--notif-speed) ease, transform var(--notif-speed) ease;
+  pointer-events: none;
+  letter-spacing: 0.3px;
+}
+
+.cart-notification.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.cart-notification.error {
+  background: var(--notif-error-bg);
+}
+
+
+/* ── Guest Email Modal ──────────────────────────────────────── */
+.guest-email-modal {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--cart-z) + 50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.guest-email-modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--modal-overlay-bg);
+}
+
+.modal-content {
+  position: relative;
+  width: var(--modal-width);
+  max-width: 90vw;
+  padding: var(--modal-padding);
+  background: var(--modal-bg);
+  border: var(--modal-border);
+  border-radius: var(--modal-radius);
+  z-index: 1;
+}
+
+.modal-content h3 {
+  font-size: var(--modal-heading-font);
+  font-weight: 400;
+  color: var(--modal-heading-color);
+  margin: 0 0 10px;
+  letter-spacing: 0.3px;
+}
+
+.modal-content p {
+  font-size: var(--modal-text-font);
+  color: var(--modal-text-color);
+  font-weight: 300;
+  line-height: 1.5;
+  margin: 0 0 18px;
+}
+
+.modal-content input[type="email"] {
+  width: 100%;
+  height: var(--modal-input-h);
+  padding: 0 14px;
+  background: var(--modal-input-bg);
+  border: var(--modal-input-border);
+  border-radius: var(--modal-input-radius);
+  color: var(--modal-input-color);
+  font-size: var(--modal-input-font);
+  font-family: Helvetica, sans-serif;
+  outline: none;
+  transition: border-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.modal-content input[type="email"]::placeholder {
+  color: rgba(138, 183, 206, 0.5);
+}
+
+.modal-content input[type="email"]:focus {
+  border-color: var(--modal-input-focus);
+}
+
+.modal-content input[type="email"].input-error {
+  border-color: #dc3545;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.modal-buttons button {
+  flex: 1;
+  height: var(--cart-checkout-h);
+  border: none;
+  border-radius: var(--cart-checkout-radius);
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: background 0.15s ease;
+}
+
+#emailSubmitBtn {
+  background: var(--cart-checkout-bg);
+  color: var(--cart-checkout-color);
+}
+
+#emailSubmitBtn:hover {
+  background: var(--cart-checkout-hover);
+}
+
+#emailCancelBtn {
+  background: rgba(43, 127, 140, 0.15);
+  color: var(--cart-subtitle-color);
+}
+
+#emailCancelBtn:hover {
+  background: rgba(43, 127, 140, 0.25);
+}
+
+
+/* ── Auth Modal (V6 overrides) ──────────────────────────────── */
+.auth-modal {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--cart-z) + 50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--modal-overlay-bg);
+}
+
+.auth-modal-content {
+  position: relative;
+  width: var(--modal-width);
+  max-width: 90vw;
+  padding: var(--modal-padding);
+  background: var(--modal-bg);
+  border: var(--modal-border);
+  border-radius: var(--modal-radius);
+}
+
+.auth-modal-content h2 {
+  font-size: var(--modal-heading-font);
+  font-weight: 400;
+  color: var(--modal-heading-color);
+  margin: 0 0 16px;
+  letter-spacing: 0.3px;
+}
+
+.auth-form input {
+  width: 100%;
+  height: var(--modal-input-h);
+  padding: 0 14px;
+  background: var(--modal-input-bg);
+  border: var(--modal-input-border);
+  border-radius: var(--modal-input-radius);
+  color: var(--modal-input-color);
+  font-size: var(--modal-input-font);
+  font-family: Helvetica, sans-serif;
+  outline: none;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease;
+}
+
+.auth-form input::placeholder {
+  color: rgba(138, 183, 206, 0.5);
+}
+
+.auth-form input:focus {
+  border-color: var(--modal-input-focus);
+}
+
+.auth-form button[type="submit"] {
+  width: 100%;
+  height: var(--cart-checkout-h);
+  border: none;
+  border-radius: var(--cart-checkout-radius);
+  background: var(--cart-checkout-bg);
+  color: var(--cart-checkout-color);
+  font-size: 14px;
+  font-weight: var(--cart-checkout-weight);
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  margin-top: 6px;
+  transition: background 0.15s ease;
+}
+
+.auth-form button[type="submit"]:hover {
+  background: var(--cart-checkout-hover);
+}
+
+.auth-error {
+  color: #dc3545;
+  font-size: 13px;
+  font-weight: 300;
+  margin-bottom: 10px;
+}
+
+.auth-success {
+  color: #3AA0A0;
+  font-size: 13px;
+  font-weight: 300;
+  margin-bottom: 10px;
+}
+
+.form-toggle {
+  font-size: 13px;
+  color: var(--cart-subtitle-color);
+  font-weight: 300;
+  margin-top: 14px;
+  text-align: center;
+}
+
+.form-toggle a {
+  color: #3AA0A0;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.form-toggle a:hover {
+  text-decoration: underline;
+}
+
+.auth-modal .close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.auth-modal .close:hover {
+  opacity: 1;
+}
+
+.auth-modal .close::before,
+.auth-modal .close::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 1.5px;
+  background: var(--cart-close-color);
+}
+.auth-modal .close::before { transform: translate(-50%, -50%) rotate(45deg); }
+.auth-modal .close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
+
+.password-input-container {
+  position: relative;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  opacity: 0.5;
+  transition: opacity 0.15s ease;
+}
+
+.password-toggle-icon:hover {
+  opacity: 0.8;
+}
+
+
+/* ── Cart Button (in footer nav) ────────────────────────────── */
+.cart-button {
+  position: relative;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.cart-icon {
+  width: 22px;
+  height: 22px;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
+.cart-button:hover .cart-icon {
+  opacity: 1;
+}
+
+.cart-count {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background: #8D2016;
+  color: #EAE9DF;
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.cart-count.hidden {
+  display: none;
+}
+
+
+/* ── Responsive: Mobile ─────────────────────────────────────── */
+@media (max-width: 767px) {
+  :root {
+    --cart-width: 100vw;
+    --cart-header-h: 48px;
+    --cart-thumb-size: 48px;
+  }
+
+  .cart-notification {
+    left: 16px;
+    right: 16px;
+    top: 12px;
+  }
+}
+
+/* ── Responsive: Tablet ─────────────────────────────────────── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --cart-width: 360px;
+  }
+}
