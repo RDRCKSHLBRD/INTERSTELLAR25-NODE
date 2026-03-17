@@ -1,36 +1,25 @@
 /* ================================================================
    PLAYER / FOOTER BAR — player.css  V6.3
    
-   RODUX principle: CSS is a dumb renderer. Consumes vars only.
-   footerQuadTree.js owns ALL layout decisions:
-     - Zone widths (--ft-player-w, --ft-nav-w, --ft-logo-w)
-     - Footer height (--ft-height)
-     - Profile selection (--ft-profile)
-     - Volume visibility (--ft-vol-visible)
-     - Stacked vs horizontal (--ft-stacked)
-     - All responsive sizing via --ft-* and per-profile --player-* vars
+   RODUX: CSS is a dumb renderer. Consumes vars only.
+   footerQuadTree.js owns ALL layout via --ft-* vars + inline styles.
+   NO @media queries. Profile-driven via [data-ft-profile] attribute.
    
-   NO @media queries. NO flex-based layout logic.
-   CSS sets defaults. JS overwrites them per profile.
+   Device-aware: data-ft-device="touch" vs "pointer" on #artistControls.
+   Desktop at 400px ≠ iPhone at 400px. The state decides.
    
-   V6.3: QuadTree migration. State-driven profiles.
-         Safe-area-inset-bottom for iOS Safari.
-         Volume hidden on touch profiles via data-ft-profile.
+   V6.3: compact-portrait profile matches wireframe:
+         title row → transport row → seek+time row → nav row → logo row
    ================================================================ */
 
 
-/* ── Custom Property Defaults ────────────────────────────────── 
-   These are starting values only. footerQuadTree.js overwrites
-   them per profile via the vars{} object in footer.json.
-   ────────────────────────────────────────────────────────────── */
+/* ── Custom Property Defaults ────────────────────────────────── */
 :root {
-  /* Footer chrome */
   --footer-height:       75px;
   --footer-bg:           #07212B;
   --footer-border:       1px solid rgba(43, 127, 140, 0.4);
   --footer-separator:    1px solid rgba(43, 127, 140, 0.25);
 
-  /* Player zone */
   --player-btn-size:     45px;
   --player-icon-size:    40px;
   --player-btn-gap:      4px;
@@ -39,7 +28,6 @@
   --player-time-font:    12px;
   --player-time-min-w:   78px;
 
-  /* Seek bar */
   --seek-height:         6px;
   --seek-radius:         3px;
   --seek-max-w:          200px;
@@ -47,26 +35,21 @@
   --seek-track-bg:       rgba(138, 183, 206, 0.15);
   --seek-fill-bg:        var(--ip-primary, #3AA0A0);
 
-  /* Volume */
   --vol-track-w:         100px;
   --vol-track-h:         4px;
 
-  /* Nav zone */
   --nav-font:            14px;
   --nav-padding:         10px 20px;
 
-  /* Logo zone */
   --logo-img-h:          38px;
   --logo-tag-font:       11px;
   --logo-tag-color:      #829D9E;
   --logo-padding:        12px 34px 10px;
 
-  /* Toggle */
   --toggle-font:         12px;
   --toggle-color:        var(--ip-muted, #8ab7ce);
   --toggle-padding:      5px 16px;
 
-  /* User cell */
   --user-icon-size:      20px;
   --user-name-font:      11px;
   --user-name-color:     var(--ip-fg, #cadbda);
@@ -75,7 +58,6 @@
   --user-cell-padding:   6px 16px;
   --user-cell-gap:       2px;
 
-  /* QuadTree outputs — defaults, overwritten by footerQuadTree.js */
   --ft-vol-visible:      1;
   --ft-stacked:          0;
 }
@@ -90,16 +72,12 @@
   border-top: var(--footer-border);
   padding: 0;
   font-family: Helvetica, sans-serif;
-
-  /* Safe area — iOS Safari bottom bar */
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 
 /* ── Collapsible Toggle ──────────────────────────────────────── */
-.footer-details {
-  margin: 0;
-}
+.footer-details { margin: 0; }
 
 .footer-details summary {
   font-size: var(--toggle-font);
@@ -119,10 +97,7 @@
 .footer-details[open] summary::before { content: '▾ '; font-size: 10px; }
 
 
-/* ── Footer Bar ──────────────────────────────────────────────── 
-   Display: flex for flow (wrap when stacked).
-   Width/height/sizing all from QuadTree vars + inline styles.
-   ────────────────────────────────────────────────────────────── */
+/* ── Footer Bar ──────────────────────────────────────────────── */
 .footer-bar {
   display: flex;
   align-items: center;
@@ -133,8 +108,7 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   PLAYER ZONE
-   Width set by footerQuadTree.js inline style.
+   PLAYER ZONE — width set by JS
    ══════════════════════════════════════════════════════════════ */
 
 .footer-player-zone {
@@ -144,7 +118,6 @@
   height: 100%;
   padding: 0 14px;
   gap: 8px;
-  /* width set by JS */
 }
 
 .player {
@@ -205,7 +178,6 @@
 }
 .player-transport button:hover { opacity: 0.7; }
 
-/* Icon mapping */
 .player-transport .btn-prev      { background-image: url('/images/PLAYER-BACK_BLUE-5.svg'); }
 .player-transport .btn-skip-back { background-image: url('/images/PLAYER-bkwd30_BLUE.svg'); }
 .player-transport .btn-play      { background-image: url('/images/PLAYER-PLAY-v2.svg'); }
@@ -260,10 +232,7 @@
 }
 
 
-/* ── Volume ──────────────────────────────────────────────────── 
-   Visibility driven by data-ft-profile attribute (set by footerQuadTree.js).
-   On touch profiles (compact, narrow), volume is device-controlled.
-   ────────────────────────────────────────────────────────────── */
+/* ── Volume ──────────────────────────────────────────────────── */
 .player-volume {
   display: flex;
   align-items: center;
@@ -271,15 +240,13 @@
   flex-shrink: 0;
 }
 
-/* State-driven hide via profile attribute */
-[data-ft-profile="compact"] .player-volume,
-[data-ft-profile="narrow"] .player-volume {
+/* Hide volume on touch device profiles */
+[data-ft-device="touch"] .player-volume {
   display: none;
 }
 
 .player-volume-icon {
-  width: 16px;
-  height: 16px;
+  width: 16px; height: 16px;
   background-image: url('/images/IP-MUSIC-2teal.svg');
   background-size: 14px 14px;
   background-repeat: no-repeat;
@@ -306,8 +273,7 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   NAV ZONE
-   Width set by footerQuadTree.js inline style.
+   NAV ZONE — width set by JS
    ══════════════════════════════════════════════════════════════ */
 
 .footer-nav-zone {
@@ -316,7 +282,6 @@
   height: 100%;
   border-left: var(--footer-separator);
   overflow: visible;
-  /* width set by JS */
 }
 
 .footer-nav-zone a,
@@ -344,16 +309,9 @@
   background: rgba(43, 127, 140, 0.15);
 }
 
-/* Compact profile: nav zone stacked adjustments */
-[data-ft-profile="compact"] .footer-nav-zone {
-  justify-content: center;
-  border-left: none;
-  border-top: var(--footer-separator);
-}
-
 
 /* ══════════════════════════════════════════════════════════════
-   USER CELL — vertical micro-stack (icon / name / logout)
+   USER CELL
    ══════════════════════════════════════════════════════════════ */
 
 .user-cell {
@@ -370,23 +328,13 @@
   position: relative;
 }
 
-.user-cell.active {
-  display: flex;
-}
-
-/* Compact profile: user cell goes horizontal */
-[data-ft-profile="compact"] .user-cell.active {
-  flex-direction: row;
-  gap: 6px;
-  border-right: 1px solid rgba(43, 127, 140, 0.15);
-}
+.user-cell.active { display: flex; }
 
 .user-cell-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
-  border: none;
+  padding: 0; border: none;
   height: auto !important;
   border-right: none !important;
 }
@@ -397,10 +345,7 @@
   opacity: 0.8;
   transition: opacity 0.15s ease;
 }
-
-.user-cell-icon:hover .user-icon-img {
-  opacity: 1;
-}
+.user-cell-icon:hover .user-icon-img { opacity: 1; }
 
 .user-cell-name {
   font-size: var(--user-name-font);
@@ -418,8 +363,7 @@
   font-size: var(--user-logout-font);
   font-weight: 300;
   color: var(--user-logout-color);
-  background: none;
-  border: none;
+  background: none; border: none;
   cursor: pointer;
   padding: 1px 4px;
   letter-spacing: 0.5px;
@@ -430,18 +374,12 @@
   border-right: none !important;
   font-family: inherit;
 }
+.user-cell-logout:hover { color: var(--ip-fg, #cadbda); }
 
-.user-cell-logout:hover {
-  color: var(--ip-fg, #cadbda);
-}
-
-/* Login button */
-.nav-login-btn.hidden {
-  display: none;
-}
+.nav-login-btn.hidden { display: none; }
 
 
-/* ── Cart Button (in footer nav) ────────────────────────────── */
+/* ── Cart Button ─────────────────────────────────────────────── */
 .footer-nav-zone .cart-button {
   position: relative;
   display: flex;
@@ -449,21 +387,17 @@
   gap: 4px;
   padding: var(--nav-padding);
   overflow: visible;
-  background: none;
-  border: none;
+  background: none; border: none;
   cursor: pointer;
   height: 100%;
   font-family: inherit;
   transition: background 0.15s;
 }
-
 .footer-nav-zone .cart-button:hover {
   background: rgba(43, 127, 140, 0.15);
 }
 
-.cart-icon {
-  width: 20px; height: 20px; display: block;
-}
+.cart-icon { width: 20px; height: 20px; display: block; }
 
 .cart-count {
   position: absolute;
@@ -476,22 +410,11 @@
   font-size: 9px; font-weight: 700;
   padding: 0 3px;
 }
-
-.cart-count.hidden {
-  display: none;
-}
-
-/* Compact profile: hide inline cart-add in transport */
-[data-ft-profile="compact"] .player-transport .btn-cart { display: none; }
-
-/* Compact profile: hide skip buttons to save space */
-[data-ft-profile="compact"] .player-transport .btn-skip-back,
-[data-ft-profile="compact"] .player-transport .btn-skip-fwd { display: none; }
+.cart-count.hidden { display: none; }
 
 
 /* ══════════════════════════════════════════════════════════════
-   LOGO ZONE
-   Width set by footerQuadTree.js inline style.
+   LOGO ZONE — width set by JS
    ══════════════════════════════════════════════════════════════ */
 
 .footer-logo {
@@ -502,7 +425,6 @@
   padding: var(--logo-padding);
   border-left: var(--footer-separator);
   height: 100%;
-  /* width set by JS */
 }
 
 .footer-logo img {
@@ -520,11 +442,146 @@
   line-height: 1;
 }
 
-/* Compact profile: logo zone stacked adjustments */
-[data-ft-profile="compact"] .footer-logo {
+
+/* ══════════════════════════════════════════════════════════════
+   PROFILE: compact-portrait (wireframe layout)
+   
+   Touch device, portrait phone. Full vertical stack:
+   Row 1: title (full width)
+   Row 2: transport buttons (centered)
+   Row 3: seek bar + time
+   Row 4: nav links (centered, wrapping)
+   Row 5: logo + tag (centered)
+   
+   The .player element wraps its children into rows.
+   ══════════════════════════════════════════════════════════════ */
+
+[data-ft-profile="compact-portrait"] .footer-bar {
+  height: auto;
+  align-items: stretch;
+}
+
+[data-ft-profile="compact-portrait"] .footer-player-zone {
+  padding: 8px 14px 4px;
+  height: auto;
+}
+
+[data-ft-profile="compact-portrait"] .player {
+  flex-wrap: wrap;
+  justify-content: center;
+  height: auto;
+  gap: 6px;
+}
+
+/* Title: full width row */
+[data-ft-profile="compact-portrait"] .player-title {
+  width: 100%;
+  max-width: none;
+  text-align: center;
+  flex-basis: 100%;
+  padding: 2px 0;
+}
+
+/* Hide separator in stacked layout */
+[data-ft-profile="compact-portrait"] .player-separator {
+  display: none;
+}
+
+/* Transport: centered row */
+[data-ft-profile="compact-portrait"] .player-transport {
+  justify-content: center;
+  flex-basis: 100%;
+  gap: var(--player-btn-gap);
+  padding: 4px 0;
+}
+
+/* Seek + Time: row together */
+[data-ft-profile="compact-portrait"] .player-seek {
+  flex: 1 1 auto;
+  max-width: none;
+  min-width: 40%;
+}
+
+[data-ft-profile="compact-portrait"] .player-time {
+  min-width: auto;
+}
+
+/* Hide inline cart button — cart is in nav row */
+[data-ft-profile="compact-portrait"] .player-transport .btn-cart {
+  display: none;
+}
+
+/* Nav: stacked full-width, centered */
+[data-ft-profile="compact-portrait"] .footer-nav-zone {
+  justify-content: center;
+  border-left: none;
+  border-top: var(--footer-separator);
+  flex-wrap: wrap;
+}
+
+[data-ft-profile="compact-portrait"] .footer-nav-zone a,
+[data-ft-profile="compact-portrait"] .footer-nav-zone button.nav-login-btn {
+  border-right: var(--footer-separator);
+}
+
+/* User cell horizontal on compact */
+[data-ft-profile="compact-portrait"] .user-cell.active {
+  flex-direction: row;
+  gap: 6px;
+  border-right: var(--footer-separator);
+}
+
+/* Logo: stacked full-width, centered row */
+[data-ft-profile="compact-portrait"] .footer-logo {
   flex-direction: row;
   justify-content: center;
   gap: 8px;
   border-left: none;
   border-top: 1px solid rgba(43, 127, 140, 0.15);
 }
+
+
+/* ══════════════════════════════════════════════════════════════
+   PROFILE: compact-landscape
+   Same stacked structure but tighter
+   ══════════════════════════════════════════════════════════════ */
+
+[data-ft-profile="compact-landscape"] .footer-bar {
+  height: auto;
+  align-items: stretch;
+}
+
+[data-ft-profile="compact-landscape"] .footer-player-zone {
+  padding: 4px 10px;
+  height: auto;
+}
+
+[data-ft-profile="compact-landscape"] .footer-nav-zone {
+  justify-content: center;
+  border-left: none;
+  border-top: var(--footer-separator);
+}
+
+[data-ft-profile="compact-landscape"] .user-cell.active {
+  flex-direction: row;
+  gap: 6px;
+}
+
+[data-ft-profile="compact-landscape"] .footer-logo {
+  flex-direction: row;
+  justify-content: center;
+  gap: 8px;
+  border-left: none;
+  border-top: 1px solid rgba(43, 127, 140, 0.15);
+}
+
+[data-ft-profile="compact-landscape"] .player-transport .btn-cart { display: none; }
+
+
+/* ══════════════════════════════════════════════════════════════
+   PROFILE: desktop-narrow
+   Desktop browser dragged small. Everything horizontal, just tight.
+   ══════════════════════════════════════════════════════════════ */
+
+/* No special rules needed — default horizontal layout applies.
+   Profile vars handle sizing via footerQuadTree.js. */

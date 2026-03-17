@@ -22,10 +22,10 @@ body {
   background: var(--ip-bg, #083644);
   color: var(--ip-fg, #cadbda);
   font-family: Helvetica, sans-serif;
-  opacity: 0;                        /* revealed by .ready class */
+  opacity: 0;
   overflow: hidden;
-  height: 100vh;                     /* fallback */
-  height: 100dvh;                    /* V6.3: dynamic viewport height for iOS Safari */
+  height: 100vh;
+  height: 100dvh;
   transition: opacity 0.2s ease;
 }
 
@@ -37,11 +37,6 @@ body.ready { opacity: 1; }
    JS sets these vars; CSS positions everything.
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── Header ──────────────────────────────────────────────────── */
-/* (positioned by header.css, sized by --header-height) */
-
-
-/* ── Main ────────────────────────────────────────────────────── */
 #artistMain {
   position: absolute;
   left: 0;
@@ -62,12 +57,8 @@ body.ready { opacity: 1; }
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  /* position:relative so absolute covers are positioned within,
-     and the container can scroll via min-height */
 }
 
-/* Inner scroll surface — absolute children don't expand parent,
-   so we force min-height from the calculated grid content height */
 #albumsRegion::after {
   content: '';
   display: block;
@@ -75,7 +66,6 @@ body.ready { opacity: 1; }
   pointer-events: none;
 }
 
-/* Individual album cover — positioned by per-element CSS vars */
 .album-cover {
   position: absolute;
   left: var(--col-offset, 0);
@@ -85,15 +75,11 @@ body.ready { opacity: 1; }
   object-fit: cover;
   cursor: pointer;
   border-radius: 2px;
-
-  /* Fade-in on load */
   opacity: 0;
   transition: opacity 0.3s ease, box-shadow 0.15s ease;
 }
 
-.album-cover.loaded {
-  opacity: 1;
-}
+.album-cover.loaded { opacity: 1; }
 
 .album-cover.selected {
   box-shadow:
@@ -110,8 +96,6 @@ body.ready { opacity: 1; }
 
 /* ═══════════════════════════════════════════════════════════════
    SIDEBAR — desktop: absolute split; mobile: fixed overlay
-   Driven by --sidebar-width, --sidebar-left
-   Toggle: .open class (added/removed by JS)
    ═══════════════════════════════════════════════════════════════ */
 
 #infoRegion {
@@ -125,8 +109,6 @@ body.ready { opacity: 1; }
   background: #07212B;
   border-left: 1px solid rgba(43, 127, 140, 0.35);
   z-index: 10;
-
-  /* Hidden by default */
   visibility: hidden;
   opacity: 0;
   transition: opacity 0.2s ease, visibility 0.2s;
@@ -137,7 +119,6 @@ body.ready { opacity: 1; }
   opacity: 1;
 }
 
-/* Close button — sticky top */
 .sidebar-close {
   position: sticky; top: 0; z-index: 2;
   display: flex; justify-content: flex-end;
@@ -156,7 +137,6 @@ body.ready { opacity: 1; }
   background: rgba(202, 219, 218, 0.1);
 }
 
-/* Inner content */
 .sidebar-inner { padding: 16px 20px; }
 
 .sidebar-album-cover {
@@ -173,7 +153,6 @@ body.ready { opacity: 1; }
   line-height: 1.25;
 }
 
-/* Collapsible sections */
 .sidebar-section { margin-bottom: 4px; }
 .sidebar-section summary {
   font-size: 11px; font-weight: 600;
@@ -209,7 +188,6 @@ body.ready { opacity: 1; }
 }
 .sidebar-meta span { color: #7E8D9B; }
 
-/* Song list */
 .sidebar-songs { list-style: none; padding: 0; margin: 0; }
 .sidebar-songs li {
   display: flex; justify-content: space-between; align-items: center;
@@ -248,10 +226,9 @@ body.ready { opacity: 1; }
 
 /* ═══════════════════════════════════════════════════════════════
    MOBILE — sidebar as fixed slide-in panel
-   NOTE: This is the one @media block we keep in roderick.css.
-   The sidebar overlay is a rendering concern (position:fixed, 
-   full-screen takeover) not a layout math concern. When sidebar 
-   goes QuadTree, this moves too.
+   NOTE: This @media stays — it's a rendering concern (position:fixed
+   full-screen takeover), not layout math. When sidebar goes QuadTree
+   this moves too.
    ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 767px) {
   #infoRegion.open {
@@ -263,16 +240,11 @@ body.ready { opacity: 1; }
     height: 100dvh;
     z-index: 200;
     box-shadow: none;
-    
-    /* Safe area: bottom padding for Safari's UI */
-    padding-bottom: env(safe-area-inset-bottom, 100px); 
+    padding-bottom: env(safe-area-inset-bottom, 100px);
   }
 
-  /* Grid always full width on mobile */
   #albumsRegion {
     width: 100% !important;
-    
-    /* Safe area: bottom padding so last songs are reachable */
     padding-bottom: env(safe-area-inset-bottom, 100px);
   }
 }

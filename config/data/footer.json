@@ -3,12 +3,14 @@
   "_version": "6.3",
   "_engine": "footerQuadTree.js",
   "_stack": "RODUX: StateJS → RatioEngine → cssJSON → QuadTree → CSS vars",
-  "_comment": "Profiles are mathematical constraint sets selected by StateJS viewport state. No media queries. CSS is a dumb renderer.",
+  "_comment": "Profiles are mathematical constraint sets. Device-aware: touch vs pointer. Desktop resized small ≠ phone.",
 
   "profiles": [
     {
-      "name": "compact",
-      "_comment": "Phones, small viewports. Zones stack vertically.",
+      "name": "compact-portrait",
+      "_comment": "Touch device, portrait, ≤767px. Wireframe layout: title row → transport row → seek+time row → nav row → logo row. Everything stacks full-width.",
+      "device": "touch",
+      "orientation": "portrait",
       "maxWidth": 767,
       "stacked": true,
       "height": "auto",
@@ -20,25 +22,60 @@
         "logo":   { "minPx": 0 }
       },
       "vars": {
-        "--player-btn-size": "26px",
-        "--player-icon-size": "16px",
-        "--player-title-max-w": "120px",
+        "--player-btn-size": "36px",
+        "--player-icon-size": "24px",
+        "--player-btn-gap": "6px",
+        "--player-title-max-w": "100%",
+        "--player-title-font": "14px",
+        "--player-time-font": "12px",
+        "--seek-max-w": "none",
+        "--seek-min-w": "40%",
+        "--seek-height": "8px",
+        "--nav-font": "13px",
+        "--nav-padding": "10px 14px",
+        "--logo-img-h": "16px",
+        "--logo-tag-font": "9px",
+        "--logo-padding": "6px 10px",
+        "--user-icon-size": "16px",
+        "--user-name-font": "10px",
+        "--user-cell-padding": "6px 10px",
+        "--toggle-font": "11px",
+        "--toggle-padding": "6px 16px"
+      }
+    },
+    {
+      "name": "compact-landscape",
+      "_comment": "Touch device, landscape, ≤767px height effective. Tighter stacked layout.",
+      "device": "touch",
+      "orientation": "landscape",
+      "maxWidth": 767,
+      "stacked": true,
+      "height": "auto",
+      "volumeVisible": false,
+      "order": { "player": 1, "nav": 2, "logo": 3 },
+      "zones": {
+        "player": { "minPx": 0 },
+        "nav":    { "minPx": 0 },
+        "logo":   { "minPx": 0 }
+      },
+      "vars": {
+        "--player-btn-size": "28px",
+        "--player-icon-size": "18px",
+        "--player-title-max-w": "160px",
         "--player-title-font": "12px",
         "--player-time-font": "11px",
         "--seek-max-w": "none",
         "--seek-min-w": "60px",
         "--nav-font": "12px",
         "--nav-padding": "6px 10px",
-        "--logo-img-h": "16px",
-        "--logo-padding": "3px 10px",
-        "--user-icon-size": "14px",
-        "--user-name-font": "9px",
-        "--user-cell-padding": "4px 8px"
+        "--logo-img-h": "14px",
+        "--logo-padding": "3px 10px"
       }
     },
     {
-      "name": "narrow",
-      "_comment": "Tablets, small laptops. Horizontal but tighter.",
+      "name": "touch-tablet",
+      "_comment": "Touch device, 768-1023px. iPad etc. Horizontal but no volume.",
+      "device": "touch",
       "minWidth": 768,
       "maxWidth": 1023,
       "stacked": false,
@@ -50,14 +87,14 @@
         "logo":   { "minPx": 50, "maxPx": 120 }
       },
       "vars": {
-        "--player-btn-size": "28px",
-        "--player-icon-size": "18px",
-        "--player-title-max-w": "160px",
+        "--player-btn-size": "30px",
+        "--player-icon-size": "20px",
+        "--player-title-max-w": "180px",
         "--player-title-font": "12px",
-        "--seek-max-w": "160px",
+        "--seek-max-w": "180px",
         "--nav-font": "13px",
         "--nav-padding": "8px 14px",
-        "--logo-img-h": "20px",
+        "--logo-img-h": "22px",
         "--logo-padding": "4px 14px",
         "--user-icon-size": "16px",
         "--user-name-font": "10px",
@@ -66,8 +103,64 @@
       }
     },
     {
+      "name": "touch-wide",
+      "_comment": "Touch device, ≥1024px. iPad Pro landscape etc. Full layout, no volume.",
+      "device": "touch",
+      "minWidth": 1024,
+      "stacked": false,
+      "height": 65,
+      "volumeVisible": false,
+      "zones": {
+        "player": { "minPx": 280 },
+        "nav":    { "minPx": 0 },
+        "logo":   { "minPx": 60 }
+      },
+      "vars": {
+        "--player-btn-size": "40px",
+        "--player-icon-size": "32px",
+        "--player-title-max-w": "400px",
+        "--player-title-font": "13px",
+        "--seek-max-w": "200px",
+        "--nav-font": "14px",
+        "--nav-padding": "10px 20px",
+        "--logo-img-h": "34px",
+        "--logo-padding": "10px 30px 8px"
+      }
+    },
+    {
+      "name": "desktop-narrow",
+      "_comment": "Desktop/pointer device dragged narrow. NOT a phone. Horizontal, all controls, volume visible.",
+      "device": "pointer",
+      "maxWidth": 1023,
+      "stacked": false,
+      "height": 50,
+      "volumeVisible": true,
+      "zones": {
+        "player": { "minPx": 200 },
+        "nav":    { "minPx": 0, "maxPx": 350 },
+        "logo":   { "minPx": 40, "maxPx": 100 }
+      },
+      "vars": {
+        "--player-btn-size": "26px",
+        "--player-icon-size": "18px",
+        "--player-title-max-w": "140px",
+        "--player-title-font": "12px",
+        "--seek-max-w": "140px",
+        "--vol-track-w": "50px",
+        "--nav-font": "12px",
+        "--nav-padding": "6px 10px",
+        "--logo-img-h": "18px",
+        "--logo-padding": "4px 12px",
+        "--user-icon-size": "14px",
+        "--user-name-font": "9px",
+        "--user-logout-font": "7px",
+        "--user-cell-padding": "3px 8px"
+      }
+    },
+    {
       "name": "standard",
-      "_comment": "Laptops, desktops. Full horizontal layout.",
+      "_comment": "Desktop/pointer, 1024-1599px. Normal laptop/monitor.",
+      "device": "pointer",
       "minWidth": 1024,
       "maxWidth": 1599,
       "stacked": false,
@@ -97,7 +190,8 @@
     },
     {
       "name": "wide",
-      "_comment": "Large monitors, ultrawide. More breathing room.",
+      "_comment": "Desktop/pointer, ≥1600px. Large monitors.",
+      "device": "pointer",
       "minWidth": 1600,
       "stacked": false,
       "height": 75,
@@ -124,63 +218,14 @@
 
   "zones": {
     "_comment": "Default zone constraints. Profiles override these.",
-    "player": {
-      "priority": 1,
-      "greedy": true,
-      "minPx": 200
-    },
-    "nav": {
-      "priority": 2,
-      "shrink": 0,
-      "minPx": 0
-    },
-    "logo": {
-      "priority": 3,
-      "shrink": 0,
-      "widthPx": 80,
-      "minPx": 60
-    }
-  },
-
-  "player": {
-    "_comment": "Internal player component config. Consumed by player.js.",
-    "transport": {
-      "buttonSize": { "compact": 22, "narrow": 24, "standard": 26, "wide": 26 },
-      "iconSize":   { "compact": 14, "narrow": 16, "standard": 18, "wide": 18 },
-      "gap":        { "compact": 1,  "narrow": 2,  "standard": 2,  "wide": 2 }
-    },
-    "seek": {
-      "height": 6,
-      "radius": 3,
-      "maxWidth": 320,
-      "minWidth": 80,
-      "trackBg": "rgba(138, 183, 206, 0.15)",
-      "fillColor": "#3AA0A0"
-    },
-    "title": {
-      "maxWidth":  { "compact": 120, "narrow": 160, "standard": 500, "wide": 600 },
-      "fontSize":  { "compact": 12,  "narrow": 12,  "standard": 13,  "wide": 14 }
-    },
-    "time": {
-      "fontSize": 12,
-      "fontFamily": "monospace",
-      "minWidth": 78
-    },
-    "volume": {
-      "_comment": "Hidden on compact+narrow profiles (device-controlled on touch).",
-      "trackWidth": { "compact": 0, "narrow": 0, "standard": 100, "wide": 120 },
-      "trackHeight": 4
-    }
+    "player": { "priority": 1, "greedy": true, "minPx": 200 },
+    "nav":    { "priority": 2, "shrink": 0, "minPx": 0 },
+    "logo":   { "priority": 3, "shrink": 0, "widthPx": 80, "minPx": 60 }
   },
 
   "nav": {
     "items": ["playlists", "film", "contact", "login", "cart"],
     "separator": "1px solid rgba(43, 127, 140, 0.25)"
-  },
-
-  "userCell": {
-    "_comment": "Vertical micro-stack inside nav zone. Auth-driven visibility.",
-    "compactLayout": "horizontal"
   },
 
   "logo": {
@@ -195,7 +240,7 @@
   },
 
   "mobile": {
-    "_comment": "Legacy key for backward compat. Profiles replace this.",
+    "_comment": "Legacy compat. Profiles replace this.",
     "stackBreakpoint": 767,
     "layout": "stacked"
   }

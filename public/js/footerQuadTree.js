@@ -3,42 +3,18 @@
 //
 // QuadTree-driven footer layout engine.
 // Full RODUX pipeline: StateJS → RatioEngine → cssJSON → QuadTree → CSS vars.
-// NO flex. NO media queries. CSS is a dumb renderer.
 //
-// PIPELINE:
-//   1. StateJS provides viewport state (vw, vh, breakpoint, orientation)
-//   2. cssJSON config (footer.json) defines zone constraints per profile
-//   3. RatioEngine computes proportional zone widths from ratios
-//   4. QuadTree allocates zones into the footer strip (collision-free)
-//   5. Results written as CSS vars on #artistControls + .footer-bar
-//   6. CSS consumes vars. No layout logic in CSS.
+// DEVICE DETECTION:
+//   Distinguishes touch devices from desktop browsers resized small.
+//   Uses navigator.maxTouchPoints + pointer:coarse media query.
+//   A desktop at 375px gets 'narrow' profile (horizontal, all controls).
+//   An iPhone at 375px gets 'compact-portrait' profile (stacked, wireframe layout).
+//   DevTools device emulation triggers touch detection correctly.
 //
-// PROFILES:
-//   State-driven, not media-query-driven. StateJS viewport dimensions
-//   select a profile key from config thresholds. Each profile defines
-//   its own ratios, constraints, visibility, and ordering.
-//   Profiles are mathematical constraint sets, not "mobile/tablet/desktop".
-//
-// ZONE MODEL:
-//   Zones: player, nav, logo
-//   Each zone has: ratio (of total width), minPx, maxPx, visible, order
-//   Player is greedy (gets remainder after fixed zones).
-//   On compact profiles, zones stack (order + full-width).
-//
-// CSS VAR OUTPUT (set on .footer-bar):
-//   --ft-height          computed footer height in px
-//   --ft-player-x        player zone left offset
-//   --ft-player-w        player zone width
-//   --ft-nav-x           nav zone left offset
-//   --ft-nav-w           nav zone width
-//   --ft-logo-x          logo zone left offset
-//   --ft-logo-w          logo zone width
-//   --ft-profile         active profile name
-//   --ft-vol-visible     1 or 0 (volume bar visibility)
-//   --ft-stacked         1 or 0 (stacked vs horizontal)
-//
-// DIAGNOSTIC:
-//   window.footerQT.diagnose() — dumps current state
+// PROFILE MATCHING:
+//   Profiles can require { device: "touch" } or { device: "pointer" }.
+//   Profiles without a device field match any device.
+//   First matching profile wins (walk array top to bottom).
 //
 // ============================================================================
 
@@ -50,9 +26,9 @@ export class FooterQuadTree {
     this._ready = false;
     this._profile = null;
     this._zones = null;
+    this._device = null;
   }
 
-  // ── Init ───────────────────────────────────────────────────────
   async init() {
     try {
       const res = await fetch('/config/data/footer.json', { cache: 'no-store' });
@@ -67,15 +43,43 @@ export class FooterQuadTree {
         return;
       }
 
+      // Detect device class once on init (doesn't change mid-session)
+      this._device = this._detectDevice();
+
       this._ready = true;
-      console.log('✅ FooterQuadTree initialized (RODUX pipeline)');
+      console.log(`✅ FooterQuadTree initialized (device: ${this._device})`);
     } catch (err) {
       console.error('❌ FooterQuadTree init failed:', err);
     }
   }
 
   // ══════════════════════════════════════════════════════════════
-  // STEP 1: STATE — Read viewport from StateJS or measure directly
+  // DEVICE DETECTION
+  //
+  // Separates "this is a phone/tablet" from "this is a desktop
+  // browser dragged small". Runs once on init.
+  //
+  // touch:   real phones/tablets (maxTouchPoints > 0 AND coarse pointer)
+  // pointer: desktop/laptop (mouse, trackpad)
+  //
+  // DevTools device toolbar sets maxTouchPoints correctly when
+  // you pick a device preset, so emulation works.
+  // ══════════════════════════════════════════════════════════════
+
+  _detectDevice() {
+    const hasTouch = navigator.maxTouchPoints > 0;
+    const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+
+    // Both conditions: real touch device
+    // Touch but fine pointer: stylus/convertible — treat as touch
+    // No touch: desktop
+    if (hasTouch && hasCoarsePointer) return 'touch';
+    if (hasTouch) return 'touch';
+    return 'pointer';
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  // STATE — Read viewport from StateJS or measure directly
   // ══════════════════════════════════════════════════════════════
 
   _readState() {
@@ -87,6 +91,22 @@ export class FooterQuadTree {
         vh: vp.height || window.innerHeight,
         orientation: vp.orientation || this._detectOrientation(),
         dpr: vp.dpr || window.devicePixelRatio || 1,
+        device: this._device,
+      };
+    }
+    // If StateJS has a calculate() method but no cached viewport, call it
+    if (IS?.state?.calculate) {
+      const calc = IS.state.calculate({
+        width: window.innerWidth,
+        height: window.innerHeight,
+        dpr: window.devicePixelRatio || 1,
+      });
+      return {
+        vw: calc.width,
+        vh: calc.height,
+        orientation: calc.orientation,
+        dpr: calc.pixelRatio || 1,
+        device: this._device,
       };
     }
     return {
@@ -94,6 +114,7 @@ export class FooterQuadTree {
       vh: window.innerHeight,
       orientation: this._detectOrientation(),
       dpr: window.devicePixelRatio || 1,
+      device: this._device,
     };
   }
 
@@ -102,10 +123,16 @@ export class FooterQuadTree {
   }
 
   // ══════════════════════════════════════════════════════════════
-  // STEP 2: PROFILE SELECTION — from cssJSON config thresholds
+  // PROFILE SELECTION
   //
-  // Profiles are ordered by maxWidth ascending in the config.
-  // First matching profile wins. No CSS media queries involved.
+  // Walks profiles array. Each profile can optionally require:
+  //   device: "touch" | "pointer"    (skip if mismatch)
+  //   orientation: "portrait" | "landscape"
+  //   minWidth / maxWidth
+  //
+  // Desktop at 400px: device=pointer → skips touch-only profiles,
+  //   matches a pointer-compatible narrow profile instead.
+  // iPhone at 400px: device=touch → matches compact-portrait.
   // ══════════════════════════════════════════════════════════════
 
   _selectProfile(state) {
@@ -113,24 +140,26 @@ export class FooterQuadTree {
     if (!profiles) return this._legacyProfile(state);
 
     for (const profile of profiles) {
+      // Device filter
+      if (profile.device && profile.device !== state.device) continue;
+
+      // Orientation filter
+      if (profile.orientation && profile.orientation !== state.orientation) continue;
+
+      // Width filters
       const minOk = (profile.minWidth === undefined) || (state.vw >= profile.minWidth);
       const maxOk = (profile.maxWidth === undefined) || (state.vw <= profile.maxWidth);
-      const oriOk = (!profile.orientation) || (state.orientation === profile.orientation);
 
-      if (minOk && maxOk && oriOk) {
-        return profile;
-      }
+      if (minOk && maxOk) return profile;
     }
 
     return profiles[profiles.length - 1] || this._legacyProfile(state);
   }
 
-  // Backward compat: if config uses old height/mobile keys
   _legacyProfile(state) {
     const cfg = this.config;
     const isStacked = state.vw <= (cfg.mobile?.stackBreakpoint ?? 767);
     const bp = isStacked ? 'mobile' : (state.vw <= 1023 ? 'tablet' : 'desktop');
-
     return {
       name: bp,
       stacked: isStacked,
@@ -141,18 +170,13 @@ export class FooterQuadTree {
   }
 
   // ══════════════════════════════════════════════════════════════
-  // STEP 3: RATIO ENGINE — compute zone widths mathematically
-  //
-  // Fixed zones (nav, logo) get measured or config-defined widths.
-  // Greedy zone (player) gets the remainder.
-  // All values are integers (floor). No subpixel.
+  // RATIO ENGINE — compute zone widths
   // ══════════════════════════════════════════════════════════════
 
   _computeZones(profile, state) {
     const zones = profile.zones || this.config.zones || {};
     const vw = state.vw;
 
-    // If stacked, every zone is full width
     if (profile.stacked) {
       return {
         player: { x: 0, w: vw, order: profile.order?.player ?? 1 },
@@ -162,43 +186,30 @@ export class FooterQuadTree {
       };
     }
 
-    // ── Fixed zones: measure natural content width ─────────
+    // Measure fixed zones at natural width
     const navEl  = this.footerBar.querySelector('.footer-nav-zone');
     const logoEl = this.footerBar.querySelector('.footer-logo');
 
-    // Temporarily clear width constraints to measure natural size
     const navPrev  = navEl?.style.getPropertyValue('width')  || '';
     const logoPrev = logoEl?.style.getPropertyValue('width') || '';
     if (navEl)  navEl.style.width  = 'auto';
     if (logoEl) logoEl.style.width = 'auto';
 
-    // Force reflow to get accurate measurement
     const navW  = navEl  ? navEl.scrollWidth  : 0;
     const logoW = logoEl ? logoEl.scrollWidth : 0;
 
-    // Restore (will be overwritten by final values below)
     if (navEl)  navEl.style.width  = navPrev;
     if (logoEl) logoEl.style.width = logoPrev;
 
-    // Apply constraints from config
     const navCfg  = zones.nav  || {};
     const logoCfg = zones.logo || {};
+    const finalNavW  = Math.floor(Math.min(navCfg.maxPx  ?? Infinity, Math.max(navCfg.minPx  ?? 0, navW)));
+    const finalLogoW = Math.floor(Math.min(logoCfg.maxPx ?? Infinity, Math.max(logoCfg.minPx ?? 0, logoW)));
 
-    const navMin  = navCfg.minPx  ?? 0;
-    const navMax  = navCfg.maxPx  ?? Infinity;
-    const logoMin = logoCfg.minPx ?? 0;
-    const logoMax = logoCfg.maxPx ?? Infinity;
-
-    const finalNavW  = Math.floor(Math.min(navMax,  Math.max(navMin,  navW)));
-    const finalLogoW = Math.floor(Math.min(logoMax, Math.max(logoMin, logoW)));
-
-    // ── Greedy zone: player gets remainder ─────────────────
     const playerCfg = zones.player || {};
-    const playerMin = playerCfg.minPx ?? 200;
     const available = vw - finalNavW - finalLogoW;
-    const finalPlayerW = Math.max(playerMin, Math.floor(available));
+    const finalPlayerW = Math.max(playerCfg.minPx ?? 200, Math.floor(available));
 
-    // ── QuadTree allocation: left-to-right strip packing ───
     const playerX = 0;
     const navX    = finalPlayerW;
     const logoX   = finalPlayerW + finalNavW;
@@ -212,23 +223,20 @@ export class FooterQuadTree {
   }
 
   // ══════════════════════════════════════════════════════════════
-  // STEP 4: WRITE — set CSS vars on DOM elements
-  //
-  // All layout is expressed as CSS custom properties.
-  // CSS rules are var() consumers only. No flex, no grid from CSS.
+  // WRITE — CSS vars + inline styles on DOM
   // ══════════════════════════════════════════════════════════════
 
   _writeVars(zones, profile, state) {
     const bar = this.footerBar;
     const el  = this.footerEl;
 
-    // ── Footer height ─────────────────────────────────────────
+    // Height
     const rawH = profile.height ?? 75;
     const hVal = (rawH === 'auto') ? 'auto' : `${rawH}px`;
     bar.style.setProperty('--ft-height', hVal);
     bar.style.setProperty('--footer-height', hVal);
 
-    // ── Zone dimensions ───────────────────────────────────────
+    // Zone vars
     bar.style.setProperty('--ft-player-x', `${zones.player.x}px`);
     bar.style.setProperty('--ft-player-w', `${zones.player.w}px`);
     bar.style.setProperty('--ft-nav-x',    `${zones.nav.x}px`);
@@ -236,53 +244,33 @@ export class FooterQuadTree {
     bar.style.setProperty('--ft-logo-x',   `${zones.logo.x}px`);
     bar.style.setProperty('--ft-logo-w',   `${zones.logo.w}px`);
 
-    // ── Profile metadata ──────────────────────────────────────
+    // Profile metadata
     const profileName = profile.name || 'default';
     bar.style.setProperty('--ft-profile', profileName);
     bar.style.setProperty('--ft-stacked', zones.stacked ? '1' : '0');
     el.dataset.ftProfile = profileName;
+    el.dataset.ftDevice  = state.device;
 
-    // ── Volume visibility ─────────────────────────────────────
+    // Volume
     const volVisible = profile.volumeVisible ?? true;
     bar.style.setProperty('--ft-vol-visible', volVisible ? '1' : '0');
 
-    // ── Apply zone widths directly to DOM elements ────────────
-    // This is the QuadTree output — pixel-precise, no flex.
+    // Apply zone widths to DOM
     const playerZone = bar.querySelector('.footer-player-zone');
     const navZone    = bar.querySelector('.footer-nav-zone');
     const logoZone   = bar.querySelector('.footer-logo');
 
     if (zones.stacked) {
-      if (playerZone) {
-        playerZone.style.width = '100%';
-        playerZone.style.order = zones.player.order;
-      }
-      if (navZone) {
-        navZone.style.width = '100%';
-        navZone.style.order = zones.nav.order;
-        navZone.style.borderLeft = 'none';
-      }
-      if (logoZone) {
-        logoZone.style.width = '100%';
-        logoZone.style.order = zones.logo.order;
-        logoZone.style.borderLeft = 'none';
-      }
+      if (playerZone) { playerZone.style.width = '100%'; playerZone.style.order = zones.player.order; }
+      if (navZone)    { navZone.style.width = '100%'; navZone.style.order = zones.nav.order; navZone.style.borderLeft = 'none'; }
+      if (logoZone)   { logoZone.style.width = '100%'; logoZone.style.order = zones.logo.order; logoZone.style.borderLeft = 'none'; }
     } else {
-      if (playerZone) {
-        playerZone.style.width = `${zones.player.w}px`;
-        playerZone.style.order = '';
-      }
-      if (navZone) {
-        navZone.style.width = `${zones.nav.w}px`;
-        navZone.style.order = '';
-      }
-      if (logoZone) {
-        logoZone.style.width = `${zones.logo.w}px`;
-        logoZone.style.order = '';
-      }
+      if (playerZone) { playerZone.style.width = `${zones.player.w}px`; playerZone.style.order = ''; }
+      if (navZone)    { navZone.style.width = `${zones.nav.w}px`; navZone.style.order = ''; }
+      if (logoZone)   { logoZone.style.width = `${zones.logo.w}px`; logoZone.style.order = ''; }
     }
 
-    // ── Per-profile CSS var overrides from config ─────────────
+    // Per-profile CSS var overrides
     if (profile.vars) {
       for (const [varName, value] of Object.entries(profile.vars)) {
         bar.style.setProperty(varName, value);
@@ -291,10 +279,7 @@ export class FooterQuadTree {
   }
 
   // ══════════════════════════════════════════════════════════════
-  // MAIN ENTRY: layout()
-  //
-  // Called on every render() tick from roderick.js.
-  // Runs the full RODUX pipeline: State → Profile → Ratios → Write
+  // MAIN ENTRY
   // ══════════════════════════════════════════════════════════════
 
   layout() {
@@ -316,11 +301,11 @@ export class FooterQuadTree {
 
   diagnose() {
     if (!this._ready) return { status: 'not ready' };
-
     const state = this._readState();
     return {
       status: 'ok',
       state,
+      device: this._device,
       profile: this._profile?.name || 'none',
       stacked: this._zones?.stacked ?? null,
       zones: this._zones ? {
@@ -329,7 +314,6 @@ export class FooterQuadTree {
         logo:   `x:${this._zones.logo.x} w:${this._zones.logo.w}`,
       } : null,
       volumeVisible: this._profile?.volumeVisible ?? null,
-      configVersion: this.config?._version || 'unknown',
     };
   }
 }

@@ -5,24 +5,11 @@
 // Owns: data fetch, DOM creation, region layout, QuadTree grid,
 //       album detail sidebar, player wiring.
 //
-// V6 PRINCIPLE: JS sets CSS custom properties, CSS does all rendering.
-//   roderick.json → setRegionVars()  [--header-h, --main-top, --main-h, etc.]
-//                 → layoutGrid()     [--grid-cols, --tile-w, --tile-h, --grid-gap, --grid-margin]
-//
-// V6.3: FooterQuadTree integration. Footer layout is now RODUX pipeline:
-//   StateJS → cssJSON (footer.json) → RatioEngine → QuadTree → CSS vars.
-//   setRegionVars() no longer writes --footer-height to :root (bug #4 fix).
-//   footerQuadTree.js owns footer height + zone widths.
-//
-// Footer (#artistControls) is position:fixed in CSS — not laid out here.
-// Sidebar uses .open class toggle — CSS handles positioning/sizing.
-// No Object.assign(el.style, ...) anywhere.
+// V6.3: FooterQuadTree integration. Device-aware profiles.
+//       setRegionVars() no longer writes --footer-height to :root.
 // ============================================================================
 
-// V6.3: Import FooterQuadTree module
 import { FooterQuadTree } from './footerQuadTree.js';
-
-// V6.1: Colors defined in CSS :root defaults. No paint-applier needed.
 
 // ── Helpers ─────────────────────────────────────────────────────
 const Q  = (id) => document.getElementById(id);
@@ -32,10 +19,6 @@ const TABLET_MAX = 1023;
 function isMobile()  { return innerWidth <= MOBILE_MAX; }
 function isDesktop() { return innerWidth > TABLET_MAX; }
 
-// Footer is position:fixed — measure its actual rendered height.
-// V6.3: offsetHeight now includes env(safe-area-inset-bottom) padding
-// from player.css. We do NOT write this back to :root (that was bug #4).
-// footerQuadTree.js owns --footer-height on .footer-bar.
 function footerHeight() {
   const f = Q('artistControls');
   return f ? f.offsetHeight : 40;
@@ -190,14 +173,12 @@ function renderSidebar(album, coverUrl) {
     </div>
   `;
 
-  // Wire close
   Q('sidebarCloseBtn')?.addEventListener('click', () => {
     document.querySelectorAll('.album-cover').forEach(c => c.classList.remove('selected'));
     closeSidebar();
     currentAlbum = null;
   });
 
-  // Wire song clicks
   sidebar.querySelectorAll('.sidebar-songs li').forEach(li => {
     li.addEventListener('click', () => {
       const songId = parseInt(li.dataset.songId);
@@ -227,7 +208,6 @@ function openSidebar() {
     };
   }
 
-  // Recalculate layout vars (sidebar changes grid width)
   render();
 }
 
@@ -245,13 +225,6 @@ function closeSidebar() {
 
 // ═══════════════════════════════════════════════════════════════
 // LAYOUT — CSS Custom Property Pipeline
-//
-// Instead of el.style.left = '340px', we set CSS vars on :root
-// and let CSS rules consume them. This is the RODUX way.
-//
-// V6.3: No longer writes --footer-height to :root.
-//       footerQuadTree.js owns that var on .footer-bar.
-//       setRegionVars() still READS footerHeight() for --main-height calc.
 // ═══════════════════════════════════════════════════════════════
 
 function setRegionVars() {
@@ -265,17 +238,13 @@ function setRegionVars() {
   const headerH = Math.round(vh * headerR);
   const mainH   = vh - headerH - fh;
 
-  // ── Core region vars ─────────────────────────────────────────
   root.style.setProperty('--header-height', `${headerH}px`);
   root.style.setProperty('--main-top',      `${headerH}px`);
   root.style.setProperty('--main-height',   `${mainH}px`);
   root.style.setProperty('--vw',            `${vw}px`);
 
-  // V6.3: REMOVED — do NOT set --footer-height on :root.
-  // footerQuadTree.js owns this on .footer-bar now.
-  // This was bug #4: setRegionVars() was overwriting 75px with 51px.
+  // V6.3: Do NOT set --footer-height on :root. footerQuadTree.js owns it.
 
-  // ── Sidebar split vars ───────────────────────────────────────
   if (!isMobile() && sidebarOpen) {
     const ms     = cfg.layout?.mainSplit;
     const rightR = ms?.right?.ratio ?? 0.25;
@@ -292,7 +261,6 @@ function setRegionVars() {
     root.style.setProperty('--sidebar-left',  `${vw}px`);
   }
 
-  // ── Breakpoint data attribute ────────────────────────────────
   const bp = isMobile() ? 'mobile' : isDesktop() ? 'desktop' : 'tablet';
   root.dataset.breakpoint = bp;
 }
@@ -322,7 +290,6 @@ function layoutGrid() {
   const gap     = qtCfg.gap?.px ?? 16;
   const aspect  = qtCfg.tile?.aspect ?? 1.0;
 
-  // Symmetric margin
   const marginPct = 0.02;
   const margin    = Math.round(w * marginPct);
   const availW    = w - (margin * 2);
@@ -332,7 +299,6 @@ function layoutGrid() {
   const cols   = Math.max(1, Math.min(maxCols, Math.floor((availW + gap) / (tileW + gap))));
   const rows   = Math.ceil(covers.length / cols);
 
-  // Set grid vars on the grid element itself
   const gs = gridEl.style;
   gs.setProperty('--grid-cols',   cols);
   gs.setProperty('--grid-tile-w', `${tileW}px`);
@@ -341,8 +307,6 @@ function layoutGrid() {
   gs.setProperty('--grid-margin', `${margin}px`);
   gs.setProperty('--grid-content-h', `${rows * tileH + Math.max(0, rows - 1) * gap + 16}px`);
 
-  // Position each cover via absolute + calculated offsets
-  // (This is still JS because QuadTree computes per-item positions)
   covers.forEach((cover, i) => {
     const col = i % cols;
     const row = Math.floor(i / cols);
@@ -358,9 +322,6 @@ function layoutGrid() {
 
 // ═══════════════════════════════════════════════════════════════
 // RENDER
-//
-// V6.3: FooterQuadTree runs FIRST so that footerHeight() measures
-//       the QT-computed footer height (including safe-area padding).
 // ═══════════════════════════════════════════════════════════════
 
 function render() {
@@ -368,13 +329,8 @@ function render() {
   _layoutInProgress = true;
 
   try {
-    // V6.3: Footer QuadTree layout — computes zone widths + height
     if (window.footerQT) window.footerQT.layout();
-
-    // Region vars (header, main, sidebar) — reads footerHeight()
     setRegionVars();
-
-    // Album grid — QuadTree tile positions
     layoutGrid();
   } finally {
     requestAnimationFrame(() => { _layoutInProgress = false; });
@@ -417,18 +373,15 @@ function setupKeyboard() {
 // ═══════════════════════════════════════════════════════════════
 
 (async function init() {
-  // Shim for player.js
   window.apiClient = {
     getAlbum: (id) => fetchJSON(`/api/albums/${id}`),
     getSong:  (id) => fetchJSON(`/api/songs/${id}`)
   };
 
-  // Load page config
   const cfgRes = await fetch('/config/pages/roderick.json', { cache: 'no-store' });
   if (!cfgRes.ok) throw new Error('roderick.json not found');
   cfg = await cfgRes.json();
 
-  // Fetch albums from flash
   try {
     albums = await fetchJSON('/api/albums');
     console.log(`📡 Loaded ${albums.length} albums from flash`);
@@ -444,18 +397,16 @@ function setupKeyboard() {
 
   setupKeyboard();
 
-  // Wait for RODUX stack
   whenInterstellarReady(async (IS) => {
     if (document.readyState === 'loading') {
       await new Promise(r => document.addEventListener('DOMContentLoaded', r, { once: true }));
     }
 
-    // V6.3: Initialize Footer QuadTree (RODUX pipeline)
+    // V6.3: Footer QuadTree (RODUX pipeline, device-aware)
     const fqt = new FooterQuadTree();
     await fqt.init();
     window.footerQT = fqt;
 
-    // Debounced resize
     let resizeTimer;
     addEventListener('resize', () => {
       clearTimeout(resizeTimer);
@@ -464,9 +415,8 @@ function setupKeyboard() {
 
     render();
 
-    // Reveal
     document.body.classList.add('ready');
 
-    console.log('🎉 roderick.js V6.3 initialized (FooterQuadTree active)');
+    console.log('🎉 roderick.js V6.3 initialized (FooterQuadTree active, device:', fqt._device + ')');
   });
 })();
