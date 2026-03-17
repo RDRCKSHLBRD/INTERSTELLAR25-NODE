@@ -1,472 +1,436 @@
 /* ================================================================
    QUAD CONTENT - Content-Aware Scaling Engine
-   Scales content intelligently within spatial constraints
+   V6.4.1 — Two-mode architecture
+
+   MODE 1 — PROPORTIONAL: Album grids, heroes, cards, media.
+            Scale factor = container ÷ baseSize, clamped.
+
+   MODE 2 — CONSTRAINT-DRIVEN: Header elements, nav, icons, footer.
+            Read breakpoint config directly. No scale multiplier.
+            measure → clamp(min, base, max) → CSS vars.
+
+   The footer's inner calc is the model. If an element has explicit
+   per-breakpoint config in quadtree.json, those values flow straight
+   through. Scale factors only apply where proportional sizing makes
+   sense.
+
+   RODUX pipeline: StateJS → RatioEngine → cssJSON → QuadTree → CSS vars
    ================================================================ */
 
 import { QuadMath, QUAD_CONSTANTS } from './QuadMath.js';
 import { QuadSpatial } from './QuadSpatial.js';
 import { quadConfig } from './QuadConfig.js';
 
+
+// ── Element types that use constraint mode (Mode 2) ──────────────
+// These get their values directly from quadtree.json element configs.
+// Everything else uses proportional scaling (Mode 1).
+const CONSTRAINT_TYPES = new Set([
+  'artistLink', 'brandLogo', 'headerIcon', 'navButton',
+  'navigation', 'actions', 'logo', 'footer'
+]);
+
+
 export class QuadContent {
-  /**
-   * Calculate content scale for container
-   * @param {Element} container 
-   * @param {Object} spatialBounds 
-   * @param {Object} options 
-   * @returns {Object} Content scaling result
-   */
 
-
-
-
-  
-
-static calculateContentScale(container, spatialBounds, options = {}) {
-  if (!container || !spatialBounds) {
-    return this.getEmptyResult();
-  }
-  
-  const containerType = this.determineContainerType(container);
-  const breakpoint = this.getCurrentBreakpoint();
-  const isLandscape = window.innerWidth > window.innerHeight;
-  
-  // NEW: Try element-specific config FIRST (your structure!)
-  const elementId = container.id || container.dataset.element || null;
-  let baseSize = null;
-  let sizeConfig = null;
-  
-  // PRIORITY 1: elements.{id}.{breakpoint} (YOUR STRUCTURE!)
-  if (elementId) {
-    sizeConfig = quadConfig.get(`elements.${elementId}.${breakpoint}`);
-    if (sizeConfig) {
-      baseSize = sizeConfig.baseWidth || sizeConfig.baseHeight || sizeConfig.baseSize;
-    }
-  }
-  
-  // PRIORITY 2: baseSizes.{type}.{breakpoint} (fallback)
-  if (!baseSize) {
-    baseSize = quadConfig.get(`baseSizes.${containerType}.${breakpoint}`);
-  }
-  
-  // PRIORITY 3: Simplified breakpoint (desktop-lg → desktop)
-  if (!baseSize && breakpoint.includes('-')) {
-    const simple = breakpoint.split('-')[0]; // "desktop-lg" → "desktop"
-    baseSize = quadConfig.get(`baseSizes.${containerType}.${simple}`);
-  }
-  
-  // PRIORITY 4: Global fallback
-  if (!baseSize) {
-    baseSize = quadConfig.get('scaling.baseSize') || 100;
-  }
-  
-  // Apply landscape multiplier
-  if (isLandscape && breakpoint.includes('mobile')) {
-    baseSize *= 0.8;
-  }
-  
-  const {
-    minScale = quadConfig.get('scaleConstraints.min') || 0.5,
-    maxScale = quadConfig.get('scaleConstraints.max') || 3.0,
-    aspectRatio = quadConfig.get('scaling.aspectRatio') || QUAD_CONSTANTS.ASPECT_16_9,
-    contentType = 'auto'
-  } = options;
-  
-  const baseScale = QuadMath.calculateScale(
-    spatialBounds.absolute.width,
-    spatialBounds.absolute.height,
-    baseSize,
-    aspectRatio
-  );
-  
-  const contentAdjustment = this.calculateContentAdjustment(
-    container, 
-    containerType, 
-    breakpoint, 
-    contentType
-  );
-  
-  const finalScale = QuadMath.clamp(
-    baseScale * contentAdjustment.multiplier,
-    minScale,
-    maxScale
-  );
-  
-  const cssVariables = this.generateCSSVariables(
-    finalScale,
-    spatialBounds,
-    contentAdjustment,
-    breakpoint,
-    sizeConfig  // NEW: Pass element config
-  );
-  
-  return {
-    scale: finalScale,
-    baseScale: baseScale,
-    baseSize: baseSize,
-    elementId: elementId,           // NEW
-    elementConfig: sizeConfig,      // NEW
-    adjustment: contentAdjustment,
-    containerType: containerType,
-    breakpoint: breakpoint,
-    isLandscape: isLandscape,
-    cssVariables: cssVariables,
-    spatialData: {
-      aspect: spatialBounds.math.aspect,
-      area: spatialBounds.math.area,
-      visibility: spatialBounds.viewport.visibilityRatio
-    }
-  };
-}
-
-  // In QuadContent.js, update determineContainerType method:
-static determineContainerType(container) {
-  // NEW: Check for explicit element type first
-  if (container.dataset.element) {
-    return container.dataset.element;
-  }
-  
-  const classList = container.classList;
-  
-  if (classList.contains('qt-hero')) return 'hero';
-  if (classList.contains('qt-card')) return 'card';
-  if (classList.contains('qt-grid')) return 'grid';
-  if (classList.contains('qt-text')) return 'text';
-  if (classList.contains('qt-media')) return 'media';
-  if (classList.contains('qt-nav')) return 'navigation';
-  if (classList.contains('header-logo')) return 'logo';        // NEW
-  if (classList.contains('header-icon-button')) return 'actions';
-  if (classList.contains('header-actions-section')) return 'actions';
-  
-  // Auto-detect (existing logic)
-  const hasImages = container.querySelectorAll('img, video').length > 0;
-  const hasText = container.textContent.trim().length > 50;
-  const hasMultipleChildren = container.children.length > 3;
-  
-  if (hasMultipleChildren) return 'grid';
-  if (hasImages) return 'media';
-  if (hasText) return 'text';
-  
-  return 'generic';
-}
+  // ================================================================
+  // MAIN ENTRY — routes to the correct mode
+  // ================================================================
 
   /**
-   * Get current breakpoint
-   * @returns {string} Current breakpoint
+   * Calculate content scale / constraints for a container.
+   *
+   * @param {Element}  container      DOM element
+   * @param {Object}   spatialBounds  from QuadSpatial.getContainerBounds()
+   * @param {Object}   options        caller overrides
+   * @returns {Object} Result with cssVariables, scale, metadata
    */
+  static calculateContentScale(container, spatialBounds, options = {}) {
+    if (!container || !spatialBounds) {
+      return this.getEmptyResult();
+    }
+
+    const containerType = this.determineContainerType(container);
+    const breakpoint    = this.getCurrentBreakpoint();
+    const elementId     = container.id || container.dataset.element || null;
+
+    // ── Route: does this element have constraint config? ──────
+    const elementConfig = elementId
+      ? quadConfig.get(`elements.${elementId}.${breakpoint}`)
+      : null;
+
+    const useConstraintMode =
+      elementConfig ||                                // explicit config exists
+      CONSTRAINT_TYPES.has(containerType) ||           // known constraint type
+      CONSTRAINT_TYPES.has(elementId);                 // element id is constraint type
+
+    if (useConstraintMode) {
+      return this._constraintMode(
+        container, spatialBounds, containerType, breakpoint, elementId, elementConfig, options
+      );
+    }
+
+    return this._proportionalMode(
+      container, spatialBounds, containerType, breakpoint, elementId, options
+    );
+  }
+
+
+  // ================================================================
+  // MODE 2 — CONSTRAINT-DRIVEN
+  //
+  // Follows the footerQuadTree model:
+  //   1. Read per-breakpoint config values
+  //   2. Clamp to min/max constraints
+  //   3. Write values directly as CSS vars
+  //   4. No scale multiplier — the config IS the layout
+  //
+  // For elements that need to share space (like title vs seek bar),
+  // the available-width arithmetic happens at the *caller* level
+  // (footerQuadTree._computeZones, headerQuadTree, etc).
+  // This method just resolves a single element's constraints.
+  // ================================================================
+
+  static _constraintMode(container, spatialBounds, containerType, breakpoint, elementId, elementConfig, options) {
+    const cfg = elementConfig || {};
+    const parentWidth  = spatialBounds.absolute.width;
+    const parentHeight = spatialBounds.absolute.height;
+
+    // ── Resolve base dimensions ───────────────────────────────
+    // Width: use baseWidth from config, or measure from parent
+    const baseW   = cfg.baseWidth  || cfg.baseSize || null;
+    const minW    = cfg.minWidth   || cfg.minSize  || 0;
+    const maxW    = cfg.maxWidth   || cfg.maxSize  || Infinity;
+    const finalW  = baseW
+      ? Math.max(minW, Math.min(maxW, baseW))
+      : parentWidth;   // no config → fill parent
+
+    // Height: use baseHeight, or derive from aspect ratio, or fill
+    const baseH   = cfg.baseHeight || null;
+    const minH    = cfg.minHeight  || 0;
+    const maxH    = cfg.maxHeight  || Infinity;
+    const finalH  = baseH
+      ? Math.max(minH, Math.min(maxH, baseH))
+      : (cfg.aspectRatio ? finalW / cfg.aspectRatio : parentHeight);
+
+    // ── Responsive squeeze ────────────────────────────────────
+    // If the parent is narrower than the configured width,
+    // scale down proportionally (same logic as footer title).
+    // This is where long titles on narrow viewports get handled.
+    let squeeze = 1.0;
+    if (baseW && parentWidth < baseW) {
+      squeeze = parentWidth / baseW;
+    }
+
+    const displayW = Math.max(minW, Math.floor(finalW * squeeze));
+    const displayH = Math.max(minH, Math.floor(finalH * squeeze));
+
+    // ── Font size ─────────────────────────────────────────────
+    // Config fontSize is authoritative. If squeezing, scale it
+    // down but floor at 11px for readability.
+    const baseFontSize = cfg.fontSize || null;
+    const displayFontSize = baseFontSize
+      ? Math.max(11, Math.round(baseFontSize * squeeze))
+      : null;
+
+    // ── CSS variables ─────────────────────────────────────────
+    const cssVariables = {
+      // Core geometry
+      '--qt-width':      `${displayW}px`,
+      '--qt-height':     `${displayH}px`,
+      '--qt-scale':      squeeze.toFixed(3),
+      '--qt-breakpoint': `"${breakpoint}"`,
+      '--qt-mode':       '"constraint"',
+
+      // Element-specific (only set if config provides them)
+      ...(displayFontSize  && { '--qt-font-size': `${displayFontSize}px` }),
+      ...(cfg.padding      && { '--qt-padding':   `${Math.round(cfg.padding * squeeze)}px` }),
+      ...(cfg.gap          && { '--qt-gap':       `${Math.round(cfg.gap * squeeze)}px` }),
+      ...(minW             && { '--qt-min-width':  `${minW}px` }),
+      ...(maxW < Infinity  && { '--qt-max-width':  `${maxW}px` }),
+      ...(minH             && { '--qt-min-height': `${minH}px` }),
+      ...(maxH < Infinity  && { '--qt-max-height': `${maxH}px` }),
+    };
+
+    return {
+      mode: 'constraint',
+      scale: squeeze,
+      baseSize: baseW || finalW,
+      displayWidth: displayW,
+      displayHeight: displayH,
+      displayFontSize,
+      squeeze,
+      elementId,
+      elementConfig: cfg,
+      containerType,
+      breakpoint,
+      isLandscape: window.innerWidth > window.innerHeight,
+      cssVariables,
+      spatialData: {
+        aspect:     spatialBounds.math.aspect,
+        area:       spatialBounds.math.area,
+        visibility: spatialBounds.viewport.visibilityRatio,
+        parentWidth,
+        parentHeight,
+      },
+    };
+  }
+
+
+  // ================================================================
+  // MODE 1 — PROPORTIONAL
+  //
+  // For containers where content scales with the container:
+  // album grids, hero sections, cards, media blocks.
+  //
+  // Scale = container dimension ÷ baseSize, clamped to [min, max].
+  // Single multiplier — no stacked heuristics.
+  // ================================================================
+
+  static _proportionalMode(container, spatialBounds, containerType, breakpoint, elementId, options) {
+    const isLandscape = window.innerWidth > window.innerHeight;
+
+    // ── Resolve baseSize from config ──────────────────────────
+    let baseSize = null;
+
+    // Try element-specific config first
+    if (elementId) {
+      const cfg = quadConfig.get(`elements.${elementId}.${breakpoint}`);
+      if (cfg) baseSize = cfg.baseWidth || cfg.baseHeight || cfg.baseSize;
+    }
+
+    // Fallback: baseSizes.{type}.{breakpoint}
+    if (!baseSize) {
+      baseSize = quadConfig.get(`baseSizes.${containerType}.${breakpoint}`);
+    }
+
+    // Fallback: simplified breakpoint (desktop-lg → desktop)
+    if (!baseSize && breakpoint.includes('-')) {
+      const simple = breakpoint.split('-')[0];
+      baseSize = quadConfig.get(`baseSizes.${containerType}.${simple}`);
+    }
+
+    // Fallback: global default
+    if (!baseSize) {
+      baseSize = quadConfig.get('scaling.baseSize') || 100;
+    }
+
+    // ── Scale constraints ─────────────────────────────────────
+    const minScale = options.minScale || quadConfig.get('scaleConstraints.min') || 0.5;
+    const maxScale = options.maxScale || quadConfig.get('scaleConstraints.max') || 3.0;
+    const aspectRatio = options.aspectRatio || quadConfig.get('scaling.aspectRatio') || QUAD_CONSTANTS.ASPECT_16_9;
+
+    // ── Calculate scale ───────────────────────────────────────
+    const baseScale = QuadMath.calculateScale(
+      spatialBounds.absolute.width,
+      spatialBounds.absolute.height,
+      baseSize,
+      aspectRatio
+    );
+
+    const finalScale = QuadMath.clamp(baseScale, minScale, maxScale);
+
+    // ── CSS variables ─────────────────────────────────────────
+    const scaledSize = finalScale * 100;
+    const cssVariables = {
+      '--qt-scale':         finalScale.toFixed(3),
+      '--qt-size':          `${scaledSize.toFixed(1)}px`,
+      '--qt-width':         `${spatialBounds.absolute.width}px`,
+      '--qt-height':        `${spatialBounds.absolute.height}px`,
+      '--qt-aspect':        spatialBounds.math.aspect.toFixed(3),
+      '--qt-breakpoint':    `"${breakpoint}"`,
+      '--qt-mode':          '"proportional"',
+      '--qt-font-size':     `clamp(0.8rem, ${(finalScale * 1).toFixed(2)}rem, 2rem)`,
+      '--qt-spacing':       `clamp(0.5rem, ${(finalScale * 1.5).toFixed(2)}rem, 3rem)`,
+      '--qt-border-radius': `clamp(4px, ${(finalScale * 8).toFixed(1)}px, 16px)`,
+      '--qt-grid-gap':      `clamp(8px, ${(finalScale * 16).toFixed(1)}px, 32px)`,
+      '--qt-padding':       `clamp(12px, ${(finalScale * 24).toFixed(1)}px, 48px)`,
+      '--qt-margin':        `clamp(8px, ${(finalScale * 16).toFixed(1)}px, 32px)`,
+    };
+
+    return {
+      mode: 'proportional',
+      scale: finalScale,
+      baseScale,
+      baseSize,
+      elementId,
+      elementConfig: null,
+      containerType,
+      breakpoint,
+      isLandscape,
+      cssVariables,
+      spatialData: {
+        aspect:     spatialBounds.math.aspect,
+        area:       spatialBounds.math.area,
+        visibility: spatialBounds.viewport.visibilityRatio,
+      },
+    };
+  }
+
+
+  // ================================================================
+  // CONTAINER TYPE DETECTION
+  // ================================================================
+
+  static determineContainerType(container) {
+    // Explicit element type from data attribute (preferred)
+    if (container.dataset.element) return container.dataset.element;
+
+    // Class-based detection
+    const cl = container.classList;
+    if (cl.contains('qt-hero'))                return 'hero';
+    if (cl.contains('qt-card'))                return 'card';
+    if (cl.contains('qt-grid'))                return 'grid';
+    if (cl.contains('qt-text'))                return 'text';
+    if (cl.contains('qt-media'))               return 'media';
+    if (cl.contains('qt-nav'))                 return 'navigation';
+    if (cl.contains('header-logo'))            return 'brandLogo';
+    if (cl.contains('header-icon-button'))     return 'headerIcon';
+    if (cl.contains('header-actions-section')) return 'actions';
+
+    // Auto-detect from content
+    const hasImages   = container.querySelectorAll('img, video').length > 0;
+    const hasText     = container.textContent.trim().length > 50;
+    const hasChildren = container.children.length > 3;
+
+    if (hasChildren) return 'grid';
+    if (hasImages)   return 'media';
+    if (hasText)     return 'text';
+
+    return 'generic';
+  }
+
   static getCurrentBreakpoint() {
     return document.documentElement.dataset.breakpoint || 'desktop';
   }
 
-  /**
-   * Calculate content-specific adjustments
-   * @param {Element} container 
-   * @param {string} containerType 
-   * @param {string} breakpoint 
-   * @param {string} contentType 
-   * @returns {Object} Content adjustment data
-   */
-  static calculateContentAdjustment(container, containerType, breakpoint, contentType) {
-    let multiplier = 1.0;
-    const adjustments = [];
-    
-    // Container type adjustments
-    switch (containerType) {
-      case 'hero':
-        multiplier *= 1.2; // Heroes need to be prominent
-        adjustments.push('hero-boost');
-        break;
-      case 'card':
-        multiplier *= 0.9; // Cards should be compact
-        adjustments.push('card-compact');
-        break;
-      case 'text':
-        multiplier *= 0.8; // Text needs to be readable, not huge
-        adjustments.push('text-readable');
-        break;
-      case 'media':
-        multiplier *= 1.1; // Media should be engaging
-        adjustments.push('media-engaging');
-        break;
-      case 'navigation':
-        multiplier *= 0.7; // Navigation should be subtle
-        adjustments.push('nav-subtle');
-        break;
-    }
-    
-    // Breakpoint adjustments
-    switch (breakpoint) {
-      case 'mobile':
-        multiplier *= 0.8; // Smaller on mobile
-        adjustments.push('mobile-compact');
-        break;
-      case 'tablet':
-        multiplier *= 0.9; // Slightly smaller on tablet
-        adjustments.push('tablet-optimized');
-        break;
-      case 'desktop':
-        // No adjustment for desktop (baseline)
-        break;
-    }
-    
-    // Content density adjustment
-    const children = container.children.length;
-    if (children > 5) {
-      multiplier *= 0.85; // Dense content scales down
-      adjustments.push('dense-content');
-    } else if (children === 1) {
-      multiplier *= 1.1; // Single content item can be larger
-      adjustments.push('single-content');
-    }
-    
-    // Viewport visibility adjustment
-    const rect = container.getBoundingClientRect();
-    const visibility = QuadSpatial.calculateVisibilityRatio(rect);
-    if (visibility < 0.5) {
-      multiplier *= 0.9; // Partially visible content scales down
-      adjustments.push('partial-visibility');
-    }
-    
-    return {
-      multiplier: QuadMath.round(multiplier, 0.01),
-      adjustments: adjustments,
-      reasoning: this.generateReasoningText(adjustments, multiplier)
-    };
-  }
 
-  /**
-   * Generate CSS variables for scaling
-   * @param {number} scale 
-   * @param {Object} spatialBounds 
-   * @param {Object} adjustment 
-   * @param {string} breakpoint 
-   * @returns {Object} CSS variables
-   */
+  // ================================================================
+  // CSS VARIABLE APPLICATION
+  // ================================================================
 
-
-
-  static generateCSSVariables(scale, spatialBounds, adjustment, breakpoint, elementConfig = null) {
-  const scaledSize = scale * 100;
-  
-  const vars = {
-    '--qt-scale': scale.toFixed(3),
-    '--qt-size': `${scaledSize.toFixed(1)}px`,
-    '--qt-width': `${spatialBounds.absolute.width}px`,
-    '--qt-height': `${spatialBounds.absolute.height}px`,
-    '--qt-aspect': spatialBounds.math.aspect.toFixed(3),
-    '--qt-breakpoint': `"${breakpoint}"`,
-    '--qt-adjustment': adjustment.multiplier.toFixed(3),
-    '--qt-font-size': `clamp(0.8rem, ${(scale * 1).toFixed(2)}rem, 2rem)`,
-    '--qt-spacing': `clamp(0.5rem, ${(scale * 1.5).toFixed(2)}rem, 3rem)`,
-    '--qt-border-radius': `clamp(4px, ${(scale * 8).toFixed(1)}px, 16px)`,
-    '--qt-grid-gap': `clamp(8px, ${(scale * 16).toFixed(1)}px, 32px)`,
-    '--qt-padding': `clamp(12px, ${(scale * 24).toFixed(1)}px, 48px)`,
-    '--qt-margin': `clamp(8px, ${(scale * 16).toFixed(1)}px, 32px)`
-  };
-  
-  // NEW: Add element-specific properties from your config
-  if (elementConfig) {
-    if (elementConfig.fontSize) vars['--qt-font-size'] = `${elementConfig.fontSize}px`;
-    if (elementConfig.padding) vars['--qt-padding'] = `${elementConfig.padding}px`;
-    if (elementConfig.gap) vars['--qt-gap'] = `${elementConfig.gap}px`;
-    if (elementConfig.minWidth) vars['--qt-min-width'] = `${elementConfig.minWidth}px`;
-    if (elementConfig.maxWidth) vars['--qt-max-width'] = `${elementConfig.maxWidth}px`;
-    if (elementConfig.minHeight) vars['--qt-min-height'] = `${elementConfig.minHeight}px`;
-    if (elementConfig.maxHeight) vars['--qt-max-height'] = `${elementConfig.maxHeight}px`;
-  }
-  
-  return vars;
-}
-
-  /**
-   * Apply CSS variables to container
-   * @param {Element} container 
-   * @param {Object} cssVariables 
-   */
   static applyCSSVariables(container, cssVariables) {
     if (!container || !cssVariables) return;
-    
-    Object.entries(cssVariables).forEach(([property, value]) => {
-      container.style.setProperty(property, value);
+
+    Object.entries(cssVariables).forEach(([prop, value]) => {
+      container.style.setProperty(prop, value);
     });
-    
-    // Add QuadTree class for styling
+
     container.classList.add('qt-container');
   }
 
-  /**
-   * Calculate layout for multiple content items
-   * @param {Element} container 
-   * @param {Array} items 
-   * @param {Object} options 
-   * @returns {Object} Multi-item layout result
-   */
+
+  // ================================================================
+  // MULTI-ITEM LAYOUT
+  //
+  // For grids of items within a container. Uses QuadSpatial
+  // for grid geometry, then applies proportional scaling to each cell.
+  // ================================================================
+
   static calculateContentLayout(container, items = [], options = {}) {
     const spatialBounds = QuadSpatial.getContainerBounds(container);
     if (!spatialBounds || items.length === 0) {
       return this.getEmptyLayoutResult();
     }
-    
-    // Calculate grid layout
+
     const gridLayout = QuadSpatial.calculateGridLayout(
       items,
       spatialBounds.absolute,
       options
     );
-    
-    // Calculate individual item scales
+
     const itemScales = items.map((item, index) => {
       const position = gridLayout.positions[index];
-      const itemOptions = {
-        ...options,
-        baseSize: Math.min(position.width, position.height) * 0.8
-      };
-      
-      return this.calculateContentScale(item, {
+      const itemBounds = {
         absolute: position,
         math: {
           aspect: position.width / position.height,
-          area: position.width * position.height
-        }
-      }, itemOptions);
+          area:   position.width * position.height,
+        },
+        viewport: { visibilityRatio: 1 },
+      };
+      return this.calculateContentScale(item, itemBounds, {
+        ...options,
+        baseSize: Math.min(position.width, position.height) * 0.8,
+      });
     });
-    
+
     return {
       subdivision: gridLayout.grid,
-      positions: gridLayout.positions,
-      itemScales: itemScales,
+      positions:   gridLayout.positions,
+      itemScales,
       containerScale: this.calculateContentScale(container, spatialBounds, options),
       performance: {
-        itemCount: items.length,
-        efficiency: gridLayout.grid.efficiency,
-        utilization: gridLayout.grid.utilization
-      }
-    };
-  }
-
-  /**
-   * Generate reasoning text for adjustments
-   * @param {Array} adjustments 
-   * @param {number} multiplier 
-   * @returns {string} Reasoning text
-   */
-  static generateReasoningText(adjustments, multiplier) {
-    if (adjustments.length === 0) return 'No adjustments applied';
-    
-    const direction = multiplier > 1 ? 'increased' : multiplier < 1 ? 'decreased' : 'maintained';
-    return `Scale ${direction} (${multiplier.toFixed(2)}x) due to: ${adjustments.join(', ')}`;
-  }
-
-  /**
-   * Get empty result for error cases
-   * @returns {Object} Empty result
-   */
-  static getEmptyResult() {
-    return {
-      scale: 1.0,
-      baseScale: 1.0,
-      adjustment: { multiplier: 1.0, adjustments: [], reasoning: 'No calculation performed' },
-      containerType: 'unknown',
-      breakpoint: 'desktop',
-      cssVariables: {
-        '--qt-scale': '1.000',
-        '--qt-size': '100px'
+        itemCount:   items.length,
+        efficiency:  gridLayout.grid.efficiency,
+        utilization: gridLayout.grid.utilization,
       },
-      spatialData: {
-        aspect: 1.0,
-        area: 0,
-        visibility: 0
-      }
     };
   }
 
-  /**
-   * Get empty layout result for error cases
-   * @returns {Object} Empty layout result
-   */
-  static getEmptyLayoutResult() {
-    return {
-      subdivision: null,
-      positions: [],
-      itemScales: [],
-      containerScale: this.getEmptyResult(),
-      performance: {
-        itemCount: 0,
-        efficiency: 0,
-        utilization: 0
-      }
-    };
-  }
 
-  /**
-   * Analyze content complexity
-   * @param {Element} container 
-   * @returns {Object} Complexity analysis
-   */
+  // ================================================================
+  // CONTENT ANALYSIS (unchanged — still useful for diagnostics)
+  // ================================================================
+
   static analyzeContentComplexity(container) {
     const textLength = container.textContent.trim().length;
     const imageCount = container.querySelectorAll('img, video, svg').length;
-    const linkCount = container.querySelectorAll('a, button').length;
+    const linkCount  = container.querySelectorAll('a, button').length;
     const childCount = container.children.length;
-    
-    // Calculate complexity score (0-1)
-    const textComplexity = Math.min(textLength / 1000, 1);
-    const mediaComplexity = Math.min(imageCount / 5, 1);
+
+    const textComplexity        = Math.min(textLength / 1000, 1);
+    const mediaComplexity       = Math.min(imageCount / 5, 1);
     const interactionComplexity = Math.min(linkCount / 10, 1);
-    const structureComplexity = Math.min(childCount / 20, 1);
-    
-    const overallComplexity = (
+    const structureComplexity   = Math.min(childCount / 20, 1);
+
+    const overall = (
       textComplexity * 0.3 +
       mediaComplexity * 0.3 +
       interactionComplexity * 0.2 +
       structureComplexity * 0.2
     );
-    
+
     return {
-      overall: overallComplexity,
-      text: textComplexity,
-      media: mediaComplexity,
+      overall,
+      text:        textComplexity,
+      media:       mediaComplexity,
       interaction: interactionComplexity,
-      structure: structureComplexity,
-      category: overallComplexity > 0.7 ? 'complex' : 
-                overallComplexity > 0.3 ? 'moderate' : 'simple'
+      structure:   structureComplexity,
+      category:    overall > 0.7 ? 'complex' : overall > 0.3 ? 'moderate' : 'simple',
     };
   }
 
-  /**
-   * Calculate optimal font scaling
-   * @param {number} baseScale 
-   * @param {string} containerType 
-   * @param {Object} complexity 
-   * @returns {Object} Font scaling data
-   */
-  static calculateFontScaling(baseScale, containerType, complexity) {
-    let fontMultiplier = 1.0;
-    
-    // Adjust based on container type
-    switch (containerType) {
-      case 'hero': fontMultiplier = 1.5; break;
-      case 'text': fontMultiplier = 1.0; break;
-      case 'card': fontMultiplier = 0.9; break;
-      case 'navigation': fontMultiplier = 0.8; break;
-    }
-    
-    // Adjust based on complexity
-    if (complexity.category === 'complex') {
-      fontMultiplier *= 0.9; // Smaller fonts for dense content
-    } else if (complexity.category === 'simple') {
-      fontMultiplier *= 1.1; // Larger fonts for simple content
-    }
-    
-    const finalFontScale = baseScale * fontMultiplier;
-    
+
+  // ================================================================
+  // EMPTY / FALLBACK RESULTS
+  // ================================================================
+
+  static getEmptyResult() {
     return {
-      scale: finalFontScale,
-      multiplier: fontMultiplier,
-      baseFontSize: `${(finalFontScale * 16).toFixed(1)}px`,
-      headingScale: finalFontScale * 1.5,
-      smallScale: finalFontScale * 0.8
+      mode: 'proportional',
+      scale: 1.0,
+      baseScale: 1.0,
+      containerType: 'unknown',
+      breakpoint: 'desktop',
+      cssVariables: {
+        '--qt-scale': '1.000',
+        '--qt-size':  '100px',
+        '--qt-mode':  '"proportional"',
+      },
+      spatialData: { aspect: 1.0, area: 0, visibility: 0 },
+    };
+  }
+
+  static getEmptyLayoutResult() {
+    return {
+      subdivision:    null,
+      positions:      [],
+      itemScales:     [],
+      containerScale: this.getEmptyResult(),
+      performance:    { itemCount: 0, efficiency: 0, utilization: 0 },
     };
   }
 }
 
-console.log('🎯 QuadContent v1.0 loaded - Content-aware scaling engine ready');
+console.log('🎯 QuadContent v6.4.1 loaded — two-mode scaling engine (constraint + proportional)');
