@@ -1,5 +1,5 @@
 // ============================================================================
-// public/js/footerQuadTree.js — V6.4.0 (RODUX Stack)
+// public/js/footerQuadTree.js — V6.5.0 (RODUX Stack)
 //
 // QuadTree-driven footer layout engine.
 // Full RODUX pipeline: StateJS → RatioEngine → cssJSON → QuadTree → CSS vars.
@@ -7,46 +7,36 @@
 // DEVICE DETECTION:
 //   Distinguishes touch devices from desktop browsers resized small.
 //   Uses navigator.maxTouchPoints + pointer:coarse media query.
-//   A desktop at 375px gets 'narrow' profile (horizontal, all controls).
+//   A desktop at 375px gets 'desktop-narrow' profile (horizontal, all controls).
 //   An iPhone at 375px gets 'compact-portrait' profile (stacked, wireframe layout).
-//   DevTools device emulation triggers touch detection correctly.
 //
-// LAYOUT MODES (mathematical, not CSS):
+// LAYOUT MODES:
 //
-//   "stacked"    — portrait phone. All zones full width, vertical stack.
-//                  CSS flex-wrap renders the rows (acceptable: stacked is
-//                  simple, content-height unknown at measure time).
+//   "stacked"    — portrait phone. Flex-wrap, full-width zones.
+//                  CSS handles order. No absolute calc needed.
 //
-//   "two-tier"   — landscape phone / tablet. QuadTree computes 3 rows,
-//                  ALL positions as absolute px:
+//   "two-tier"   — landscape phone / tablet.
+//                  .footer-bar is position:relative, all elements positioned
+//                  absolutely AGAINST THE BAR (not against zone wrappers).
+//                  Zone wrappers use display:contents to become invisible.
 //
-//                  Row 1 (title + seek + time):
-//                    timeW    = measure(.player-time).w
-//                    seekW    = clamp(seekMin, availW - titleMin - timeW - gaps, seekMax)
-//                    titleW   = vw - seekW - timeW - hPad*2 - gaps
-//                    row1H    = rowPad*2 + contentH
+//                  Row 1: title | seek | time
+//                  Row 2: transport (left) | nav (right)
+//                  Row 3: logo (right-aligned)
 //
-//                  Row 2 (transport left | nav right, gap between):
-//                    transportW = measure(.player-transport).w
-//                    navW       = measure(.footer-nav-zone).w
-//                    (gap fills space between them)
-//                    row2H    = rowPad*2 + max(btnSize, navH)
+//   "horizontal" — desktop. Single strip, three zones side by side.
+//                  Zones positioned absolutely. Player zone uses flex internally
+//                  with computed max-widths for title/seek that adapt on narrow
+//                  viewports (measure → compute → apply).
 //
-//                  Row 3 (logo right-aligned):
-//                    logoW    = measure(.footer-logo).w
-//                    logoX    = vw - logoW
-//                    row3H    = rowPad*2 + logoH
-//
-//                  .footer-bar: position:relative, height = sum of rows
-//                  All row containers: position:absolute, top/left/width/height set by JS
-//                  CSS IS A DUMB RENDERER. No flex-wrap, no margin:auto.
-//
-//   "horizontal" — desktop. Single strip: player | nav | logo.
-//                  QuadTree measures nav + logo, assigns remainder to player.
-//                  Horizontal layout uses position:absolute zones too.
-//
-// V6.4.0: two-tier rebuilt as full inner calc engine (absolute positioning).
-//         stacked unchanged. horizontal converted to absolute zones.
+// V6.5.0 FIXES:
+//   - Two-tier: zone wrappers use display:contents. All inner elements
+//     positioned against .footer-bar. Transport no longer clipped.
+//   - Horizontal: inner player gets explicit width calc so title/seek
+//     squeeze proportionally on narrow desktop (like album grid does).
+//   - Clean mode transitions: _clearAbsoluteLayout resets ALL elements.
+//   - Title-first distribution: title measured at natural width, gets
+//     priority up to 60% of available space. Seek gets remainder.
 // ============================================================================
 
 export class FooterQuadTree {
@@ -58,6 +48,7 @@ export class FooterQuadTree {
     this._profile   = null;
     this._zones     = null;
     this._device    = null;
+    this._lastLayout = null;
   }
 
   async init() {
@@ -76,7 +67,7 @@ export class FooterQuadTree {
 
       this._device = this._detectDevice();
       this._ready  = true;
-      console.log(`✅ FooterQuadTree V6.4.0 initialized (device: ${this._device})`);
+      console.log(`✅ FooterQuadTree V6.5.0 initialized (device: ${this._device})`);
     } catch (err) {
       console.error('❌ FooterQuadTree init failed:', err);
     }
@@ -88,7 +79,7 @@ export class FooterQuadTree {
   // ══════════════════════════════════════════════════════════════
 
   _detectDevice() {
-    const hasTouch       = navigator.maxTouchPoints > 0;
+    const hasTouch         = navigator.maxTouchPoints > 0;
     const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
     if (hasTouch && hasCoarsePointer) return 'touch';
     if (hasTouch) return 'touch';
@@ -160,7 +151,7 @@ export class FooterQuadTree {
   }
 
   _legacyProfile(state) {
-    const cfg      = this.config;
+    const cfg       = this.config;
     const isStacked = state.vw <= (cfg.mobile?.stackBreakpoint ?? 767);
     const bp        = isStacked ? 'mobile' : (state.vw <= 1023 ? 'tablet' : 'desktop');
     return {
@@ -176,24 +167,20 @@ export class FooterQuadTree {
 
   // ══════════════════════════════════════════════════════════════
   // MEASURE — natural dimensions of a DOM element
-  //
-  // Temporarily removes width/height constraints, reads
-  // scrollWidth/scrollHeight, restores original values.
-  // Standard QuadTree measurement pass.
   // ══════════════════════════════════════════════════════════════
 
   _measure(el) {
     if (!el) return { w: 0, h: 0 };
 
-    // Stash current inline constraints
     const prevW    = el.style.width;
     const prevH    = el.style.height;
     const prevPos  = el.style.position;
     const prevVis  = el.style.visibility;
     const prevTop  = el.style.top;
     const prevLeft = el.style.left;
+    const prevCss  = el.style.cssText;
 
-    // Measure freely
+    // Temporarily free from constraints
     el.style.width      = 'auto';
     el.style.height     = 'auto';
     el.style.position   = 'static';
@@ -217,12 +204,12 @@ export class FooterQuadTree {
 
 
   // ══════════════════════════════════════════════════════════════
-  // RATIO ENGINE — compute zone geometry (all mathematical)
+  // COMPUTE ZONES — all mathematical, returns geometry objects
   // ══════════════════════════════════════════════════════════════
 
   _computeZones(profile, state) {
-    const zones    = profile.zones || this.config.zones || {};
-    const vw       = state.vw;
+    const zones      = profile.zones || this.config.zones || {};
+    const vw         = state.vw;
     const layoutMode = profile.layout || (profile.stacked ? 'stacked' : 'horizontal');
 
 
@@ -240,14 +227,9 @@ export class FooterQuadTree {
 
 
     // ── Two-tier (landscape phone / tablet) ──────────────────
-    //
-    // QuadTree measures every element. Computes 3 rows as
-    // absolute-positioned blocks. No flex-wrap involved.
-    //
     if (layoutMode === 'two-tier') {
       const bar = this.footerBar;
 
-      // ── Elements ────────────────────────────────────────────
       const titleEl     = bar.querySelector('.player-title');
       const seekEl      = bar.querySelector('.player-seek');
       const timeEl      = bar.querySelector('.player-time');
@@ -255,32 +237,23 @@ export class FooterQuadTree {
       const navEl       = bar.querySelector('.footer-nav-zone');
       const logoEl      = bar.querySelector('.footer-logo');
 
-      // ── Measure all natural sizes ────────────────────────────
+      const titleSize     = this._measure(titleEl);
       const timeSize      = this._measure(timeEl);
       const transportSize = this._measure(transportEl);
       const navSize       = this._measure(navEl);
       const logoSize      = this._measure(logoEl);
 
-      // ── Profile var overrides (applied before clamp reads) ───
-      // Read CSS-var-driven button size for row height calc
       const btnSizePx = parseInt(
         getComputedStyle(bar).getPropertyValue('--player-btn-size') || '30'
       ) || 30;
 
-      // ── Row padding (consistent vertical rhythm) ─────────────
-      const rowPadV = 5;   // px top + bottom per row
-      const hPad    = 14;  // px horizontal padding on player zone
+      const rowPadV = 5;
+      const hPad    = 14;
 
-      // ── Zone constraints from config ─────────────────────────
-      const navCfg   = zones.nav   || {};
-      const logoCfg  = zones.logo  || {};
+      const navCfg  = zones.nav  || {};
+      const logoCfg = zones.logo || {};
 
-      // ── ROW 1: title | seek | time (full viewport width) ─────
-      //
-      // timeW is fixed (monospace, known content)
-      // seekW clamps to [seekMin, seekMax] from profile vars
-      // titleW gets the remainder
-      //
+      // ── ROW 1: title | seek | time ───────────────────────
       const seekMinW = parseInt(
         getComputedStyle(bar).getPropertyValue('--seek-min-w') || '100'
       ) || 100;
@@ -288,26 +261,26 @@ export class FooterQuadTree {
         getComputedStyle(bar).getPropertyValue('--seek-max-w') || '9999'
       ) || 9999;
 
-      const gapRow1    = 8;   // gap between title, seek, time
+      const gapRow1    = 8;
       const timeW      = Math.ceil(timeSize.w) || 70;
-      const titleMinW  = 60;
       const availRow1  = vw - hPad * 2 - gapRow1 * 2 - timeW;
-      const seekW      = Math.floor(Math.min(seekMaxW, Math.max(seekMinW, availRow1 * 0.45)));
-      const titleW     = Math.max(titleMinW, availRow1 - seekW);
-      const row1H      = rowPadV * 2 + Math.max(timeSize.h || 20, 20);
 
-      // Row 1 inner positions (relative to player-zone left edge after hPad)
+      // Title-first: priority up to 60%, seek gets remainder
+      const titleMaxW  = Math.floor(availRow1 * 0.6);
+      const titleNatW  = Math.ceil(titleSize.w) || 100;
+      const titleW     = Math.max(60, Math.min(titleMaxW, titleNatW));
+
+      const seekAvail  = availRow1 - titleW;
+      const seekW      = Math.floor(Math.min(seekMaxW, Math.max(seekMinW, seekAvail)));
+
+      const row1ContentH = Math.max(timeSize.h || 20, 20);
+      const row1H        = rowPadV * 2 + row1ContentH;
+
       const titleX = hPad;
       const seekX  = titleX + titleW + gapRow1;
       const timeX  = seekX  + seekW  + gapRow1;
 
-      // ── ROW 2: transport (left) | gap | nav (right) ──────────
-      //
-      // Transport is measured at natural width (left-anchored)
-      // Nav is measured at natural width (right-anchored)
-      // Gap fills the space between them — QuadTree asserts this,
-      // no CSS involvement.
-      //
+      // ── ROW 2: transport (left) | nav (right) ────────────
       const navW       = Math.floor(
         Math.min(navCfg.maxPx ?? Infinity, Math.max(navCfg.minPx ?? 0, navSize.w))
       );
@@ -315,45 +288,41 @@ export class FooterQuadTree {
       const navX       = vw - navW;
       const row2H      = rowPadV * 2 + Math.max(btnSizePx, navSize.h || btnSizePx);
 
-      // ── ROW 3: logo right-aligned ────────────────────────────
-      const logoW  = Math.floor(
+      // ── ROW 3: logo right-aligned ────────────────────────
+      const logoW = Math.floor(
         Math.min(logoCfg.maxPx ?? Infinity, Math.max(logoCfg.minPx ?? 0, logoSize.w))
       );
-      const logoX  = vw - logoW;
-      const row3H  = rowPadV * 2 + (logoSize.h || 28);
+      const logoX = vw - logoW;
+      const row3H = rowPadV * 2 + (logoSize.h || 28);
 
-      // ── Row Y positions ──────────────────────────────────────
-      const row1Y = 0;
-      const row2Y = row1H;
-      const row3Y = row1H + row2H;
+      // ── Row Y positions ──────────────────────────────────
+      const row1Y  = 0;
+      const row2Y  = row1H;
+      const row3Y  = row1H + row2H;
       const totalH = row1H + row2H + row3H;
 
       return {
-        // Zone objects (used by _writeVars for data-ft-* attrs)
         player:    { x: 0,    w: vw   },
         nav:       { x: navX, w: navW },
         logo:      { x: logoX, w: logoW },
         transport: { x: hPad,  w: transportW },
 
-        // Full inner calc — all px, all absolute
         rows: {
           row1: { y: row1Y, h: row1H },
           row2: { y: row2Y, h: row2H },
           row3: { y: row3Y, h: row3H },
         },
         inner: {
-          // Row 1 elements (absolute within row1 container)
           titleX, titleW,
           seekX,  seekW,
           timeX,  timeW,
           hPad,
-          // Row 2 elements
           transportX: hPad,
           transportW,
           navX, navW,
           rowPadV,
-          // Row 3 elements
           logoX, logoW,
+          row1ContentH,
         },
         totalH,
         stacked:    false,
@@ -364,8 +333,9 @@ export class FooterQuadTree {
 
 
     // ── Horizontal (desktop / touch-wide) ────────────────────
-    const navEl  = this.footerBar.querySelector('.footer-nav-zone');
-    const logoEl = this.footerBar.querySelector('.footer-logo');
+    const bar    = this.footerBar;
+    const navEl  = bar.querySelector('.footer-nav-zone');
+    const logoEl = bar.querySelector('.footer-logo');
 
     const navSize  = this._measure(navEl);
     const logoSize = this._measure(logoEl);
@@ -376,34 +346,67 @@ export class FooterQuadTree {
     const finalNavW  = Math.floor(Math.min(navCfg.maxPx  ?? Infinity, Math.max(navCfg.minPx  ?? 0, navSize.w)));
     const finalLogoW = Math.floor(Math.min(logoCfg.maxPx ?? Infinity, Math.max(logoCfg.minPx ?? 0, logoSize.w)));
 
-    const playerCfg   = zones.player || {};
-    const available   = vw - finalNavW - finalLogoW;
+    const playerCfg    = zones.player || {};
+    const available    = vw - finalNavW - finalLogoW;
     const finalPlayerW = Math.max(playerCfg.minPx ?? 200, Math.floor(available));
 
     const height = (profile.height && profile.height !== 'auto') ? profile.height : 75;
 
+    // ── Inner player calc for horizontal ─────────────────────
+    const titleEl     = bar.querySelector('.player-title');
+    const transportEl = bar.querySelector('.player-transport');
+    const timeEl      = bar.querySelector('.player-time');
+    const volEl       = bar.querySelector('.player-volume');
+
+    const transportSize = this._measure(transportEl);
+    const timeSize      = this._measure(timeEl);
+    const volSize       = profile.volumeVisible ? this._measure(volEl) : { w: 0, h: 0 };
+
+    const hPad   = 14;
+    const gap    = 8;
+    const sepW   = 12;   // separator + its margins
+    const fixedW = (transportSize.w || 200) + sepW + (timeSize.w || 70) + volSize.w;
+    const gapCount = profile.volumeVisible ? 5 : 4;
+    const gaps   = gap * gapCount;
+    const titleSeekAvail = finalPlayerW - hPad * 2 - fixedW - gaps;
+
+    const titleNatW = this._measure(titleEl)?.w || 100;
+    const titleMaxW = Math.floor(titleSeekAvail * 0.4);
+    const hzTitleW  = Math.max(60, Math.min(titleMaxW, titleNatW));
+    const hzSeekW   = Math.max(40, titleSeekAvail - hzTitleW);
+
     return {
-      player: { x: 0,                         w: finalPlayerW },
-      nav:    { x: finalPlayerW,               w: finalNavW    },
-      logo:   { x: finalPlayerW + finalNavW,   w: finalLogoW   },
+      player: { x: 0,                       w: finalPlayerW },
+      nav:    { x: finalPlayerW,             w: finalNavW    },
+      logo:   { x: finalPlayerW + finalNavW, w: finalLogoW   },
       height,
       stacked:    false,
       twoTier:    false,
       layoutMode: 'horizontal',
+      playerInner: {
+        hPad,
+        titleMaxW: hzTitleW,
+        seekMaxW:  hzSeekW,
+        volW:      volSize.w || 0,
+      },
     };
   }
 
 
   // ══════════════════════════════════════════════════════════════
   // WRITE — CSS vars + inline styles on DOM
-  //
-  // This is the ONLY place JS touches the DOM for layout.
-  // CSS consumes these values. That is the RODUX contract.
   // ══════════════════════════════════════════════════════════════
 
   _writeVars(zones, profile, state) {
     const bar = this.footerBar;
     const el  = this.footerEl;
+
+    // ── Clean mode transitions ────────────────────────────────
+    const newLayout = zones.layoutMode;
+    if (this._lastLayout && this._lastLayout !== newLayout) {
+      this._clearAbsoluteLayout();
+    }
+    this._lastLayout = newLayout;
 
     // ── Profile metadata ──────────────────────────────────────
     const profileAttr = zones.twoTier ? 'two-tier' : (profile.name || 'default');
@@ -413,17 +416,17 @@ export class FooterQuadTree {
     el.dataset.ftDevice  = state.device;
 
     // ── Volume visibility ─────────────────────────────────────
-    bar.style.setProperty('--ft-vol-visible', (profile.volumeVisible ?? true) ? '1' : '0');
+    const showVol = profile.volumeVisible ?? true;
+    bar.style.setProperty('--ft-vol-visible', showVol ? '1' : '0');
 
     // ── Per-profile CSS var overrides ─────────────────────────
-    // Applied early so measurement reads above reflect profile fonts/sizes
     if (profile.vars) {
       for (const [varName, value] of Object.entries(profile.vars)) {
         bar.style.setProperty(varName, value);
       }
     }
 
-    // ── Zone position vars (for diagnostic + legacy compat) ───
+    // ── Zone position vars ────────────────────────────────────
     bar.style.setProperty('--ft-player-x', `${zones.player.x}px`);
     bar.style.setProperty('--ft-player-w', `${zones.player.w}px`);
     bar.style.setProperty('--ft-nav-x',    `${zones.nav.x}px`);
@@ -440,17 +443,32 @@ export class FooterQuadTree {
       const hVal = (rawH === 'auto') ? 'auto' : `${rawH}px`;
       bar.style.setProperty('--ft-height', hVal);
       bar.style.setProperty('--footer-height', hVal);
-
-      // Reset any two-tier absolute positioning from a previous render
-      this._clearAbsoluteLayout();
+      bar.style.position = '';
+      bar.style.height   = '';
+      bar.style.display  = '';
 
       const playerZone = bar.querySelector('.footer-player-zone');
       const navZone    = bar.querySelector('.footer-nav-zone');
       const logoZone   = bar.querySelector('.footer-logo');
 
-      if (playerZone) { playerZone.style.width = '100%'; playerZone.style.order = zones.player.order; }
-      if (navZone)    { navZone.style.width = '100%'; navZone.style.order = zones.nav.order; navZone.style.borderLeft = 'none'; }
-      if (logoZone)   { logoZone.style.width = '100%'; logoZone.style.order = zones.logo.order; logoZone.style.borderLeft = 'none'; }
+      if (playerZone) playerZone.style.cssText = `width: 100%; order: ${zones.player.order};`;
+      if (navZone)    navZone.style.cssText    = `width: 100%; order: ${zones.nav.order}; border-left: none;`;
+      if (logoZone)   logoZone.style.cssText   = `width: 100%; order: ${zones.logo.order}; border-left: none;`;
+
+      // Restore inner player to default flex
+      const playerInner = bar.querySelector('.player');
+      if (playerInner) playerInner.style.cssText = '';
+
+      // Restore all inner elements to CSS defaults
+      ['.player-title', '.player-separator', '.player-transport',
+       '.player-seek', '.player-time'].forEach(sel => {
+        const child = bar.querySelector(sel);
+        if (child) child.style.cssText = '';
+      });
+
+      const volEl = bar.querySelector('.player-volume');
+      if (volEl) volEl.style.display = showVol ? '' : 'none';
+
       return;
     }
 
@@ -458,21 +476,21 @@ export class FooterQuadTree {
     // ══════════════════════════════════════════════════════════
     // TWO-TIER — landscape phone / tablet
     //
-    // Three absolute-positioned row containers inside .footer-bar.
-    // All math already done in _computeZones.
-    // CSS: position:absolute, top/left/width/height from JS.
-    // No flex-wrap. No margin:auto. QuadTree owns everything.
+    // V6.5.0 FIX: Zone wrappers use display:contents.
+    // All inner elements positioned against .footer-bar.
+    // Transport is no longer clipped by player zone height.
     // ══════════════════════════════════════════════════════════
     if (zones.twoTier) {
       const { rows, inner, totalH } = zones;
 
-      // Set footer-bar to known height, position:relative
+      // Footer bar: positioning context
       bar.style.height   = `${totalH}px`;
       bar.style.position = 'relative';
+      bar.style.display  = 'block';
       bar.style.setProperty('--ft-height',     `${totalH}px`);
       bar.style.setProperty('--footer-height', `${totalH}px`);
 
-      // Expose row vars for CSS theming (borders, bg etc)
+      // Row vars for CSS theming
       bar.style.setProperty('--ft-row1-y', `${rows.row1.y}px`);
       bar.style.setProperty('--ft-row1-h', `${rows.row1.h}px`);
       bar.style.setProperty('--ft-row2-y', `${rows.row2.y}px`);
@@ -481,100 +499,77 @@ export class FooterQuadTree {
       bar.style.setProperty('--ft-row3-h', `${rows.row3.h}px`);
       bar.style.setProperty('--ft-transport-w', `${inner.transportW}px`);
 
-      // ── Player zone (Row 1: title, seek, time) ────────────
-      const playerZone = bar.querySelector('.footer-player-zone');
-      if (playerZone) {
-        playerZone.style.cssText = `
+      // ── Zone wrappers → display:contents ────────────────────
+      // Children position directly against .footer-bar
+      const playerZone  = bar.querySelector('.footer-player-zone');
+      const playerInner = playerZone?.querySelector('.player');
+      if (playerZone)  playerZone.style.cssText  = 'display: contents;';
+      if (playerInner) playerInner.style.cssText = 'display: contents;';
+
+      // ── Row 1: title, seek, time ────────────────────────────
+      const titleEl = bar.querySelector('.player-title');
+      const seekEl  = bar.querySelector('.player-seek');
+      const timeEl  = bar.querySelector('.player-time');
+
+      if (titleEl) {
+        titleEl.style.cssText = `
           position: absolute;
-          top:    ${rows.row1.y}px;
-          left:   0;
-          width:  ${zones.player.w}px;
-          height: ${rows.row1.h}px;
-          padding: ${inner.rowPadV}px 0;
-          box-sizing: border-box;
+          left: ${inner.titleX}px;
+          top: ${rows.row1.y + inner.rowPadV}px;
+          width: ${inner.titleW}px;
+          height: ${inner.row1ContentH}px;
+          max-width: ${inner.titleW}px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          line-height: ${inner.row1ContentH}px;
         `;
-
-        // Inner elements: title, seek, time
-        const titleEl = playerZone.querySelector('.player-title');
-        const seekEl  = playerZone.querySelector('.player-seek');
-        const timeEl  = playerZone.querySelector('.player-time');
-
-        const innerTop = 0; // relative to playerZone (padding handles vertical)
-
-        if (titleEl) {
-          titleEl.style.cssText = `
-            position: absolute;
-            left:  ${inner.titleX}px;
-            top:   50%;
-            transform: translateY(-50%);
-            width: ${inner.titleW}px;
-            max-width: ${inner.titleW}px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          `;
-        }
-        if (seekEl) {
-          seekEl.style.cssText = `
-            position: absolute;
-            left:  ${inner.seekX}px;
-            top:   50%;
-            transform: translateY(-50%);
-            width: ${inner.seekW}px;
-            flex: none;
-          `;
-        }
-        if (timeEl) {
-          timeEl.style.cssText = `
-            position: absolute;
-            left:  ${inner.timeX}px;
-            top:   50%;
-            transform: translateY(-50%);
-            width: ${inner.timeW}px;
-            text-align: right;
-          `;
-        }
-
-        // Hide .player wrapper's own layout influence
-        const playerInner = playerZone.querySelector('.player');
-        if (playerInner) {
-          playerInner.style.cssText = `
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            overflow: hidden;
-          `;
-        }
-
-        // Hide player separator
-        const sep = playerZone.querySelector('.player-separator');
-        if (sep) sep.style.display = 'none';
+      }
+      if (seekEl) {
+        seekEl.style.cssText = `
+          position: absolute;
+          left: ${inner.seekX}px;
+          top: ${rows.row1.y + inner.rowPadV}px;
+          width: ${inner.seekW}px;
+          height: ${inner.row1ContentH}px;
+          display: flex;
+          align-items: center;
+        `;
+      }
+      if (timeEl) {
+        timeEl.style.cssText = `
+          position: absolute;
+          left: ${inner.timeX}px;
+          top: ${rows.row1.y + inner.rowPadV}px;
+          width: ${inner.timeW}px;
+          height: ${inner.row1ContentH}px;
+          line-height: ${inner.row1ContentH}px;
+          text-align: right;
+        `;
       }
 
-      // ── Transport (Row 2 left) ────────────────────────────
+      // ── Row 2: transport + nav ──────────────────────────────
       const transportEl = bar.querySelector('.player-transport');
       if (transportEl) {
         transportEl.style.cssText = `
           position: absolute;
-          top:    ${rows.row2.y + inner.rowPadV}px;
-          left:   ${inner.transportX}px;
-          width:  ${inner.transportW}px;
+          top: ${rows.row2.y + inner.rowPadV}px;
+          left: ${inner.transportX}px;
+          width: ${inner.transportW}px;
           height: ${rows.row2.h - inner.rowPadV * 2}px;
           display: flex;
           align-items: center;
           gap: var(--player-btn-gap, 4px);
-          flex-shrink: 0;
         `;
       }
 
-      // ── Nav zone (Row 2 right) ────────────────────────────
       const navZone = bar.querySelector('.footer-nav-zone');
       if (navZone) {
         navZone.style.cssText = `
           position: absolute;
-          top:    ${rows.row2.y}px;
-          left:   ${inner.navX}px;
-          width:  ${inner.navW}px;
+          top: ${rows.row2.y}px;
+          left: ${inner.navX}px;
+          width: ${inner.navW}px;
           height: ${rows.row2.h}px;
           display: flex;
           align-items: center;
@@ -585,14 +580,14 @@ export class FooterQuadTree {
         `;
       }
 
-      // ── Logo zone (Row 3 right) ───────────────────────────
+      // ── Row 3: logo ─────────────────────────────────────────
       const logoZone = bar.querySelector('.footer-logo');
       if (logoZone) {
         logoZone.style.cssText = `
           position: absolute;
-          top:    ${rows.row3.y}px;
-          left:   ${inner.logoX}px;
-          width:  ${inner.logoW}px;
+          top: ${rows.row3.y}px;
+          left: ${inner.logoX}px;
+          width: ${inner.logoW}px;
           height: ${rows.row3.h}px;
           display: flex;
           flex-direction: row;
@@ -605,9 +600,15 @@ export class FooterQuadTree {
         `;
       }
 
-      // Volume hidden on touch
+      // ── Hide separator, volume, audio ───────────────────────
+      const sep = bar.querySelector('.player-separator');
+      if (sep) sep.style.display = 'none';
+
       const volEl = bar.querySelector('.player-volume');
       if (volEl) volEl.style.display = 'none';
+
+      const audioEl = bar.querySelector('audio');
+      if (audioEl) audioEl.style.display = 'none';
 
       return;
     }
@@ -616,31 +617,90 @@ export class FooterQuadTree {
     // ══════════════════════════════════════════════════════════
     // HORIZONTAL — desktop
     //
-    // Single strip. Three absolute-positioned zones.
+    // Three zones side by side. Player uses flex internally
+    // with computed max-widths so elements adapt on narrow
+    // viewports.
     // ══════════════════════════════════════════════════════════
-    const rawH = profile.height ?? 75;
+    const rawH = zones.height ?? 75;
     const hPx  = (rawH === 'auto') ? 75 : rawH;
 
     bar.style.height   = `${hPx}px`;
     bar.style.position = 'relative';
+    bar.style.display  = 'block';
     bar.style.setProperty('--ft-height',     `${hPx}px`);
     bar.style.setProperty('--footer-height', `${hPx}px`);
-
-    // Reset any two-tier layout from previous render
-    this._clearAbsoluteLayout();
 
     const playerZone = bar.querySelector('.footer-player-zone');
     const navZone    = bar.querySelector('.footer-nav-zone');
     const logoZone   = bar.querySelector('.footer-logo');
 
+    // ── Player zone: absolute, inner flex ─────────────────────
     if (playerZone) {
       playerZone.style.cssText = `
         position: absolute;
         top: 0; left: ${zones.player.x}px;
         width: ${zones.player.w}px;
         height: ${hPx}px;
+        display: flex;
+        align-items: center;
+        padding: 0 ${zones.playerInner?.hPad || 14}px;
+        gap: 8px;
+        box-sizing: border-box;
       `;
     }
+
+    const playerInner = playerZone?.querySelector('.player');
+    if (playerInner) {
+      playerInner.style.cssText = `
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        gap: 8px;
+        height: 100%;
+        width: 100%;
+      `;
+    }
+
+    // ── Inner player constraints ──────────────────────────────
+    const pi = zones.playerInner;
+    if (pi) {
+      const titleEl = bar.querySelector('.player-title');
+      const seekEl  = bar.querySelector('.player-seek');
+
+      if (titleEl) {
+        titleEl.style.cssText = `
+          max-width: ${pi.titleMaxW}px;
+          min-width: 60px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          flex-shrink: 1;
+        `;
+      }
+      if (seekEl) {
+        seekEl.style.cssText = `
+          max-width: ${pi.seekMaxW}px;
+          min-width: 40px;
+          flex: 1 1 auto;
+        `;
+      }
+    }
+
+    // ── Restore separator, transport, time to CSS defaults ────
+    const sep = bar.querySelector('.player-separator');
+    if (sep) sep.style.cssText = '';
+
+    const transportEl = bar.querySelector('.player-transport');
+    if (transportEl) transportEl.style.cssText = '';
+
+    const timeEl = bar.querySelector('.player-time');
+    if (timeEl) timeEl.style.cssText = '';
+
+    // ── Volume ────────────────────────────────────────────────
+    const volEl = bar.querySelector('.player-volume');
+    if (volEl) volEl.style.display = showVol ? '' : 'none';
+
+    // ── Nav & Logo ────────────────────────────────────────────
     if (navZone) {
       navZone.style.cssText = `
         position: absolute;
@@ -663,33 +723,34 @@ export class FooterQuadTree {
 
 
   // ══════════════════════════════════════════════════════════════
-  // CLEAR — remove absolute two-tier positioning from a previous
-  // render when switching to a different layout mode
+  // CLEAR — reset all inline styles for clean mode transitions
   // ══════════════════════════════════════════════════════════════
 
   _clearAbsoluteLayout() {
     const bar = this.footerBar;
     if (!bar) return;
 
-    const playerZone  = bar.querySelector('.footer-player-zone');
-    const navZone     = bar.querySelector('.footer-nav-zone');
-    const logoZone    = bar.querySelector('.footer-logo');
-    const transportEl = bar.querySelector('.player-transport');
-    const playerInner = bar.querySelector('.player');
-    const titleEl     = bar.querySelector('.player-title');
-    const seekEl      = bar.querySelector('.player-seek');
-    const timeEl      = bar.querySelector('.player-time');
-    const volEl       = bar.querySelector('.player-volume');
+    const selectors = [
+      '.footer-player-zone',
+      '.footer-nav-zone',
+      '.footer-logo',
+      '.player',
+      '.player-title',
+      '.player-separator',
+      '.player-transport',
+      '.player-seek',
+      '.player-time',
+      '.player-volume',
+    ];
 
-    [playerZone, navZone, logoZone, transportEl,
-     playerInner, titleEl, seekEl, timeEl].forEach(el => {
+    selectors.forEach(sel => {
+      const el = bar.querySelector(sel);
       if (el) el.style.cssText = '';
     });
 
-    if (volEl) volEl.style.display = '';
-
     bar.style.position = '';
     bar.style.height   = '';
+    bar.style.display  = '';
   }
 
 
@@ -728,7 +789,7 @@ export class FooterQuadTree {
     const z     = this._zones;
     return {
       status:      'ok',
-      version:     'V6.4.0',
+      version:     'V6.5.0',
       state,
       device:      this._device,
       profile:     this._profile?.name || 'none',
@@ -748,6 +809,7 @@ export class FooterQuadTree {
         row3: `y:${z.rows.row3.y} h:${z.rows.row3.h}`,
       } : null,
       inner:         z?.inner ?? null,
+      playerInner:   z?.playerInner ?? null,
       volumeVisible: this._profile?.volumeVisible ?? null,
     };
   }
