@@ -247,6 +247,9 @@ body.ready { opacity: 1; }
 /* ═══════════════════════════════════════════════════════════════
    MOBILE — sidebar as fixed slide-in panel
    ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE — sidebar as fixed slide-in panel
+   ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 767px) {
   #infoRegion.open {
     /* Override the CSS-var positioning for mobile */
@@ -257,11 +260,17 @@ body.ready { opacity: 1; }
     height: 100vh;
     z-index: 200;
     box-shadow: none;
+    
+    /* FIX: Adds padding so the bottom isn't hidden behind Safari's UI */
+    padding-bottom: env(safe-area-inset-bottom, 100px); 
   }
 
   /* Grid always full width on mobile */
   #albumsRegion {
     width: 100% !important;
+    
+    /* FIX: Same padding for the main album grid */
+    padding-bottom: env(safe-area-inset-bottom, 100px);
   }
 }
 
