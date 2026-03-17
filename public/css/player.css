@@ -550,61 +550,29 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   PROFILE: two-tier (landscape phone + tablet)
-   
-   3-row layout, all positions computed by footerQuadTree.js:
-   
-   Row 1: [title ..................] [seek .......] [time]
-   Row 2: [transport buttons ....] [nav links ............]
-   Row 3:                                    [logo] [tag]
-   
-   footerQuadTree.js sets:
-     - Player zone width (full vw)
-     - Nav zone width (measured) + marginLeft:auto
-     - Logo zone width (measured) + marginLeft:auto
-     - --ft-transport-w (available space left of nav)
-   
-   CSS here only handles:
-     - .footer-bar wrapping (inherits from base)
-     - .player internal wrap (title/seek/time vs transport)
-     - Visual styling (borders, padding, alignment)
-   
-   NO layout computation. CSS is a dumb renderer.
+   PROFILE: two-tier (landscape phone + tablet)   V6.4.0
+
+   3-row layout. ALL positions computed by footerQuadTree.js V6.4.0.
+   .footer-bar: position:relative, height = totalH (px, set by JS).
+   All zones + inner elements: position:absolute, top/left/width/height
+   written as px inline styles by footerQuadTree.js.
+
+   CSS here is VISUAL ONLY — borders, colors, link styling.
+   NO width, height, top, left, position, flex-wrap, margin:auto.
+   QuadTree owns the geometry completely.
    ══════════════════════════════════════════════════════════════ */
 
-/* Footer bar: height auto for stacking rows */
-[data-ft-profile="two-tier"] .footer-bar {
-  height: auto;
-  align-items: stretch;
-}
+/* footer-bar: QuadTree writes height + position:relative inline */
 
-/* ── Player zone (Row 1 + Row 2 transport) ─────────────────── */
-/* Width set by footerQuadTree.js (full vw) */
+/* Row 1 border — decorative only */
 [data-ft-profile="two-tier"] .footer-player-zone {
-  height: auto;
-  padding: 6px 14px 0;
+  border-bottom: var(--footer-separator);
+  box-sizing: border-box;
 }
 
-/* .player wraps: title/seek/time on line 1, transport on line 2 */
-[data-ft-profile="two-tier"] .player {
-  height: auto;
-  gap: 8px;
-}
-
+/* Separator hidden in two-tier */
 [data-ft-profile="two-tier"] .player-separator {
   display: none;
-}
-
-/* Title takes remaining space on line 1 */
-[data-ft-profile="two-tier"] .player-title {
-  max-width: none;
-  min-width: 80px;
-}
-
-/* Seek bar fluid on line 1 */
-[data-ft-profile="two-tier"] .player-seek {
-  max-width: none;
-  min-width: var(--seek-min-w);
 }
 
 /* Volume hidden on touch */
@@ -612,42 +580,18 @@
   display: none;
 }
 
-/* Transport drops to line 2, takes available width */
-[data-ft-profile="two-tier"] .player-transport {
-  padding: 4px 0 6px;
-}
-
-
-/* ── Nav zone (Row 2 right) ────────────────────────────────── */
-/* Width + marginLeft set by footerQuadTree.js */
-[data-ft-profile="two-tier"] .footer-nav-zone {
-  height: auto;
-  border-top: var(--footer-separator);
-}
-
+/* Nav links — visual styling only, no layout */
 [data-ft-profile="two-tier"] .footer-nav-zone a,
 [data-ft-profile="two-tier"] .footer-nav-zone button.nav-login-btn {
-  height: auto;
   border-right: var(--footer-separator);
+  box-sizing: border-box;
 }
 
-/* User cell horizontal */
+/* User cell — horizontal display */
 [data-ft-profile="two-tier"] .user-cell.active {
   flex-direction: row;
   gap: 6px;
   border-right: var(--footer-separator);
-}
-
-
-/* ── Logo zone (Row 3 right) ───────────────────────────────── */
-/* Width + marginLeft set by footerQuadTree.js */
-[data-ft-profile="two-tier"] .footer-logo {
-  flex-direction: row;
-  justify-content: flex-end;
-  gap: 8px;
-  border-top: 1px solid rgba(43, 127, 140, 0.1);
-  height: auto;
-  padding: var(--logo-padding);
 }
 
 
