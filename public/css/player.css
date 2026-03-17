@@ -1,5 +1,5 @@
 /* ================================================================
-   PLAYER / FOOTER BAR — player.css  V6.3
+   PLAYER / FOOTER BAR — player.css  V6.3.1
    
    RODUX: CSS is a dumb renderer. Consumes vars only.
    footerQuadTree.js owns ALL layout via --ft-* vars + inline styles.
@@ -8,8 +8,9 @@
    Device-aware: data-ft-device="touch" vs "pointer" on #artistControls.
    Desktop at 400px ≠ iPhone at 400px. The state decides.
    
-   V6.3: compact-portrait profile matches wireframe:
-         title row → transport row → seek+time row → nav row → logo row
+   V6.3:   compact-portrait profile matches wireframe
+   V6.3.1: two-tier profile (landscape/tablet), +Plist button,
+           transport borders (global)
    ================================================================ */
 
 
@@ -23,6 +24,7 @@
   --player-btn-size:     45px;
   --player-icon-size:    40px;
   --player-btn-gap:      4px;
+  --player-btn-border:   1px solid rgba(43, 127, 140, 0.35);
   --player-title-max-w:  500px;
   --player-title-font:   13px;
   --player-time-font:    12px;
@@ -160,7 +162,7 @@
 
 .player-transport button {
   background: none;
-  border: none;
+  border: var(--player-btn-border);
   outline: none;
   cursor: pointer;
   width: var(--player-btn-size);
@@ -174,9 +176,12 @@
   font-size: 0;
   color: transparent;
   overflow: hidden;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, background-color 0.15s;
 }
-.player-transport button:hover { opacity: 0.7; }
+.player-transport button:hover {
+  opacity: 0.85;
+  background-color: rgba(43, 127, 140, 0.1);
+}
 
 .player-transport .btn-prev      { background-image: url('/images/PLAYER-BACK_BLUE-5.svg'); }
 .player-transport .btn-skip-back { background-image: url('/images/PLAYER-bkwd30_BLUE.svg'); }
@@ -195,6 +200,12 @@
 .player-transport .btn-cart {
   background-image: url('/images/IP-CART-add-v1.svg');
   background-size: 22px 22px;
+}
+
+/* V6.3.1: Playlist add button */
+.player-transport .btn-plist {
+  background-image: url('/images/IP-MUSIC-2teal.svg');
+  background-size: 20px 20px;
 }
 
 
@@ -511,6 +522,11 @@
   display: none;
 }
 
+/* Hide inline plist button — on mobile portrait it's in nav or hidden */
+[data-ft-profile="compact-portrait"] .player-transport .btn-plist {
+  display: none;
+}
+
 /* Nav: stacked full-width, centered */
 [data-ft-profile="compact-portrait"] .footer-nav-zone {
   justify-content: center;
@@ -542,40 +558,157 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   PROFILE: compact-landscape
-   Same stacked structure but tighter
+   PROFILE: two-tier (landscape phone + tablet)
+   
+   3-row grid using the full footer width:
+   
+   Row 1: [title ..................] [seek .......] [time]
+   Row 2: [transport buttons ....] [nav links ............]
+   Row 3:                                    [logo] [tag]
+   
+   The .footer-bar becomes a CSS grid.
+   Player zone, nav zone, and logo zone all span full width
+   but are repositioned by grid areas.
+   
+   This is NOT stacked (portrait) and NOT horizontal (desktop).
+   It's a hybrid: controls and nav share a row.
    ══════════════════════════════════════════════════════════════ */
 
-[data-ft-profile="compact-landscape"] .footer-bar {
+[data-ft-profile="two-tier"] .footer-bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "player-top  player-top"
+    "transport   nav"
+    "spacer      logo";
   height: auto;
-  align-items: stretch;
+  align-items: center;
+  gap: 0;
 }
 
-[data-ft-profile="compact-landscape"] .footer-player-zone {
-  padding: 4px 10px;
+/* ── Row 1: title + seek + time (spans full width) ─────────── */
+[data-ft-profile="two-tier"] .footer-player-zone {
+  grid-area: player-top;
+  width: 100% !important;
   height: auto;
+  padding: 6px 14px 4px;
 }
 
-[data-ft-profile="compact-landscape"] .footer-nav-zone {
-  justify-content: center;
-  border-left: none;
-  border-top: var(--footer-separator);
+[data-ft-profile="two-tier"] .player {
+  flex-wrap: nowrap;
+  height: auto;
+  gap: 10px;
 }
 
-[data-ft-profile="compact-landscape"] .user-cell.active {
+[data-ft-profile="two-tier"] .player-title {
+  flex: 1 1 auto;
+  max-width: none;
+  min-width: 80px;
+}
+
+[data-ft-profile="two-tier"] .player-separator {
+  display: none;
+}
+
+[data-ft-profile="two-tier"] .player-seek {
+  flex: 0 1 auto;
+  max-width: none;
+  min-width: var(--seek-min-w);
+  width: 30%;
+}
+
+[data-ft-profile="two-tier"] .player-time {
+  flex-shrink: 0;
+}
+
+/* Hide volume on two-tier (touch devices) */
+[data-ft-profile="two-tier"] .player-volume {
+  display: none;
+}
+
+
+/* ── Row 2 left: transport buttons ─────────────────────────── */
+/*
+   The transport lives INSIDE .footer-player-zone in the DOM,
+   but we need it on row 2. We pull it out of flow with a
+   wrapper trick: the .player element wraps, and transport
+   gets flex-basis: 100% to force a new row, then we use
+   the grid to position the whole player zone.
+   
+   Actually — simpler approach: we make .player wrap and
+   let title+seek+time be row 1 inside it, transport be
+   row 2. Then nav zone sits beside the transport visually
+   via grid placement.
+*/
+
+[data-ft-profile="two-tier"] .player {
+  flex-wrap: wrap;
+}
+
+/* Title + seek + time stay on one line */
+[data-ft-profile="two-tier"] .player-title {
+  order: 1;
+}
+[data-ft-profile="two-tier"] .player-seek {
+  order: 2;
+}
+[data-ft-profile="two-tier"] .player-time {
+  order: 3;
+}
+
+/* Transport drops to its own row inside .player */
+[data-ft-profile="two-tier"] .player-transport {
+  order: 4;
+  flex-basis: 100%;
+  justify-content: flex-start;
+  padding: 4px 0 2px;
+}
+
+
+/* ── Row 2 right: nav zone ─────────────────────────────────── */
+[data-ft-profile="two-tier"] .footer-nav-zone {
+  grid-area: nav;
+  width: auto !important;
+  height: auto;
+  border-left: var(--footer-separator);
+  border-top: none;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-self: end;
+  padding-bottom: 2px;
+}
+
+[data-ft-profile="two-tier"] .footer-nav-zone a,
+[data-ft-profile="two-tier"] .footer-nav-zone button.nav-login-btn {
+  height: auto;
+  border-right: var(--footer-separator);
+}
+
+/* User cell stays horizontal in two-tier */
+[data-ft-profile="two-tier"] .user-cell.active {
   flex-direction: row;
   gap: 6px;
+  border-right: var(--footer-separator);
 }
 
-[data-ft-profile="compact-landscape"] .footer-logo {
+
+/* ── Row 3: logo right-aligned ─────────────────────────────── */
+[data-ft-profile="two-tier"] .footer-logo {
+  grid-area: logo;
+  width: auto !important;
   flex-direction: row;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 8px;
   border-left: none;
-  border-top: 1px solid rgba(43, 127, 140, 0.15);
+  border-top: 1px solid rgba(43, 127, 140, 0.1);
+  height: auto;
+  padding: var(--logo-padding);
 }
 
-[data-ft-profile="compact-landscape"] .player-transport .btn-cart { display: none; }
+
+/* ── Row 3 left: empty spacer ──────────────────────────────── */
+/* Grid area "spacer" is empty — nothing needs to render there */
 
 
 /* ══════════════════════════════════════════════════════════════

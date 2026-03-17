@@ -1,9 +1,11 @@
 // ============================================================================
-// public/js/player.js — V6 (RODUX Stack / Zero Inline Styles)
+// public/js/player.js — V6.3.1 (RODUX Stack / Zero Inline Styles)
 //
 // Audio player. Builds DOM with classnames only — CSS handles all presentation.
 // Transport icons mapped via CSS classes (.btn-prev, .btn-play, etc.)
 // Seek, volume, time all rendered by player.css custom properties.
+//
+// V6.3.1: Added .btn-plist (playlist add) in transport after .btn-cart
 //
 // Exposes window.audioPlayer for global access.
 // ============================================================================
@@ -124,6 +126,25 @@ class AudioPlayer {
       }
     });
     transport.appendChild(this.els.cart);
+
+    // ── Playlist add button (V6.3.1) ───────────────────────────
+    this.els.plist = document.createElement('button');
+    this.els.plist.className = 'btn-plist';
+    this.els.plist.title = 'Add to Playlist';
+    this.els.plist.setAttribute('aria-label', 'Add to Playlist');
+    this.els.plist.addEventListener('click', () => {
+      if (this.currentSong) {
+        window.dispatchEvent(new CustomEvent('addToPlaylist', {
+          detail: {
+            songId: this.currentSong.id,
+            songName: this.currentSong.name,
+            albumId: this.currentAlbum?.id,
+            albumName: this.currentAlbum?.name
+          }
+        }));
+      }
+    });
+    transport.appendChild(this.els.plist);
 
     // ── Audio events ───────────────────────────────────────────
     this.audio.addEventListener('loadedmetadata', () => this._updateProgress());

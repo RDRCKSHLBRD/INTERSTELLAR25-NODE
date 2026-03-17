@@ -1,5 +1,5 @@
 // ============================================================================
-// public/js/footerQuadTree.js — V6.3 (RODUX Stack)
+// public/js/footerQuadTree.js — V6.3.1 (RODUX Stack)
 //
 // QuadTree-driven footer layout engine.
 // Full RODUX pipeline: StateJS → RatioEngine → cssJSON → QuadTree → CSS vars.
@@ -15,6 +15,12 @@
 //   Profiles can require { device: "touch" } or { device: "pointer" }.
 //   Profiles without a device field match any device.
 //   First matching profile wins (walk array top to bottom).
+//
+// LAYOUT MODES:
+//   "stacked"    — portrait phone. All zones full width, vertical stack.
+//   "two-tier"   — landscape phone / tablet. CSS grid: title row, then
+//                   transport+nav side-by-side, logo right-aligned.
+//   "horizontal" — desktop. Single strip: player | nav | logo.
 //
 // ============================================================================
 
@@ -55,24 +61,12 @@ export class FooterQuadTree {
 
   // ══════════════════════════════════════════════════════════════
   // DEVICE DETECTION
-  //
-  // Separates "this is a phone/tablet" from "this is a desktop
-  // browser dragged small". Runs once on init.
-  //
-  // touch:   real phones/tablets (maxTouchPoints > 0 AND coarse pointer)
-  // pointer: desktop/laptop (mouse, trackpad)
-  //
-  // DevTools device toolbar sets maxTouchPoints correctly when
-  // you pick a device preset, so emulation works.
   // ══════════════════════════════════════════════════════════════
 
   _detectDevice() {
     const hasTouch = navigator.maxTouchPoints > 0;
     const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
 
-    // Both conditions: real touch device
-    // Touch but fine pointer: stylus/convertible — treat as touch
-    // No touch: desktop
     if (hasTouch && hasCoarsePointer) return 'touch';
     if (hasTouch) return 'touch';
     return 'pointer';
@@ -94,7 +88,6 @@ export class FooterQuadTree {
         device: this._device,
       };
     }
-    // If StateJS has a calculate() method but no cached viewport, call it
     if (IS?.state?.calculate) {
       const calc = IS.state.calculate({
         width: window.innerWidth,
@@ -124,15 +117,6 @@ export class FooterQuadTree {
 
   // ══════════════════════════════════════════════════════════════
   // PROFILE SELECTION
-  //
-  // Walks profiles array. Each profile can optionally require:
-  //   device: "touch" | "pointer"    (skip if mismatch)
-  //   orientation: "portrait" | "landscape"
-  //   minWidth / maxWidth
-  //
-  // Desktop at 400px: device=pointer → skips touch-only profiles,
-  //   matches a pointer-compatible narrow profile instead.
-  // iPhone at 400px: device=touch → matches compact-portrait.
   // ══════════════════════════════════════════════════════════════
 
   _selectProfile(state) {
@@ -140,13 +124,9 @@ export class FooterQuadTree {
     if (!profiles) return this._legacyProfile(state);
 
     for (const profile of profiles) {
-      // Device filter
       if (profile.device && profile.device !== state.device) continue;
-
-      // Orientation filter
       if (profile.orientation && profile.orientation !== state.orientation) continue;
 
-      // Width filters
       const minOk = (profile.minWidth === undefined) || (state.vw >= profile.minWidth);
       const maxOk = (profile.maxWidth === undefined) || (state.vw <= profile.maxWidth);
 
@@ -163,6 +143,7 @@ export class FooterQuadTree {
     return {
       name: bp,
       stacked: isStacked,
+      layout: isStacked ? 'stacked' : 'horizontal',
       height: cfg.height?.[bp] ?? 75,
       volumeVisible: (bp === 'desktop'),
       zones: cfg.zones || {},
@@ -171,22 +152,46 @@ export class FooterQuadTree {
 
   // ══════════════════════════════════════════════════════════════
   // RATIO ENGINE — compute zone widths
+  //
+  // Three layout modes:
+  //   stacked:    all zones 100% width, ordered vertically
+  //   two-tier:   all zones 100% width, CSS grid handles positioning
+  //   horizontal: player gets remaining space after nav + logo measured
   // ══════════════════════════════════════════════════════════════
 
   _computeZones(profile, state) {
     const zones = profile.zones || this.config.zones || {};
     const vw = state.vw;
+    const layoutMode = profile.layout || (profile.stacked ? 'stacked' : 'horizontal');
 
-    if (profile.stacked) {
+    // ── Stacked (portrait phone) ───────────────────────────────
+    if (layoutMode === 'stacked') {
       return {
         player: { x: 0, w: vw, order: profile.order?.player ?? 1 },
         nav:    { x: 0, w: vw, order: profile.order?.nav    ?? 2 },
         logo:   { x: 0, w: vw, order: profile.order?.logo   ?? 3 },
         stacked: true,
+        twoTier: false,
+        layoutMode: 'stacked',
       };
     }
 
-    // Measure fixed zones at natural width
+    // ── Two-tier (landscape phone / tablet) ────────────────────
+    // CSS grid handles the actual 2-tier positioning.
+    // We set all zones to full width; grid-template-areas in
+    // player.css does the row/column assignment.
+    if (layoutMode === 'two-tier') {
+      return {
+        player: { x: 0, w: vw, order: profile.order?.player ?? 1 },
+        nav:    { x: 0, w: vw, order: profile.order?.nav    ?? 2 },
+        logo:   { x: 0, w: vw, order: profile.order?.logo   ?? 3 },
+        stacked: false,
+        twoTier: true,
+        layoutMode: 'two-tier',
+      };
+    }
+
+    // ── Horizontal (desktop / touch-wide) ──────────────────────
     const navEl  = this.footerBar.querySelector('.footer-nav-zone');
     const logoEl = this.footerBar.querySelector('.footer-logo');
 
@@ -219,6 +224,8 @@ export class FooterQuadTree {
       nav:    { x: navX,    w: finalNavW,    order: 2 },
       logo:   { x: logoX,   w: finalLogoW,  order: 3 },
       stacked: false,
+      twoTier: false,
+      layoutMode: 'horizontal',
     };
   }
 
@@ -245,10 +252,12 @@ export class FooterQuadTree {
     bar.style.setProperty('--ft-logo-w',   `${zones.logo.w}px`);
 
     // Profile metadata
-    const profileName = profile.name || 'default';
-    bar.style.setProperty('--ft-profile', profileName);
+    // For two-tier, we set data-ft-profile to "two-tier" so CSS
+    // grid rules activate, regardless of the profile's name field.
+    const profileAttr = zones.twoTier ? 'two-tier' : (profile.name || 'default');
+    bar.style.setProperty('--ft-profile', profileAttr);
     bar.style.setProperty('--ft-stacked', zones.stacked ? '1' : '0');
-    el.dataset.ftProfile = profileName;
+    el.dataset.ftProfile = profileAttr;
     el.dataset.ftDevice  = state.device;
 
     // Volume
@@ -261,10 +270,18 @@ export class FooterQuadTree {
     const logoZone   = bar.querySelector('.footer-logo');
 
     if (zones.stacked) {
+      // Stacked: all zones full-width, ordered
       if (playerZone) { playerZone.style.width = '100%'; playerZone.style.order = zones.player.order; }
       if (navZone)    { navZone.style.width = '100%'; navZone.style.order = zones.nav.order; navZone.style.borderLeft = 'none'; }
       if (logoZone)   { logoZone.style.width = '100%'; logoZone.style.order = zones.logo.order; logoZone.style.borderLeft = 'none'; }
+    } else if (zones.twoTier) {
+      // Two-tier: CSS grid handles layout. Clear any stale inline widths.
+      // Zone elements participate in grid areas defined by player.css.
+      if (playerZone) { playerZone.style.width = ''; playerZone.style.order = ''; }
+      if (navZone)    { navZone.style.width = ''; navZone.style.order = ''; navZone.style.borderLeft = ''; }
+      if (logoZone)   { logoZone.style.width = ''; logoZone.style.order = ''; logoZone.style.borderLeft = ''; }
     } else {
+      // Horizontal: explicit pixel widths
       if (playerZone) { playerZone.style.width = `${zones.player.w}px`; playerZone.style.order = ''; }
       if (navZone)    { navZone.style.width = `${zones.nav.w}px`; navZone.style.order = ''; }
       if (logoZone)   { logoZone.style.width = `${zones.logo.w}px`; logoZone.style.order = ''; }
@@ -307,7 +324,9 @@ export class FooterQuadTree {
       state,
       device: this._device,
       profile: this._profile?.name || 'none',
+      layoutMode: this._zones?.layoutMode || 'unknown',
       stacked: this._zones?.stacked ?? null,
+      twoTier: this._zones?.twoTier ?? null,
       zones: this._zones ? {
         player: `x:${this._zones.player.x} w:${this._zones.player.w}`,
         nav:    `x:${this._zones.nav.x} w:${this._zones.nav.w}`,

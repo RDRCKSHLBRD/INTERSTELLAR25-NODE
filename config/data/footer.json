@@ -1,6 +1,6 @@
 {
   "_component": "footer",
-  "_version": "6.3",
+  "_version": "6.3.1",
   "_engine": "footerQuadTree.js",
   "_stack": "RODUX: StateJS → RatioEngine → cssJSON → QuadTree → CSS vars",
   "_comment": "Profiles are mathematical constraint sets. Device-aware: touch vs pointer. Desktop resized small ≠ phone.",
@@ -13,6 +13,7 @@
       "orientation": "portrait",
       "maxWidth": 767,
       "stacked": true,
+      "layout": "stacked",
       "height": "auto",
       "volumeVisible": false,
       "order": { "player": 1, "nav": 2, "logo": 3 },
@@ -44,12 +45,13 @@
       }
     },
     {
-      "name": "compact-landscape",
-      "_comment": "Touch device, landscape, ≤767px height effective. Tighter stacked layout.",
+      "name": "two-tier",
+      "_comment": "Touch device, landscape OR tablet (768-1023px). 2-tier grid: Row1=title+seek+time, Row2=transport+nav side-by-side, Row3=logo right-aligned. No volume (touch device).",
       "device": "touch",
       "orientation": "landscape",
-      "maxWidth": 767,
-      "stacked": true,
+      "maxWidth": 1023,
+      "stacked": false,
+      "layout": "two-tier",
       "height": "auto",
       "volumeVisible": false,
       "order": { "player": 1, "nav": 2, "logo": 3 },
@@ -59,47 +61,67 @@
         "logo":   { "minPx": 0 }
       },
       "vars": {
-        "--player-btn-size": "28px",
-        "--player-icon-size": "18px",
-        "--player-title-max-w": "160px",
-        "--player-title-font": "12px",
-        "--player-time-font": "11px",
-        "--seek-max-w": "none",
-        "--seek-min-w": "60px",
-        "--nav-font": "12px",
-        "--nav-padding": "6px 10px",
-        "--logo-img-h": "14px",
-        "--logo-padding": "3px 10px"
-      }
-    },
-    {
-      "name": "touch-tablet",
-      "_comment": "Touch device, 768-1023px. iPad etc. Horizontal but no volume.",
-      "device": "touch",
-      "minWidth": 768,
-      "maxWidth": 1023,
-      "stacked": false,
-      "height": 56,
-      "volumeVisible": false,
-      "zones": {
-        "player": { "minPx": 200 },
-        "nav":    { "minPx": 0, "maxPx": 400 },
-        "logo":   { "minPx": 50, "maxPx": 120 }
-      },
-      "vars": {
         "--player-btn-size": "30px",
         "--player-icon-size": "20px",
-        "--player-title-max-w": "180px",
-        "--player-title-font": "12px",
-        "--seek-max-w": "180px",
+        "--player-btn-gap": "4px",
+        "--player-title-max-w": "none",
+        "--player-title-font": "13px",
+        "--player-time-font": "11px",
+        "--player-time-min-w": "70px",
+        "--seek-max-w": "none",
+        "--seek-min-w": "100px",
+        "--seek-height": "6px",
         "--nav-font": "13px",
         "--nav-padding": "8px 14px",
-        "--logo-img-h": "22px",
+        "--logo-img-h": "18px",
+        "--logo-tag-font": "9px",
         "--logo-padding": "4px 14px",
         "--user-icon-size": "16px",
         "--user-name-font": "10px",
         "--user-logout-font": "8px",
-        "--user-cell-padding": "4px 10px"
+        "--user-cell-padding": "4px 10px",
+        "--toggle-font": "11px",
+        "--toggle-padding": "4px 14px"
+      }
+    },
+    {
+      "name": "two-tier",
+      "_comment": "Touch device, tablet portrait (768-1023px). Same 2-tier grid layout. Matched by minWidth since no orientation filter (covers both portrait and landscape tablets).",
+      "device": "touch",
+      "minWidth": 768,
+      "maxWidth": 1023,
+      "stacked": false,
+      "layout": "two-tier",
+      "height": "auto",
+      "volumeVisible": false,
+      "order": { "player": 1, "nav": 2, "logo": 3 },
+      "zones": {
+        "player": { "minPx": 0 },
+        "nav":    { "minPx": 0 },
+        "logo":   { "minPx": 0 }
+      },
+      "vars": {
+        "--player-btn-size": "32px",
+        "--player-icon-size": "22px",
+        "--player-btn-gap": "5px",
+        "--player-title-max-w": "none",
+        "--player-title-font": "13px",
+        "--player-time-font": "12px",
+        "--player-time-min-w": "78px",
+        "--seek-max-w": "none",
+        "--seek-min-w": "120px",
+        "--seek-height": "6px",
+        "--nav-font": "13px",
+        "--nav-padding": "10px 16px",
+        "--logo-img-h": "22px",
+        "--logo-tag-font": "10px",
+        "--logo-padding": "6px 16px",
+        "--user-icon-size": "18px",
+        "--user-name-font": "10px",
+        "--user-logout-font": "8px",
+        "--user-cell-padding": "4px 12px",
+        "--toggle-font": "11px",
+        "--toggle-padding": "4px 16px"
       }
     },
     {
@@ -108,6 +130,7 @@
       "device": "touch",
       "minWidth": 1024,
       "stacked": false,
+      "layout": "horizontal",
       "height": 65,
       "volumeVisible": false,
       "zones": {
@@ -133,6 +156,7 @@
       "device": "pointer",
       "maxWidth": 1023,
       "stacked": false,
+      "layout": "horizontal",
       "height": 50,
       "volumeVisible": true,
       "zones": {
@@ -164,6 +188,7 @@
       "minWidth": 1024,
       "maxWidth": 1599,
       "stacked": false,
+      "layout": "horizontal",
       "height": 75,
       "volumeVisible": true,
       "zones": {
@@ -194,6 +219,7 @@
       "device": "pointer",
       "minWidth": 1600,
       "stacked": false,
+      "layout": "horizontal",
       "height": 75,
       "volumeVisible": true,
       "zones": {
