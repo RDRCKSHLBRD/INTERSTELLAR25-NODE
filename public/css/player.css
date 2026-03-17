@@ -257,9 +257,9 @@
 }
 
 .player-volume-icon {
-  width: 16px; height: 16px;
+  width: 26px; height: 26px;
   background-image: url('/images/IP-SOUND-candyFloss.svg');
-  background-size: 14px 14px;
+  background-size: 24px 24px;
   background-repeat: no-repeat;
   background-position: center;
   flex-shrink: 0;
