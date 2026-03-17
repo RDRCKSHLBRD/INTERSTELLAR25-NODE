@@ -1,5 +1,5 @@
 /* ================================================================
-   RODERICK PAGE — roderick.css  V6
+   RODERICK PAGE — roderick.css  V6.3
    
    RODUX principle: CSS custom properties drive all layout.
    roderick.js sets: --header-height, --main-top, --main-height,
@@ -8,6 +8,7 @@
                      --grid-gap, --grid-margin, --grid-content-h
    Per-cover:        --col-offset, --row-offset, --tile-w, --tile-h
    
+   V6.3: dvh for iOS Safari dynamic viewport, safe-area on footer.
    Does NOT contain header styles (see header.css)
    Does NOT contain footer/player styles (see player.css)
    ================================================================ */
@@ -23,7 +24,8 @@ body {
   font-family: Helvetica, sans-serif;
   opacity: 0;                        /* revealed by .ready class */
   overflow: hidden;
-  height: 100vh;
+  height: 100vh;                     /* fallback */
+  height: 100dvh;                    /* V6.3: dynamic viewport height for iOS Safari */
   transition: opacity 0.2s ease;
 }
 
@@ -45,7 +47,7 @@ body.ready { opacity: 1; }
   left: 0;
   top: var(--main-top, 44px);
   width: 100%;
-  height: var(--main-height, calc(100vh - 44px - 65px));
+  height: var(--main-height, calc(100dvh - 44px - 75px));
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -246,22 +248,23 @@ body.ready { opacity: 1; }
 
 /* ═══════════════════════════════════════════════════════════════
    MOBILE — sidebar as fixed slide-in panel
-   ═══════════════════════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════════════════════
-   MOBILE — sidebar as fixed slide-in panel
+   NOTE: This is the one @media block we keep in roderick.css.
+   The sidebar overlay is a rendering concern (position:fixed, 
+   full-screen takeover) not a layout math concern. When sidebar 
+   goes QuadTree, this moves too.
    ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 767px) {
   #infoRegion.open {
-    /* Override the CSS-var positioning for mobile */
     position: fixed;
     top: 0; right: 0;
     left: auto;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     z-index: 200;
     box-shadow: none;
     
-    /* FIX: Adds padding so the bottom isn't hidden behind Safari's UI */
+    /* Safe area: bottom padding for Safari's UI */
     padding-bottom: env(safe-area-inset-bottom, 100px); 
   }
 
@@ -269,7 +272,7 @@ body.ready { opacity: 1; }
   #albumsRegion {
     width: 100% !important;
     
-    /* FIX: Same padding for the main album grid */
+    /* Safe area: bottom padding so last songs are reachable */
     padding-bottom: env(safe-area-inset-bottom, 100px);
   }
 }

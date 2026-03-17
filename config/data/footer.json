@@ -1,74 +1,201 @@
 {
   "_component": "footer",
-  "_comment": "Footer/Player bar config — RODUX stack (RatioEngine → CSS vars → CSS rules)",
-  "_version": "6.0",
+  "_version": "6.3",
+  "_engine": "footerQuadTree.js",
+  "_stack": "RODUX: StateJS → RatioEngine → cssJSON → QuadTree → CSS vars",
+  "_comment": "Profiles are mathematical constraint sets selected by StateJS viewport state. No media queries. CSS is a dumb renderer.",
 
-  "layout": {
-    "_comment": "Horizontal regions as ratios of footer width. Player zone gets remainder.",
-    "regions": {
-      "player":  { "flex": 1, "minPx": 280 },
-      "nav":     { "shrink": 0 },
-      "logo":    { "shrink": 0, "widthPx": 80 }
+  "profiles": [
+    {
+      "name": "compact",
+      "_comment": "Phones, small viewports. Zones stack vertically.",
+      "maxWidth": 767,
+      "stacked": true,
+      "height": "auto",
+      "volumeVisible": false,
+      "order": { "player": 1, "nav": 2, "logo": 3 },
+      "zones": {
+        "player": { "minPx": 0 },
+        "nav":    { "minPx": 0 },
+        "logo":   { "minPx": 0 }
+      },
+      "vars": {
+        "--player-btn-size": "26px",
+        "--player-icon-size": "16px",
+        "--player-title-max-w": "120px",
+        "--player-title-font": "12px",
+        "--player-time-font": "11px",
+        "--seek-max-w": "none",
+        "--seek-min-w": "60px",
+        "--nav-font": "12px",
+        "--nav-padding": "6px 10px",
+        "--logo-img-h": "16px",
+        "--logo-padding": "3px 10px",
+        "--user-icon-size": "14px",
+        "--user-name-font": "9px",
+        "--user-cell-padding": "4px 8px"
+      }
     },
-    "height": {
-      "desktop": 42,
-      "tablet": 40,
-      "mobile": 38
+    {
+      "name": "narrow",
+      "_comment": "Tablets, small laptops. Horizontal but tighter.",
+      "minWidth": 768,
+      "maxWidth": 1023,
+      "stacked": false,
+      "height": 56,
+      "volumeVisible": false,
+      "zones": {
+        "player": { "minPx": 200 },
+        "nav":    { "minPx": 0, "maxPx": 400 },
+        "logo":   { "minPx": 50, "maxPx": 120 }
+      },
+      "vars": {
+        "--player-btn-size": "28px",
+        "--player-icon-size": "18px",
+        "--player-title-max-w": "160px",
+        "--player-title-font": "12px",
+        "--seek-max-w": "160px",
+        "--nav-font": "13px",
+        "--nav-padding": "8px 14px",
+        "--logo-img-h": "20px",
+        "--logo-padding": "4px 14px",
+        "--user-icon-size": "16px",
+        "--user-name-font": "10px",
+        "--user-logout-font": "8px",
+        "--user-cell-padding": "4px 10px"
+      }
     },
-    "border": "1px solid rgba(43, 127, 140, 0.4)"
+    {
+      "name": "standard",
+      "_comment": "Laptops, desktops. Full horizontal layout.",
+      "minWidth": 1024,
+      "maxWidth": 1599,
+      "stacked": false,
+      "height": 75,
+      "volumeVisible": true,
+      "zones": {
+        "player": { "minPx": 280 },
+        "nav":    { "minPx": 0 },
+        "logo":   { "minPx": 60 }
+      },
+      "vars": {
+        "--player-btn-size": "45px",
+        "--player-icon-size": "40px",
+        "--player-title-max-w": "500px",
+        "--player-title-font": "13px",
+        "--seek-max-w": "200px",
+        "--vol-track-w": "100px",
+        "--nav-font": "14px",
+        "--nav-padding": "10px 20px",
+        "--logo-img-h": "38px",
+        "--logo-padding": "12px 34px 10px",
+        "--user-icon-size": "20px",
+        "--user-name-font": "11px",
+        "--user-logout-font": "9px",
+        "--user-cell-padding": "6px 16px"
+      }
+    },
+    {
+      "name": "wide",
+      "_comment": "Large monitors, ultrawide. More breathing room.",
+      "minWidth": 1600,
+      "stacked": false,
+      "height": 75,
+      "volumeVisible": true,
+      "zones": {
+        "player": { "minPx": 400 },
+        "nav":    { "minPx": 0 },
+        "logo":   { "minPx": 80 }
+      },
+      "vars": {
+        "--player-btn-size": "45px",
+        "--player-icon-size": "40px",
+        "--player-title-max-w": "600px",
+        "--player-title-font": "14px",
+        "--seek-max-w": "300px",
+        "--vol-track-w": "120px",
+        "--nav-font": "14px",
+        "--nav-padding": "10px 24px",
+        "--logo-img-h": "38px",
+        "--logo-padding": "12px 34px 10px"
+      }
+    }
+  ],
+
+  "zones": {
+    "_comment": "Default zone constraints. Profiles override these.",
+    "player": {
+      "priority": 1,
+      "greedy": true,
+      "minPx": 200
+    },
+    "nav": {
+      "priority": 2,
+      "shrink": 0,
+      "minPx": 0
+    },
+    "logo": {
+      "priority": 3,
+      "shrink": 0,
+      "widthPx": 80,
+      "minPx": 60
+    }
   },
 
   "player": {
-    "_comment": "Internal player layout — transport | seek | time",
+    "_comment": "Internal player component config. Consumed by player.js.",
     "transport": {
-      "buttonSize": { "desktop": 26, "tablet": 24, "mobile": 22 },
-      "iconSize":   { "desktop": 18, "tablet": 16, "mobile": 14 },
-      "gap":        { "desktop": 2,  "tablet": 2,  "mobile": 1 }
+      "buttonSize": { "compact": 22, "narrow": 24, "standard": 26, "wide": 26 },
+      "iconSize":   { "compact": 14, "narrow": 16, "standard": 18, "wide": 18 },
+      "gap":        { "compact": 1,  "narrow": 2,  "standard": 2,  "wide": 2 }
     },
     "seek": {
-      "height":    6,
-      "radius":    3,
-      "maxWidth":  320,
-      "minWidth":  80,
-      "trackBg":   "rgba(138, 183, 206, 0.15)",
+      "height": 6,
+      "radius": 3,
+      "maxWidth": 320,
+      "minWidth": 80,
+      "trackBg": "rgba(138, 183, 206, 0.15)",
       "fillColor": "#3AA0A0"
     },
     "title": {
-      "maxWidth":  { "desktop": 180, "tablet": 140, "mobile": 100 },
-      "fontSize":  { "desktop": 12,  "tablet": 11,  "mobile": 11 }
+      "maxWidth":  { "compact": 120, "narrow": 160, "standard": 500, "wide": 600 },
+      "fontSize":  { "compact": 12,  "narrow": 12,  "standard": 13,  "wide": 14 }
     },
     "time": {
-      "fontSize":  11,
+      "fontSize": 12,
       "fontFamily": "monospace",
-      "minWidth":  70
+      "minWidth": 78
     },
     "volume": {
-      "trackWidth": { "desktop": 50, "tablet": 40, "mobile": 0 },
+      "_comment": "Hidden on compact+narrow profiles (device-controlled on touch).",
+      "trackWidth": { "compact": 0, "narrow": 0, "standard": 100, "wide": 120 },
       "trackHeight": 4
     }
   },
 
   "nav": {
-    "items": ["film", "contact", "login", "cart"],
-    "fontSize":  { "desktop": 13, "tablet": 12, "mobile": 11 },
-    "padding":   { "desktop": "10px 18px", "tablet": "8px 12px", "mobile": "5px 8px" },
-    "separator": "1px solid rgba(43, 127, 140, 0.2)"
+    "items": ["playlists", "film", "contact", "login", "cart"],
+    "separator": "1px solid rgba(43, 127, 140, 0.25)"
+  },
+
+  "userCell": {
+    "_comment": "Vertical micro-stack inside nav zone. Auth-driven visibility.",
+    "compactLayout": "horizontal"
   },
 
   "logo": {
-    "imgHeight": { "desktop": 20, "tablet": 16, "mobile": 14 },
-    "tagFontSize": 8,
-    "tagColor": "#829D9E"
+    "tagColor": "#829D9E",
+    "tagText": "rdxenv 24/25/26"
   },
 
   "toggle": {
-    "fontSize": 10,
-    "color": "#8ab7ce",
-    "padding": "4px 16px"
+    "text": "PLAYER I/O",
+    "textTransform": "uppercase",
+    "letterSpacing": "1.5px"
   },
 
   "mobile": {
-    "_comment": "Below 768px: player full-width row 1, nav row 2, logo row 3",
+    "_comment": "Legacy key for backward compat. Profiles replace this.",
     "stackBreakpoint": 767,
     "layout": "stacked"
   }

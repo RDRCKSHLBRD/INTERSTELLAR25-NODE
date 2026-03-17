@@ -1,19 +1,28 @@
 /* ================================================================
-   PLAYER / FOOTER BAR — player.css  V6.2
+   PLAYER / FOOTER BAR — player.css  V6.3
    
-   RODUX principle: CSS is the rendering engine.
-   All sizing/spacing via --footer-* and --player-* custom properties.
-   JS (player.js) builds DOM with classnames only. No inline styles.
+   RODUX principle: CSS is a dumb renderer. Consumes vars only.
+   footerQuadTree.js owns ALL layout decisions:
+     - Zone widths (--ft-player-w, --ft-nav-w, --ft-logo-w)
+     - Footer height (--ft-height)
+     - Profile selection (--ft-profile)
+     - Volume visibility (--ft-vol-visible)
+     - Stacked vs horizontal (--ft-stacked)
+     - All responsive sizing via --ft-* and per-profile --player-* vars
    
-   Regions:  [toggle] -> [player-zone | nav-zone | logo-zone]
-   Player:   [title | sep | transport | seek | time | volume | loop | cart]
-   Transport: [prev | skip-back | play/pause | skip-fwd | next | stop]
+   NO @media queries. NO flex-based layout logic.
+   CSS sets defaults. JS overwrites them per profile.
    
-   V6.2: User cell stack, playlist link, PLAYER I/O toggle, 75px footer
+   V6.3: QuadTree migration. State-driven profiles.
+         Safe-area-inset-bottom for iOS Safari.
+         Volume hidden on touch profiles via data-ft-profile.
    ================================================================ */
 
 
-/* ── Custom Property Defaults ────────────────────────────────── */
+/* ── Custom Property Defaults ────────────────────────────────── 
+   These are starting values only. footerQuadTree.js overwrites
+   them per profile via the vars{} object in footer.json.
+   ────────────────────────────────────────────────────────────── */
 :root {
   /* Footer chrome */
   --footer-height:       75px;
@@ -65,6 +74,10 @@
   --user-logout-color:   #829D9E;
   --user-cell-padding:   6px 16px;
   --user-cell-gap:       2px;
+
+  /* QuadTree outputs — defaults, overwritten by footerQuadTree.js */
+  --ft-vol-visible:      1;
+  --ft-stacked:          0;
 }
 
 
@@ -77,6 +90,9 @@
   border-top: var(--footer-border);
   padding: 0;
   font-family: Helvetica, sans-serif;
+
+  /* Safe area — iOS Safari bottom bar */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 
@@ -103,36 +119,41 @@
 .footer-details[open] summary::before { content: '▾ '; font-size: 10px; }
 
 
-/* ── Footer Bar — the main horizontal strip ──────────────────── */
+/* ── Footer Bar ──────────────────────────────────────────────── 
+   Display: flex for flow (wrap when stacked).
+   Width/height/sizing all from QuadTree vars + inline styles.
+   ────────────────────────────────────────────────────────────── */
 .footer-bar {
   display: flex;
   align-items: center;
-  height: var(--footer-height);
+  flex-wrap: wrap;
+  height: var(--ft-height, var(--footer-height));
   padding: 0;
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   PLAYER ZONE — left, takes remaining space
+   PLAYER ZONE
+   Width set by footerQuadTree.js inline style.
    ══════════════════════════════════════════════════════════════ */
 
 .footer-player-zone {
   display: flex;
   align-items: center;
-  flex: 1 1 auto;
   min-width: 0;
   height: 100%;
   padding: 0 14px;
   gap: 8px;
+  /* width set by JS */
 }
 
 .player {
   display: flex;
   align-items: center;
-  flex: 1 1 auto;
   min-width: 0;
   gap: 8px;
   height: 100%;
+  width: 100%;
 }
 
 
@@ -184,7 +205,7 @@
 }
 .player-transport button:hover { opacity: 0.7; }
 
-/* Icon mapping — SVG transport icons */
+/* Icon mapping */
 .player-transport .btn-prev      { background-image: url('/images/PLAYER-BACK_BLUE-5.svg'); }
 .player-transport .btn-skip-back { background-image: url('/images/PLAYER-bkwd30_BLUE.svg'); }
 .player-transport .btn-play      { background-image: url('/images/PLAYER-PLAY-v2.svg'); }
@@ -215,7 +236,6 @@
   border-radius: var(--seek-radius);
   cursor: pointer;
   position: relative;
-  flex-shrink: 1;
 }
 
 .player-seek-fill {
@@ -240,12 +260,21 @@
 }
 
 
-/* ── Volume ──────────────────────────────────────────────────── */
+/* ── Volume ──────────────────────────────────────────────────── 
+   Visibility driven by data-ft-profile attribute (set by footerQuadTree.js).
+   On touch profiles (compact, narrow), volume is device-controlled.
+   ────────────────────────────────────────────────────────────── */
 .player-volume {
   display: flex;
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
+}
+
+/* State-driven hide via profile attribute */
+[data-ft-profile="compact"] .player-volume,
+[data-ft-profile="narrow"] .player-volume {
+  display: none;
 }
 
 .player-volume-icon {
@@ -277,16 +306,17 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   NAV ZONE — right side, fixed width
+   NAV ZONE
+   Width set by footerQuadTree.js inline style.
    ══════════════════════════════════════════════════════════════ */
 
 .footer-nav-zone {
   display: flex;
   align-items: center;
-  flex-shrink: 0;
   height: 100%;
   border-left: var(--footer-separator);
   overflow: visible;
+  /* width set by JS */
 }
 
 .footer-nav-zone a,
@@ -314,15 +344,20 @@
   background: rgba(43, 127, 140, 0.15);
 }
 
+/* Compact profile: nav zone stacked adjustments */
+[data-ft-profile="compact"] .footer-nav-zone {
+  justify-content: center;
+  border-left: none;
+  border-top: var(--footer-separator);
+}
+
 
 /* ══════════════════════════════════════════════════════════════
    USER CELL — vertical micro-stack (icon / name / logout)
-   Shows when logged in, hidden when logged out.
-   Can overflow above footer if needed.
    ══════════════════════════════════════════════════════════════ */
 
 .user-cell {
-  display: none;  /* hidden by default, shown by auth.js */
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -339,13 +374,19 @@
   display: flex;
 }
 
+/* Compact profile: user cell goes horizontal */
+[data-ft-profile="compact"] .user-cell.active {
+  flex-direction: row;
+  gap: 6px;
+  border-right: 1px solid rgba(43, 127, 140, 0.15);
+}
+
 .user-cell-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   border: none;
-  /* override nav-zone a styles */
   height: auto !important;
   border-right: none !important;
 }
@@ -385,7 +426,6 @@
   text-transform: lowercase;
   line-height: 1;
   transition: color 0.15s ease;
-  /* override nav-zone button styles */
   height: auto !important;
   border-right: none !important;
   font-family: inherit;
@@ -395,11 +435,7 @@
   color: var(--ip-fg, #cadbda);
 }
 
-/* Login button — hidden when user cell is active */
-.nav-login-btn {
-  /* inherits nav-zone a/button styles */
-}
-
+/* Login button */
 .nav-login-btn.hidden {
   display: none;
 }
@@ -445,9 +481,17 @@
   display: none;
 }
 
+/* Compact profile: hide inline cart-add in transport */
+[data-ft-profile="compact"] .player-transport .btn-cart { display: none; }
+
+/* Compact profile: hide skip buttons to save space */
+[data-ft-profile="compact"] .player-transport .btn-skip-back,
+[data-ft-profile="compact"] .player-transport .btn-skip-fwd { display: none; }
+
 
 /* ══════════════════════════════════════════════════════════════
-   LOGO ZONE — far right edge
+   LOGO ZONE
+   Width set by footerQuadTree.js inline style.
    ══════════════════════════════════════════════════════════════ */
 
 .footer-logo {
@@ -457,8 +501,8 @@
   justify-content: center;
   padding: var(--logo-padding);
   border-left: var(--footer-separator);
-  flex-shrink: 0;
   height: 100%;
+  /* width set by JS */
 }
 
 .footer-logo img {
@@ -476,101 +520,11 @@
   line-height: 1;
 }
 
-
-/* ══════════════════════════════════════════════════════════════
-   RESPONSIVE — TABLET (768-1023)
-   ══════════════════════════════════════════════════════════════ */
-@media (max-width: 1023px) {
-  :root {
-    --footer-height:      56px;
-    --player-btn-size:    28px;
-    --player-icon-size:   18px;
-    --player-title-max-w: 160px;
-    --player-title-font:  12px;
-    --seek-max-w:         160px;
-    --vol-track-w:        40px;
-    --nav-font:           13px;
-    --nav-padding:        8px 14px;
-    --logo-img-h:         20px;
-    --logo-padding:       4px 14px;
-    --user-icon-size:     16px;
-    --user-name-font:     10px;
-    --user-logout-font:   8px;
-    --user-cell-padding:  4px 10px;
-  }
-}
-
-
-/* ══════════════════════════════════════════════════════════════
-   RESPONSIVE — MOBILE (<768)
-   Stacked layout: player row 1, nav row 2, logo row 3
-   ══════════════════════════════════════════════════════════════ */
-@media (max-width: 767px) {
-  :root {
-    --footer-height:      auto;
-    --player-btn-size:    26px;
-    --player-icon-size:   16px;
-    --player-title-max-w: 120px;
-    --player-title-font:  12px;
-    --player-time-font:   11px;
-    --seek-max-w:         none;
-    --seek-min-w:         60px;
-    --vol-track-w:        0px;
-    --nav-font:           12px;
-    --nav-padding:        6px 10px;
-    --logo-img-h:         16px;
-    --logo-padding:       3px 10px;
-    --user-icon-size:     14px;
-    --user-name-font:     9px;
-    --user-cell-padding:  4px 8px;
-  }
-
-  .footer-bar {
-    flex-wrap: wrap;
-    height: auto;
-  }
-
-  .footer-player-zone {
-    width: 100%;
-    order: 1;
-    padding: 4px 10px;
-  }
-
-  .player-volume { display: none; }
-
-  .player-transport .btn-skip-back,
-  .player-transport .btn-skip-fwd { display: none; }
-
-  .footer-nav-zone {
-    width: 100%;
-    justify-content: center;
-    border-left: none;
-    border-top: var(--footer-separator);
-    order: 2;
-  }
-
-  .footer-nav-zone a,
-  .footer-nav-zone button.nav-login-btn {
-    border-right: 1px solid rgba(43, 127, 140, 0.15);
-  }
-
-  /* User cell goes horizontal on mobile */
-  .user-cell.active {
-    flex-direction: row;
-    gap: 6px;
-    border-right: 1px solid rgba(43, 127, 140, 0.15);
-  }
-
-  .footer-logo {
-    width: 100%;
-    flex-direction: row;
-    justify-content: center;
-    gap: 8px;
-    border-left: none;
-    border-top: 1px solid rgba(43, 127, 140, 0.15);
-    padding: var(--logo-padding);
-    order: 3;
-  }
-
-  .player-transport .btn-cart { display: none; }
+/* Compact profile: logo zone stacked adjustments */
+[data-ft-profile="compact"] .footer-logo {
+  flex-direction: row;
+  justify-content: center;
+  gap: 8px;
+  border-left: none;
+  border-top: 1px solid rgba(43, 127, 140, 0.15);
 }

@@ -1,5 +1,5 @@
 // ============================================================================
-// public/js/roderick.js — V6.1 (RODUX Stack / CSS-Var-Driven Layout)
+// public/js/roderick.js — V6.3 (RODUX Stack / CSS-Var-Driven Layout)
 //
 // Single controller for the Roderick Shoolbraid artist page.
 // Owns: data fetch, DOM creation, region layout, QuadTree grid,
@@ -9,10 +9,18 @@
 //   roderick.json → setRegionVars()  [--header-h, --main-top, --main-h, etc.]
 //                 → layoutGrid()     [--grid-cols, --tile-w, --tile-h, --grid-gap, --grid-margin]
 //
+// V6.3: FooterQuadTree integration. Footer layout is now RODUX pipeline:
+//   StateJS → cssJSON (footer.json) → RatioEngine → QuadTree → CSS vars.
+//   setRegionVars() no longer writes --footer-height to :root (bug #4 fix).
+//   footerQuadTree.js owns footer height + zone widths.
+//
 // Footer (#artistControls) is position:fixed in CSS — not laid out here.
 // Sidebar uses .open class toggle — CSS handles positioning/sizing.
 // No Object.assign(el.style, ...) anywhere.
 // ============================================================================
+
+// V6.3: Import FooterQuadTree module
+import { FooterQuadTree } from './footerQuadTree.js';
 
 // V6.1: Colors defined in CSS :root defaults. No paint-applier needed.
 
@@ -24,7 +32,10 @@ const TABLET_MAX = 1023;
 function isMobile()  { return innerWidth <= MOBILE_MAX; }
 function isDesktop() { return innerWidth > TABLET_MAX; }
 
-// Footer is position:fixed — measure its actual rendered height
+// Footer is position:fixed — measure its actual rendered height.
+// V6.3: offsetHeight now includes env(safe-area-inset-bottom) padding
+// from player.css. We do NOT write this back to :root (that was bug #4).
+// footerQuadTree.js owns --footer-height on .footer-bar.
 function footerHeight() {
   const f = Q('artistControls');
   return f ? f.offsetHeight : 40;
@@ -237,6 +248,10 @@ function closeSidebar() {
 //
 // Instead of el.style.left = '340px', we set CSS vars on :root
 // and let CSS rules consume them. This is the RODUX way.
+//
+// V6.3: No longer writes --footer-height to :root.
+//       footerQuadTree.js owns that var on .footer-bar.
+//       setRegionVars() still READS footerHeight() for --main-height calc.
 // ═══════════════════════════════════════════════════════════════
 
 function setRegionVars() {
@@ -255,6 +270,10 @@ function setRegionVars() {
   root.style.setProperty('--main-top',      `${headerH}px`);
   root.style.setProperty('--main-height',   `${mainH}px`);
   root.style.setProperty('--vw',            `${vw}px`);
+
+  // V6.3: REMOVED — do NOT set --footer-height on :root.
+  // footerQuadTree.js owns this on .footer-bar now.
+  // This was bug #4: setRegionVars() was overwriting 75px with 51px.
 
   // ── Sidebar split vars ───────────────────────────────────────
   if (!isMobile() && sidebarOpen) {
@@ -339,6 +358,9 @@ function layoutGrid() {
 
 // ═══════════════════════════════════════════════════════════════
 // RENDER
+//
+// V6.3: FooterQuadTree runs FIRST so that footerHeight() measures
+//       the QT-computed footer height (including safe-area padding).
 // ═══════════════════════════════════════════════════════════════
 
 function render() {
@@ -346,7 +368,13 @@ function render() {
   _layoutInProgress = true;
 
   try {
+    // V6.3: Footer QuadTree layout — computes zone widths + height
+    if (window.footerQT) window.footerQT.layout();
+
+    // Region vars (header, main, sidebar) — reads footerHeight()
     setRegionVars();
+
+    // Album grid — QuadTree tile positions
     layoutGrid();
   } finally {
     requestAnimationFrame(() => { _layoutInProgress = false; });
@@ -422,6 +450,11 @@ function setupKeyboard() {
       await new Promise(r => document.addEventListener('DOMContentLoaded', r, { once: true }));
     }
 
+    // V6.3: Initialize Footer QuadTree (RODUX pipeline)
+    const fqt = new FooterQuadTree();
+    await fqt.init();
+    window.footerQT = fqt;
+
     // Debounced resize
     let resizeTimer;
     addEventListener('resize', () => {
@@ -434,6 +467,6 @@ function setupKeyboard() {
     // Reveal
     document.body.classList.add('ready');
 
-    console.log('🎉 roderick.js V6 initialized');
+    console.log('🎉 roderick.js V6.3 initialized (FooterQuadTree active)');
   });
 })();
