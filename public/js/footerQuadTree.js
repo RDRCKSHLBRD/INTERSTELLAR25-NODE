@@ -1,5 +1,5 @@
 // ============================================================================
-// public/js/footerQuadTree.js — V6.3.1 (RODUX Stack)
+// public/js/footerQuadTree.js — V6.3.2 (RODUX Stack)
 //
 // QuadTree-driven footer layout engine.
 // Full RODUX pipeline: StateJS → RatioEngine → cssJSON → QuadTree → CSS vars.
@@ -11,17 +11,16 @@
 //   An iPhone at 375px gets 'compact-portrait' profile (stacked, wireframe layout).
 //   DevTools device emulation triggers touch detection correctly.
 //
-// PROFILE MATCHING:
-//   Profiles can require { device: "touch" } or { device: "pointer" }.
-//   Profiles without a device field match any device.
-//   First matching profile wins (walk array top to bottom).
-//
-// LAYOUT MODES:
+// LAYOUT MODES (mathematical, not CSS):
 //   "stacked"    — portrait phone. All zones full width, vertical stack.
-//   "two-tier"   — landscape phone / tablet. CSS grid: title row, then
-//                   transport+nav side-by-side, logo right-aligned.
+//   "two-tier"   — landscape phone / tablet. QuadTree computes 3 rows:
+//                   R1: player (full width), title+seek+time row
+//                   R2: transport (left, measured) + nav (right, measured)
+//                   R3: logo (right-aligned, measured)
+//                   All positions computed as px, written as CSS vars.
 //   "horizontal" — desktop. Single strip: player | nav | logo.
 //
+// CSS IS A DUMB RENDERER. It consumes --ft-* vars only.
 // ============================================================================
 
 export class FooterQuadTree {
@@ -49,9 +48,7 @@ export class FooterQuadTree {
         return;
       }
 
-      // Detect device class once on init (doesn't change mid-session)
       this._device = this._detectDevice();
-
       this._ready = true;
       console.log(`✅ FooterQuadTree initialized (device: ${this._device})`);
     } catch (err) {
@@ -66,14 +63,13 @@ export class FooterQuadTree {
   _detectDevice() {
     const hasTouch = navigator.maxTouchPoints > 0;
     const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
-
     if (hasTouch && hasCoarsePointer) return 'touch';
     if (hasTouch) return 'touch';
     return 'pointer';
   }
 
   // ══════════════════════════════════════════════════════════════
-  // STATE — Read viewport from StateJS or measure directly
+  // STATE
   // ══════════════════════════════════════════════════════════════
 
   _readState() {
@@ -126,10 +122,8 @@ export class FooterQuadTree {
     for (const profile of profiles) {
       if (profile.device && profile.device !== state.device) continue;
       if (profile.orientation && profile.orientation !== state.orientation) continue;
-
       const minOk = (profile.minWidth === undefined) || (state.vw >= profile.minWidth);
       const maxOk = (profile.maxWidth === undefined) || (state.vw <= profile.maxWidth);
-
       if (minOk && maxOk) return profile;
     }
 
@@ -151,12 +145,27 @@ export class FooterQuadTree {
   }
 
   // ══════════════════════════════════════════════════════════════
-  // RATIO ENGINE — compute zone widths
+  // MEASURE — get natural dimensions of a DOM element
   //
-  // Three layout modes:
-  //   stacked:    all zones 100% width, ordered vertically
-  //   two-tier:   all zones 100% width, CSS grid handles positioning
-  //   horizontal: player gets remaining space after nav + logo measured
+  // Temporarily sets auto sizing, reads scrollWidth/scrollHeight,
+  // restores original values. Standard QuadTree measurement pass.
+  // ══════════════════════════════════════════════════════════════
+
+  _measure(el) {
+    if (!el) return { w: 0, h: 0 };
+    const prevW = el.style.width || '';
+    const prevH = el.style.height || '';
+    el.style.width = 'auto';
+    el.style.height = 'auto';
+    const w = el.scrollWidth;
+    const h = el.scrollHeight;
+    el.style.width = prevW;
+    el.style.height = prevH;
+    return { w, h };
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  // RATIO ENGINE — compute zone geometry (all mathematical)
   // ══════════════════════════════════════════════════════════════
 
   _computeZones(profile, state) {
@@ -177,14 +186,47 @@ export class FooterQuadTree {
     }
 
     // ── Two-tier (landscape phone / tablet) ────────────────────
-    // CSS grid handles the actual 2-tier positioning.
-    // We set all zones to full width; grid-template-areas in
-    // player.css does the row/column assignment.
+    //
+    // QuadTree measures nav and logo at natural widths, then
+    // computes positions mathematically:
+    //
+    //   Row 1: player zone = full viewport width
+    //          (.player internally wraps title/seek/time vs transport)
+    //
+    //   Row 2: nav zone positioned right, width = measured
+    //          transport gets remaining space (inside player zone)
+    //
+    //   Row 3: logo zone right-aligned, width = measured
+    //
     if (layoutMode === 'two-tier') {
+      const navEl  = this.footerBar.querySelector('.footer-nav-zone');
+      const logoEl = this.footerBar.querySelector('.footer-logo');
+
+      const navSize  = this._measure(navEl);
+      const logoSize = this._measure(logoEl);
+
+      const navCfg  = zones.nav  || {};
+      const logoCfg = zones.logo || {};
+
+      const navW  = Math.floor(
+        Math.min(navCfg.maxPx ?? Infinity, Math.max(navCfg.minPx ?? 0, navSize.w))
+      );
+      const logoW = Math.floor(
+        Math.min(logoCfg.maxPx ?? Infinity, Math.max(logoCfg.minPx ?? 0, logoSize.w))
+      );
+
+      // Nav sits right on row 2
+      const navX = vw - navW;
+      // Logo right-aligned on row 3
+      const logoX = vw - logoW;
+      // Transport available width (left side of row 2)
+      const transportW = vw - navW;
+
       return {
-        player: { x: 0, w: vw, order: profile.order?.player ?? 1 },
-        nav:    { x: 0, w: vw, order: profile.order?.nav    ?? 2 },
-        logo:   { x: 0, w: vw, order: profile.order?.logo   ?? 3 },
+        player:    { x: 0,     w: vw    },
+        nav:       { x: navX,  w: navW  },
+        logo:      { x: logoX, w: logoW },
+        transport: { x: 0,     w: transportW },
         stacked: false,
         twoTier: true,
         layoutMode: 'two-tier',
@@ -215,14 +257,10 @@ export class FooterQuadTree {
     const available = vw - finalNavW - finalLogoW;
     const finalPlayerW = Math.max(playerCfg.minPx ?? 200, Math.floor(available));
 
-    const playerX = 0;
-    const navX    = finalPlayerW;
-    const logoX   = finalPlayerW + finalNavW;
-
     return {
-      player: { x: playerX, w: finalPlayerW, order: 1 },
-      nav:    { x: navX,    w: finalNavW,    order: 2 },
-      logo:   { x: logoX,   w: finalLogoW,  order: 3 },
+      player: { x: 0,                          w: finalPlayerW, order: 1 },
+      nav:    { x: finalPlayerW,                w: finalNavW,    order: 2 },
+      logo:   { x: finalPlayerW + finalNavW,    w: finalLogoW,  order: 3 },
       stacked: false,
       twoTier: false,
       layoutMode: 'horizontal',
@@ -231,6 +269,9 @@ export class FooterQuadTree {
 
   // ══════════════════════════════════════════════════════════════
   // WRITE — CSS vars + inline styles on DOM
+  //
+  // This is the ONLY place JS touches the DOM for layout.
+  // CSS consumes these values. That's the RODUX contract.
   // ══════════════════════════════════════════════════════════════
 
   _writeVars(zones, profile, state) {
@@ -243,7 +284,7 @@ export class FooterQuadTree {
     bar.style.setProperty('--ft-height', hVal);
     bar.style.setProperty('--footer-height', hVal);
 
-    // Zone vars
+    // Zone position vars
     bar.style.setProperty('--ft-player-x', `${zones.player.x}px`);
     bar.style.setProperty('--ft-player-w', `${zones.player.w}px`);
     bar.style.setProperty('--ft-nav-x',    `${zones.nav.x}px`);
@@ -252,8 +293,6 @@ export class FooterQuadTree {
     bar.style.setProperty('--ft-logo-w',   `${zones.logo.w}px`);
 
     // Profile metadata
-    // For two-tier, we set data-ft-profile to "two-tier" so CSS
-    // grid rules activate, regardless of the profile's name field.
     const profileAttr = zones.twoTier ? 'two-tier' : (profile.name || 'default');
     bar.style.setProperty('--ft-profile', profileAttr);
     bar.style.setProperty('--ft-stacked', zones.stacked ? '1' : '0');
@@ -261,33 +300,70 @@ export class FooterQuadTree {
     el.dataset.ftDevice  = state.device;
 
     // Volume
-    const volVisible = profile.volumeVisible ?? true;
-    bar.style.setProperty('--ft-vol-visible', volVisible ? '1' : '0');
+    bar.style.setProperty('--ft-vol-visible', (profile.volumeVisible ?? true) ? '1' : '0');
 
-    // Apply zone widths to DOM
+    // ── Apply zone geometry to DOM ─────────────────────────────
     const playerZone = bar.querySelector('.footer-player-zone');
     const navZone    = bar.querySelector('.footer-nav-zone');
     const logoZone   = bar.querySelector('.footer-logo');
 
+    // Clear stale styles from other layout modes
+    const clearZone = (z) => {
+      if (!z) return;
+      z.style.order = '';
+      z.style.marginLeft = '';
+      z.style.borderLeft = '';
+    };
+    clearZone(playerZone);
+    clearZone(navZone);
+    clearZone(logoZone);
+
     if (zones.stacked) {
-      // Stacked: all zones full-width, ordered
+      // ── Stacked: all zones full-width, ordered ───────────────
       if (playerZone) { playerZone.style.width = '100%'; playerZone.style.order = zones.player.order; }
       if (navZone)    { navZone.style.width = '100%'; navZone.style.order = zones.nav.order; navZone.style.borderLeft = 'none'; }
       if (logoZone)   { logoZone.style.width = '100%'; logoZone.style.order = zones.logo.order; logoZone.style.borderLeft = 'none'; }
+
     } else if (zones.twoTier) {
-      // Two-tier: CSS grid handles layout. Clear any stale inline widths.
-      // Zone elements participate in grid areas defined by player.css.
-      if (playerZone) { playerZone.style.width = ''; playerZone.style.order = ''; }
-      if (navZone)    { navZone.style.width = ''; navZone.style.order = ''; navZone.style.borderLeft = ''; }
-      if (logoZone)   { logoZone.style.width = ''; logoZone.style.order = ''; logoZone.style.borderLeft = ''; }
+      // ── Two-tier: QuadTree-computed positions ────────────────
+      //
+      // Player zone: full viewport width. Its internal .player
+      // uses flex-wrap (set by CSS profile rules) to split
+      // title/seek/time from transport into two visual rows.
+      //
+      // Nav zone: QuadTree-computed width, pushed right via
+      // marginLeft:auto. Sits beside transport on visual row 2.
+      //
+      // Logo zone: QuadTree-computed width, pushed right via
+      // marginLeft:auto. Sits on visual row 3.
+      //
+      if (playerZone) {
+        playerZone.style.width = `${zones.player.w}px`;
+      }
+      if (navZone) {
+        navZone.style.width = `${zones.nav.w}px`;
+        navZone.style.marginLeft = 'auto';
+        navZone.style.borderLeft = 'none';
+      }
+      if (logoZone) {
+        logoZone.style.width = `${zones.logo.w}px`;
+        logoZone.style.marginLeft = 'auto';
+        logoZone.style.borderLeft = 'none';
+      }
+
+      // Transport width var for CSS
+      if (zones.transport) {
+        bar.style.setProperty('--ft-transport-w', `${zones.transport.w}px`);
+      }
+
     } else {
-      // Horizontal: explicit pixel widths
-      if (playerZone) { playerZone.style.width = `${zones.player.w}px`; playerZone.style.order = ''; }
-      if (navZone)    { navZone.style.width = `${zones.nav.w}px`; navZone.style.order = ''; }
-      if (logoZone)   { logoZone.style.width = `${zones.logo.w}px`; logoZone.style.order = ''; }
+      // ── Horizontal: pixel widths, left to right ──────────────
+      if (playerZone) { playerZone.style.width = `${zones.player.w}px`; }
+      if (navZone)    { navZone.style.width = `${zones.nav.w}px`; }
+      if (logoZone)   { logoZone.style.width = `${zones.logo.w}px`; }
     }
 
-    // Per-profile CSS var overrides
+    // Per-profile CSS var overrides from config
     if (profile.vars) {
       for (const [varName, value] of Object.entries(profile.vars)) {
         bar.style.setProperty(varName, value);
@@ -331,6 +407,7 @@ export class FooterQuadTree {
         player: `x:${this._zones.player.x} w:${this._zones.player.w}`,
         nav:    `x:${this._zones.nav.x} w:${this._zones.nav.w}`,
         logo:   `x:${this._zones.logo.x} w:${this._zones.logo.w}`,
+        transport: this._zones.transport ? `x:${this._zones.transport.x} w:${this._zones.transport.w}` : 'n/a',
       } : null,
       volumeVisible: this._profile?.volumeVisible ?? null,
     };

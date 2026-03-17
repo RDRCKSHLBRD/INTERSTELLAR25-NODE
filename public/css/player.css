@@ -517,15 +517,7 @@
   min-width: auto;
 }
 
-/* Hide inline cart button — cart is in nav row */
-[data-ft-profile="compact-portrait"] .player-transport .btn-cart {
-  display: none;
-}
-
-/* Hide inline plist button — on mobile portrait it's in nav or hidden */
-[data-ft-profile="compact-portrait"] .player-transport .btn-plist {
-  display: none;
-}
+/* V6.3.1: +cart and +plist stay visible in transport on portrait */
 
 /* Nav: stacked full-width, centered */
 [data-ft-profile="compact-portrait"] .footer-nav-zone {
@@ -560,123 +552,77 @@
 /* ══════════════════════════════════════════════════════════════
    PROFILE: two-tier (landscape phone + tablet)
    
-   3-row grid using the full footer width:
+   3-row layout, all positions computed by footerQuadTree.js:
    
    Row 1: [title ..................] [seek .......] [time]
    Row 2: [transport buttons ....] [nav links ............]
    Row 3:                                    [logo] [tag]
    
-   The .footer-bar becomes a CSS grid.
-   Player zone, nav zone, and logo zone all span full width
-   but are repositioned by grid areas.
+   footerQuadTree.js sets:
+     - Player zone width (full vw)
+     - Nav zone width (measured) + marginLeft:auto
+     - Logo zone width (measured) + marginLeft:auto
+     - --ft-transport-w (available space left of nav)
    
-   This is NOT stacked (portrait) and NOT horizontal (desktop).
-   It's a hybrid: controls and nav share a row.
+   CSS here only handles:
+     - .footer-bar wrapping (inherits from base)
+     - .player internal wrap (title/seek/time vs transport)
+     - Visual styling (borders, padding, alignment)
+   
+   NO layout computation. CSS is a dumb renderer.
    ══════════════════════════════════════════════════════════════ */
 
+/* Footer bar: height auto for stacking rows */
 [data-ft-profile="two-tier"] .footer-bar {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-rows: auto auto auto;
-  grid-template-areas:
-    "player-top  player-top"
-    "transport   nav"
-    "spacer      logo";
   height: auto;
-  align-items: center;
-  gap: 0;
+  align-items: stretch;
 }
 
-/* ── Row 1: title + seek + time (spans full width) ─────────── */
+/* ── Player zone (Row 1 + Row 2 transport) ─────────────────── */
+/* Width set by footerQuadTree.js (full vw) */
 [data-ft-profile="two-tier"] .footer-player-zone {
-  grid-area: player-top;
-  width: 100% !important;
   height: auto;
-  padding: 6px 14px 4px;
+  padding: 6px 14px 0;
 }
 
+/* .player wraps: title/seek/time on line 1, transport on line 2 */
 [data-ft-profile="two-tier"] .player {
-  flex-wrap: nowrap;
   height: auto;
-  gap: 10px;
-}
-
-[data-ft-profile="two-tier"] .player-title {
-  flex: 1 1 auto;
-  max-width: none;
-  min-width: 80px;
+  gap: 8px;
 }
 
 [data-ft-profile="two-tier"] .player-separator {
   display: none;
 }
 
+/* Title takes remaining space on line 1 */
+[data-ft-profile="two-tier"] .player-title {
+  max-width: none;
+  min-width: 80px;
+}
+
+/* Seek bar fluid on line 1 */
 [data-ft-profile="two-tier"] .player-seek {
-  flex: 0 1 auto;
   max-width: none;
   min-width: var(--seek-min-w);
-  width: 30%;
 }
 
-[data-ft-profile="two-tier"] .player-time {
-  flex-shrink: 0;
-}
-
-/* Hide volume on two-tier (touch devices) */
+/* Volume hidden on touch */
 [data-ft-profile="two-tier"] .player-volume {
   display: none;
 }
 
-
-/* ── Row 2 left: transport buttons ─────────────────────────── */
-/*
-   The transport lives INSIDE .footer-player-zone in the DOM,
-   but we need it on row 2. We pull it out of flow with a
-   wrapper trick: the .player element wraps, and transport
-   gets flex-basis: 100% to force a new row, then we use
-   the grid to position the whole player zone.
-   
-   Actually — simpler approach: we make .player wrap and
-   let title+seek+time be row 1 inside it, transport be
-   row 2. Then nav zone sits beside the transport visually
-   via grid placement.
-*/
-
-[data-ft-profile="two-tier"] .player {
-  flex-wrap: wrap;
-}
-
-/* Title + seek + time stay on one line */
-[data-ft-profile="two-tier"] .player-title {
-  order: 1;
-}
-[data-ft-profile="two-tier"] .player-seek {
-  order: 2;
-}
-[data-ft-profile="two-tier"] .player-time {
-  order: 3;
-}
-
-/* Transport drops to its own row inside .player */
+/* Transport drops to line 2, takes available width */
 [data-ft-profile="two-tier"] .player-transport {
-  order: 4;
-  flex-basis: 100%;
-  justify-content: flex-start;
-  padding: 4px 0 2px;
+  padding: 4px 0 6px;
 }
 
 
-/* ── Row 2 right: nav zone ─────────────────────────────────── */
+/* ── Nav zone (Row 2 right) ────────────────────────────────── */
+/* Width + marginLeft set by footerQuadTree.js */
 [data-ft-profile="two-tier"] .footer-nav-zone {
-  grid-area: nav;
-  width: auto !important;
   height: auto;
-  border-left: var(--footer-separator);
-  border-top: none;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  align-self: end;
-  padding-bottom: 2px;
+  border-top: var(--footer-separator);
 }
 
 [data-ft-profile="two-tier"] .footer-nav-zone a,
@@ -685,7 +631,7 @@
   border-right: var(--footer-separator);
 }
 
-/* User cell stays horizontal in two-tier */
+/* User cell horizontal */
 [data-ft-profile="two-tier"] .user-cell.active {
   flex-direction: row;
   gap: 6px;
@@ -693,22 +639,16 @@
 }
 
 
-/* ── Row 3: logo right-aligned ─────────────────────────────── */
+/* ── Logo zone (Row 3 right) ───────────────────────────────── */
+/* Width + marginLeft set by footerQuadTree.js */
 [data-ft-profile="two-tier"] .footer-logo {
-  grid-area: logo;
-  width: auto !important;
   flex-direction: row;
   justify-content: flex-end;
   gap: 8px;
-  border-left: none;
   border-top: 1px solid rgba(43, 127, 140, 0.1);
   height: auto;
   padding: var(--logo-padding);
 }
-
-
-/* ── Row 3 left: empty spacer ──────────────────────────────── */
-/* Grid area "spacer" is empty — nothing needs to render there */
 
 
 /* ══════════════════════════════════════════════════════════════
