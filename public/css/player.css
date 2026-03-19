@@ -24,7 +24,7 @@
   --footer-border:       1px solid rgba(43, 127, 140, 0.4);
   --footer-separator:    1px solid rgba(43, 127, 140, 0.25);
 
-  --player-btn-size:     45px;
+  --player-btn-size:     40px;
   --player-icon-size:    40px;
   --player-btn-gap:      4px;
   --player-btn-border:   1px solid rgba(43, 127, 140, 0.35);
@@ -111,34 +111,21 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   GROUP: TRANSPORT — 3-col button grid
-   Position: absolute (set by footerQuadTree.js)
-   Internal: CSS grid
+   GROUP: TRANSPORT
+   Position + inner layout: footerQuadTree.js (absolute)
+   CSS: colors, borders, typography ONLY
    ══════════════════════════════════════════════════════════════ */
 
-.group-transport {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 6px;
-  overflow: hidden;
-}
+/* .group-transport — no CSS layout. JS positions everything. */
 
-.transport-grid {
-  display: grid;
-  grid-template-columns: repeat(3, var(--player-btn-size));
-  gap: var(--player-btn-gap);
-  flex-shrink: 0;
-}
+/* .transport-grid wrapper uses display:contents (JS sets this) */
 
-.transport-grid button {
+.transport-grid button,
+.group-transport button {
   background: none;
   border: var(--player-btn-border);
   outline: none;
   cursor: pointer;
-  width: var(--player-btn-size);
-  height: var(--player-btn-size);
-  flex-shrink: 0;
   background-size: var(--player-icon-size) var(--player-icon-size);
   background-repeat: no-repeat;
   background-position: center;
@@ -148,8 +135,10 @@
   color: transparent;
   overflow: hidden;
   transition: opacity 0.15s, background-color 0.15s;
+  box-sizing: border-box;
 }
-.transport-grid button:hover {
+.transport-grid button:hover,
+.group-transport button:hover {
   opacity: 0.85;
   background-color: rgba(43, 127, 140, 0.1);
 }
@@ -181,26 +170,13 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   GROUP: INFORMATION — title, seek+time, volume (column)
-   Position: absolute (set by footerQuadTree.js)
-   Internal: flex column
+   GROUP: INFORMATION
+   Position + inner layout: footerQuadTree.js (absolute)
+   CSS: colors, typography ONLY
    ══════════════════════════════════════════════════════════════ */
 
-.group-information {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 4px 12px;
-  gap: 3px;
-}
-
-.info-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  min-width: 0;
-}
+/* .group-information — no CSS layout. JS positions title/seek/time/vol. */
+/* .info-row wrappers use display:contents (JS sets this) */
 
 /* Song Title */
 .player-title {
@@ -288,14 +264,12 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   GROUP: LINK — navigation links (inline)
+   GROUP: LINK — navigation links
+   Position + inner layout: footerQuadTree.js (absolute)
+   CSS: colors, typography ONLY
    ══════════════════════════════════════════════════════════════ */
 
-.group-link {
-  display: flex;
-  align-items: center;
-  height: 100%;
-}
+/* .group-link — no CSS layout. JS positions each link. */
 
 .group-link a {
   display: flex;
@@ -318,13 +292,11 @@
 
 /* ══════════════════════════════════════════════════════════════
    GROUP: ACTION — login, cart (high-value CTAs)
+   Position + inner layout: footerQuadTree.js (absolute)
+   CSS: colors, typography ONLY
    ══════════════════════════════════════════════════════════════ */
 
-.group-action {
-  display: flex;
-  align-items: center;
-  height: 100%;
-}
+/* .group-action — no CSS layout. JS positions each element. */
 
 .group-action button,
 .group-action a {
@@ -445,16 +417,12 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   GROUP: LOGO — brand mark + tag (column)
+   GROUP: LOGO — brand mark + tag
+   Position + inner layout: footerQuadTree.js (absolute)
+   CSS: colors, typography ONLY
    ══════════════════════════════════════════════════════════════ */
 
-.group-logo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--logo-padding);
-}
+/* .group-logo — no CSS layout. JS positions img + tag. */
 
 .group-logo img {
   height: var(--logo-img-h);

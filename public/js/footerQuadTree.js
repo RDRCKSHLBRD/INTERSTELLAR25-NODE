@@ -1,27 +1,17 @@
 // ============================================================================
-// public/js/footerQuadTree.js — V7.0.0 (RODUX Stack)
+// public/js/footerQuadTree.js — V7.1.0 (RODUX Stack)
 //
-// Group-based footer layout engine.
-// Full RODUX pipeline: StateJS → RatioEngine → cssJSON → QuadTree → CSS vars.
+// Group-based footer layout engine with INNER CALCULATIONS.
+// Full RODUX: JS owns every position. CSS is dumb renderer.
 //
-// ARCHITECTURE:
-//   Five named groups: Transport, Information, Link, Action, Logo.
-//   Fixed order. ONE packing algorithm for ALL viewports.
+// OUTER PACK: positions 5 group boxes (L→R, wrap on overflow).
+// INNER CALC: positions elements INSIDE each group:
+//   Transport:   every button absolute x/y/w/h
+//   Information: title, seek, time, volume absolute
+//   Link/Action: children measured and positioned inline
+//   Logo:        img + tag centered
 //
-//   Transport: pinned left (always row 1, col 1).
-//   Action + Logo: pinned right on desktop (first row, right edge).
-//   Information + Link: flow into remaining space, greedy-expand.
-//
-//   When viewport narrows: groups that don't fit wrap to next row.
-//   No "stacked" vs "two-tier" vs "horizontal" modes.
-//   The packing output IS the layout.
-//
-// DEVICE DETECTION:
-//   navigator.maxTouchPoints + pointer:coarse.
-//   Touch → volume hidden in Information group.
-//   Pointer → volume visible.
-//
-// V7.0.0: Clean rewrite. Group containers. Paragraph-flow packing.
+// V7.1.0: Full inner calculations. No CSS grid/flex for layout.
 // ============================================================================
 
 export class FooterQuadTree {
@@ -34,113 +24,60 @@ export class FooterQuadTree {
     this._packResult = null;
   }
 
-
-  // ══════════════════════════════════════════════════════════════
-  // INIT
-  // ══════════════════════════════════════════════════════════════
-
   async init() {
     try {
       const res = await fetch('/config/data/footer.json', { cache: 'no-store' });
-      if (!res.ok) throw new Error(`footer.json: ${res.status}`);
+      if (!res.ok) throw new Error('footer.json: ' + res.status);
       this.config = await res.json();
-
       this.footerEl  = document.getElementById('artistControls');
       this.footerBar = this.footerEl?.querySelector('.footer-bar');
-
-      if (!this.footerBar) {
-        console.warn('⚠️ FooterQuadTree: .footer-bar not found in DOM');
-        return;
-      }
-
+      if (!this.footerBar) { console.warn('⚠️ FooterQuadTree: .footer-bar not found'); return; }
       this._device = this._detectDevice();
       this._ready  = true;
-      console.log(`✅ FooterQuadTree V7.0.0 initialized (device: ${this._device})`);
-    } catch (err) {
-      console.error('❌ FooterQuadTree init failed:', err);
-    }
+      console.log('✅ FooterQuadTree V7.1.0 initialized (device: ' + this._device + ')');
+    } catch (err) { console.error('❌ FooterQuadTree init failed:', err); }
   }
-
-
-  // ══════════════════════════════════════════════════════════════
-  // DEVICE DETECTION
-  // ══════════════════════════════════════════════════════════════
 
   _detectDevice() {
-    const hasTouch         = navigator.maxTouchPoints > 0;
-    const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
-    return (hasTouch && hasCoarsePointer) ? 'touch' : (hasTouch ? 'touch' : 'pointer');
+    const hasTouch = navigator.maxTouchPoints > 0;
+    const hasCoarse = window.matchMedia('(pointer: coarse)').matches;
+    return (hasTouch && hasCoarse) ? 'touch' : (hasTouch ? 'touch' : 'pointer');
   }
-
-
-  // ══════════════════════════════════════════════════════════════
-  // STATE
-  // ══════════════════════════════════════════════════════════════
 
   _readState() {
     const IS = window.Interstellar;
     if (IS?.state?.viewport) {
       const vp = IS.state.viewport;
-      return {
-        vw:     vp.width  || window.innerWidth,
-        vh:     vp.height || window.innerHeight,
-        dpr:    vp.dpr    || window.devicePixelRatio || 1,
-        device: this._device,
-      };
+      return { vw: vp.width || innerWidth, vh: vp.height || innerHeight, dpr: vp.dpr || devicePixelRatio || 1, device: this._device };
     }
-    return {
-      vw:     window.innerWidth,
-      vh:     window.innerHeight,
-      dpr:    window.devicePixelRatio || 1,
-      device: this._device,
-    };
+    return { vw: innerWidth, vh: innerHeight, dpr: devicePixelRatio || 1, device: this._device };
   }
-
-
-  // ══════════════════════════════════════════════════════════════
-  // PROFILE SELECTION — sizing presets only, not layout presets
-  // ══════════════════════════════════════════════════════════════
 
   _selectProfile(state) {
     const profiles = this.config.profiles;
     if (!profiles) return {};
-
     for (const name of ['compact', 'standard', 'wide']) {
       const p = profiles[name];
       if (!p) continue;
-      const minOk = (p.minWidth === undefined) || (state.vw >= p.minWidth);
-      const maxOk = (p.maxWidth === undefined) || (state.vw <= p.maxWidth);
-      if (minOk && maxOk) return { name, ...p };
+      if ((p.minWidth === undefined || state.vw >= p.minWidth) && (p.maxWidth === undefined || state.vw <= p.maxWidth))
+        return { name, ...p };
     }
-
     return { name: 'standard', ...(profiles.standard || {}) };
   }
 
-
-  // ══════════════════════════════════════════════════════════════
-  // MEASURE — natural dimensions of a DOM element
-  // ══════════════════════════════════════════════════════════════
-
   _measure(el) {
     if (!el) return { w: 0, h: 0 };
-
     const prev = el.style.cssText;
-    el.style.width      = 'auto';
-    el.style.height     = 'auto';
-    el.style.position   = 'static';
-    el.style.visibility = 'hidden';
-
-    const w = el.scrollWidth;
-    const h = el.scrollHeight;
-
+    el.style.width = 'auto'; el.style.height = 'auto';
+    el.style.position = 'static'; el.style.visibility = 'hidden';
+    const w = el.scrollWidth, h = el.scrollHeight;
     el.style.cssText = prev;
     return { w, h };
   }
 
-
-  // ══════════════════════════════════════════════════════════════
-  // GROUP ELEMENT MAP
-  // ══════════════════════════════════════════════════════════════
+  _cssVar(name, fallback) {
+    return parseInt(getComputedStyle(this.footerBar).getPropertyValue(name)) || fallback;
+  }
 
   _getGroupElements() {
     const bar = this.footerBar;
@@ -153,56 +90,160 @@ export class FooterQuadTree {
     };
   }
 
+  // ══════════════════════════════════════════════════════════════
+  // INNER CALC: TRANSPORT — positions every button
+  // ══════════════════════════════════════════════════════════════
+
+  _calcTransport() {
+    const cfg     = this.config.groups.transport?.internal || {};
+    const cols    = cfg.columns || 3;
+    const btnSize = this._cssVar('--player-btn-size', 38);
+    const btnGap  = this._cssVar('--player-btn-gap', 4);
+    const padL    = 6;  // left offset
+    const padT    = 0;  // top offset (buttons flush to top)
+    const el      = this._getGroupElements().transport;
+
+    const gridWrapper = el?.querySelector('.transport-grid');
+    const btns = gridWrapper
+      ? Array.from(gridWrapper.querySelectorAll('button'))
+      : (el ? Array.from(el.querySelectorAll('button')) : []);
+
+    const count = btns.length;
+    const rows  = Math.ceil(count / cols);
+    const gridW = cols * btnSize + (cols - 1) * btnGap;
+    const gridH = rows * btnSize + (rows - 1) * btnGap;
+
+    const buttons = [];
+    for (let i = 0; i < count; i++) {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      buttons.push({
+        el: btns[i],
+        x:  padL + col * (btnSize + btnGap),
+        y:  padT + row * (btnSize + btnGap),
+        w:  btnSize,
+        h:  btnSize,
+      });
+    }
+
+    return { width: gridW + padL, height: gridH + padT, buttons, btnSize, btnGap, cols, rows };
+  }
 
   // ══════════════════════════════════════════════════════════════
-  // PACK — the core algorithm
-  //
-  // 1. Measure all groups at natural size.
-  // 2. Separate pinned-left, pinned-right, and flow groups.
-  // 3. On row 1: place pinned-left first, then pinned-right at
-  //    right edge, then flow groups fill the middle.
-  // 4. If flow groups don't fit row 1 middle, they wrap to row 2+.
-  // 5. Greedy groups expand to fill remaining row space.
+  // INNER CALC: INFORMATION — title, seek+time, volume
+  // ══════════════════════════════════════════════════════════════
+
+  _calcInformation(groupW, state) {
+    const showVol = this.config.device?.[state.device]?.volumeVisible ?? (state.device === 'pointer');
+    const pad = 12, gap = 3;
+    const innerW = groupW - pad * 2;
+    const titleH = 18;
+    const timeW = 78, seekH = this._cssVar('--seek-height', 6);
+    const row2H = Math.max(seekH, 18);
+    const seekW = Math.max(40, innerW - timeW - 8);
+    const volH = showVol ? 20 : 0;
+    const totalH = titleH + gap + row2H + (showVol ? gap + volH : 0) + pad * 2;
+
+    let y = pad;
+    const elements = {};
+    elements.title = { x: pad, y, w: innerW, h: titleH };
+    y += titleH + gap;
+    elements.seek = { x: pad, y, w: seekW, h: row2H };
+    elements.time = { x: pad + seekW + 8, y, w: timeW, h: row2H };
+    y += row2H + gap;
+    if (showVol) elements.volume = { x: pad, y, w: innerW, h: volH };
+
+    return { height: totalH, elements, showVol };
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  // INNER CALC: INLINE (Link, Action) — measure + position children
+  // ══════════════════════════════════════════════════════════════
+
+  _calcInline(groupEl, groupH) {
+    if (!groupEl) return { width: 0, height: groupH, items: [] };
+
+    const children = Array.from(groupEl.children);
+    const items = [];
+    let x = 0;
+
+    for (const child of children) {
+      // Skip truly hidden elements
+      const cs = getComputedStyle(child);
+      if (cs.display === 'none') continue;
+      if (child.classList.contains('hidden')) continue;
+
+      // For elements that are currently absolutely positioned from a prior pass,
+      // we need to measure their natural width. Temporarily free them.
+      const prevCss = child.style.cssText;
+      child.style.cssText = 'position:static;visibility:hidden;width:auto;height:auto;display:inline-flex;';
+      const w = Math.max(child.scrollWidth || child.offsetWidth, 40);
+      child.style.cssText = prevCss;
+
+      items.push({ el: child, x, y: 0, w, h: groupH });
+      x += w;
+    }
+
+    return { width: x, height: groupH, items };
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  // INNER CALC: LOGO — center img + tag
+  // ══════════════════════════════════════════════════════════════
+
+  _calcLogo(groupEl, groupW, groupH) {
+    if (!groupEl) return { height: groupH, elements: {} };
+    const img = groupEl.querySelector('img');
+    const tag = groupEl.querySelector('.footer-tag');
+    const imgH = this._cssVar('--logo-img-h', 38);
+    const tagH = 14, gap = 2;
+    const totalContentH = imgH + gap + tagH;
+    const startY = Math.max(0, Math.floor((groupH - totalContentH) / 2));
+    const elements = {};
+    if (img) {
+      const imgW = Math.min(groupW - 16, imgH * 3);
+      elements.img = { el: img, x: Math.floor((groupW - imgW) / 2), y: startY, w: imgW, h: imgH };
+    }
+    if (tag) {
+      elements.tag = { el: tag, x: 0, y: startY + imgH + gap, w: groupW, h: tagH };
+    }
+    return { height: groupH, elements };
+  }
+
+
+  // ══════════════════════════════════════════════════════════════
+  // PACK — outer group packing + inner calcs for accurate heights
   // ══════════════════════════════════════════════════════════════
 
   _pack(state) {
     const groupsCfg = this.config.groups;
     const groupEls  = this._getGroupElements();
-    const vw        = state.vw;
-
+    const vw = state.vw;
     const GROUP_ORDER = ['transport', 'information', 'link', 'action', 'logo'];
 
-    // ── Build group data with measurements ──────────────────
+    const transportCalc = this._calcTransport();
+
     const allGroups = GROUP_ORDER.map(name => {
       const cfg = groupsCfg[name] || {};
       const el  = groupEls[name];
       const m   = this._measure(el);
-
       let minPx = cfg.minPx || 0;
+      let computedH = m.h || 44;
 
-      // Transport: calculate minPx from grid math
-      // 3 cols × btnSize + 2 × btnGap + padding
       if (name === 'transport') {
-        const bar     = this.footerBar;
-        const cs      = getComputedStyle(bar);
-        const btnSize = parseInt(cs.getPropertyValue('--player-btn-size')) || 38;
-        const btnGap  = parseInt(cs.getPropertyValue('--player-btn-gap'))  || 4;
-        const cols    = cfg.internal?.columns || 3;
-        const gridW   = cols * btnSize + (cols - 1) * btnGap;
-        const padW    = 12; // 6px padding each side
-        minPx = Math.max(minPx, gridW + padW);
+        minPx     = Math.max(minPx, transportCalc.width);
+        computedH = transportCalc.height;
       }
 
       return {
-        name,
-        el,
-        pinned:    cfg.pinned  || false,
-        greedy:    cfg.greedy  || false,
+        name, el,
+        pinned:  cfg.pinned || false,
+        greedy:  cfg.greedy || false,
         minPx,
-        maxPx:     cfg.maxPx   || 9999,
-        idealPx:   Math.max(minPx, Math.min(cfg.maxPx || 9999, Math.max(cfg.idealPx || 100, m.w))),
+        maxPx:   cfg.maxPx || 9999,
+        idealPx: Math.max(minPx, Math.min(cfg.maxPx || 9999, Math.max(cfg.idealPx || 100, m.w))),
         measuredW: m.w,
-        measuredH: m.h,
+        measuredH: computedH,
       };
     });
 
@@ -210,289 +251,252 @@ export class FooterQuadTree {
     const pinnedRight = allGroups.filter(g => g.pinned === 'right');
     const flowGroups  = allGroups.filter(g => !g.pinned);
 
-    // ── Row 1: pinned left + middle flow + pinned right ─────
-    // Calculate pinned widths
     let leftW = 0;
-    for (const g of pinnedLeft) {
-      g.w = Math.min(g.maxPx, Math.max(g.minPx, g.idealPx));
-      g.x = leftW;
-      leftW += g.w;
-    }
+    for (const g of pinnedLeft) { g.w = Math.min(g.maxPx, Math.max(g.minPx, g.idealPx)); g.x = leftW; leftW += g.w; }
 
     let rightW = 0;
     const rightWidths = [];
-    for (const g of pinnedRight) {
-      const w = Math.min(g.maxPx, Math.max(g.minPx, g.idealPx));
-      rightWidths.push(w);
-      rightW += w;
-    }
+    for (const g of pinnedRight) { const w = Math.min(g.maxPx, Math.max(g.minPx, g.idealPx)); rightWidths.push(w); rightW += w; }
 
-    // Available middle space on row 1
     const middleAvail = Math.max(0, vw - leftW - rightW);
-
-    // ── Try to fit flow groups into row 1 middle ────────────
-    const row1Flow  = [];
-    const overflow  = [];
-    let middleUsed  = 0;
+    const row1Flow = [], overflow = [];
+    let middleUsed = 0;
 
     for (const g of flowGroups) {
-      const wantW   = Math.max(g.minPx, Math.min(g.maxPx, g.idealPx));
+      const wantW = Math.max(g.minPx, Math.min(g.maxPx, g.idealPx));
       const remaining = middleAvail - middleUsed;
-
-      if (wantW <= remaining) {
-        // Fits
-        g.w = wantW;
-        g.x = leftW + middleUsed;
-        row1Flow.push(g);
-        middleUsed += wantW;
-      } else if (g.minPx <= remaining && remaining >= 60) {
-        // Squeeze
-        g.w = remaining;
-        g.x = leftW + middleUsed;
-        row1Flow.push(g);
-        middleUsed += remaining;
-      } else {
-        // Overflow to row 2+
-        overflow.push(g);
-      }
+      if (wantW <= remaining) { g.w = wantW; g.x = leftW + middleUsed; row1Flow.push(g); middleUsed += wantW; }
+      else if (g.minPx <= remaining && remaining >= 60) { g.w = remaining; g.x = leftW + middleUsed; row1Flow.push(g); middleUsed += remaining; }
+      else { overflow.push(g); }
     }
 
-    // ── Greedy expansion in row 1 middle ────────────────────
     const middleSlack = middleAvail - middleUsed;
     if (middleSlack > 0 && row1Flow.length > 0) {
       const greedy = row1Flow.find(g => g.greedy);
-      if (greedy) {
-        greedy.w = Math.min(greedy.maxPx, greedy.w + middleSlack);
-      } else {
-        // Distribute to all flow groups
-        const share = Math.floor(middleSlack / row1Flow.length);
-        for (const g of row1Flow) {
-          g.w = Math.min(g.maxPx, g.w + share);
-        }
-      }
-      // Recalc X for row1 flow
-      let x = leftW;
-      for (const g of row1Flow) { g.x = x; x += g.w; }
+      if (greedy) greedy.w = Math.min(greedy.maxPx, greedy.w + middleSlack);
+      else { const share = Math.floor(middleSlack / row1Flow.length); for (const g of row1Flow) g.w = Math.min(g.maxPx, g.w + share); }
+      let x = leftW; for (const g of row1Flow) { g.x = x; x += g.w; }
     }
 
-    // ── Position pinned-right groups at right edge of row 1 ─
     let rx = vw;
-    for (let i = pinnedRight.length - 1; i >= 0; i--) {
-      const g = pinnedRight[i];
-      g.w = rightWidths[i];
-      rx -= g.w;
-      g.x = rx;
+    for (let i = pinnedRight.length - 1; i >= 0; i--) { const g = pinnedRight[i]; g.w = rightWidths[i]; rx -= g.w; g.x = rx; }
+
+    // Inner calcs for height accuracy
+    const innerCalcs = {};
+    for (const g of [...pinnedLeft, ...row1Flow, ...pinnedRight, ...overflow]) {
+      if (g.name === 'transport') { innerCalcs.transport = transportCalc; g.measuredH = transportCalc.height; }
+      else if (g.name === 'information') { innerCalcs.information = this._calcInformation(g.w || 200, state); g.measuredH = innerCalcs.information.height; }
     }
 
-    // ── Build row 1 ─────────────────────────────────────────
     const row1Groups = [...pinnedLeft, ...row1Flow, ...pinnedRight];
     let row1H = 44;
+    for (const g of row1Groups) row1H = Math.max(row1H, g.measuredH || 44);
+    for (const g of row1Groups) { g.y = 0; g.h = row1H; g.rowIdx = 0; }
+
     for (const g of row1Groups) {
-      row1H = Math.max(row1H, g.measuredH || 44);
-    }
-    for (const g of row1Groups) {
-      g.y = 0;
-      g.h = row1H;
-      g.rowIdx = 0;
+      if (g.name === 'link') innerCalcs.link = this._calcInline(g.el, g.h);
+      else if (g.name === 'action') innerCalcs.action = this._calcInline(g.el, g.h);
+      else if (g.name === 'logo') innerCalcs.logo = this._calcLogo(g.el, g.w, g.h);
     }
 
     const rows = [{ y: 0, h: row1H, groups: row1Groups }];
 
-    // ── Pack overflow groups into additional rows ───────────
     if (overflow.length > 0) {
-      let currentRow = [];
-      let rowX = 0;
-      let rowY = row1H;
-
+      let currentRow = [], rowX = 0, rowY = row1H;
       for (const g of overflow) {
-        const wantW    = Math.max(g.minPx, Math.min(g.maxPx, g.idealPx));
+        const wantW = Math.max(g.minPx, Math.min(g.maxPx, g.idealPx));
         const remaining = vw - rowX;
-
-        if (currentRow.length === 0) {
-          g.w = Math.min(wantW, vw);
-          g.x = 0;
-          currentRow.push(g);
-          rowX += g.w;
-        } else if (wantW <= remaining) {
-          g.w = wantW;
-          g.x = rowX;
-          currentRow.push(g);
-          rowX += g.w;
-        } else if (g.minPx <= remaining && remaining >= 60) {
-          g.w = Math.max(g.minPx, remaining);
-          g.x = rowX;
-          currentRow.push(g);
-          rowX += g.w;
-        } else {
-          // Finish current row, start new
-          const rowH = Math.max(44, ...currentRow.map(g => g.measuredH || 44));
+        if (currentRow.length === 0) { g.w = Math.min(wantW, vw); g.x = 0; currentRow.push(g); rowX += g.w; }
+        else if (wantW <= remaining) { g.w = wantW; g.x = rowX; currentRow.push(g); rowX += g.w; }
+        else if (g.minPx <= remaining && remaining >= 60) { g.w = Math.max(g.minPx, remaining); g.x = rowX; currentRow.push(g); rowX += g.w; }
+        else {
+          const rowH = Math.max(44, ...currentRow.map(rg => rg.measuredH || 44));
           for (const rg of currentRow) { rg.y = rowY; rg.h = rowH; rg.rowIdx = rows.length; }
           rows.push({ y: rowY, h: rowH, groups: currentRow });
-          rowY += rowH;
-
-          currentRow = [];
-          rowX = 0;
-          g.w = Math.min(wantW, vw);
-          g.x = 0;
-          currentRow.push(g);
-          rowX += g.w;
+          rowY += rowH; currentRow = []; rowX = 0;
+          g.w = Math.min(wantW, vw); g.x = 0; currentRow.push(g); rowX += g.w;
         }
       }
-
-      // Finalize last overflow row
       if (currentRow.length > 0) {
-        const rowH = Math.max(44, ...currentRow.map(g => g.measuredH || 44));
-
-        // Greedy expand in overflow row
+        const rowH = Math.max(44, ...currentRow.map(rg => rg.measuredH || 44));
         const usedW = currentRow.reduce((s, g) => s + g.w, 0);
         const slack = vw - usedW;
         if (slack > 0) {
           const greedy = currentRow.find(g => g.greedy);
-          if (greedy) {
-            greedy.w = Math.min(greedy.maxPx, greedy.w + slack);
-          } else if (currentRow.length > 0) {
-            const share = Math.floor(slack / currentRow.length);
-            for (const g of currentRow) g.w = Math.min(g.maxPx, g.w + share);
-          }
-          let x = 0;
-          for (const g of currentRow) { g.x = x; x += g.w; }
+          if (greedy) greedy.w = Math.min(greedy.maxPx, greedy.w + slack);
+          else { const share = Math.floor(slack / currentRow.length); for (const g of currentRow) g.w = Math.min(g.maxPx, g.w + share); }
+          let x = 0; for (const g of currentRow) { g.x = x; x += g.w; }
         }
-
         for (const rg of currentRow) { rg.y = rowY; rg.h = rowH; rg.rowIdx = rows.length; }
         rows.push({ y: rowY, h: rowH, groups: currentRow });
-        rowY += rowH;
+
+        for (const rg of currentRow) {
+          if (rg.name === 'link' && !innerCalcs.link) innerCalcs.link = this._calcInline(rg.el, rg.h);
+          else if (rg.name === 'action' && !innerCalcs.action) innerCalcs.action = this._calcInline(rg.el, rg.h);
+          else if (rg.name === 'logo' && !innerCalcs.logo) innerCalcs.logo = this._calcLogo(rg.el, rg.w, rg.h);
+          else if (rg.name === 'information' && !innerCalcs.information) { innerCalcs.information = this._calcInformation(rg.w, state); }
+        }
       }
     }
 
-    // ── Calculate total height ──────────────────────────────
     const totalH = rows.reduce((sum, r) => sum + r.h, 0);
-
-    // ── Build placement map ─────────────────────────────────
     const placements = {};
-    for (const row of rows) {
-      for (const g of row.groups) {
-        placements[g.name] = { x: g.x, y: g.y, w: g.w, h: g.h, row: g.rowIdx };
-      }
-    }
+    for (const row of rows) for (const g of row.groups) placements[g.name] = { x: g.x, y: g.y, w: g.w, h: g.h, row: g.rowIdx };
 
-    return { placements, rows, totalH, rowCount: rows.length, vw };
+    return { placements, rows, totalH, rowCount: rows.length, vw, innerCalcs };
   }
 
 
   // ══════════════════════════════════════════════════════════════
-  // WRITE — apply pack results to DOM
+  // WRITE — outer groups + inner elements
   // ══════════════════════════════════════════════════════════════
 
   _write(packResult, profile, state) {
     const bar = this.footerBar;
     const el  = this.footerEl;
-    const { placements, totalH, rowCount } = packResult;
+    const { placements, totalH, rowCount, innerCalcs } = packResult;
 
-    // ── Footer bar sizing ─────────────────────────────────
     bar.style.position = 'relative';
-    bar.style.height   = `${totalH}px`;
+    bar.style.height   = totalH + 'px';
     bar.style.display  = 'block';
+    bar.style.setProperty('--ft-height', totalH + 'px');
+    bar.style.setProperty('--footer-height', totalH + 'px');
+    bar.style.setProperty('--ft-row-count', '' + rowCount);
 
-    bar.style.setProperty('--ft-height', `${totalH}px`);
-    bar.style.setProperty('--footer-height', `${totalH}px`);
-    bar.style.setProperty('--ft-row-count', `${rowCount}`);
-
-    // ── Profile metadata on footer container ──────────────
     el.dataset.ftProfile = profile.name || 'standard';
     el.dataset.ftDevice  = state.device;
-    el.dataset.ftRows    = `${rowCount}`;
+    el.dataset.ftRows    = '' + rowCount;
 
-    // ── Volume visibility ─────────────────────────────────
     const showVol = this.config.device?.[state.device]?.volumeVisible ?? (state.device === 'pointer');
     bar.style.setProperty('--ft-vol-visible', showVol ? '1' : '0');
 
-    const volEl = bar.querySelector('.player-volume');
-    if (volEl) volEl.style.display = showVol ? '' : 'none';
+    if (profile.vars) for (const [k, v] of Object.entries(profile.vars)) bar.style.setProperty(k, v);
 
-    // ── Per-profile CSS var overrides ─────────────────────
-    if (profile.vars) {
-      for (const [varName, value] of Object.entries(profile.vars)) {
-        bar.style.setProperty(varName, value);
-      }
-    }
-
-    // ── Position each group absolutely ────────────────────
+    // ── Position group boxes ──────────────────────────────
     const groupEls = this._getGroupElements();
-
     for (const [name, groupEl] of Object.entries(groupEls)) {
       if (!groupEl) continue;
       const p = placements[name];
       if (!p) continue;
 
-      groupEl.style.position   = 'absolute';
-      groupEl.style.left       = `${p.x}px`;
-      groupEl.style.top        = `${p.y}px`;
-      groupEl.style.width      = `${p.w}px`;
-      groupEl.style.height     = `${p.h}px`;
-      groupEl.style.boxSizing  = 'border-box';
-      groupEl.style.overflow   = 'hidden';
+      groupEl.style.cssText = '';
+      groupEl.style.position  = 'absolute';
+      groupEl.style.left      = p.x + 'px';
+      groupEl.style.top       = p.y + 'px';
+      groupEl.style.width     = p.w + 'px';
+      groupEl.style.height    = p.h + 'px';
+      groupEl.style.boxSizing = 'border-box';
+      groupEl.style.overflow  = 'hidden';
+      groupEl.style.setProperty('--group-w', p.w + 'px');
+      groupEl.style.setProperty('--group-h', p.h + 'px');
 
-      groupEl.style.setProperty('--group-w', `${p.w}px`);
-      groupEl.style.setProperty('--group-h', `${p.h}px`);
-
-      // ── Separators ──────────────────────────────────────
-      // Right border between groups on same row
       const row = packResult.rows[p.row];
       if (row) {
-        const isLastInRow = row.groups[row.groups.length - 1].name === name;
-        groupEl.style.borderRight = isLastInRow ? 'none' : 'var(--footer-separator)';
+        const isLast = row.groups[row.groups.length - 1].name === name;
+        if (!isLast) groupEl.style.borderRight = 'var(--footer-separator)';
       }
-      // Top border on non-first rows
-      groupEl.style.borderTop = (p.row > 0) ? 'var(--footer-separator)' : 'none';
+      if (p.row > 0) groupEl.style.borderTop = 'var(--footer-separator)';
+    }
+
+    // ── INNER: Transport buttons ──────────────────────────
+    if (innerCalcs.transport) {
+      const tc = innerCalcs.transport;
+      const gridWrapper = groupEls.transport?.querySelector('.transport-grid');
+      if (gridWrapper) gridWrapper.style.display = 'contents';
+
+      for (const btn of tc.buttons) {
+        btn.el.style.position = 'absolute';
+        btn.el.style.left   = btn.x + 'px';
+        btn.el.style.top    = btn.y + 'px';
+        btn.el.style.width  = btn.w + 'px';
+        btn.el.style.height = btn.h + 'px';
+        btn.el.style.margin = '0';
+      }
+    }
+
+    // ── INNER: Information ────────────────────────────────
+    if (innerCalcs.information) {
+      const ic = innerCalcs.information;
+      const infoEl = groupEls.information;
+      if (infoEl) {
+        infoEl.querySelectorAll('.info-row').forEach(r => { r.style.display = 'contents'; });
+
+        const titleEl = infoEl.querySelector('.player-title');
+        if (titleEl && ic.elements.title) {
+          const t = ic.elements.title;
+          titleEl.style.cssText = 'position:absolute;left:' + t.x + 'px;top:' + t.y + 'px;width:' + t.w + 'px;height:' + t.h + 'px;line-height:' + t.h + 'px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+        }
+        const seekEl = infoEl.querySelector('.player-seek');
+        if (seekEl && ic.elements.seek) {
+          const s = ic.elements.seek;
+          seekEl.style.cssText = 'position:absolute;left:' + s.x + 'px;top:' + s.y + 'px;width:' + s.w + 'px;height:' + s.h + 'px;';
+        }
+        const timeEl = infoEl.querySelector('.player-time');
+        if (timeEl && ic.elements.time) {
+          const tm = ic.elements.time;
+          timeEl.style.cssText = 'position:absolute;left:' + tm.x + 'px;top:' + tm.y + 'px;width:' + tm.w + 'px;height:' + tm.h + 'px;line-height:' + tm.h + 'px;text-align:right;';
+        }
+        const volEl = infoEl.querySelector('.player-volume');
+        const volRow = infoEl.querySelector('.info-volume-row');
+        if (ic.showVol && volEl && ic.elements.volume) {
+          const v = ic.elements.volume;
+          if (volRow) volRow.style.display = 'contents';
+          volEl.style.cssText = 'position:absolute;left:' + v.x + 'px;top:' + v.y + 'px;width:' + v.w + 'px;height:' + v.h + 'px;display:flex;align-items:center;gap:4px;';
+        } else {
+          if (volRow) volRow.style.display = 'none';
+          if (volEl) volEl.style.display = 'none';
+        }
+      }
+    }
+
+    // ── INNER: Link ───────────────────────────────────────
+    if (innerCalcs.link) {
+      for (const item of innerCalcs.link.items) {
+        item.el.style.cssText = 'position:absolute;left:' + item.x + 'px;top:0;width:' + item.w + 'px;height:' + item.h + 'px;display:flex;align-items:center;justify-content:center;';
+      }
+    }
+
+    // ── INNER: Action ─────────────────────────────────────
+    if (innerCalcs.action) {
+      for (const item of innerCalcs.action.items) {
+        item.el.style.cssText = 'position:absolute;left:' + item.x + 'px;top:0;width:' + item.w + 'px;height:' + item.h + 'px;display:flex;align-items:center;justify-content:center;';
+      }
+    }
+
+    // ── INNER: Logo ───────────────────────────────────────
+    if (innerCalcs.logo) {
+      for (const [key, item] of Object.entries(innerCalcs.logo.elements)) {
+        if (!item.el) continue;
+        let extra = '';
+        if (key === 'tag') extra = 'text-align:center;line-height:' + item.h + 'px;';
+        item.el.style.cssText = 'position:absolute;left:' + item.x + 'px;top:' + item.y + 'px;width:' + item.w + 'px;height:' + item.h + 'px;' + extra;
+      }
     }
   }
 
-
-  // ══════════════════════════════════════════════════════════════
-  // MAIN ENTRY
-  // ══════════════════════════════════════════════════════════════
 
   layout() {
     if (!this._ready || !this.config) return;
-
     const state   = this._readState();
     const profile = this._selectProfile(state);
-
-    // Apply profile vars BEFORE measuring (font sizes affect measurement)
-    if (profile.vars) {
-      for (const [varName, value] of Object.entries(profile.vars)) {
-        this.footerBar.style.setProperty(varName, value);
-      }
-    }
-
+    if (profile.vars) for (const [k, v] of Object.entries(profile.vars)) this.footerBar.style.setProperty(k, v);
     const packResult = this._pack(state);
     this._packResult = packResult;
-
     this._write(packResult, profile, state);
   }
-
-
-  // ══════════════════════════════════════════════════════════════
-  // DIAGNOSTIC
-  // ══════════════════════════════════════════════════════════════
 
   diagnose() {
     if (!this._ready) return { status: 'not ready' };
     const state = this._readState();
-    const pr    = this._packResult;
+    const pr = this._packResult;
+    const tc = pr?.innerCalcs?.transport;
     return {
-      status:     'ok',
-      version:    'V7.0.0',
-      state,
-      device:     this._device,
-      profile:    this._selectProfile(state)?.name || 'none',
-      rowCount:   pr?.rowCount ?? null,
-      totalH:     pr?.totalH ?? null,
+      status: 'ok', version: 'V7.1.0', state, device: this._device,
+      profile: this._selectProfile(state)?.name || 'none',
+      rowCount: pr?.rowCount ?? null, totalH: pr?.totalH ?? null,
       placements: pr?.placements ?? null,
-      rows: pr?.rows?.map((r, i) => ({
-        row: i, y: r.y, h: r.h,
-        groups: r.groups.map(g => `${g.name}:${g.w}px`).join(' | '),
-      })) ?? null,
+      transport: tc ? { w: tc.width, h: tc.height, btns: tc.buttons.length, cols: tc.cols, rows: tc.rows } : null,
+      rows: pr?.rows?.map((r, i) => ({ row: i, y: r.y, h: r.h, groups: r.groups.map(g => g.name + ':' + g.w + 'px').join(' | ') })) ?? null,
     };
   }
 }
