@@ -1,6 +1,6 @@
 {
   "_component": "footer",
-  "_version": "7.0.0",
+  "_version": "7.2.0",
   "_engine": "footerQuadTree.js",
   "_stack": "RODUX: StateJS → RatioEngine → cssJSON → QuadTree → CSS vars",
   "_architecture": "Group-based packing. Five named groups flow L→R, wrap on overflow. Transport pinned left. Action+Logo pinned right. No layout modes — one algorithm.",
@@ -10,7 +10,7 @@
       "order": 1,
       "pinned": "left",
       "minPx": 155,
-      "maxPx": 320,
+      "maxPx": 460,
       "idealPx": 155,
       "priority": 1,
       "internal": {
@@ -96,6 +96,7 @@
   "profiles": {
     "compact": {
       "maxWidth": 767,
+      "transportColumns": 3,
       "vars": {
         "--player-btn-size": "30px",
         "--player-icon-size": "20px",
@@ -113,6 +114,7 @@
     "standard": {
       "minWidth": 768,
       "maxWidth": 1279,
+      "transportColumns": 3,
       "vars": {
         "--player-btn-size": "38px",
         "--player-icon-size": "30px",
@@ -130,6 +132,7 @@
     },
     "wide": {
       "minWidth": 1280,
+      "transportColumns": 9,
       "vars": {
         "--player-btn-size": "45px",
         "--player-icon-size": "40px",

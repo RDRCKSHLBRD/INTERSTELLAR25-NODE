@@ -1,5 +1,5 @@
 // ============================================================================
-// public/js/footerQuadTree.js — V7.1.0 (RODUX Stack)
+// public/js/footerQuadTree.js — V7.2.0 (RODUX Stack)
 //
 // Group-based footer layout engine with INNER CALCULATIONS.
 // Full RODUX: JS owns every position. CSS is dumb renderer.
@@ -11,7 +11,8 @@
 //   Link/Action: children measured and positioned inline
 //   Logo:        img + tag centered
 //
-// V7.1.0: Full inner calculations. No CSS grid/flex for layout.
+// V7.2.0: Profile-aware transport columns (9-across on wide, 3x3 on compact/standard).
+//         Profile flows into _pack() and _calcTransport() for accurate geometry.
 // ============================================================================
 
 export class FooterQuadTree {
@@ -34,7 +35,7 @@ export class FooterQuadTree {
       if (!this.footerBar) { console.warn('⚠️ FooterQuadTree: .footer-bar not found'); return; }
       this._device = this._detectDevice();
       this._ready  = true;
-      console.log('✅ FooterQuadTree V7.1.0 initialized (device: ' + this._device + ')');
+      console.log('✅ FooterQuadTree V7.2.0 initialized (device: ' + this._device + ')');
     } catch (err) { console.error('❌ FooterQuadTree init failed:', err); }
   }
 
@@ -92,11 +93,13 @@ export class FooterQuadTree {
 
   // ══════════════════════════════════════════════════════════════
   // INNER CALC: TRANSPORT — positions every button
+  // V7.2: reads profile.transportColumns as column override
   // ══════════════════════════════════════════════════════════════
 
-  _calcTransport() {
+  _calcTransport(profile) {
     const cfg     = this.config.groups.transport?.internal || {};
-    const cols    = cfg.columns || 3;
+    // Profile-level override > config-level default > fallback 3
+    const cols    = profile?.transportColumns || cfg.columns || 3;
     const btnSize = this._cssVar('--player-btn-size', 38);
     const btnGap  = this._cssVar('--player-btn-gap', 4);
     const padL    = 6;  // left offset
@@ -213,15 +216,17 @@ export class FooterQuadTree {
 
   // ══════════════════════════════════════════════════════════════
   // PACK — outer group packing + inner calcs for accurate heights
+  // V7.2: accepts profile so transport columns are viewport-aware
   // ══════════════════════════════════════════════════════════════
 
-  _pack(state) {
+  _pack(state, profile) {
     const groupsCfg = this.config.groups;
     const groupEls  = this._getGroupElements();
     const vw = state.vw;
     const GROUP_ORDER = ['transport', 'information', 'link', 'action', 'logo'];
 
-    const transportCalc = this._calcTransport();
+    // V7.2: pass profile so column count is viewport-aware
+    const transportCalc = this._calcTransport(profile);
 
     const allGroups = GROUP_ORDER.map(name => {
       const cfg = groupsCfg[name] || {};
@@ -577,7 +582,8 @@ export class FooterQuadTree {
     const state   = this._readState();
     const profile = this._selectProfile(state);
     if (profile.vars) for (const [k, v] of Object.entries(profile.vars)) this.footerBar.style.setProperty(k, v);
-    const packResult = this._pack(state);
+    // V7.2: pass profile into _pack so transport columns are viewport-aware
+    const packResult = this._pack(state, profile);
     this._packResult = packResult;
     this._write(packResult, profile, state);
   }
@@ -588,7 +594,7 @@ export class FooterQuadTree {
     const pr = this._packResult;
     const tc = pr?.innerCalcs?.transport;
     return {
-      status: 'ok', version: 'V7.1.0', state, device: this._device,
+      status: 'ok', version: 'V7.2.0', state, device: this._device,
       profile: this._selectProfile(state)?.name || 'none',
       rowCount: pr?.rowCount ?? null, totalH: pr?.totalH ?? null,
       placements: pr?.placements ?? null,
