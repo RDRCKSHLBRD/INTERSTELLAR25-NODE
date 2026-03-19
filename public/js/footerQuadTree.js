@@ -247,52 +247,109 @@ export class FooterQuadTree {
       };
     });
 
+    // ── Separate groups by pin type ─────────────────────────
     const pinnedLeft  = allGroups.filter(g => g.pinned === 'left');
     const pinnedRight = allGroups.filter(g => g.pinned === 'right');
     const flowGroups  = allGroups.filter(g => !g.pinned);
 
+    // ── Calculate pinned-left width ─────────────────────────
     let leftW = 0;
-    for (const g of pinnedLeft) { g.w = Math.min(g.maxPx, Math.max(g.minPx, g.idealPx)); g.x = leftW; leftW += g.w; }
+    for (const g of pinnedLeft) {
+      g.w = Math.min(g.maxPx, Math.max(g.minPx, g.idealPx));
+      g.x = leftW;
+      leftW += g.w;
+    }
 
+    // ── Calculate pinned-right width ────────────────────────
     let rightW = 0;
     const rightWidths = [];
-    for (const g of pinnedRight) { const w = Math.min(g.maxPx, Math.max(g.minPx, g.idealPx)); rightWidths.push(w); rightW += w; }
+    for (const g of pinnedRight) {
+      const w = Math.min(g.maxPx, Math.max(g.minPx, g.idealPx));
+      rightWidths.push(w);
+      rightW += w;
+    }
 
+    // ── Check if pinned-right fits on row 1 ─────────────────
+    // If viewport is too narrow for left + right, demote right to flow
+    const pinnedFits = (leftW + rightW) < vw;
+    let actualPinnedRight = [];
+    let demotedToFlow = [];
+
+    if (pinnedFits) {
+      actualPinnedRight = pinnedRight;
+    } else {
+      // Demote pinned-right groups to overflow — they'll wrap to row 2
+      demotedToFlow = pinnedRight;
+      rightW = 0;
+    }
+
+    // ── Middle space for flow groups on row 1 ───────────────
     const middleAvail = Math.max(0, vw - leftW - rightW);
-    const row1Flow = [], overflow = [];
+    const row1Flow = [];
+    const overflow = [];
     let middleUsed = 0;
 
     for (const g of flowGroups) {
       const wantW = Math.max(g.minPx, Math.min(g.maxPx, g.idealPx));
       const remaining = middleAvail - middleUsed;
-      if (wantW <= remaining) { g.w = wantW; g.x = leftW + middleUsed; row1Flow.push(g); middleUsed += wantW; }
-      else if (g.minPx <= remaining && remaining >= 60) { g.w = remaining; g.x = leftW + middleUsed; row1Flow.push(g); middleUsed += remaining; }
-      else { overflow.push(g); }
+      if (wantW <= remaining) {
+        g.w = wantW; g.x = leftW + middleUsed;
+        row1Flow.push(g); middleUsed += wantW;
+      } else if (g.minPx <= remaining && remaining >= 60) {
+        g.w = remaining; g.x = leftW + middleUsed;
+        row1Flow.push(g); middleUsed += remaining;
+      } else {
+        overflow.push(g);
+      }
     }
 
+    // Add demoted pinned-right groups to overflow (in order)
+    overflow.push(...demotedToFlow);
+
+    // ── Greedy expansion in row 1 middle ────────────────────
     const middleSlack = middleAvail - middleUsed;
     if (middleSlack > 0 && row1Flow.length > 0) {
       const greedy = row1Flow.find(g => g.greedy);
-      if (greedy) greedy.w = Math.min(greedy.maxPx, greedy.w + middleSlack);
-      else { const share = Math.floor(middleSlack / row1Flow.length); for (const g of row1Flow) g.w = Math.min(g.maxPx, g.w + share); }
-      let x = leftW; for (const g of row1Flow) { g.x = x; x += g.w; }
+      if (greedy) {
+        greedy.w = Math.min(greedy.maxPx, greedy.w + middleSlack);
+      } else {
+        const share = Math.floor(middleSlack / row1Flow.length);
+        for (const g of row1Flow) g.w = Math.min(g.maxPx, g.w + share);
+      }
+      let x = leftW;
+      for (const g of row1Flow) { g.x = x; x += g.w; }
     }
 
-    let rx = vw;
-    for (let i = pinnedRight.length - 1; i >= 0; i--) { const g = pinnedRight[i]; g.w = rightWidths[i]; rx -= g.w; g.x = rx; }
+    // ── Position pinned-right at right edge of row 1 ────────
+    if (actualPinnedRight.length > 0) {
+      let rx = vw;
+      for (let i = actualPinnedRight.length - 1; i >= 0; i--) {
+        const g = actualPinnedRight[i];
+        g.w = rightWidths[i];
+        rx -= g.w;
+        g.x = rx;
+      }
+    }
 
-    // Inner calcs for height accuracy
+    // ── Inner calcs for accurate heights ────────────────────
     const innerCalcs = {};
-    for (const g of [...pinnedLeft, ...row1Flow, ...pinnedRight, ...overflow]) {
-      if (g.name === 'transport') { innerCalcs.transport = transportCalc; g.measuredH = transportCalc.height; }
-      else if (g.name === 'information') { innerCalcs.information = this._calcInformation(g.w || 200, state); g.measuredH = innerCalcs.information.height; }
+    for (const g of [...pinnedLeft, ...row1Flow, ...actualPinnedRight, ...overflow]) {
+      if (g.name === 'transport') {
+        innerCalcs.transport = transportCalc;
+        g.measuredH = transportCalc.height;
+      } else if (g.name === 'information') {
+        innerCalcs.information = this._calcInformation(g.w || 200, state);
+        g.measuredH = innerCalcs.information.height;
+      }
     }
 
-    const row1Groups = [...pinnedLeft, ...row1Flow, ...pinnedRight];
+    // ── Build row 1 ─────────────────────────────────────────
+    const row1Groups = [...pinnedLeft, ...row1Flow, ...actualPinnedRight];
     let row1H = 44;
     for (const g of row1Groups) row1H = Math.max(row1H, g.measuredH || 44);
     for (const g of row1Groups) { g.y = 0; g.h = row1H; g.rowIdx = 0; }
 
+    // Inner calcs for row 1 inline groups (using row1's height)
     for (const g of row1Groups) {
       if (g.name === 'link') innerCalcs.link = this._calcInline(g.el, g.h);
       else if (g.name === 'action') innerCalcs.action = this._calcInline(g.el, g.h);
@@ -301,49 +358,89 @@ export class FooterQuadTree {
 
     const rows = [{ y: 0, h: row1H, groups: row1Groups }];
 
+    // ── Pack overflow into additional rows ───────────────────
     if (overflow.length > 0) {
       let currentRow = [], rowX = 0, rowY = row1H;
+
       for (const g of overflow) {
         const wantW = Math.max(g.minPx, Math.min(g.maxPx, g.idealPx));
         const remaining = vw - rowX;
-        if (currentRow.length === 0) { g.w = Math.min(wantW, vw); g.x = 0; currentRow.push(g); rowX += g.w; }
-        else if (wantW <= remaining) { g.w = wantW; g.x = rowX; currentRow.push(g); rowX += g.w; }
-        else if (g.minPx <= remaining && remaining >= 60) { g.w = Math.max(g.minPx, remaining); g.x = rowX; currentRow.push(g); rowX += g.w; }
-        else {
-          const rowH = Math.max(44, ...currentRow.map(rg => rg.measuredH || 44));
-          for (const rg of currentRow) { rg.y = rowY; rg.h = rowH; rg.rowIdx = rows.length; }
-          rows.push({ y: rowY, h: rowH, groups: currentRow });
-          rowY += rowH; currentRow = []; rowX = 0;
-          g.w = Math.min(wantW, vw); g.x = 0; currentRow.push(g); rowX += g.w;
+
+        if (currentRow.length === 0) {
+          g.w = Math.min(wantW, vw); g.x = 0;
+          currentRow.push(g); rowX += g.w;
+        } else if (wantW <= remaining) {
+          g.w = wantW; g.x = rowX;
+          currentRow.push(g); rowX += g.w;
+        } else if (g.minPx <= remaining && remaining >= 60) {
+          g.w = Math.max(g.minPx, remaining); g.x = rowX;
+          currentRow.push(g); rowX += g.w;
+        } else {
+          // Finish current overflow row
+          this._finalizeOverflowRow(currentRow, rows, rowY, vw, innerCalcs, state);
+          rowY += rows[rows.length - 1].h;
+          currentRow = []; rowX = 0;
+          g.w = Math.min(wantW, vw); g.x = 0;
+          currentRow.push(g); rowX += g.w;
         }
       }
-      if (currentRow.length > 0) {
-        const rowH = Math.max(44, ...currentRow.map(rg => rg.measuredH || 44));
-        const usedW = currentRow.reduce((s, g) => s + g.w, 0);
-        const slack = vw - usedW;
-        if (slack > 0) {
-          const greedy = currentRow.find(g => g.greedy);
-          if (greedy) greedy.w = Math.min(greedy.maxPx, greedy.w + slack);
-          else { const share = Math.floor(slack / currentRow.length); for (const g of currentRow) g.w = Math.min(g.maxPx, g.w + share); }
-          let x = 0; for (const g of currentRow) { g.x = x; x += g.w; }
-        }
-        for (const rg of currentRow) { rg.y = rowY; rg.h = rowH; rg.rowIdx = rows.length; }
-        rows.push({ y: rowY, h: rowH, groups: currentRow });
 
-        for (const rg of currentRow) {
-          if (rg.name === 'link' && !innerCalcs.link) innerCalcs.link = this._calcInline(rg.el, rg.h);
-          else if (rg.name === 'action' && !innerCalcs.action) innerCalcs.action = this._calcInline(rg.el, rg.h);
-          else if (rg.name === 'logo' && !innerCalcs.logo) innerCalcs.logo = this._calcLogo(rg.el, rg.w, rg.h);
-          else if (rg.name === 'information' && !innerCalcs.information) { innerCalcs.information = this._calcInformation(rg.w, state); }
-        }
+      // Finalize last overflow row
+      if (currentRow.length > 0) {
+        this._finalizeOverflowRow(currentRow, rows, rowY, vw, innerCalcs, state);
       }
     }
 
     const totalH = rows.reduce((sum, r) => sum + r.h, 0);
     const placements = {};
-    for (const row of rows) for (const g of row.groups) placements[g.name] = { x: g.x, y: g.y, w: g.w, h: g.h, row: g.rowIdx };
+    for (const row of rows) {
+      for (const g of row.groups) {
+        placements[g.name] = { x: g.x, y: g.y, w: g.w, h: g.h, row: g.rowIdx };
+      }
+    }
 
     return { placements, rows, totalH, rowCount: rows.length, vw, innerCalcs };
+  }
+
+  // ── Helper: finalize an overflow row ──────────────────────
+  _finalizeOverflowRow(currentRow, rows, rowY, vw, innerCalcs, state) {
+    // Greedy expand
+    const usedW = currentRow.reduce((s, g) => s + g.w, 0);
+    const slack = vw - usedW;
+    if (slack > 0) {
+      const greedy = currentRow.find(g => g.greedy);
+      if (greedy) greedy.w = Math.min(greedy.maxPx, greedy.w + slack);
+      else {
+        const share = Math.floor(slack / currentRow.length);
+        for (const g of currentRow) g.w = Math.min(g.maxPx, g.w + share);
+      }
+      let x = 0;
+      for (const g of currentRow) { g.x = x; x += g.w; }
+    }
+
+    // Compute height for this row independently
+    // Re-run inner calcs for information if it landed here
+    for (const g of currentRow) {
+      if (g.name === 'information' && !innerCalcs.information) {
+        innerCalcs.information = this._calcInformation(g.w, state);
+        g.measuredH = innerCalcs.information.height;
+      }
+    }
+
+    // Row height = tallest group, but use a shorter default (36) for link/action-only rows
+    const hasTransportOrInfo = currentRow.some(g => g.name === 'transport' || g.name === 'information');
+    const defaultH = hasTransportOrInfo ? 44 : 36;
+    const rowH = Math.max(defaultH, ...currentRow.map(g => g.measuredH || defaultH));
+
+    for (const rg of currentRow) { rg.y = rowY; rg.h = rowH; rg.rowIdx = rows.length; }
+    rows.push({ y: rowY, h: rowH, groups: currentRow });
+
+    // Inner calcs for this row's inline groups
+    for (const rg of currentRow) {
+      if (rg.name === 'link' && !innerCalcs.link) innerCalcs.link = this._calcInline(rg.el, rg.h);
+      else if (rg.name === 'action' && !innerCalcs.action) innerCalcs.action = this._calcInline(rg.el, rg.h);
+      else if (rg.name === 'logo' && !innerCalcs.logo) innerCalcs.logo = this._calcLogo(rg.el, rg.w, rg.h);
+    }
   }
 
 
