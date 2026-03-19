@@ -1,257 +1,159 @@
 {
   "_component": "footer",
-  "_version": "6.3.1",
+  "_version": "7.0.0",
   "_engine": "footerQuadTree.js",
   "_stack": "RODUX: StateJS → RatioEngine → cssJSON → QuadTree → CSS vars",
-  "_comment": "Profiles are mathematical constraint sets. Device-aware: touch vs pointer. Desktop resized small ≠ phone.",
+  "_architecture": "Group-based packing. Five named groups flow L→R, wrap on overflow. Transport pinned left. Action+Logo pinned right. No layout modes — one algorithm.",
 
-  "profiles": [
-    {
-      "name": "compact-portrait",
-      "_comment": "Touch device, portrait, ≤767px. Wireframe layout: title row → transport row → seek+time row → nav row → logo row. Everything stacks full-width.",
-      "device": "touch",
-      "orientation": "portrait",
-      "maxWidth": 767,
-      "stacked": true,
-      "layout": "stacked",
-      "height": "auto",
-      "volumeVisible": false,
-      "order": { "player": 1, "nav": 2, "logo": 3 },
-      "zones": {
-        "player": { "minPx": 0 },
-        "nav":    { "minPx": 0 },
-        "logo":   { "minPx": 0 }
-      },
-      "vars": {
-        "--player-btn-size": "36px",
-        "--player-icon-size": "24px",
-        "--player-btn-gap": "6px",
-        "--player-title-max-w": "100%",
-        "--player-title-font": "14px",
-        "--player-time-font": "12px",
-        "--seek-max-w": "none",
-        "--seek-min-w": "40%",
-        "--seek-height": "8px",
-        "--nav-font": "13px",
-        "--nav-padding": "10px 14px",
-        "--logo-img-h": "16px",
-        "--logo-tag-font": "9px",
-        "--logo-padding": "6px 10px",
-        "--user-icon-size": "16px",
-        "--user-name-font": "10px",
-        "--user-cell-padding": "6px 10px",
-        "--toggle-font": "11px",
-        "--toggle-padding": "6px 16px"
+  "groups": {
+    "transport": {
+      "order": 1,
+      "pinned": "left",
+      "minPx": 140,
+      "maxPx": 320,
+      "idealPx": 180,
+      "priority": 1,
+      "internal": {
+        "columns": 3,
+        "btnSize": "var(--player-btn-size)",
+        "btnGap": "var(--player-btn-gap)",
+        "padding": "4px 6px"
       }
     },
-    {
-      "name": "two-tier",
-      "_comment": "Touch device, landscape OR tablet (768-1023px). 2-tier grid: Row1=title+seek+time, Row2=transport+nav side-by-side, Row3=logo right-aligned. No volume (touch device).",
-      "device": "touch",
-      "orientation": "landscape",
-      "maxWidth": 1023,
-      "stacked": false,
-      "layout": "two-tier",
-      "height": "auto",
-      "volumeVisible": false,
-      "order": { "player": 1, "nav": 2, "logo": 3 },
-      "zones": {
-        "player": { "minPx": 0 },
-        "nav":    { "minPx": 0 },
-        "logo":   { "minPx": 0 }
-      },
+
+    "information": {
+      "order": 2,
+      "pinned": false,
+      "minPx": 180,
+      "maxPx": 9999,
+      "idealPx": 350,
+      "greedy": true,
+      "priority": 2,
+      "internal": {
+        "layout": "column",
+        "row1": ["title"],
+        "row2": ["seek", "time"],
+        "row3_pointer_only": ["volume"],
+        "titleMaxRatio": 0.6,
+        "padding": "4px 12px",
+        "gap": "3px"
+      }
+    },
+
+    "link": {
+      "order": 3,
+      "pinned": false,
+      "minPx": 100,
+      "maxPx": 400,
+      "idealPx": 180,
+      "priority": 3,
+      "internal": {
+        "layout": "inline",
+        "gap": "0",
+        "separator": "var(--footer-separator)"
+      }
+    },
+
+    "action": {
+      "order": 4,
+      "pinned": "right",
+      "minPx": 80,
+      "maxPx": 250,
+      "idealPx": 140,
+      "priority": 4,
+      "internal": {
+        "layout": "inline",
+        "gap": "0",
+        "separator": "var(--footer-separator)"
+      }
+    },
+
+    "logo": {
+      "order": 5,
+      "pinned": "right",
+      "minPx": 80,
+      "maxPx": 200,
+      "idealPx": 120,
+      "priority": 5,
+      "internal": {
+        "layout": "column",
+        "align": "center",
+        "padding": "var(--logo-padding)"
+      }
+    }
+  },
+
+  "packing": {
+    "groupGap": 0,
+    "rowGap": 0
+  },
+
+  "device": {
+    "touch": { "volumeVisible": false },
+    "pointer": { "volumeVisible": true }
+  },
+
+  "profiles": {
+    "compact": {
+      "maxWidth": 767,
       "vars": {
         "--player-btn-size": "30px",
         "--player-icon-size": "20px",
-        "--player-btn-gap": "4px",
-        "--player-title-max-w": "none",
+        "--player-btn-gap": "3px",
         "--player-title-font": "13px",
         "--player-time-font": "11px",
-        "--player-time-min-w": "70px",
-        "--seek-max-w": "none",
-        "--seek-min-w": "100px",
         "--seek-height": "6px",
-        "--nav-font": "13px",
-        "--nav-padding": "8px 14px",
+        "--nav-font": "12px",
+        "--nav-padding": "8px 10px",
         "--logo-img-h": "18px",
         "--logo-tag-font": "9px",
-        "--logo-padding": "4px 14px",
-        "--user-icon-size": "16px",
-        "--user-name-font": "10px",
-        "--user-logout-font": "8px",
-        "--user-cell-padding": "4px 10px",
-        "--toggle-font": "11px",
-        "--toggle-padding": "4px 14px"
+        "--logo-padding": "4px 10px"
       }
     },
-    {
-      "name": "two-tier",
-      "_comment": "Touch device, tablet portrait (768-1023px). Same 2-tier grid layout. Matched by minWidth since no orientation filter (covers both portrait and landscape tablets).",
-      "device": "touch",
+    "standard": {
       "minWidth": 768,
-      "maxWidth": 1023,
-      "stacked": false,
-      "layout": "two-tier",
-      "height": "auto",
-      "volumeVisible": false,
-      "order": { "player": 1, "nav": 2, "logo": 3 },
-      "zones": {
-        "player": { "minPx": 0 },
-        "nav":    { "minPx": 0 },
-        "logo":   { "minPx": 0 }
-      },
+      "maxWidth": 1279,
       "vars": {
-        "--player-btn-size": "32px",
-        "--player-icon-size": "22px",
-        "--player-btn-gap": "5px",
-        "--player-title-max-w": "none",
+        "--player-btn-size": "38px",
+        "--player-icon-size": "30px",
+        "--player-btn-gap": "4px",
         "--player-title-font": "13px",
         "--player-time-font": "12px",
-        "--player-time-min-w": "78px",
-        "--seek-max-w": "none",
-        "--seek-min-w": "120px",
         "--seek-height": "6px",
         "--nav-font": "13px",
         "--nav-padding": "10px 16px",
-        "--logo-img-h": "22px",
+        "--logo-img-h": "30px",
         "--logo-tag-font": "10px",
-        "--logo-padding": "6px 16px",
-        "--user-icon-size": "18px",
-        "--user-name-font": "10px",
-        "--user-logout-font": "8px",
-        "--user-cell-padding": "4px 12px",
-        "--toggle-font": "11px",
-        "--toggle-padding": "4px 16px"
+        "--logo-padding": "8px 20px",
+        "--vol-track-w": "80px"
       }
     },
-    {
-      "name": "touch-wide",
-      "_comment": "Touch device, ≥1024px. iPad Pro landscape etc. Full layout, no volume.",
-      "device": "touch",
-      "minWidth": 1024,
-      "stacked": false,
-      "layout": "horizontal",
-      "height": 65,
-      "volumeVisible": false,
-      "zones": {
-        "player": { "minPx": 280 },
-        "nav":    { "minPx": 0 },
-        "logo":   { "minPx": 60 }
-      },
-      "vars": {
-        "--player-btn-size": "40px",
-        "--player-icon-size": "32px",
-        "--player-title-max-w": "400px",
-        "--player-title-font": "13px",
-        "--seek-max-w": "200px",
-        "--nav-font": "14px",
-        "--nav-padding": "10px 20px",
-        "--logo-img-h": "34px",
-        "--logo-padding": "10px 30px 8px"
-      }
-    },
-    {
-      "name": "desktop-narrow",
-      "_comment": "Desktop/pointer device dragged narrow. NOT a phone. Horizontal, all controls, volume visible.",
-      "device": "pointer",
-      "maxWidth": 1023,
-      "stacked": false,
-      "layout": "horizontal",
-      "height": 50,
-      "volumeVisible": true,
-      "zones": {
-        "player": { "minPx": 200 },
-        "nav":    { "minPx": 0, "maxPx": 350 },
-        "logo":   { "minPx": 40, "maxPx": 100 }
-      },
-      "vars": {
-        "--player-btn-size": "26px",
-        "--player-icon-size": "18px",
-        "--player-title-max-w": "140px",
-        "--player-title-font": "12px",
-        "--seek-max-w": "140px",
-        "--vol-track-w": "50px",
-        "--nav-font": "12px",
-        "--nav-padding": "6px 10px",
-        "--logo-img-h": "18px",
-        "--logo-padding": "4px 12px",
-        "--user-icon-size": "14px",
-        "--user-name-font": "9px",
-        "--user-logout-font": "7px",
-        "--user-cell-padding": "3px 8px"
-      }
-    },
-    {
-      "name": "standard",
-      "_comment": "Desktop/pointer, 1024-1599px. Normal laptop/monitor.",
-      "device": "pointer",
-      "minWidth": 1024,
-      "maxWidth": 1599,
-      "stacked": false,
-      "layout": "horizontal",
-      "height": 75,
-      "volumeVisible": true,
-      "zones": {
-        "player": { "minPx": 280 },
-        "nav":    { "minPx": 0 },
-        "logo":   { "minPx": 60 }
-      },
+    "wide": {
+      "minWidth": 1280,
       "vars": {
         "--player-btn-size": "45px",
         "--player-icon-size": "40px",
-        "--player-title-max-w": "500px",
+        "--player-btn-gap": "4px",
         "--player-title-font": "13px",
-        "--seek-max-w": "200px",
-        "--vol-track-w": "100px",
+        "--player-time-font": "12px",
+        "--seek-height": "6px",
         "--nav-font": "14px",
         "--nav-padding": "10px 20px",
         "--logo-img-h": "38px",
+        "--logo-tag-font": "11px",
         "--logo-padding": "12px 34px 10px",
-        "--user-icon-size": "20px",
-        "--user-name-font": "11px",
-        "--user-logout-font": "9px",
-        "--user-cell-padding": "6px 16px"
-      }
-    },
-    {
-      "name": "wide",
-      "_comment": "Desktop/pointer, ≥1600px. Large monitors.",
-      "device": "pointer",
-      "minWidth": 1600,
-      "stacked": false,
-      "layout": "horizontal",
-      "height": 75,
-      "volumeVisible": true,
-      "zones": {
-        "player": { "minPx": 400 },
-        "nav":    { "minPx": 0 },
-        "logo":   { "minPx": 80 }
-      },
-      "vars": {
-        "--player-btn-size": "45px",
-        "--player-icon-size": "40px",
-        "--player-title-max-w": "600px",
-        "--player-title-font": "14px",
-        "--seek-max-w": "300px",
-        "--vol-track-w": "120px",
-        "--nav-font": "14px",
-        "--nav-padding": "10px 24px",
-        "--logo-img-h": "38px",
-        "--logo-padding": "12px 34px 10px"
+        "--vol-track-w": "100px"
       }
     }
-  ],
-
-  "zones": {
-    "_comment": "Default zone constraints. Profiles override these.",
-    "player": { "priority": 1, "greedy": true, "minPx": 200 },
-    "nav":    { "priority": 2, "shrink": 0, "minPx": 0 },
-    "logo":   { "priority": 3, "shrink": 0, "widthPx": 80, "minPx": 60 }
   },
 
   "nav": {
-    "items": ["playlists", "film", "contact", "login", "cart"],
+    "items": ["playlists", "film", "contact"],
     "separator": "1px solid rgba(43, 127, 140, 0.25)"
+  },
+
+  "actions": {
+    "items": ["login", "cart"]
   },
 
   "logo": {
@@ -263,11 +165,5 @@
     "text": "PLAYER I/O",
     "textTransform": "uppercase",
     "letterSpacing": "1.5px"
-  },
-
-  "mobile": {
-    "_comment": "Legacy compat. Profiles replace this.",
-    "stackBreakpoint": 767,
-    "layout": "stacked"
   }
 }

@@ -1,11 +1,14 @@
 // ============================================================================
-// public/js/player.js — V6.3.1 (RODUX Stack / Zero Inline Styles)
+// public/js/player.js — V7.0.0 (RODUX Stack / Group-Based Footer)
 //
-// Audio player. Builds DOM with classnames only — CSS handles all presentation.
+// Audio player. Builds DOM into V7 group containers:
+//   .group-transport  → 3-col button grid (transport-grid)
+//   .group-information → title row, seek+time row, volume row
+//
+// CSS handles all presentation. JS builds DOM with classnames only.
 // Transport icons mapped via CSS classes (.btn-prev, .btn-play, etc.)
-// Seek, volume, time all rendered by player.css custom properties.
 //
-// V6.3.1: Added .btn-plist (playlist add) in transport after .btn-cart
+// V7.0.0: Group-based architecture. Transport grid. Info column.
 //
 // Exposes window.audioPlayer for global access.
 // ============================================================================
@@ -17,45 +20,40 @@ class AudioPlayer {
     this.currentAlbum = null;
     this.isLooping = false;
     this.volume = 0.8;
-    this.container = null;
     this.els = {};
     this.built = false;
   }
 
   // ── Build player DOM (once) ──────────────────────────────────
   build() {
-    this.container = document.getElementById('playerControls');
-    if (!this.container || this.built) return;
+    const transportContainer = document.querySelector('.group-transport');
+    const infoContainer      = document.querySelector('.group-information');
+
+    if (!transportContainer || !infoContainer || this.built) return;
     this.built = true;
 
-    // Audio element (hidden)
+    // ═══════════════════════════════════════════════════════════
+    // TRANSPORT GROUP — 3-column button grid
+    // ═══════════════════════════════════════════════════════════
+
+    const grid = document.createElement('div');
+    grid.className = 'transport-grid';
+
+    // Audio element (hidden, lives in transport)
     this.audio = document.createElement('audio');
     this.audio.preload = 'metadata';
-    this.container.appendChild(this.audio);
-
-    // ── Song title ─────────────────────────────────────────────
-    this.els.title = document.createElement('span');
-    this.els.title.className = 'player-title';
-    this.els.title.textContent = '—';
-    this.container.appendChild(this.els.title);
-
-    // Separator
-    const sep = document.createElement('span');
-    sep.className = 'player-separator';
-    sep.textContent = '|';
-    this.container.appendChild(sep);
-
-    // ── Transport buttons ──────────────────────────────────────
-    const transport = document.createElement('div');
-    transport.className = 'player-transport';
+    transportContainer.appendChild(this.audio);
 
     const buttons = [
-      { key: 'prev',     cls: 'btn-prev',      title: 'Previous',    fn: () => this.previousTrack() },
-      { key: 'skipBack', cls: 'btn-skip-back',  title: 'Back 30s',   fn: () => this.skip(-30) },
-      { key: 'play',     cls: 'btn-play',       title: 'Play',       fn: () => this.togglePlay() },
+      { key: 'prev',     cls: 'btn-prev',      title: 'Previous',     fn: () => this.previousTrack() },
+      { key: 'skipBack', cls: 'btn-skip-back',  title: 'Back 30s',    fn: () => this.skip(-30) },
+      { key: 'play',     cls: 'btn-play',       title: 'Play',        fn: () => this.togglePlay() },
       { key: 'skipFwd',  cls: 'btn-skip-fwd',   title: 'Forward 30s', fn: () => this.skip(30) },
-      { key: 'next',     cls: 'btn-next',       title: 'Next',       fn: () => this.nextTrack() },
-      { key: 'stop',     cls: 'btn-stop',       title: 'Stop',       fn: () => this.stop() },
+      { key: 'next',     cls: 'btn-next',       title: 'Next',        fn: () => this.nextTrack() },
+      { key: 'stop',     cls: 'btn-stop',       title: 'Stop',        fn: () => this.stop() },
+      { key: 'loop',     cls: 'btn-loop',       title: 'Loop',        fn: () => this.toggleLoop() },
+      { key: 'plist',    cls: 'btn-plist',      title: 'Add to Playlist', fn: () => this._addToPlaylist() },
+      { key: 'cart',     cls: 'btn-cart',       title: 'Add to Cart', fn: () => this._addToCart() },
     ];
 
     buttons.forEach(b => {
@@ -65,29 +63,48 @@ class AudioPlayer {
       btn.setAttribute('aria-label', b.title);
       btn.addEventListener('click', b.fn);
       this.els[b.key] = btn;
-      transport.appendChild(btn);
+      grid.appendChild(btn);
     });
 
-    this.container.appendChild(transport);
+    transportContainer.appendChild(grid);
 
-    // ── Seek bar ───────────────────────────────────────────────
+
+    // ═══════════════════════════════════════════════════════════
+    // INFORMATION GROUP — title, seek+time, volume (column layout)
+    // ═══════════════════════════════════════════════════════════
+
+    // Row 1: Song title
+    const titleRow = document.createElement('div');
+    titleRow.className = 'info-row info-title-row';
+    this.els.title = document.createElement('span');
+    this.els.title.className = 'player-title';
+    this.els.title.textContent = '—';
+    titleRow.appendChild(this.els.title);
+    infoContainer.appendChild(titleRow);
+
+    // Row 2: Seek bar + Time
+    const seekRow = document.createElement('div');
+    seekRow.className = 'info-row info-seek-row';
+
     const seek = document.createElement('div');
     seek.className = 'player-seek';
-
     this.els.seekFill = document.createElement('div');
     this.els.seekFill.className = 'player-seek-fill';
     seek.appendChild(this.els.seekFill);
     seek.addEventListener('click', (e) => this._seekTo(e, seek));
+    seekRow.appendChild(seek);
 
-    this.container.appendChild(seek);
-
-    // ── Time display ───────────────────────────────────────────
     this.els.time = document.createElement('span');
     this.els.time.className = 'player-time';
     this.els.time.textContent = '0:00 / 0:00';
-    this.container.appendChild(this.els.time);
+    seekRow.appendChild(this.els.time);
 
-    // ── Volume ─────────────────────────────────────────────────
+    infoContainer.appendChild(seekRow);
+
+    // Row 3: Volume (pointer devices only — visibility controlled by QuadTree)
+    const volRow = document.createElement('div');
+    volRow.className = 'info-row info-volume-row';
+
     const vol = document.createElement('div');
     vol.className = 'player-volume';
 
@@ -97,54 +114,15 @@ class AudioPlayer {
 
     const volTrack = document.createElement('div');
     volTrack.className = 'player-volume-track';
-
     this.els.volFill = document.createElement('div');
     this.els.volFill.className = 'player-volume-fill';
     volTrack.appendChild(this.els.volFill);
     volTrack.addEventListener('click', (e) => this._setVolume(e, volTrack));
     vol.appendChild(volTrack);
 
-    this.container.appendChild(vol);
+    volRow.appendChild(vol);
+    infoContainer.appendChild(volRow);
 
-    // ── Loop button ────────────────────────────────────────────
-    this.els.loop = document.createElement('button');
-    this.els.loop.className = 'btn-loop';
-    this.els.loop.title = 'Loop';
-    this.els.loop.setAttribute('aria-label', 'Loop');
-    this.els.loop.addEventListener('click', () => this.toggleLoop());
-    // Put loop inside transport cluster visually
-    transport.appendChild(this.els.loop);
-
-    // ── Cart button ────────────────────────────────────────────
-    this.els.cart = document.createElement('button');
-    this.els.cart.className = 'btn-cart';
-    this.els.cart.title = 'Add Track to Cart';
-    this.els.cart.setAttribute('aria-label', 'Add Track to Cart');
-    this.els.cart.addEventListener('click', () => {
-      if (window.cartManager && this.currentSong) {
-        window.cartManager.addSongToCart(this.currentSong.id, this.currentSong);
-      }
-    });
-    transport.appendChild(this.els.cart);
-
-    // ── Playlist add button (V6.3.1) ───────────────────────────
-    this.els.plist = document.createElement('button');
-    this.els.plist.className = 'btn-plist';
-    this.els.plist.title = 'Add to Playlist';
-    this.els.plist.setAttribute('aria-label', 'Add to Playlist');
-    this.els.plist.addEventListener('click', () => {
-      if (this.currentSong) {
-        window.dispatchEvent(new CustomEvent('addToPlaylist', {
-          detail: {
-            songId: this.currentSong.id,
-            songName: this.currentSong.name,
-            albumId: this.currentAlbum?.id,
-            albumName: this.currentAlbum?.name
-          }
-        }));
-      }
-    });
-    transport.appendChild(this.els.plist);
 
     // ── Audio events ───────────────────────────────────────────
     this.audio.addEventListener('loadedmetadata', () => this._updateProgress());
@@ -155,7 +133,9 @@ class AudioPlayer {
     this.audio.volume = this.volume;
   }
 
+
   // ── Playback ─────────────────────────────────────────────────
+
   async playSong(songId, albumId) {
     try {
       if (!this.built) this.build();
@@ -238,10 +218,33 @@ class AudioPlayer {
     this.els.loop.dataset.active = this.isLooping ? 'true' : 'false';
   }
 
+
+  // ── Actions ──────────────────────────────────────────────────
+
+  _addToCart() {
+    if (window.cartManager && this.currentSong) {
+      window.cartManager.addSongToCart(this.currentSong.id, this.currentSong);
+    }
+  }
+
+  _addToPlaylist() {
+    if (this.currentSong) {
+      window.dispatchEvent(new CustomEvent('addToPlaylist', {
+        detail: {
+          songId: this.currentSong.id,
+          songName: this.currentSong.name,
+          albumId: this.currentAlbum?.id,
+          albumName: this.currentAlbum?.name
+        }
+      }));
+    }
+  }
+
+
   // ── Internal UI updates ──────────────────────────────────────
+
   _updatePlayBtn(playing) {
     if (!this.els.play) return;
-    // Swap CSS class for play/pause icon
     this.els.play.classList.toggle('btn-play', !playing);
     this.els.play.classList.toggle('btn-pause', playing);
     this.els.play.title = playing ? 'Pause' : 'Play';
@@ -301,7 +304,7 @@ class AudioPlayer {
       volume: this.volume,
       isLooping: this.isLooping,
       currentSong: this.currentSong,
-      currentAlbum: this.currentAlbum
+      currentAlbum: this.currentAlbum,
     };
   }
 }
@@ -311,7 +314,7 @@ const audioPlayer = new AudioPlayer();
 window.audioPlayer = audioPlayer;
 window.playSong = (songId, albumId) => audioPlayer.playSong(songId, albumId);
 
-// Build when container exists
+// Build when group containers exist
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => audioPlayer.build());
 } else {

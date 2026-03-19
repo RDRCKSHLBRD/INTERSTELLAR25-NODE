@@ -1,16 +1,19 @@
 /* ================================================================
-   PLAYER / FOOTER BAR — player.css  V6.3.1
-   
+   PLAYER / FOOTER BAR — player.css  V7.0.0
+
    RODUX: CSS is a dumb renderer. Consumes vars only.
-   footerQuadTree.js owns ALL layout via --ft-* vars + inline styles.
-   NO @media queries. Profile-driven via [data-ft-profile] attribute.
-   
-   Device-aware: data-ft-device="touch" vs "pointer" on #artistControls.
-   Desktop at 400px ≠ iPhone at 400px. The state decides.
-   
-   V6.3:   compact-portrait profile matches wireframe
-   V6.3.1: two-tier profile (landscape/tablet), +Plist button,
-           transport borders (global)
+   footerQuadTree.js V7 owns ALL layout via absolute positioning.
+   NO @media queries. NO layout modes. Groups are positioned by JS.
+
+   CSS provides: colors, borders, typography, internal flex/grid
+   for group contents. Nothing else.
+
+   V7.0.0: Group-based architecture.
+     .group-transport   — 3-col button grid
+     .group-information — title, seek+time, volume (column)
+     .group-link        — nav links (inline)
+     .group-action      — login, cart (inline)
+     .group-logo        — brand mark + tag (column)
    ================================================================ */
 
 
@@ -32,10 +35,10 @@
 
   --seek-height:         6px;
   --seek-radius:         3px;
-  --seek-max-w:          200px;
-  --seek-min-w:          80px;
   --seek-track-bg:       rgba(138, 183, 206, 0.15);
   --seek-fill-bg:        var(--ip-primary, #3AA0A0);
+  --seek-max-w:          none;
+  --seek-min-w:          40px;
 
   --vol-track-w:         100px;
   --vol-track-h:         4px;
@@ -61,7 +64,6 @@
   --user-cell-gap:       2px;
 
   --ft-vol-visible:      1;
-  --ft-stacked:          0;
 }
 
 
@@ -101,66 +103,33 @@
 
 /* ── Footer Bar ──────────────────────────────────────────────── */
 .footer-bar {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+  position: relative;
   height: var(--ft-height, var(--footer-height));
   padding: 0;
+  overflow: visible;
 }
 
 
 /* ══════════════════════════════════════════════════════════════
-   PLAYER ZONE — width set by JS
+   GROUP: TRANSPORT — 3-col button grid
+   Position: absolute (set by footerQuadTree.js)
+   Internal: CSS grid
    ══════════════════════════════════════════════════════════════ */
 
-.footer-player-zone {
+.group-transport {
   display: flex;
   align-items: center;
-  min-width: 0;
-  height: 100%;
-  padding: 0 14px;
-  gap: 8px;
+  justify-content: center;
+  padding: 4px 6px;
 }
 
-.player {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  gap: 8px;
-  height: 100%;
-  width: 100%;
-}
-
-
-/* ── Song Title ──────────────────────────────────────────────── */
-.player-title {
-  font-size: var(--player-title-font);
-  font-weight: 400;
-  color: var(--ip-fg, #cadbda);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: var(--player-title-max-w);
-  min-width: 60px;
-  flex-shrink: 0;
-}
-
-.player-separator {
-  color: rgba(138, 183, 206, 0.3);
-  margin: 0 2px;
-  flex-shrink: 0;
-}
-
-
-/* ── Transport Buttons ───────────────────────────────────────── */
-.player-transport {
-  display: flex;
-  align-items: center;
+.transport-grid {
+  display: grid;
+  grid-template-columns: repeat(3, var(--player-btn-size));
   gap: var(--player-btn-gap);
-  flex-shrink: 0;
 }
 
-.player-transport button {
+.transport-grid button {
   background: none;
   border: var(--player-btn-border);
   outline: none;
@@ -178,42 +147,76 @@
   overflow: hidden;
   transition: opacity 0.15s, background-color 0.15s;
 }
-.player-transport button:hover {
+.transport-grid button:hover {
   opacity: 0.85;
   background-color: rgba(43, 127, 140, 0.1);
 }
 
-.player-transport .btn-prev      { background-image: url('/images/PLAYER-BACK_BLUE-5.svg'); }
-.player-transport .btn-skip-back { background-image: url('/images/PLAYER-bkwd30_BLUE.svg'); }
-.player-transport .btn-play      { background-image: url('/images/PLAYER-PLAY-v2.svg'); }
-.player-transport .btn-pause     { background-image: url('/images/PLAYER-PAUSE.svg'); }
-.player-transport .btn-skip-fwd  { background-image: url('/images/PLAYER-fwd30_BLUE.svg'); }
-.player-transport .btn-next      { background-image: url('/images/PLAYER-FWD_BLUE-5.svg'); }
-.player-transport .btn-stop      { background-image: url('/images/PLAYER-STOP.svg'); }
-.player-transport .btn-loop      { background-image: url('/images/PLAYER-REPEAT_BLUE.svg'); }
+/* Transport button icons */
+.transport-grid .btn-prev      { background-image: url('/images/PLAYER-BACK_BLUE-5.svg'); }
+.transport-grid .btn-skip-back { background-image: url('/images/PLAYER-bkwd30_BLUE.svg'); }
+.transport-grid .btn-play      { background-image: url('/images/PLAYER-PLAY-v2.svg'); }
+.transport-grid .btn-pause     { background-image: url('/images/PLAYER-PAUSE.svg'); }
+.transport-grid .btn-skip-fwd  { background-image: url('/images/PLAYER-fwd30_BLUE.svg'); }
+.transport-grid .btn-next      { background-image: url('/images/PLAYER-FWD_BLUE-5.svg'); }
+.transport-grid .btn-stop      { background-image: url('/images/PLAYER-STOP.svg'); }
+.transport-grid .btn-loop      { background-image: url('/images/PLAYER-REPEAT_BLUE.svg'); }
 
-.player-transport .btn-loop[data-active="true"] {
+.transport-grid .btn-loop[data-active="true"] {
   background-color: rgba(43, 127, 140, 0.3);
   border: 1px solid rgba(43, 127, 140, 0.6);
 }
 
-.player-transport .btn-cart {
+.transport-grid .btn-cart {
   background-image: url('/images/IP-CART-add-v1.svg');
   background-size: 22px 22px;
 }
 
-/* V6.3.1: Playlist add button */
-.player-transport .btn-plist {
+.transport-grid .btn-plist {
   background-image: url('/images/IP-MUSIC-2teal.svg');
   background-size: 20px 20px;
 }
 
 
-/* ── Seek Bar ────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════
+   GROUP: INFORMATION — title, seek+time, volume (column)
+   Position: absolute (set by footerQuadTree.js)
+   Internal: flex column
+   ══════════════════════════════════════════════════════════════ */
+
+.group-information {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4px 12px;
+  gap: 3px;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Song Title */
+.player-title {
+  font-size: var(--player-title-font);
+  font-weight: 400;
+  color: var(--ip-fg, #cadbda);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Seek Bar */
 .player-seek {
   flex: 1 1 auto;
-  max-width: var(--seek-max-w);
-  min-width: var(--seek-min-w);
+  max-width: var(--seek-max-w, none);
+  min-width: var(--seek-min-w, 40px);
   height: var(--seek-height);
   background: var(--seek-track-bg);
   border-radius: var(--seek-radius);
@@ -230,20 +233,18 @@
   pointer-events: none;
 }
 
-
-/* ── Time Display ────────────────────────────────────────────── */
+/* Time Display */
 .player-time {
   font-size: var(--player-time-font);
   font-family: monospace;
   color: var(--ip-muted, #8ab7ce);
   white-space: nowrap;
-  min-width: var(--player-time-min-w);
+  min-width: var(--player-time-min-w, 78px);
   text-align: center;
   flex-shrink: 0;
 }
 
-
-/* ── Volume ──────────────────────────────────────────────────── */
+/* Volume */
 .player-volume {
   display: flex;
   align-items: center;
@@ -251,8 +252,9 @@
   flex-shrink: 0;
 }
 
-/* Hide volume on touch device profiles */
-[data-ft-device="touch"] .player-volume {
+/* Volume hidden on touch devices */
+[data-ft-device="touch"] .player-volume,
+[data-ft-device="touch"] .info-volume-row {
   display: none;
 }
 
@@ -284,19 +286,16 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   NAV ZONE — width set by JS
+   GROUP: LINK — navigation links (inline)
    ══════════════════════════════════════════════════════════════ */
 
-.footer-nav-zone {
+.group-link {
   display: flex;
   align-items: center;
   height: 100%;
-  border-left: var(--footer-separator);
-  overflow: visible;
 }
 
-.footer-nav-zone a,
-.footer-nav-zone button.nav-login-btn {
+.group-link a {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -306,39 +305,61 @@
   font-size: var(--nav-font);
   font-weight: 300;
   white-space: nowrap;
+  height: 100%;
+  border-right: var(--footer-separator);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.group-link a:last-child { border-right: none; }
+.group-link a:hover { background: rgba(43, 127, 140, 0.15); }
+
+
+/* ══════════════════════════════════════════════════════════════
+   GROUP: ACTION — login, cart (high-value CTAs)
+   ══════════════════════════════════════════════════════════════ */
+
+.group-action {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.group-action button,
+.group-action a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--nav-padding);
+  color: var(--ip-fg, #cadbda);
+  text-decoration: none;
+  font-size: var(--nav-font);
+  font-weight: 300;
+  white-space: nowrap;
+  height: 100%;
   background: none;
   border: none;
   border-right: var(--footer-separator);
   cursor: pointer;
   font-family: inherit;
-  height: 100%;
   transition: background 0.15s;
 }
+.group-action button:last-child,
+.group-action a:last-child { border-right: none; }
+.group-action button:hover,
+.group-action a:hover { background: rgba(43, 127, 140, 0.15); }
 
-.footer-nav-zone a:hover,
-.footer-nav-zone button.nav-login-btn:hover {
-  background: rgba(43, 127, 140, 0.15);
-}
-
-
-/* ══════════════════════════════════════════════════════════════
-   USER CELL
-   ══════════════════════════════════════════════════════════════ */
-
+/* User Cell (logged-in state) */
 .user-cell {
   display: none;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: var(--user-cell-gap);
+  gap: 6px;
   padding: var(--user-cell-padding);
   border-right: var(--footer-separator);
   height: 100%;
   min-width: 60px;
-  overflow: visible;
   position: relative;
 }
-
 .user-cell.active { display: flex; }
 
 .user-cell-icon {
@@ -367,7 +388,6 @@
   text-overflow: ellipsis;
   max-width: 80px;
   line-height: 1;
-  text-align: center;
 }
 
 .user-cell-logout {
@@ -389,24 +409,22 @@
 
 .nav-login-btn.hidden { display: none; }
 
-
-/* ── Cart Button ─────────────────────────────────────────────── */
-.footer-nav-zone .cart-button {
+/* Cart Button */
+.cart-button {
   position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
   padding: var(--nav-padding);
   overflow: visible;
-  background: none; border: none;
+  background: none;
+  border: none;
   cursor: pointer;
   height: 100%;
   font-family: inherit;
   transition: background 0.15s;
 }
-.footer-nav-zone .cart-button:hover {
-  background: rgba(43, 127, 140, 0.15);
-}
+.cart-button:hover { background: rgba(43, 127, 140, 0.15); }
 
 .cart-icon { width: 20px; height: 20px; display: block; }
 
@@ -425,20 +443,18 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   LOGO ZONE — width set by JS
+   GROUP: LOGO — brand mark + tag (column)
    ══════════════════════════════════════════════════════════════ */
 
-.footer-logo {
+.group-logo {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: var(--logo-padding);
-  border-left: var(--footer-separator);
-  height: 100%;
 }
 
-.footer-logo img {
+.group-logo img {
   height: var(--logo-img-h);
   width: auto;
   display: block;
@@ -452,153 +468,3 @@
   white-space: nowrap;
   line-height: 1;
 }
-
-
-/* ══════════════════════════════════════════════════════════════
-   PROFILE: compact-portrait (wireframe layout)
-   
-   Touch device, portrait phone. Full vertical stack:
-   Row 1: title (full width)
-   Row 2: transport buttons (centered)
-   Row 3: seek bar + time
-   Row 4: nav links (centered, wrapping)
-   Row 5: logo + tag (centered)
-   
-   The .player element wraps its children into rows.
-   ══════════════════════════════════════════════════════════════ */
-
-[data-ft-profile="compact-portrait"] .footer-bar {
-  height: auto;
-  align-items: stretch;
-}
-
-[data-ft-profile="compact-portrait"] .footer-player-zone {
-  padding: 8px 14px 4px;
-  height: auto;
-}
-
-[data-ft-profile="compact-portrait"] .player {
-  flex-wrap: wrap;
-  justify-content: center;
-  height: auto;
-  gap: 6px;
-}
-
-/* Title: full width row */
-[data-ft-profile="compact-portrait"] .player-title {
-  width: 100%;
-  max-width: none;
-  text-align: center;
-  flex-basis: 100%;
-  padding: 2px 0;
-}
-
-/* Hide separator in stacked layout */
-[data-ft-profile="compact-portrait"] .player-separator {
-  display: none;
-}
-
-/* Transport: centered row */
-[data-ft-profile="compact-portrait"] .player-transport {
-  justify-content: center;
-  flex-basis: 100%;
-  gap: var(--player-btn-gap);
-  padding: 4px 0;
-}
-
-/* Seek + Time: row together */
-[data-ft-profile="compact-portrait"] .player-seek {
-  flex: 1 1 auto;
-  max-width: none;
-  min-width: 40%;
-}
-
-[data-ft-profile="compact-portrait"] .player-time {
-  min-width: auto;
-}
-
-/* V6.3.1: +cart and +plist stay visible in transport on portrait */
-
-/* Nav: stacked full-width, centered */
-[data-ft-profile="compact-portrait"] .footer-nav-zone {
-  justify-content: center;
-  border-left: none;
-  border-top: var(--footer-separator);
-  flex-wrap: wrap;
-}
-
-[data-ft-profile="compact-portrait"] .footer-nav-zone a,
-[data-ft-profile="compact-portrait"] .footer-nav-zone button.nav-login-btn {
-  border-right: var(--footer-separator);
-}
-
-/* User cell horizontal on compact */
-[data-ft-profile="compact-portrait"] .user-cell.active {
-  flex-direction: row;
-  gap: 6px;
-  border-right: var(--footer-separator);
-}
-
-/* Logo: stacked full-width, centered row */
-[data-ft-profile="compact-portrait"] .footer-logo {
-  flex-direction: row;
-  justify-content: center;
-  gap: 8px;
-  border-left: none;
-  border-top: 1px solid rgba(43, 127, 140, 0.15);
-}
-
-
-/* ══════════════════════════════════════════════════════════════
-   PROFILE: two-tier (landscape phone + tablet)   V6.4.0
-
-   3-row layout. ALL positions computed by footerQuadTree.js V6.4.0.
-   .footer-bar: position:relative, height = totalH (px, set by JS).
-   All zones + inner elements: position:absolute, top/left/width/height
-   written as px inline styles by footerQuadTree.js.
-
-   CSS here is VISUAL ONLY — borders, colors, link styling.
-   NO width, height, top, left, position, flex-wrap, margin:auto.
-   QuadTree owns the geometry completely.
-   ══════════════════════════════════════════════════════════════ */
-
-/* footer-bar: QuadTree writes height + position:relative inline */
-
-/* Row 1 border — decorative only */
-[data-ft-profile="two-tier"] .footer-player-zone {
-  border-bottom: var(--footer-separator);
-  box-sizing: border-box;
-}
-
-/* Separator hidden in two-tier */
-[data-ft-profile="two-tier"] .player-separator {
-  display: none;
-}
-
-/* Volume hidden on touch */
-[data-ft-profile="two-tier"] .player-volume {
-  display: none;
-}
-
-/* Nav links — visual styling only, no layout */
-[data-ft-profile="two-tier"] .footer-nav-zone a,
-[data-ft-profile="two-tier"] .footer-nav-zone button.nav-login-btn {
-  border-right: var(--footer-separator);
-  box-sizing: border-box;
-}
-
-/* User cell — horizontal display */
-[data-ft-profile="two-tier"] .user-cell.active {
-  flex-direction: row;
-  gap: 6px;
-  border-right: var(--footer-separator);
-}
-
-
-/* ══════════════════════════════════════════════════════════════
-   PROFILE: desktop-narrow
-   Desktop browser dragged small. Everything horizontal, just tight.
-   ══════════════════════════════════════════════════════════════ */
-
-/* No special rules needed — default horizontal layout applies.
-   Profile vars handle sizing via footerQuadTree.js. */

@@ -1,12 +1,12 @@
 // ============================================================================
-// public/js/roderick.js — V6.3 (RODUX Stack / CSS-Var-Driven Layout)
+// public/js/roderick.js — V7.0.0 (RODUX Stack / CSS-Var-Driven Layout)
 //
 // Single controller for the Roderick Shoolbraid artist page.
 // Owns: data fetch, DOM creation, region layout, QuadTree grid,
 //       album detail sidebar, player wiring.
 //
-// V6.3: FooterQuadTree integration. Device-aware profiles.
-//       setRegionVars() no longer writes --footer-height to :root.
+// V7.0.0: FooterQuadTree V7 integration. Group-based footer.
+//         setRegionVars() does NOT write --footer-height to :root.
 // ============================================================================
 
 import { FooterQuadTree } from './footerQuadTree.js';
@@ -243,7 +243,7 @@ function setRegionVars() {
   root.style.setProperty('--main-height',   `${mainH}px`);
   root.style.setProperty('--vw',            `${vw}px`);
 
-  // V6.3: Do NOT set --footer-height on :root. footerQuadTree.js owns it.
+  // V7: Do NOT set --footer-height on :root. footerQuadTree.js owns it.
 
   if (!isMobile() && sidebarOpen) {
     const ms     = cfg.layout?.mainSplit;
@@ -402,7 +402,7 @@ function setupKeyboard() {
       await new Promise(r => document.addEventListener('DOMContentLoaded', r, { once: true }));
     }
 
-    // V6.3: Footer QuadTree (RODUX pipeline, device-aware)
+    // V7: Footer QuadTree (group-based packing, one algorithm)
     const fqt = new FooterQuadTree();
     await fqt.init();
     window.footerQT = fqt;
@@ -417,6 +417,6 @@ function setupKeyboard() {
 
     document.body.classList.add('ready');
 
-    console.log('🎉 roderick.js V6.3 initialized (FooterQuadTree active, device:', fqt._device + ')');
+    console.log('🎉 roderick.js V7.0.0 initialized (FooterQuadTree V7, device:', fqt._device + ')');
   });
 })();
