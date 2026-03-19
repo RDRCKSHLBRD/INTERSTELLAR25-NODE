@@ -9,9 +9,9 @@
     "transport": {
       "order": 1,
       "pinned": "left",
-      "minPx": 140,
+      "minPx": 155,
       "maxPx": 320,
-      "idealPx": 180,
+      "idealPx": 155,
       "priority": 1,
       "internal": {
         "columns": 3,
@@ -24,9 +24,9 @@
     "information": {
       "order": 2,
       "pinned": false,
-      "minPx": 180,
+      "minPx": 160,
       "maxPx": 9999,
-      "idealPx": 350,
+      "idealPx": 260,
       "greedy": true,
       "priority": 2,
       "internal": {
@@ -43,9 +43,9 @@
     "link": {
       "order": 3,
       "pinned": false,
-      "minPx": 100,
-      "maxPx": 400,
-      "idealPx": 180,
+      "minPx": 90,
+      "maxPx": 350,
+      "idealPx": 150,
       "priority": 3,
       "internal": {
         "layout": "inline",
@@ -57,9 +57,9 @@
     "action": {
       "order": 4,
       "pinned": "right",
-      "minPx": 80,
-      "maxPx": 250,
-      "idealPx": 140,
+      "minPx": 70,
+      "maxPx": 200,
+      "idealPx": 100,
       "priority": 4,
       "internal": {
         "layout": "inline",
@@ -71,9 +71,9 @@
     "logo": {
       "order": 5,
       "pinned": "right",
-      "minPx": 80,
-      "maxPx": 200,
-      "idealPx": 120,
+      "minPx": 70,
+      "maxPx": 180,
+      "idealPx": 100,
       "priority": 5,
       "internal": {
         "layout": "column",

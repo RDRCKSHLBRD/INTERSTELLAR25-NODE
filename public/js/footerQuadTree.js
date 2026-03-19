@@ -178,14 +178,29 @@ export class FooterQuadTree {
       const el  = groupEls[name];
       const m   = this._measure(el);
 
+      let minPx = cfg.minPx || 0;
+
+      // Transport: calculate minPx from grid math
+      // 3 cols × btnSize + 2 × btnGap + padding
+      if (name === 'transport') {
+        const bar     = this.footerBar;
+        const cs      = getComputedStyle(bar);
+        const btnSize = parseInt(cs.getPropertyValue('--player-btn-size')) || 38;
+        const btnGap  = parseInt(cs.getPropertyValue('--player-btn-gap'))  || 4;
+        const cols    = cfg.internal?.columns || 3;
+        const gridW   = cols * btnSize + (cols - 1) * btnGap;
+        const padW    = 12; // 6px padding each side
+        minPx = Math.max(minPx, gridW + padW);
+      }
+
       return {
         name,
         el,
-        pinned:    cfg.pinned  || false,   // "left", "right", or false
+        pinned:    cfg.pinned  || false,
         greedy:    cfg.greedy  || false,
-        minPx:     cfg.minPx   || 0,
+        minPx,
         maxPx:     cfg.maxPx   || 9999,
-        idealPx:   Math.max(cfg.minPx || 0, Math.min(cfg.maxPx || 9999, Math.max(cfg.idealPx || 100, m.w))),
+        idealPx:   Math.max(minPx, Math.min(cfg.maxPx || 9999, Math.max(cfg.idealPx || 100, m.w))),
         measuredW: m.w,
         measuredH: m.h,
       };

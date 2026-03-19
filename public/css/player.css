@@ -121,12 +121,14 @@
   align-items: center;
   justify-content: center;
   padding: 4px 6px;
+  overflow: hidden;
 }
 
 .transport-grid {
   display: grid;
   grid-template-columns: repeat(3, var(--player-btn-size));
   gap: var(--player-btn-gap);
+  flex-shrink: 0;
 }
 
 .transport-grid button {
