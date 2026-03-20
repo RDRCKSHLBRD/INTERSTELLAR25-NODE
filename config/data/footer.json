@@ -59,7 +59,7 @@
       "pinned": "right",
       "minPx": 70,
       "maxPx": 200,
-      "idealPx": 100,
+      "idealPx": 70,
       "priority": 4,
       "internal": {
         "layout": "inline",
@@ -73,7 +73,7 @@
       "pinned": "right",
       "minPx": 70,
       "maxPx": 180,
-      "idealPx": 100,
+      "idealPx": 70,
       "priority": 5,
       "internal": {
         "layout": "column",

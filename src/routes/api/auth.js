@@ -1,12 +1,36 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
+import rateLimit from 'express-rate-limit';
 import { query } from '../../config/database.js';
 import CartModel from '../../models/CartModel.js';
 
 const router = express.Router();
 
+// ══════════════════════════════════════════════════════════════
+// SECURITY LIMITERS
+// ══════════════════════════════════════════════════════════════
+
+// SHIELD 1: Prevent Database Flooding (Spam Accounts)
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour window
+  max: 5, // Limit each IP to 5 registrations per window
+  message: { success: false, message: 'Too many accounts created from this IP. Please try again later.' }
+});
+
+// SHIELD 2: Prevent Password Brute-Forcing
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minute window
+  max: 10, // Limit each IP to 10 login requests per window
+  message: { success: false, message: 'Too many login attempts. Please try again in 15 minutes.' }
+});
+
+
+// ══════════════════════════════════════════════════════════════
+// AUTHENTICATION ROUTES
+// ══════════════════════════════════════════════════════════════
+
 // POST /api/auth/register - User registration
-router.post('/register', async (req, res, next) => {
+router.post('/register', registerLimiter, async (req, res, next) => {
   try {
     const { user_name, name_first, name_last, email, password } = req.body;
 
@@ -62,17 +86,14 @@ router.post('/register', async (req, res, next) => {
       email: user.email
     };
 
-
-
-if (req.session.sessionId) {
-  try {
-    await CartModel.migrateSessionCartToUser(req.session.sessionId, user.id);
-  } catch (err) {
-    console.error('Cart migration failed:', err);
-    // Don't fail login if cart migration fails
-  }
-}
-
+    if (req.session.sessionId) {
+      try {
+        await CartModel.migrateSessionCartToUser(req.session.sessionId, user.id);
+      } catch (err) {
+        console.error('Cart migration failed:', err);
+        // Don't fail login if cart migration fails
+      }
+    }
 
     res.status(201).json({
       success: true,
@@ -85,10 +106,9 @@ if (req.session.sessionId) {
   }
 });
 
-// POST /api/auth/login - User login
-// REPLACE the login route in src/routes/api/auth.js with this:
 
-router.post('/login', async (req, res, next) => {
+// POST /api/auth/login - User login
+router.post('/login', loginLimiter, async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -131,7 +151,7 @@ router.post('/login', async (req, res, next) => {
       [user.id]
     );
 
-    // 🔧 CAPTURE SESSION ID from headers before setting session
+    // CAPTURE SESSION ID from headers before setting session
     const sessionId = req.headers['x-session-id'] || req.session.sessionId;
     console.log(`🔍 Login attempt - sessionId from headers: ${sessionId}`);
 
@@ -145,7 +165,7 @@ router.post('/login', async (req, res, next) => {
       email: user.email
     };
 
-    // 🔄 CART MIGRATION with captured session ID
+    // CART MIGRATION with captured session ID
     if (sessionId) {
       try {
         console.log(`🔄 Attempting cart migration for session: ${sessionId} → user: ${user.id}`);
@@ -153,7 +173,6 @@ router.post('/login', async (req, res, next) => {
         console.log(`✅ Cart migration completed for user ${user.id}`);
       } catch (err) {
         console.error('❌ Cart migration failed:', err);
-        // Don't fail login if cart migration fails
       }
     } else {
       console.log('📭 No session ID found for cart migration');
@@ -170,6 +189,7 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
+
 // POST /api/auth/logout - User logout
 router.post('/logout', (req, res) => {
   if (req.session) {
@@ -181,7 +201,8 @@ router.post('/logout', (req, res) => {
         });
       }
       
-      res.clearCookie('connect.sid'); // Default session cookie name
+      // Clears the specific cookie defined in server.js
+      res.clearCookie('interstellar.sid'); 
       res.json({
         success: true,
         message: 'Logout successful'
@@ -194,6 +215,7 @@ router.post('/logout', (req, res) => {
     });
   }
 });
+
 
 // GET /api/auth/me - Get current user info
 router.get('/me', async (req, res, next) => {
