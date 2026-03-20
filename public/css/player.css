@@ -33,14 +33,14 @@
   --player-time-font:    12px;
   --player-time-min-w:   78px;
 
-  --seek-height:         6px;
+  --seek-height:         4px;
   --seek-radius:         3px;
   --seek-track-bg:       rgba(138, 183, 206, 0.15);
   --seek-fill-bg:        var(--ip-primary, #3AA0A0);
   --seek-max-w:          none;
   --seek-min-w:          40px;
 
-  --vol-track-w:         100px;
+  --vol-track-w:         150px;
   --vol-track-h:         4px;
 
   --nav-font:            14px;
@@ -228,6 +228,7 @@
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
+  margin-top: 7px
 }
 
 /* Volume hidden on touch devices */
