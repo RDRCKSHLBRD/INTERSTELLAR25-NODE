@@ -57,11 +57,23 @@ export class FooterQuadTree {
   _selectProfile(state) {
     const profiles = this.config.profiles;
     if (!profiles) return {};
-    for (const name of ['compact', 'standard', 'wide']) {
+    
+    // 1. Added 'mobile-landscape' to the evaluation order
+    const profileNames = ['compact', 'mobile-landscape', 'tablet', 'standard', 'wide'];
+    
+    for (const name of profileNames) {
       const p = profiles[name];
       if (!p) continue;
-      if ((p.minWidth === undefined || state.vw >= p.minWidth) && (p.maxWidth === undefined || state.vw <= p.maxWidth))
-        return { name, ...p };
+      
+      // 2. Check Width
+      const matchW = (p.minWidth === undefined || state.vw >= p.minWidth) && 
+                     (p.maxWidth === undefined || state.vw <= p.maxWidth);
+                     
+      // 3. Check Height (NEW - allows targeting sideways phones)
+      const matchH = (p.maxHeight === undefined || state.vh <= p.maxHeight) &&
+                     (p.minHeight === undefined || state.vh >= p.minHeight);
+
+      if (matchW && matchH) return { name, ...p };
     }
     return { name: 'standard', ...(profiles.standard || {}) };
   }

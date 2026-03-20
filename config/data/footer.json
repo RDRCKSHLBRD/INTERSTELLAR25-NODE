@@ -93,7 +93,7 @@
     "pointer": { "volumeVisible": true }
   },
 
-  "profiles": {
+ "profiles": {
     "compact": {
       "maxWidth": 767,
       "transportColumns": 9,
@@ -111,8 +111,47 @@
         "--logo-padding": "4px 10px"
       }
     },
-    "standard": {
+    "tablet": {
       "minWidth": 768,
+      "maxWidth": 1023,
+      "transportColumns": 3,
+      "vars": {
+        "--player-btn-size": "38px",
+        "--player-icon-size": "30px",
+        "--player-btn-gap": "4px",
+        "--player-title-font": "13px",
+        "--player-time-font": "12px",
+        "--seek-height": "6px",
+        "--nav-font": "13px",
+        "--nav-padding": "10px 16px",
+        "--logo-img-h": "30px",
+        "--logo-tag-font": "10px",
+        "--logo-padding": "8px 20px",
+        "--vol-track-w": "80px"
+      }
+    },
+
+"mobile-landscape": {
+      "maxWidth": 950,
+      "maxHeight": 500, 
+      "transportColumns": 9,
+      "vars": {
+        "--player-btn-size": "34px",
+        "--player-icon-size": "30px",
+        "--player-btn-gap": "4px",
+        "--player-title-font": "13px",
+        "--player-time-font": "11px",
+        "--seek-height": "6px",
+        "--nav-font": "12px",
+        "--nav-padding": "6px 12px",
+        "--logo-img-h": "20px",
+        "--logo-tag-font": "9px",
+        "--logo-padding": "4px 10px"
+      }
+    },
+
+    "standard": {
+      "minWidth": 1024,
       "maxWidth": 1279,
       "transportColumns": 9,
       "vars": {
