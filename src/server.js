@@ -29,6 +29,7 @@ import purchaseRoutes from './routes/api/purchase.js';
 import pageRoutes from './routes/pages.js';
 import downloadRoutes from './routes/downloads.js';
 import healthRoutes from './routes/api/health.js';
+import playlistRoutes from './routes/api/playlists.js';
 
 // Import middleware
 import errorHandler from './middleware/errorHandler.js';
@@ -201,6 +202,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/purchase', purchaseRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/health', healthRoutes);
+app.use('/api/playlists', playlistRoutes);
 
 // Config endpoint for frontend
 app.get('/api/config', (req, res) => {
@@ -227,7 +229,8 @@ if (config.enableApiDocs) {
         songs: '/api/songs',
         auth: '/api/auth',
         purchase: '/api/purchase',
-        health: '/api/health'
+        health: '/api/health',
+        playlists: '/api/playlists'
       },
       authentication: {
         register: 'POST /api/auth/register',
