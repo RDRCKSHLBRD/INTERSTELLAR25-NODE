@@ -192,7 +192,8 @@ router.post('/:id/songs', requireAuth, async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Playlist ID and songId required' });
     }
 
-    const result = await PlaylistModel.addSong(playlistId, parseInt(songId), req.session.userId);
+    // songId is varchar in DB (songs.id is character varying)
+    const result = await PlaylistModel.addSong(playlistId, String(songId), req.session.userId);
 
     if (!result) {
       return res.status(403).json({ success: false, message: 'Not your playlist' });
@@ -212,9 +213,10 @@ router.post('/:id/songs', requireAuth, async (req, res, next) => {
 router.delete('/:id/songs/:songId', requireAuth, async (req, res, next) => {
   try {
     const playlistId = parseInt(req.params.id);
-    const songId = parseInt(req.params.songId);
+    // songId is varchar in DB (songs.id is character varying)
+    const songId = req.params.songId;
 
-    if (isNaN(playlistId) || isNaN(songId)) {
+    if (isNaN(playlistId) || !songId) {
       return res.status(400).json({ success: false, message: 'Invalid IDs' });
     }
 
