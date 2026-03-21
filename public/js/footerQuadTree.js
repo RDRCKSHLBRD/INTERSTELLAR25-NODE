@@ -1,5 +1,5 @@
 // ============================================================================
-// public/js/footerQuadTree.js — V7.2.0 (RODUX Stack)
+// public/js/footerQuadTree.js — V7.2.1 (RODUX Stack)
 //
 // Group-based footer layout engine with INNER CALCULATIONS.
 // Full RODUX: JS owns every position. CSS is dumb renderer.
@@ -13,6 +13,9 @@
 //
 // V7.2.0: Profile-aware transport columns (9-across on wide, 3x3 on compact/standard).
 //         Profile flows into _pack() and _calcTransport() for accurate geometry.
+// V7.2.1: BUG FIX — _calcInformation was called before greedy expansion on overflow
+//         rows, locking title width to fallback (200 * 0.85 = 170px). Now deferred
+//         to _finalizeOverflowRow where post-greedy width is final.
 // ============================================================================
 
 export class FooterQuadTree {
@@ -35,7 +38,7 @@ export class FooterQuadTree {
       if (!this.footerBar) { console.warn('⚠️ FooterQuadTree: .footer-bar not found'); return; }
       this._device = this._detectDevice();
       this._ready = true;
-      console.log('✅ FooterQuadTree V7.2.0 initialized (device: ' + this._device + ')');
+      console.log('✅ FooterQuadTree V7.2.1 initialized (device: ' + this._device + ')');
     } catch (err) { console.error('❌ FooterQuadTree init failed:', err); }
   }
 
@@ -231,6 +234,7 @@ export class FooterQuadTree {
   // ══════════════════════════════════════════════════════════════
   // PACK — outer group packing + inner calcs for accurate heights
   // V7.2: accepts profile so transport columns are viewport-aware
+  // V7.2.1: information inner calc deferred for overflow groups
   // ══════════════════════════════════════════════════════════════
 
   _pack(state, profile) {
@@ -351,12 +355,17 @@ export class FooterQuadTree {
     }
 
     // ── Inner calcs for accurate heights ────────────────────
+    // V7.2.1: Only calc information here if it's in row 1 (where greedy
+    // expansion has already happened). Overflow groups get their inner
+    // calc in _finalizeOverflowRow AFTER greedy expansion.
     const innerCalcs = {};
+    const row1Set = new Set([...pinnedLeft, ...row1Flow, ...actualPinnedRight]);
     for (const g of [...pinnedLeft, ...row1Flow, ...actualPinnedRight, ...overflow]) {
       if (g.name === 'transport') {
         innerCalcs.transport = transportCalc;
         g.measuredH = transportCalc.height;
-      } else if (g.name === 'information') {
+      } else if (g.name === 'information' && row1Set.has(g)) {
+        // Only calc now if information is in row 1 (post-greedy width is final)
         innerCalcs.information = this._calcInformation(g.w || 200, state);
         g.measuredH = innerCalcs.information.height;
       }
@@ -437,10 +446,11 @@ export class FooterQuadTree {
       for (const g of currentRow) { g.x = x; x += g.w; }
     }
 
-    // Compute height for this row independently
-    // Re-run inner calcs for information if it landed here
+    // V7.2.1: ALWAYS re-run inner calcs for information with its FINAL
+    // post-greedy width. The pre-build loop no longer caches a stale calc
+    // for overflow groups, but we unconditionally recalc here to be safe.
     for (const g of currentRow) {
-      if (g.name === 'information' && !innerCalcs.information) {
+      if (g.name === 'information') {
         innerCalcs.information = this._calcInformation(g.w, state);
         g.measuredH = innerCalcs.information.height;
       }
@@ -608,7 +618,7 @@ export class FooterQuadTree {
     const pr = this._packResult;
     const tc = pr?.innerCalcs?.transport;
     return {
-      status: 'ok', version: 'V7.2.0', state, device: this._device,
+      status: 'ok', version: 'V7.2.1', state, device: this._device,
       profile: this._selectProfile(state)?.name || 'none',
       rowCount: pr?.rowCount ?? null, totalH: pr?.totalH ?? null,
       placements: pr?.placements ?? null,
