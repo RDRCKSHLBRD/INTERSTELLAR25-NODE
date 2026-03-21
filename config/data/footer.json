@@ -34,7 +34,7 @@
         "row1": ["title"],
         "row2": ["seek", "time"],
         "row3_pointer_only": ["volume"],
-        "titleMaxRatio": 0.6,
+        "titleMaxRatio": 0.85,
         "padding": "4px 12px",
         "gap": "3px"
       }
