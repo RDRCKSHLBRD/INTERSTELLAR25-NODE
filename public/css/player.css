@@ -439,3 +439,262 @@
   white-space: nowrap;
   line-height: 1;
 }
+
+
+/* ══════════════════════════════════════════════════════════════
+   FOOTER V7.3 — Action Styles
+   Playlists sidebar, Subscribe modal, nav-action-btn base
+   Add to player.css or main stylesheet
+   ══════════════════════════════════════════════════════════════ */
+
+
+/* ── Action button base (playlists, subscribe) ─────────────── */
+
+.nav-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--footer-link-color, #5BB8C4);
+  font-family: inherit;
+  font-size: var(--nav-font, 13px);
+  padding: var(--nav-padding, 10px 16px);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.nav-action-btn:hover {
+  color: var(--footer-link-hover, #8EDAE4);
+}
+
+
+/* ── Playlists Sidebar ─────────────────────────────────────── */
+
+.playlists-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(380px, 85vw);
+  height: 100vh;
+  background: #07212B;
+  color: #D8E8EA;
+  z-index: 9000;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.4);
+}
+
+.playlists-sidebar.open {
+  transform: translateX(0);
+}
+
+.playlists-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(43, 127, 140, 0.25);
+}
+
+.playlists-sidebar-header h2 {
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #5BB8C4;
+  margin: 0;
+}
+
+.playlists-close {
+  background: transparent;
+  border: none;
+  color: #5BB8C4;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.playlists-sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 24px;
+}
+
+.playlists-loading {
+  color: rgba(91, 184, 196, 0.5);
+  font-size: 13px;
+  padding: 20px 0;
+}
+
+.playlists-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 8999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.playlists-backdrop.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+/* ── Subscribe Modal ───────────────────────────────────────── */
+
+.subscribe-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  width: min(520px, 90vw);
+  max-height: 85vh;
+  background: #07212B;
+  color: #D8E8EA;
+  z-index: 9000;
+  border: 1px solid rgba(43, 127, 140, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  overflow-y: auto;
+}
+
+.subscribe-modal.open {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.subscribe-modal-inner {
+  padding: 32px;
+  position: relative;
+}
+
+.subscribe-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  color: #5BB8C4;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.subscribe-modal h2 {
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #5BB8C4;
+  margin: 0 0 8px;
+}
+
+.subscribe-desc {
+  color: rgba(216, 232, 234, 0.6);
+  font-size: 13px;
+  margin: 0 0 28px;
+}
+
+.subscribe-tiers {
+  display: flex;
+  gap: 16px;
+}
+
+@media (max-width: 520px) {
+  .subscribe-tiers {
+    flex-direction: column;
+  }
+}
+
+.subscribe-tier {
+  flex: 1;
+  padding: 24px;
+  border: 1px solid rgba(43, 127, 140, 0.2);
+  background: rgba(43, 127, 140, 0.05);
+}
+
+.subscribe-tier h3 {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #5BB8C4;
+  margin: 0 0 12px;
+}
+
+.subscribe-price {
+  font-size: 24px;
+  color: #D8E8EA;
+  margin: 0 0 12px;
+  font-weight: 300;
+}
+
+.subscribe-price-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 18px;
+  color: #D8E8EA;
+}
+
+.subscribe-price-input input {
+  width: 60px;
+  background: rgba(43, 127, 140, 0.15);
+  border: 1px solid rgba(43, 127, 140, 0.3);
+  color: #D8E8EA;
+  font-size: 18px;
+  padding: 4px 8px;
+  text-align: center;
+  font-family: inherit;
+}
+
+.subscribe-price-input input:focus {
+  outline: none;
+  border-color: #5BB8C4;
+}
+
+.subscribe-tier p {
+  color: rgba(216, 232, 234, 0.5);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
+.subscribe-cta {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid #5BB8C4;
+  color: #5BB8C4;
+  font-family: inherit;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.subscribe-cta:hover {
+  background: rgba(91, 184, 196, 0.15);
+  color: #D8E8EA;
+}
+
+.subscribe-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 8999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.subscribe-backdrop.visible {
+  opacity: 1;
+  pointer-events: auto;
+}

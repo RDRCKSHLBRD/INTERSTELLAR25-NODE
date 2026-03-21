@@ -38,4 +38,29 @@ router.get('/cancel', (req, res) => {
   res.sendFile(path.join(__dirname, '../../public/cancel.html'));
 });
 
+
+// ALBUM PAGE — single template, data-driven
+router.get('/album/:catalogue', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../public/album.html'));
+});
+ 
+// ARTIST PAGES — boilerplate for alternate artist names
+router.get('/artist/rodux', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../public/artist-rodux.html'));
+});
+router.get('/artist/betacarotine', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../public/artist-betacarotine.html'));
+});
+router.get('/artist/3ofcups', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../public/artist-3ofcups.html'));
+});
+ 
+
+
+
+
+
+
+
+
 export default router;

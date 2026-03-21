@@ -39,49 +39,63 @@
        footerQuadTree.js V7 positions all groups absolutely.
        player.js V7 builds controls into transport + information.
        ══════════════════════════════════════════════════════════ -->
-  <footer id="artistControls">
-    <details class="footer-details" open>
-      <summary>PLAYER I/O</summary>
-      <div class="footer-bar">
+ <!-- ══════════════════════════════════════════════════════════
+     FOOTER V7.3 — Group-Based Architecture (Updated Groups)
+     
+     Five groups: transport, information, link, action, logo.
+     footerQuadTree.js V7.2.1 positions all groups absolutely.
+     player.js V7 builds controls into transport + information.
+     
+     V7.3 GROUP RECLASSIFICATION:
+       link    = page navigation (downloads, film, contact)
+       action  = in-app triggers (playlists sidebar, subscribe modal,
+                 login/user, cart)
+     ══════════════════════════════════════════════════════════ -->
+<footer id="artistControls">
+  <details class="footer-details" open>
+    <summary>PLAYER I/O</summary>
+    <div class="footer-bar">
 
-        <!-- GROUP: Transport — player.js builds 3-col button grid here -->
-        <div class="group-transport"></div>
+      <!-- GROUP: Transport — player.js builds 9-col button grid here -->
+      <div class="group-transport"></div>
 
-        <!-- GROUP: Information — player.js builds title, seek, time, volume here -->
-        <div class="group-information"></div>
+      <!-- GROUP: Information — player.js builds title, seek, time, volume here -->
+      <div class="group-information"></div>
 
-        <!-- GROUP: Link — navigation -->
-        <nav class="group-link">
-          <a href="/downloads">downloads</a>
-          <a href="/filmography">film</a>
-          <a href="/contact">contact</a>
-        </nav>
+      <!-- GROUP: Link — page navigation only -->
+      <nav class="group-link">
+        <a href="/downloads">downloads</a>
+        <a href="/filmography">film</a>
+        <a href="/contact">contact</a>
+      </nav>
 
-        <!-- GROUP: Action — auth + cart (high-value CTAs) -->
-        <div class="group-action">
-          <button id="loginBtn" class="nav-login-btn">log in</button>
-          <div id="userCell" class="user-cell">
-            <a href="/account" class="user-cell-icon" title="Account">
-              <img src="/images/IP-USER-candyFloss.svg" alt="Account" class="user-icon-img">
-            </a>
-            <span id="userName" class="user-cell-name"></span>
-            <button id="logoutBtn" class="user-cell-logout">logout</button>
-          </div>
-          <button id="cartBtn" class="cart-button">
-            <img src="/images/IP-CART25-m1.svg" alt="Cart" class="cart-icon">
-            <span id="cartCount" class="cart-count hidden">0</span>
-          </button>
+      <!-- GROUP: Action — in-app triggers (sidebars, modals, auth, cart) -->
+      <div class="group-action">
+        <button id="playlistsBtn" class="nav-action-btn" data-action="playlists">playlists</button>
+        <button id="subscribeBtn" class="nav-action-btn" data-action="subscribe">subscribe</button>
+        <button id="loginBtn" class="nav-login-btn">log in</button>
+        <div id="userCell" class="user-cell">
+          <a href="/account" class="user-cell-icon" title="Account">
+            <img src="/images/IP-USER-candyFloss.svg" alt="Account" class="user-icon-img">
+          </a>
+          <span id="userName" class="user-cell-name"></span>
+          <button id="logoutBtn" class="user-cell-logout">logout</button>
         </div>
-
-        <!-- GROUP: Logo — brand mark + tag -->
-        <div class="group-logo">
-          <img src="/images/IP_TAG24.svg" alt="Interstellar Packages">
-          <span class="footer-tag">rdxenv 24/25/26</span>
-        </div>
-
+        <button id="cartBtn" class="cart-button">
+          <img src="/images/IP-CART25-m1.svg" alt="Cart" class="cart-icon">
+          <span id="cartCount" class="cart-count hidden">0</span>
+        </button>
       </div>
-    </details>
-  </footer>
+
+      <!-- GROUP: Logo — brand mark + tag -->
+      <div class="group-logo">
+        <img src="/images/IP_TAG24.svg" alt="Interstellar Packages">
+        <span class="footer-tag">rdxenv 24/25/26</span>
+      </div>
+
+    </div>
+  </details>
+</footer>
 
 
   <!-- RODUX System -->

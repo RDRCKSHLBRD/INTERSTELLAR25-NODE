@@ -1,9 +1,10 @@
 {
   "_component": "footer",
-  "_version": "7.2.0",
+  "_version": "7.3.0",
   "_engine": "footerQuadTree.js",
   "_stack": "RODUX: StateJS → RatioEngine → cssJSON → QuadTree → CSS vars",
   "_architecture": "Group-based packing. Five named groups flow L→R, wrap on overflow. Transport pinned left. Action+Logo pinned right. No layout modes — one algorithm.",
+  "_v73_changes": "Reclassified groups: playlists→action (sidebar trigger), subscribe→action (modal). Link is page-nav only. Action bumped for 5 items.",
 
   "groups": {
     "transport": {
@@ -44,8 +45,8 @@
       "order": 3,
       "pinned": false,
       "minPx": 90,
-      "maxPx": 350,
-      "idealPx": 150,
+      "maxPx": 300,
+      "idealPx": 120,
       "priority": 3,
       "internal": {
         "layout": "inline",
@@ -57,9 +58,9 @@
     "action": {
       "order": 4,
       "pinned": "right",
-      "minPx": 70,
-      "maxPx": 200,
-      "idealPx": 70,
+      "minPx": 120,
+      "maxPx": 400,
+      "idealPx": 200,
       "priority": 4,
       "internal": {
         "layout": "inline",
@@ -93,7 +94,7 @@
     "pointer": { "volumeVisible": true }
   },
 
- "profiles": {
+  "profiles": {
     "compact": {
       "maxWidth": 767,
       "transportColumns": 9,
@@ -131,9 +132,9 @@
       }
     },
 
-"mobile-landscape": {
+    "mobile-landscape": {
       "maxWidth": 950,
-      "maxHeight": 500, 
+      "maxHeight": 500,
       "transportColumns": 9,
       "vars": {
         "--player-btn-size": "34px",
@@ -190,12 +191,16 @@
   },
 
   "nav": {
-    "items": ["playlists", "film", "contact"],
+    "items": ["downloads", "film", "contact"],
     "separator": "1px solid rgba(43, 127, 140, 0.25)"
   },
 
   "actions": {
-    "items": ["login", "cart"]
+    "items": ["playlists", "subscribe", "login", "cart"],
+    "playlists": { "type": "sidebar", "target": "playlistsSidebar" },
+    "subscribe": { "type": "modal", "target": "subscribeModal" },
+    "login": { "type": "auth" },
+    "cart": { "type": "sidebar", "target": "cartSidebar" }
   },
 
   "logo": {

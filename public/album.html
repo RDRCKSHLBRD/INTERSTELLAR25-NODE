@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading... — Interstellar Packages</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    /* ══════════════════════════════════════════════════════════
+       ALBUM PAGE — Immersive Layout
+       All colours injected as CSS vars from album palette JSON.
+       This CSS is palette-agnostic.
+       ══════════════════════════════════════════════════════════ */
+
+    :root {
+      --album-bg: #083644;
+      --album-text: #D8E8EA;
+      --album-accent: #5BB8C4;
+      --album-catalogue-color: #2B7F8C;
+      --album-track-title: #5BB8C4;
+      --album-font: 'Futura PT Book', 'Avenir', 'Helvetica Neue', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--album-bg);
+      color: var(--album-text);
+      font-family: var(--album-font);
+      overflow-x: hidden;
+    }
+
+    /* ── Hero ────────────────────────────────────────────── */
+
+    .album-hero {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .album-hero-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+
+    .album-hero-img.loaded { opacity: 1; }
+
+    .album-hero-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(to top, var(--album-bg), transparent);
+      pointer-events: none;
+    }
+
+    .album-hero-title {
+      position: absolute;
+      bottom: 60px;
+      left: 40px;
+      z-index: 2;
+    }
+
+    .album-hero-title h1 {
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      color: var(--album-text);
+      line-height: 1.1;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.8s ease 0.5s forwards;
+    }
+
+    .album-hero-title .album-artist {
+      font-size: clamp(0.9rem, 2vw, 1.2rem);
+      color: var(--album-accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.8s ease 0.3s forwards;
+    }
+
+    .album-hero-title .album-catalogue {
+      font-size: 0.85rem;
+      color: var(--album-catalogue-color);
+      letter-spacing: 0.2em;
+      margin-top: 8px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.7s forwards;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Scroll indicator ────────────────────────────────── */
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 1.2s forwards;
+    }
+
+    .scroll-hint span {
+      display: block;
+      width: 1px;
+      height: 40px;
+      background: var(--album-accent);
+      margin: 0 auto;
+      opacity: 0.4;
+      animation: scrollPulse 2s ease infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.2; transform: scaleY(0.6); }
+      50% { opacity: 0.6; transform: scaleY(1); }
+    }
+
+    /* ── Content sections ────────────────────────────────── */
+
+    .album-content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 80px 40px;
+    }
+
+    .album-section {
+      margin-bottom: 80px;
+    }
+
+    .album-section-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--album-catalogue-color);
+      margin-bottom: 24px;
+    }
+
+    /* ── About / Liner Notes ─────────────────────────────── */
+
+    .album-about p {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--album-text);
+      margin-bottom: 1em;
+      opacity: 0.85;
+    }
+
+    .album-liner-note {
+      margin-bottom: 40px;
+      padding-left: 20px;
+      border-left: 2px solid var(--album-accent);
+    }
+
+    .album-liner-note h3 {
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: var(--album-accent);
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .album-liner-note p {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--album-text);
+      opacity: 0.75;
+    }
+
+    /* ── Tracklist ────────────────────────────────────────── */
+
+    .album-tracklist {
+      list-style: none;
+    }
+
+    .album-track {
+      display: flex;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .album-track:hover {
+      background: rgba(255,255,255,0.03);
+    }
+
+    .album-track.playing {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .album-track-num {
+      width: 36px;
+      font-size: 0.85rem;
+      color: var(--album-catalogue-color);
+      text-align: right;
+      padding-right: 16px;
+      flex-shrink: 0;
+    }
+
+    .album-track-title {
+      flex: 1;
+      font-size: 1rem;
+      color: var(--album-track-title);
+    }
+
+    .album-track-duration {
+      font-size: 0.85rem;
+      color: var(--album-catalogue-color);
+      padding-left: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ── Credits ──────────────────────────────────────────── */
+
+    .album-credits {
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: var(--album-text);
+      opacity: 0.65;
+    }
+
+    .album-credits strong {
+      color: var(--album-accent);
+      font-weight: 400;
+    }
+
+    /* ── Purchase CTA ────────────────────────────────────── */
+
+    .album-purchase {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 32px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .album-purchase-cover {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .album-purchase-info {
+      flex: 1;
+    }
+
+    .album-purchase-info h3 {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--album-text);
+      margin-bottom: 4px;
+    }
+
+    .album-purchase-info .price {
+      font-size: 1.2rem;
+      color: var(--album-accent);
+    }
+
+    .album-purchase-btn {
+      padding: 12px 28px;
+      background: transparent;
+      border: 1px solid var(--album-accent);
+      color: var(--album-accent);
+      font-family: inherit;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+
+    .album-purchase-btn:hover {
+      background: var(--album-accent);
+      color: var(--album-bg);
+    }
+
+    /* ── Back nav ─────────────────────────────────────────── */
+
+    .album-back {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      z-index: 100;
+      color: var(--album-accent);
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+
+    .album-back:hover { opacity: 1; }
+
+    /* ── Footer spacer ────────────────────────────────────── */
+
+    .album-footer-spacer {
+      height: 120px;
+    }
+
+    /* ── Loading state ────────────────────────────────────── */
+
+    .album-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: var(--album-catalogue-color);
+      font-size: 0.9rem;
+      letter-spacing: 0.2em;
+    }
+
+    /* ── Responsive ───────────────────────────────────────── */
+
+    @media (max-width: 767px) {
+      .album-hero-title {
+        left: 20px;
+        bottom: 40px;
+      }
+      .album-content {
+        padding: 40px 20px;
+      }
+      .album-purchase {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="/roderick.html" class="album-back">← back</a>
+
+  <div id="albumPage" class="album-loading">
+    Loading...
+  </div>
+
+  <!-- Footer (same as roderick.html) -->
+  <footer id="artistControls">
+    <details class="footer-details" open>
+      <summary>PLAYER I/O</summary>
+      <div class="footer-bar">
+        <div class="group-transport"></div>
+        <div class="group-information"></div>
+        <nav class="group-link">
+          <a href="/downloads">downloads</a>
+          <a href="/filmography">film</a>
+          <a href="/contact">contact</a>
+        </nav>
+        <div class="group-action">
+          <button id="playlistsBtn" class="nav-action-btn" data-action="playlists">playlists</button>
+          <button id="subscribeBtn" class="nav-action-btn" data-action="subscribe">subscribe</button>
+          <button id="loginBtn" class="nav-login-btn">log in</button>
+          <div id="userCell" class="user-cell">
+            <a href="/account" class="user-cell-icon" title="Account">
+              <img src="/images/IP-USER-candyFloss.svg" alt="Account" class="user-icon-img">
+            </a>
+            <span id="userName" class="user-cell-name"></span>
+            <button id="logoutBtn" class="user-cell-logout">logout</button>
+          </div>
+          <button id="cartBtn" class="cart-button">
+            <img src="/images/IP-CART25-m1.svg" alt="Cart" class="cart-icon">
+            <span id="cartCount" class="cart-count hidden">0</span>
+          </button>
+        </div>
+        <div class="group-logo">
+          <img src="/images/IP_TAG24.svg" alt="Interstellar Packages">
+          <span class="footer-tag">rdxenv 24/25/26</span>
+        </div>
+      </div>
+    </details>
+  </footer>
+
+  <!-- RODUX System -->
+  <script type="module" src="/js/InterstellarSystem.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/player.js"></script>
+
+  <script type="module">
+    import { FooterQuadTree } from '/js/footerQuadTree.js';
+
+    // ── Extract catalogue from URL ────────────────────────────
+    const pathParts = window.location.pathname.split('/');
+    const catalogue = pathParts[pathParts.length - 1];
+
+    if (!catalogue) {
+      document.getElementById('albumPage').textContent = 'No album specified.';
+      throw new Error('No catalogue in URL');
+    }
+
+    // ── Fetch album data ──────────────────────────────────────
+    const res = await fetch(`/api/albums/catalogue/${catalogue}`);
+    if (!res.ok) {
+      document.getElementById('albumPage').textContent = 'Album not found.';
+      throw new Error(`Album ${catalogue} not found`);
+    }
+
+    const json = await res.json();
+    const album = json.data;
+
+    // ── Apply palette as CSS vars ─────────────────────────────
+    const root = document.documentElement;
+    if (album.palette) {
+      if (album.palette.bg) root.style.setProperty('--album-bg', album.palette.bg);
+      if (album.palette.text) root.style.setProperty('--album-text', album.palette.text);
+      if (album.palette.accent) root.style.setProperty('--album-accent', album.palette.accent);
+      if (album.palette.catalogue) root.style.setProperty('--album-catalogue-color', album.palette.catalogue);
+      if (album.palette.trackTitle) root.style.setProperty('--album-track-title', album.palette.trackTitle);
+    }
+
+    // ── Update document title ─────────────────────────────────
+    document.title = `${album.name} — ${album.artist_name} — Interstellar Packages`;
+
+    // ── Build cover URL ───────────────────────────────────────
+    const coverUrl = album.cover_url || `/api/image/${album.catalogue}/cover.jpg`;
+
+    // ── Format duration ───────────────────────────────────────
+    function fmtDuration(d) {
+      if (!d) return '';
+      if (d.includes(':')) return d;
+      const sec = parseInt(d);
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${m}:${String(s).padStart(2, '0')}`;
+    }
+
+    // ── Render page ───────────────────────────────────────────
+    const page = document.getElementById('albumPage');
+    page.className = '';
+    page.innerHTML = `
+      <!-- Hero -->
+      <section class="album-hero">
+        <img class="album-hero-img" src="${coverUrl}" alt="${album.name}" />
+        <div class="album-hero-overlay"></div>
+        <div class="album-hero-title">
+          <div class="album-artist">${album.artist_name}</div>
+          <h1>${album.name}</h1>
+          <div class="album-catalogue">${album.catalogue} · ${album.release_date || ''}</div>
+        </div>
+        <div class="scroll-hint"><span></span></div>
+      </section>
+
+      <!-- Content -->
+      <div class="album-content">
+
+        ${album.description ? `
+        <section class="album-section album-about">
+          <div class="album-section-label">About</div>
+          <p>${album.description}</p>
+        </section>
+        ` : ''}
+
+        ${album.linerNotes && album.linerNotes.length > 0 ? `
+        <section class="album-section">
+          <div class="album-section-label">Liner Notes</div>
+          ${album.linerNotes.map(note => `
+            <div class="album-liner-note">
+              <h3>${note.section}</h3>
+              <p>${note.body}</p>
+            </div>
+          `).join('')}
+        </section>
+        ` : ''}
+
+        <section class="album-section">
+          <div class="album-section-label">Tracks (${album.songs?.length || 0})</div>
+          <ul class="album-tracklist">
+            ${(album.songs || []).map((song, i) => `
+              <li class="album-track" data-song-id="${song.id}" data-album-id="${album.id}">
+                <span class="album-track-num">${i + 1}.</span>
+                <span class="album-track-title">${song.name}</span>
+                <span class="album-track-duration">${fmtDuration(song.duration)}</span>
+              </li>
+            `).join('')}
+          </ul>
+        </section>
+
+        ${album.credit ? `
+        <section class="album-section">
+          <div class="album-section-label">Credits</div>
+          <div class="album-credits">${album.credit}</div>
+        </section>
+        ` : ''}
+
+        ${album.product ? `
+        <section class="album-section">
+          <div class="album-section-label">Purchase</div>
+          <div class="album-purchase">
+            <img class="album-purchase-cover" src="${coverUrl}" alt="${album.name}" />
+            <div class="album-purchase-info">
+              <h3>${album.name}</h3>
+              <div class="price">$${album.product.price?.toFixed(2) || '12.00'}</div>
+            </div>
+            <button class="album-purchase-btn" data-catalogue="${album.catalogue}">Add to Cart</button>
+          </div>
+        </section>
+        ` : ''}
+
+      </div>
+
+      <div class="album-footer-spacer"></div>
+    `;
+
+    // ── Hero image load animation ─────────────────────────────
+    const heroImg = page.querySelector('.album-hero-img');
+    if (heroImg) {
+      if (heroImg.complete) {
+        heroImg.classList.add('loaded');
+      } else {
+        heroImg.addEventListener('load', () => heroImg.classList.add('loaded'));
+      }
+    }
+
+    // ── Track click → play ────────────────────────────────────
+    page.querySelectorAll('.album-track').forEach(track => {
+      track.addEventListener('click', () => {
+        const songId = track.dataset.songId;
+        const albumId = track.dataset.albumId;
+        if (window.audioPlayer) {
+          window.audioPlayer.playSong(parseInt(songId), parseInt(albumId));
+        }
+        // Highlight playing track
+        page.querySelectorAll('.album-track').forEach(t => t.classList.remove('playing'));
+        track.classList.add('playing');
+      });
+    });
+
+    // ── Purchase button → cart ────────────────────────────────
+    const purchaseBtn = page.querySelector('.album-purchase-btn');
+    if (purchaseBtn) {
+      purchaseBtn.addEventListener('click', () => {
+        const cat = purchaseBtn.dataset.catalogue;
+        if (window.cartManager) {
+          window.cartManager.addAlbumToCart(cat);
+        }
+      });
+    }
+
+    // ── Footer QuadTree ───────────────────────────────────────
+    const fqt = new FooterQuadTree();
+    await fqt.init();
+    window.footerQT = fqt;
+
+    function render() {
+      if (window.footerQT) window.footerQT.layout();
+    }
+
+    let resizeTimer;
+    addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(render, 80);
+    });
+
+    render();
+    document.body.classList.add('ready');
+
+    console.log(`✅ Album page: ${album.name} (${catalogue})`);
+  </script>
+</body>
+</html>
