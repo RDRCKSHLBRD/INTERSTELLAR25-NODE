@@ -12,8 +12,6 @@ import { Storage } from '@google-cloud/storage';
 
 const isProd = config.nodeEnv === 'production';
 
-
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -34,16 +32,14 @@ import healthRoutes from './routes/api/health.js';
 
 // Import middleware
 import errorHandler from './middleware/errorHandler.js';
+import { applyRateLimiters, enableRateLimitLogging } from './middleware/rateLimiter.js';
 
 const app = express();
 
 
-// EJS ::
-
 // EJS Configuration
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
 
 
 // Cloud Run/HTTPS proxy awareness (MUST be before session)
@@ -52,18 +48,15 @@ if (isProd) app.set('trust proxy', 1);
 // Security middleware
 app.use(
   helmet({
-
     crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
     crossOriginEmbedderPolicy: false,
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
     hsts: isProd ? { maxAge: 31536000, includeSubDomains: true, preload: true } : false,
 
-
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
-        // 👇 CSP PATCH: Corrected array syntax and included the inline script hash.
         scriptSrc: [
           "'self'", 
           "https://js.stripe.com",
@@ -88,16 +81,14 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-     secure: isProd,               // HTTPS only in production
-      httpOnly: true, // Prevent XSS attacks
-      maxAge: config.session.maxAge, // 7 days from config
-      // 👇 AUTH PATCH: Use 'lax' in dev for SameSite to ensure the cookie is sent.
+      secure: isProd,
+      httpOnly: true,
+      maxAge: config.session.maxAge,
       sameSite: isProd ? 'none' : 'lax'
     },
-    name: 'interstellar.sid' // keep; or switch to "__Secure-interstellar" if you add a Domain
+    name: 'interstellar.sid'
   })
 );
-
 
 
 // Make session data available to all templates (AFTER session)
@@ -108,29 +99,34 @@ app.use((req, res, next) => {
 });
 
 
-
-
 // CORS configuration (must be after session for credentials)
 app.use(
   cors({
     origin: config.cors.origins,
-    credentials: true, // Important for sessions!
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
   })
 );
 
+// Stripe webhook (raw body required — BEFORE body parsing)
 app.use('/api/purchase/webhook', purchaseWebhook);
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Rate limiting (AFTER body parsing, BEFORE routes)
+applyRateLimiters(app);
+if (isProd) {
+  enableRateLimitLogging(app);
+}
+
 // Static file serving
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/system', express.static(path.join(__dirname, '../system')));
 app.use('/config.json', express.static(path.join(__dirname, '../config.json')));
-app.use('/config', express.static(path.join(__dirname, '../config')));  // ← ADD THIS LINE
+app.use('/config', express.static(path.join(__dirname, '../config')));
 
 
 // Request logging middleware (development only)
@@ -143,11 +139,6 @@ if (config.nodeEnv === 'development') {
     next();
   });
 }
-
-
-
-
-
 
 
 // Authenticated audio serving route
