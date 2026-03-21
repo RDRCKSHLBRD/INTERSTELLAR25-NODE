@@ -17,11 +17,11 @@
 
 export class FooterQuadTree {
   constructor() {
-    this.config      = null;
-    this.footerEl    = null;
-    this.footerBar   = null;
-    this._ready      = false;
-    this._device     = null;
+    this.config = null;
+    this.footerEl = null;
+    this.footerBar = null;
+    this._ready = false;
+    this._device = null;
     this._packResult = null;
   }
 
@@ -30,11 +30,11 @@ export class FooterQuadTree {
       const res = await fetch('/config/data/footer.json', { cache: 'no-store' });
       if (!res.ok) throw new Error('footer.json: ' + res.status);
       this.config = await res.json();
-      this.footerEl  = document.getElementById('artistControls');
+      this.footerEl = document.getElementById('artistControls');
       this.footerBar = this.footerEl?.querySelector('.footer-bar');
       if (!this.footerBar) { console.warn('⚠️ FooterQuadTree: .footer-bar not found'); return; }
       this._device = this._detectDevice();
-      this._ready  = true;
+      this._ready = true;
       console.log('✅ FooterQuadTree V7.2.0 initialized (device: ' + this._device + ')');
     } catch (err) { console.error('❌ FooterQuadTree init failed:', err); }
   }
@@ -57,21 +57,21 @@ export class FooterQuadTree {
   _selectProfile(state) {
     const profiles = this.config.profiles;
     if (!profiles) return {};
-    
+
     // 1. Added 'mobile-landscape' to the evaluation order
     const profileNames = ['compact', 'mobile-landscape', 'tablet', 'standard', 'wide'];
-    
+
     for (const name of profileNames) {
       const p = profiles[name];
       if (!p) continue;
-      
+
       // 2. Check Width
-      const matchW = (p.minWidth === undefined || state.vw >= p.minWidth) && 
-                     (p.maxWidth === undefined || state.vw <= p.maxWidth);
-                     
+      const matchW = (p.minWidth === undefined || state.vw >= p.minWidth) &&
+        (p.maxWidth === undefined || state.vw <= p.maxWidth);
+
       // 3. Check Height (NEW - allows targeting sideways phones)
       const matchH = (p.maxHeight === undefined || state.vh <= p.maxHeight) &&
-                     (p.minHeight === undefined || state.vh >= p.minHeight);
+        (p.minHeight === undefined || state.vh >= p.minHeight);
 
       if (matchW && matchH) return { name, ...p };
     }
@@ -95,11 +95,11 @@ export class FooterQuadTree {
   _getGroupElements() {
     const bar = this.footerBar;
     return {
-      transport:   bar.querySelector('.group-transport'),
+      transport: bar.querySelector('.group-transport'),
       information: bar.querySelector('.group-information'),
-      link:        bar.querySelector('.group-link'),
-      action:      bar.querySelector('.group-action'),
-      logo:        bar.querySelector('.group-logo'),
+      link: bar.querySelector('.group-link'),
+      action: bar.querySelector('.group-action'),
+      logo: bar.querySelector('.group-logo'),
     };
   }
 
@@ -109,14 +109,14 @@ export class FooterQuadTree {
   // ══════════════════════════════════════════════════════════════
 
   _calcTransport(profile) {
-    const cfg     = this.config.groups.transport?.internal || {};
+    const cfg = this.config.groups.transport?.internal || {};
     // Profile-level override > config-level default > fallback 3
-    const cols    = profile?.transportColumns || cfg.columns || 3;
+    const cols = profile?.transportColumns || cfg.columns || 3;
     const btnSize = this._cssVar('--player-btn-size', 38);
-    const btnGap  = this._cssVar('--player-btn-gap', 4);
-    const padL    = 6;  // left offset
-    const padT    = 0;  // top offset (buttons flush to top)
-    const el      = this._getGroupElements().transport;
+    const btnGap = this._cssVar('--player-btn-gap', 4);
+    const padL = 6;  // left offset
+    const padT = 0;  // top offset (buttons flush to top)
+    const el = this._getGroupElements().transport;
 
     const gridWrapper = el?.querySelector('.transport-grid');
     const btns = gridWrapper
@@ -124,7 +124,7 @@ export class FooterQuadTree {
       : (el ? Array.from(el.querySelectorAll('button')) : []);
 
     const count = btns.length;
-    const rows  = Math.ceil(count / cols);
+    const rows = Math.ceil(count / cols);
     const gridW = cols * btnSize + (cols - 1) * btnGap;
     const gridH = rows * btnSize + (rows - 1) * btnGap;
 
@@ -134,10 +134,10 @@ export class FooterQuadTree {
       const row = Math.floor(i / cols);
       buttons.push({
         el: btns[i],
-        x:  padL + col * (btnSize + btnGap),
-        y:  padT + row * (btnSize + btnGap),
-        w:  btnSize,
-        h:  btnSize,
+        x: padL + col * (btnSize + btnGap),
+        y: padT + row * (btnSize + btnGap),
+        w: btnSize,
+        h: btnSize,
       });
     }
 
@@ -161,7 +161,9 @@ export class FooterQuadTree {
 
     let y = pad;
     const elements = {};
-    elements.title = { x: pad, y, w: innerW, h: titleH };
+    const titleMaxRatio = this.config.groups?.information?.internal?.titleMaxRatio ?? 0.85;
+    elements.title = { x: pad, y, w: Math.min(innerW, groupW * titleMaxRatio), h: titleH };
+
     y += titleH + gap;
     elements.seek = { x: pad, y, w: seekW, h: row2H };
     elements.time = { x: pad + seekW + 8, y, w: timeW, h: row2H };
@@ -233,7 +235,7 @@ export class FooterQuadTree {
 
   _pack(state, profile) {
     const groupsCfg = this.config.groups;
-    const groupEls  = this._getGroupElements();
+    const groupEls = this._getGroupElements();
     const vw = state.vw;
     const GROUP_ORDER = ['transport', 'information', 'link', 'action', 'logo'];
 
@@ -242,22 +244,22 @@ export class FooterQuadTree {
 
     const allGroups = GROUP_ORDER.map(name => {
       const cfg = groupsCfg[name] || {};
-      const el  = groupEls[name];
-      const m   = this._measure(el);
+      const el = groupEls[name];
+      const m = this._measure(el);
       let minPx = cfg.minPx || 0;
       let computedH = m.h || 44;
 
       if (name === 'transport') {
-        minPx     = Math.max(minPx, transportCalc.width);
+        minPx = Math.max(minPx, transportCalc.width);
         computedH = transportCalc.height;
       }
 
       return {
         name, el,
-        pinned:  cfg.pinned || false,
-        greedy:  cfg.greedy || false,
+        pinned: cfg.pinned || false,
+        greedy: cfg.greedy || false,
         minPx,
-        maxPx:   cfg.maxPx || 9999,
+        maxPx: cfg.maxPx || 9999,
         idealPx: Math.max(minPx, Math.min(cfg.maxPx || 9999, Math.max(cfg.idealPx || 100, m.w))),
         measuredW: m.w,
         measuredH: computedH,
@@ -265,9 +267,9 @@ export class FooterQuadTree {
     });
 
     // ── Separate groups by pin type ─────────────────────────
-    const pinnedLeft  = allGroups.filter(g => g.pinned === 'left');
+    const pinnedLeft = allGroups.filter(g => g.pinned === 'left');
     const pinnedRight = allGroups.filter(g => g.pinned === 'right');
-    const flowGroups  = allGroups.filter(g => !g.pinned);
+    const flowGroups = allGroups.filter(g => !g.pinned);
 
     // ── Calculate pinned-left width ─────────────────────────
     let leftW = 0;
@@ -467,19 +469,19 @@ export class FooterQuadTree {
 
   _write(packResult, profile, state) {
     const bar = this.footerBar;
-    const el  = this.footerEl;
+    const el = this.footerEl;
     const { placements, totalH, rowCount, innerCalcs } = packResult;
 
     bar.style.position = 'relative';
-    bar.style.height   = totalH + 'px';
-    bar.style.display  = 'block';
+    bar.style.height = totalH + 'px';
+    bar.style.display = 'block';
     bar.style.setProperty('--ft-height', totalH + 'px');
     bar.style.setProperty('--footer-height', totalH + 'px');
     bar.style.setProperty('--ft-row-count', '' + rowCount);
 
     el.dataset.ftProfile = profile.name || 'standard';
-    el.dataset.ftDevice  = state.device;
-    el.dataset.ftRows    = '' + rowCount;
+    el.dataset.ftDevice = state.device;
+    el.dataset.ftRows = '' + rowCount;
 
     const showVol = this.config.device?.[state.device]?.volumeVisible ?? (state.device === 'pointer');
     bar.style.setProperty('--ft-vol-visible', showVol ? '1' : '0');
@@ -494,13 +496,13 @@ export class FooterQuadTree {
       if (!p) continue;
 
       groupEl.style.cssText = '';
-      groupEl.style.position  = 'absolute';
-      groupEl.style.left      = p.x + 'px';
-      groupEl.style.top       = p.y + 'px';
-      groupEl.style.width     = p.w + 'px';
-      groupEl.style.height    = p.h + 'px';
+      groupEl.style.position = 'absolute';
+      groupEl.style.left = p.x + 'px';
+      groupEl.style.top = p.y + 'px';
+      groupEl.style.width = p.w + 'px';
+      groupEl.style.height = p.h + 'px';
       groupEl.style.boxSizing = 'border-box';
-      groupEl.style.overflow  = 'hidden';
+      groupEl.style.overflow = 'hidden';
       groupEl.style.setProperty('--group-w', p.w + 'px');
       groupEl.style.setProperty('--group-h', p.h + 'px');
 
@@ -520,9 +522,9 @@ export class FooterQuadTree {
 
       for (const btn of tc.buttons) {
         btn.el.style.position = 'absolute';
-        btn.el.style.left   = btn.x + 'px';
-        btn.el.style.top    = btn.y + 'px';
-        btn.el.style.width  = btn.w + 'px';
+        btn.el.style.left = btn.x + 'px';
+        btn.el.style.top = btn.y + 'px';
+        btn.el.style.width = btn.w + 'px';
         btn.el.style.height = btn.h + 'px';
         btn.el.style.margin = '0';
       }
@@ -591,7 +593,7 @@ export class FooterQuadTree {
 
   layout() {
     if (!this._ready || !this.config) return;
-    const state   = this._readState();
+    const state = this._readState();
     const profile = this._selectProfile(state);
     if (profile.vars) for (const [k, v] of Object.entries(profile.vars)) this.footerBar.style.setProperty(k, v);
     // V7.2: pass profile into _pack so transport columns are viewport-aware

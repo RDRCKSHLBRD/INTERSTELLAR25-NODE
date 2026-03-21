@@ -25,8 +25,8 @@
       "order": 2,
       "pinned": false,
       "minPx": 160,
-      "maxPx": 500,
-      "idealPx": 260,
+      "maxPx": 700,
+      "idealPx": 380,
       "greedy": true,
       "priority": 2,
       "internal": {
