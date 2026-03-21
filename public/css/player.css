@@ -543,6 +543,400 @@
 }
 
 
+/* ══════════════════════════════════════════════════════════════
+   PLAYLIST MANAGER — V1.0 CSS Additions
+   Append to player.css (after existing playlists-sidebar styles)
+   
+   New components:
+     - Create section + form
+     - Playlist items (list view)
+     - Expanded song list
+     - Playlist picker modal (from transport btn-plist)
+     - Login prompt
+   ══════════════════════════════════════════════════════════════ */
+
+
+/* ── Create Section ────────────────────────────────────────── */
+
+.playlists-create-section {
+  padding: 0 0 16px 0;
+  border-bottom: 1px solid rgba(43, 127, 140, 0.15);
+  margin-bottom: 16px;
+}
+
+.playlists-create-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 0;
+  background: transparent;
+  border: 1px dashed rgba(91, 184, 196, 0.3);
+  color: #5BB8C4;
+  font-family: inherit;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  justify-content: center;
+}
+
+.playlists-create-btn:hover {
+  border-color: rgba(91, 184, 196, 0.6);
+  background: rgba(91, 184, 196, 0.05);
+}
+
+.playlists-create-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+
+/* ── Create Form ───────────────────────────────────────────── */
+
+.playlists-create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.playlists-create-input {
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(91, 184, 196, 0.25);
+  color: #D8E8EA;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.playlists-create-input:focus {
+  border-color: rgba(91, 184, 196, 0.6);
+}
+
+.playlists-create-input.input-error {
+  border-color: #e05555;
+}
+
+.playlists-create-form-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.playlists-create-save,
+.playlists-create-cancel {
+  flex: 1;
+  padding: 8px 0;
+  border: none;
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.playlists-create-save {
+  background: rgba(91, 184, 196, 0.2);
+  color: #5BB8C4;
+}
+
+.playlists-create-save:hover { opacity: 0.85; }
+
+.playlists-create-cancel {
+  background: transparent;
+  color: rgba(216, 232, 234, 0.5);
+}
+
+.playlists-create-cancel:hover { color: rgba(216, 232, 234, 0.8); }
+
+
+/* ── Section Labels ────────────────────────────────────────── */
+
+.playlists-section-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(91, 184, 196, 0.45);
+  padding: 16px 0 8px 0;
+}
+
+
+/* ── Playlist Items ────────────────────────────────────────── */
+
+.playlists-item {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(43, 127, 140, 0.1);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.playlists-item:hover {
+  background: rgba(43, 127, 140, 0.06);
+}
+
+.playlists-item-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.playlists-item-name {
+  font-size: 14px;
+  color: #D8E8EA;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playlists-item-count {
+  font-size: 11px;
+  color: rgba(91, 184, 196, 0.4);
+  flex-shrink: 0;
+  padding-left: 12px;
+}
+
+.playlists-item-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.playlists-item-play,
+.playlists-item-delete {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 8px;
+  transition: color 0.15s;
+}
+
+.playlists-item-play {
+  color: rgba(91, 184, 196, 0.5);
+}
+.playlists-item-play:hover { color: #5BB8C4; }
+
+.playlists-item-delete {
+  color: rgba(216, 232, 234, 0.25);
+}
+.playlists-item-delete:hover { color: #e05555; }
+
+
+/* ── Expanded Song List ────────────────────────────────────── */
+
+.playlists-item-songs {
+  padding: 8px 0 4px 0;
+}
+
+.playlists-song {
+  display: flex;
+  align-items: center;
+  padding: 6px 0 6px 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+  gap: 8px;
+}
+
+.playlists-song:hover {
+  background: rgba(43, 127, 140, 0.08);
+}
+
+.playlists-song-name {
+  font-size: 13px;
+  color: #D8E8EA;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playlists-song-album {
+  font-size: 11px;
+  color: rgba(91, 184, 196, 0.35);
+  flex-shrink: 0;
+}
+
+.playlists-song-remove {
+  background: transparent;
+  border: none;
+  color: rgba(216, 232, 234, 0.2);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 6px;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.playlists-song-remove:hover { color: #e05555; }
+
+
+/* ── Empty State ───────────────────────────────────────────── */
+
+.playlists-empty {
+  color: rgba(91, 184, 196, 0.35);
+  font-size: 13px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+
+/* ── Login Prompt ──────────────────────────────────────────── */
+
+.playlists-login-prompt {
+  margin-top: 24px;
+  padding: 20px 0;
+  border-top: 1px solid rgba(43, 127, 140, 0.15);
+  text-align: center;
+}
+
+.playlists-login-prompt p {
+  font-size: 13px;
+  color: rgba(216, 232, 234, 0.5);
+  margin-bottom: 12px;
+}
+
+.playlists-login-btn {
+  padding: 8px 24px;
+  background: transparent;
+  border: 1px solid rgba(91, 184, 196, 0.4);
+  color: #5BB8C4;
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.playlists-login-btn:hover {
+  background: rgba(91, 184, 196, 0.15);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   PLAYLIST PICKER — Modal from transport btn-plist
+   Appears centered over the page.
+   ══════════════════════════════════════════════════════════════ */
+
+.playlist-picker {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.playlist-picker.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.playlist-picker-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.playlist-picker-inner {
+  position: relative;
+  background: #07212B;
+  border: 1px solid rgba(43, 127, 140, 0.25);
+  width: min(340px, 90vw);
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.playlist-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(43, 127, 140, 0.2);
+  font-size: 13px;
+  color: #D8E8EA;
+}
+
+.playlist-picker-close {
+  background: transparent;
+  border: none;
+  color: #5BB8C4;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.playlist-picker-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.playlist-picker-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(43, 127, 140, 0.08);
+  color: #D8E8EA;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.playlist-picker-option:hover {
+  background: rgba(43, 127, 140, 0.1);
+}
+
+.playlist-picker-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playlist-picker-count {
+  font-size: 11px;
+  color: rgba(91, 184, 196, 0.4);
+  padding-left: 12px;
+  flex-shrink: 0;
+}
+
+.playlist-picker-new {
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid rgba(43, 127, 140, 0.2);
+  color: #5BB8C4;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s;
+}
+
+.playlist-picker-new:hover {
+  background: rgba(91, 184, 196, 0.08);
+}
+
+
+
+
+
+
 /* ── Subscribe Modal ───────────────────────────────────────── */
 
 .subscribe-modal {
