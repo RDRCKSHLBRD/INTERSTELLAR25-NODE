@@ -94,6 +94,29 @@ body.ready { opacity: 1; }
 }
 
 
+/* ── Album Page Link (in sidebar) ──────────────────────────── */
+/* Add to public/css/roderick.css */
+
+.sidebar-album-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  color: #5BB8C4;
+  text-decoration: none;
+  text-transform: uppercase;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.sidebar-album-link:hover {
+  opacity: 1;
+}
+
+
+
+
+
 /* ═══════════════════════════════════════════════════════════════
    SIDEBAR — desktop: absolute split; mobile: fixed overlay
    ═══════════════════════════════════════════════════════════════ */

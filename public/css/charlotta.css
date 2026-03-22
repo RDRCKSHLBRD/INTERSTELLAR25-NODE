@@ -237,17 +237,23 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   HIDE STANDARD FOOTER GROUPS
-   The album footer uses .footer-left / .footer-right instead
-   of the standard .group-* elements. Hide the defaults.
+   HIDE STANDARD FOOTER GROUPS (standalone only)
+   The album footer uses .footer-left / .footer-right instead.
+   Groups inside .footer-left are kept visible (player.js builds into them).
    ══════════════════════════════════════════════════════════════ */
 
-.group-transport,
-.group-information,
+.footer-bar > .group-transport,
+.footer-bar > .group-information,
 .group-link,
 .group-action,
 .group-logo {
   display: none !important;
+}
+
+/* Groups inside footer-left ARE visible */
+.footer-left .group-transport,
+.footer-left .group-information {
+  display: block !important;
 }
 
 
