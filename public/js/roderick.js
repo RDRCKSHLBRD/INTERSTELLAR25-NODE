@@ -146,6 +146,7 @@ function renderSidebar(album, coverUrl) {
     <div class="sidebar-inner">
       <img class="sidebar-album-cover" src="${coverUrl || album.cover_url || ''}" alt="${album.name}">
       <h2 class="sidebar-album-title">${album.name}</h2>
+      ${album.catalogue ? `<a href="/album/${album.catalogue}" class="sidebar-album-link">enter album →</a>` : ''}
 
       ${album.description ? `
       <details class="sidebar-section" open>
