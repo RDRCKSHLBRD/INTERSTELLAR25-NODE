@@ -16,7 +16,7 @@
   --pio-separator: rgba(43, 127, 140, 0.2);
   --pio-btn-size: 40px;
   --pio-btn-gap: 2px;
-  --pio-minibar-h: 36px;
+  --pio-minibar-h: 76px;
 }
 
 .pio-panel {
@@ -136,16 +136,36 @@
 /* ── Minibar ───────────────────────────────────────────────── */
 .pio-minibar {
   position: fixed; bottom: 12px; left: 12px;
-  height: var(--pio-minibar-h); display: flex; align-items: center;
-  gap: 8px; padding: 0 12px; background: var(--pio-bg);
+  width: var(--pio-minibar-h); height: var(--pio-minibar-h);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; padding: 6px; background: var(--pio-bg);
   border: 1px solid var(--pio-separator); z-index: 799;
-  cursor: pointer; transition: opacity 0.3s, transform 0.3s; max-width: 220px;
+  cursor: pointer; transition: opacity 0.3s, transform 0.3s;
 }
 .pio-minibar.panel-open { opacity: 0; pointer-events: none; transform: translateX(-20px); }
-.pio-minibar-play { background: transparent; border: none; color: var(--pio-accent); font-size: 14px; cursor: pointer; padding: 0; flex-shrink: 0; width: 20px; text-align: center; }
-.player-title-mini { font-size: 11px; color: var(--pio-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; opacity: 0.7; }
-.pio-minibar-open { background: transparent; border: none; color: var(--pio-muted); font-size: 14px; cursor: pointer; padding: 0; flex-shrink: 0; transition: color 0.15s; }
-.pio-minibar-open:hover { color: var(--pio-text); }
+.pio-minibar-play { background: transparent; border: none; color: var(--pio-accent); font-size: 20px; cursor: pointer; padding: 0; flex-shrink: 0; width: 24px; text-align: center; position: relative; z-index: 1; }
+.player-title-mini { font-size: 9px; color: var(--pio-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; opacity: 0.5; letter-spacing: 0.3px; text-align: center; }
+.pio-minibar-open { display: none; }
+
+/* ── Pulse ring — visible when audio is playing and panel is closed ── */
+.pio-minibar::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 1.5px solid var(--pio-accent);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  animation: none;
+}
+.pio-minibar.has-audio::after {
+  opacity: 1;
+  animation: pio-pulse 2.4s ease-in-out infinite;
+}
+@keyframes pio-pulse {
+  0%, 100% { inset: -4px; opacity: 0.4; }
+  50% { inset: -8px; opacity: 0; }
+}
 
 /* ── Notifications ─────────────────────────────────────────── */
 .cart-notification { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--pio-bg); border: 1px solid var(--pio-separator); color: var(--pio-text); padding: 10px 20px; font-size: 12px; letter-spacing: 0.5px; z-index: 10000; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; }

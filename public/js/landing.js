@@ -1,5 +1,5 @@
 // ============================================================================
-// public/js/landing.js — V6.2
+// public/js/landing.js — V6.4
 //
 // One continuous scene:
 //   - Starfield: canvas, stars moving outward from center (forward travel)
@@ -160,25 +160,32 @@ function initComms() {
     });
 
     const bars = [];
-    const MAX_BARS = 8;
+    const MAX_BARS = 12;
 
     function spawnBar() {
-        // Spawn near center with slight offset
-        const xOff = (Math.random() - 0.5) * w * 0.3;
-        const yOff = (Math.random() - 0.5) * h * 0.15;
+        // Spawn with wider spread — some originate well off-center
+        const xOff = (Math.random() - 0.5) * w * 0.55;
+        const yOff = (Math.random() - 0.5) * h * 0.3;
+
+        // Three classes: regular (55%), slow drifter (20%), thin wire (25%)
+        const roll = Math.random();
+        const isSlow = roll < 0.2;
+        const isWire = !isSlow && roll < 0.45;
 
         bars.push({
             x: cx + xOff,
             y: cy + yOff,
-            width: 0.5 + Math.random() * 1.5,    // starts very thin
-            height: 8 + Math.random() * 20,        // starts short
-            maxWidth: 2 + Math.random() * 4,
-            maxHeight: 80 + Math.random() * 200,
+            width:     isWire ? 0.2 + Math.random() * 0.4   : 0.5 + Math.random() * 2,
+            height:    isWire ? 30 + Math.random() * 60      : 8 + Math.random() * 20,
+            maxWidth:  isWire ? 0.5 + Math.random() * 1.5    : isSlow ? 8 + Math.random() * 20  : 6 + Math.random() * 16,
+            maxHeight: isWire ? 250 + Math.random() * 500    : isSlow ? 150 + Math.random() * 400 : 120 + Math.random() * 350,
             color: BAR_COLORS[Math.floor(Math.random() * BAR_COLORS.length)],
             age: 0,
-            lifespan: 4000 + Math.random() * 3000, // 4–7 seconds to cross
-            speed: 0.3 + Math.random() * 0.5,
-            drift: (Math.random() - 0.5) * 0.2,    // slight horizontal drift
+            lifespan:  isWire ? 5000 + Math.random() * 6000  : isSlow ? 14000 + Math.random() * 8000 : 7000 + Math.random() * 5000,
+            speed:     isWire ? 0.25 + Math.random() * 0.5   : isSlow ? 0.12 + Math.random() * 0.18 : 0.3 + Math.random() * 0.5,
+            drift:     (Math.random() - 0.5) * (isWire ? 0.45 : isSlow ? 0.3 : 0.6),
+            growExp:   isWire ? 2.5 + Math.random() * 1.0    : isSlow ? 1.8 + Math.random() * 0.6 : 2.2 + Math.random() * 1.3,
+            isWire:    isWire,
             opacity: 0,
         });
     }
@@ -208,43 +215,53 @@ function initComms() {
                 continue;
             }
 
-            // Growth curve: starts tiny, grows, then expands rapidly as it passes
-            const growCurve = life < 0.6
-                ? life / 0.6                          // 0→1 over first 60%
-                : 1 + (life - 0.6) / 0.4 * 3;        // 1→4 over last 40% (sweep past)
+            // Growth: smooth power curve — no seam, continuous acceleration
+            // life^exp gives gentle start, aggressive finish. Per-bar exponent adds variety.
+            const growCurve = Math.pow(life, b.growExp) * 8;
 
-            const bw = b.width + growCurve * b.maxWidth;
+            // Width gets extra boost in final 30% — but wires stay thin
+            const widthBoost = (!b.isWire && life > 0.7) ? 1 + (life - 0.7) / 0.3 * 3.5 : 1;
+            const bw = (b.width + growCurve * b.maxWidth) * widthBoost;
             const bh = b.height + growCurve * b.maxHeight;
 
-            // Position: drift slightly outward from center
-            const drift = life * b.speed * 200;
+            // Position: drift outward from center — power curve for smooth acceleration
+            const drift = Math.pow(life, 1.6) * b.speed * 400;
             const dirX = (b.x - cx) / (Math.abs(b.x - cx) + 1);
             const dirY = (b.y - cy) / (Math.abs(b.y - cy) + 1);
             const drawX = b.x + dirX * drift + b.drift * drift;
-            const drawY = b.y + dirY * drift * 0.3 - life * 40; // slight upward drift
+            const drawY = b.y + dirY * drift * 0.3 - Math.pow(life, 1.4) * 70;
 
-            // Opacity: fade in, hold, fade out rapidly at end
+            // Opacity: fade in, hold, slow dissolve — wires slightly brighter
             let alpha;
-            if (life < 0.1) {
-                alpha = life / 0.1;             // fade in
-            } else if (life < 0.65) {
-                alpha = 1;                       // hold
+            if (life < 0.08) {
+                alpha = life / 0.08;
+            } else if (life < 0.5) {
+                alpha = 1;
             } else {
-                alpha = (1 - life) / 0.35;      // fade out as it sweeps past
+                alpha = (1 - life) / 0.5;
             }
-            alpha *= 0.6; // keep them somewhat translucent
+            alpha *= b.isWire ? 0.75 : 0.65;
 
-            // Blur effect via multiple draws at slight offsets (fake glow)
+            // Render: wires get tight glow, regular bars get wide blur
             ctx.save();
-            ctx.globalAlpha = alpha * 0.15;
             ctx.fillStyle = b.color;
-            ctx.fillRect(drawX - bw * 1.5, drawY - bh / 2, bw * 3, bh);
 
-            ctx.globalAlpha = alpha * 0.4;
-            ctx.fillRect(drawX - bw * 0.8, drawY - bh / 2, bw * 1.6, bh);
+            if (b.isWire) {
+                // Narrow glow — just a subtle halo
+                ctx.globalAlpha = alpha * 0.25;
+                ctx.fillRect(drawX - bw * 2, drawY - bh / 2, bw * 4, bh);
+                ctx.globalAlpha = alpha;
+                ctx.fillRect(drawX - bw / 2, drawY - bh / 2, bw, bh);
+            } else {
+                // Wide blur effect via multiple draws
+                ctx.globalAlpha = alpha * 0.15;
+                ctx.fillRect(drawX - bw * 1.5, drawY - bh / 2, bw * 3, bh);
+                ctx.globalAlpha = alpha * 0.4;
+                ctx.fillRect(drawX - bw * 0.8, drawY - bh / 2, bw * 1.6, bh);
+                ctx.globalAlpha = alpha;
+                ctx.fillRect(drawX - bw / 2, drawY - bh / 2, bw, bh);
+            }
 
-            ctx.globalAlpha = alpha;
-            ctx.fillRect(drawX - bw / 2, drawY - bh / 2, bw, bh);
             ctx.restore();
         }
     }

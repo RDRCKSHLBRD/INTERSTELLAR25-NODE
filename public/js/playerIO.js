@@ -250,7 +250,13 @@ class PlayerIO {
     const audio = window.audioPlayer.audio;
     const icon = this.minibarEl?.querySelector('.pio-minibar-play-icon');
     if (!audio || !icon) return;
-    const update = () => { icon.textContent = audio.paused ? '▶' : '❚❚'; };
+    const update = () => {
+      icon.textContent = audio.paused ? '▶' : '❚❚';
+      // Pulse ring on minibar when audio is playing
+      if (this.minibarEl) {
+        this.minibarEl.classList.toggle('has-audio', !audio.paused);
+      }
+    };
     audio.addEventListener('play', update);
     audio.addEventListener('pause', update);
     audio.addEventListener('ended', update);
