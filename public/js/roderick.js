@@ -1,15 +1,14 @@
 // ============================================================================
-// public/js/roderick.js — V7.0.0 (RODUX Stack / CSS-Var-Driven Layout)
+// public/js/roderick.js — V8.0.0 (RODUX Stack / PlayerIO Panel)
 //
 // Single controller for the Roderick Shoolbraid artist page.
 // Owns: data fetch, DOM creation, region layout, QuadTree grid,
 //       album detail sidebar, player wiring.
 //
-// V7.0.0: FooterQuadTree V7 integration. Group-based footer.
-//         setRegionVars() does NOT write --footer-height to :root.
+// V8.0.0: FooterQuadTree removed. PlayerIO panel replaces the footer.
+//         No footer height in layout calcs. Album grid gets full viewport.
+//         Playlist/subscribe sidebar stubs removed (live in playlists.js).
 // ============================================================================
-
-import { FooterQuadTree } from './footerQuadTree.js';
 
 // ── Helpers ─────────────────────────────────────────────────────
 const Q  = (id) => document.getElementById(id);
@@ -19,10 +18,6 @@ const TABLET_MAX = 1023;
 function isMobile()  { return innerWidth <= MOBILE_MAX; }
 function isDesktop() { return innerWidth > TABLET_MAX; }
 
-function footerHeight() {
-  const f = Q('artistControls');
-  return f ? f.offsetHeight : 40;
-}
 
 // ── Data fetch ──────────────────────────────────────────────────
 async function fetchJSON(endpoint) {
@@ -41,7 +36,7 @@ let cfg = null;
 let sidebarOpen = false;
 let _layoutInProgress = false;
 
-// ── Wait for Interstellar + QuadTree ────────────────────────────
+// ── Wait for Interstellar QuadTree (album grid) ─────────────────
 function whenInterstellarReady(cb) {
   if (window.Interstellar?.quadTree) return cb(window.Interstellar);
   const t0 = performance.now();
@@ -182,8 +177,8 @@ function renderSidebar(album, coverUrl) {
 
   sidebar.querySelectorAll('.sidebar-songs li').forEach(li => {
     li.addEventListener('click', () => {
-      const songId = parseInt(li.dataset.songId);
-      const albumId = parseInt(li.dataset.albumId);
+      const songId = li.dataset.songId;
+      const albumId = li.dataset.albumId;
       if (window.audioPlayer) {
         window.audioPlayer.playSong(songId, albumId);
       }
@@ -226,6 +221,7 @@ function closeSidebar() {
 
 // ═══════════════════════════════════════════════════════════════
 // LAYOUT — CSS Custom Property Pipeline
+// V8: No footer height. Album grid gets full remaining viewport.
 // ═══════════════════════════════════════════════════════════════
 
 function setRegionVars() {
@@ -233,18 +229,18 @@ function setRegionVars() {
   const root = document.documentElement;
   const vw = innerWidth;
   const vh = innerHeight;
-  const fh = footerHeight();
+
+  // V8: PlayerIO panel width subtracted when open
+  const pioW = window.playerIO?.getPanelWidth() || 0;
 
   const headerR = cfg.layout?.regions?.header?.ratio ?? 0.06;
   const headerH = Math.round(vh * headerR);
-  const mainH   = vh - headerH - fh;
+  const mainH   = vh - headerH; // V8: no footer subtraction
 
   root.style.setProperty('--header-height', `${headerH}px`);
   root.style.setProperty('--main-top',      `${headerH}px`);
   root.style.setProperty('--main-height',   `${mainH}px`);
   root.style.setProperty('--vw',            `${vw}px`);
-
-  // V7: Do NOT set --footer-height on :root. footerQuadTree.js owns it.
 
   if (!isMobile() && sidebarOpen) {
     const ms     = cfg.layout?.mainSplit;
@@ -330,7 +326,6 @@ function render() {
   _layoutInProgress = true;
 
   try {
-    if (window.footerQT) window.footerQT.layout();
     setRegionVars();
     layoutGrid();
   } finally {
@@ -403,199 +398,10 @@ function setupKeyboard() {
       await new Promise(r => document.addEventListener('DOMContentLoaded', r, { once: true }));
     }
 
-    // V7: Footer QuadTree (group-based packing, one algorithm)
-    const fqt = new FooterQuadTree();
-    await fqt.init();
-    window.footerQT = fqt;
-
-
-
-
-
-// ══════════════════════════════════════════════════════════════
-// FOOTER V7.3 — Action Wiring
-// Add to roderick.js init block, after window.footerQT = fqt;
-// ══════════════════════════════════════════════════════════════
-
-
-// ── PLAYER I/O toggle → recalc grid ─────────────────────────
-const footerDetails = document.querySelector('.footer-details');
-if (footerDetails) {
-  footerDetails.addEventListener('toggle', () => {
-    setTimeout(() => {
-      render();
-      if (window.Interstellar?.recalculate) {
-        window.Interstellar.recalculate();
-      }
-    }, 60);
-  });
-}
-
-
-// ── Playlists sidebar trigger ────────────────────────────────
-const playlistsBtn = document.getElementById('playlistsBtn');
-if (playlistsBtn) {
-  playlistsBtn.addEventListener('click', () => {
-    togglePlaylistsSidebar();
-  });
-}
-
-let playlistsSidebar = null;
-let playlistsBackdrop = null;
-
-function togglePlaylistsSidebar() {
-  if (playlistsSidebar && playlistsSidebar.classList.contains('open')) {
-    hidePlaylistsSidebar();
-  } else {
-    showPlaylistsSidebar();
-  }
-}
-
-async function showPlaylistsSidebar() {
-  // Create sidebar if it doesn't exist
-  if (!playlistsSidebar) {
-    playlistsSidebar = document.createElement('aside');
-    playlistsSidebar.id = 'playlistsSidebar';
-    playlistsSidebar.className = 'playlists-sidebar';
-    playlistsSidebar.innerHTML = `
-      <div class="playlists-sidebar-header">
-        <h2>Playlists</h2>
-        <button class="playlists-close" aria-label="Close">✕</button>
-      </div>
-      <div class="playlists-sidebar-content">
-        <div class="playlists-loading">Loading playlists...</div>
-      </div>
-    `;
-    document.body.appendChild(playlistsSidebar);
-
-    // Close button
-    playlistsSidebar.querySelector('.playlists-close').addEventListener('click', hidePlaylistsSidebar);
-  }
-
-  // Create backdrop
-  if (!playlistsBackdrop) {
-    playlistsBackdrop = document.createElement('div');
-    playlistsBackdrop.className = 'playlists-backdrop';
-    playlistsBackdrop.addEventListener('click', hidePlaylistsSidebar);
-    document.body.appendChild(playlistsBackdrop);
-  }
-
-  // Open
-  requestAnimationFrame(() => {
-    playlistsSidebar.classList.add('open');
-    playlistsBackdrop.classList.add('visible');
-  });
-
-  // TODO: Load playlists data from API
-  // const playlists = await fetchJSON('/api/playlists');
-  // renderPlaylistsContent(playlists);
-}
-
-function hidePlaylistsSidebar() {
-  if (playlistsSidebar) playlistsSidebar.classList.remove('open');
-  if (playlistsBackdrop) playlistsBackdrop.classList.remove('visible');
-  setTimeout(() => {
-    if (playlistsSidebar?.parentNode) playlistsSidebar.remove();
-    if (playlistsBackdrop?.parentNode) playlistsBackdrop.remove();
-    playlistsSidebar = null;
-    playlistsBackdrop = null;
-  }, 300);
-}
-
-
-// ── Subscribe modal trigger ──────────────────────────────────
-const subscribeBtn = document.getElementById('subscribeBtn');
-if (subscribeBtn) {
-  subscribeBtn.addEventListener('click', () => {
-    openSubscribeModal();
-  });
-}
-
-let subscribeModal = null;
-let subscribeBackdrop = null;
-
-function openSubscribeModal() {
-  if (subscribeModal) return; // already open
-
-  subscribeBackdrop = document.createElement('div');
-  subscribeBackdrop.className = 'subscribe-backdrop';
-  subscribeBackdrop.addEventListener('click', closeSubscribeModal);
-  document.body.appendChild(subscribeBackdrop);
-
-  subscribeModal = document.createElement('div');
-  subscribeModal.id = 'subscribeModal';
-  subscribeModal.className = 'subscribe-modal';
-  subscribeModal.innerHTML = `
-    <div class="subscribe-modal-inner">
-      <button class="subscribe-close" aria-label="Close">✕</button>
-      <h2>Subscribe</h2>
-      <p class="subscribe-desc">Support the music. Choose your tier.</p>
-      
-      <div class="subscribe-tiers">
-        <div class="subscribe-tier" data-tier="fixed">
-          <h3>Monthly</h3>
-          <div class="subscribe-price">$5 / month</div>
-          <p>Access to all releases, playlists, and radio.</p>
-          <button class="subscribe-cta" data-tier="fixed">Subscribe</button>
-        </div>
-        
-        <div class="subscribe-tier" data-tier="pwyw">
-          <h3>Pay What You Want</h3>
-          <div class="subscribe-price-input">
-            <span>$</span>
-            <input type="number" min="1" value="10" id="pwywAmount" />
-            <span>/ month</span>
-          </div>
-          <p>Same access. You decide what it's worth.</p>
-          <button class="subscribe-cta" data-tier="pwyw">Subscribe</button>
-        </div>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(subscribeModal);
-
-  // Wire close
-  subscribeModal.querySelector('.subscribe-close').addEventListener('click', closeSubscribeModal);
-
-  // Wire CTAs
-  subscribeModal.querySelectorAll('.subscribe-cta').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const tier = e.target.dataset.tier;
-      const amount = tier === 'pwyw'
-        ? document.getElementById('pwywAmount')?.value || 10
-        : 5;
-      // TODO: Stripe checkout
-      console.log(`💳 Subscribe: tier=${tier}, amount=$${amount}`);
-      // window.location.href = `/api/subscribe/checkout?tier=${tier}&amount=${amount}`;
+    // V8: Listen for PlayerIO toggle to recalc grid
+    window.addEventListener('playerIOToggle', () => {
+      setTimeout(render, 350); // after panel animation
     });
-  });
-
-  // Escape key
-  const escHandler = (e) => {
-    if (e.key === 'Escape') { closeSubscribeModal(); document.removeEventListener('keydown', escHandler); }
-  };
-  document.addEventListener('keydown', escHandler);
-
-  requestAnimationFrame(() => {
-    subscribeBackdrop.classList.add('visible');
-    subscribeModal.classList.add('open');
-  });
-}
-
-function closeSubscribeModal() {
-  if (subscribeModal) subscribeModal.classList.remove('open');
-  if (subscribeBackdrop) subscribeBackdrop.classList.remove('visible');
-  setTimeout(() => {
-    if (subscribeModal?.parentNode) subscribeModal.remove();
-    if (subscribeBackdrop?.parentNode) subscribeBackdrop.remove();
-    subscribeModal = null;
-    subscribeBackdrop = null;
-  }, 300);
-}
-
-
-
-
 
     let resizeTimer;
     addEventListener('resize', () => {
@@ -607,6 +413,6 @@ function closeSubscribeModal() {
 
     document.body.classList.add('ready');
 
-    console.log('🎉 roderick.js V7.0.0 initialized (FooterQuadTree V7, device:', fqt._device + ')');
+    console.log('🎉 roderick.js V8.0.0 initialized (PlayerIO panel)');
   });
 })();
