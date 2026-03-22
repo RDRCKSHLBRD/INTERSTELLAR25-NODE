@@ -1,9 +1,9 @@
 // ============================================================================
-// public/js/album.js — V1.0 (Charlotta Lateral Environment)
+// public/js/album.js — V2.0 (PlayerIO V8 / Palette-Aware Panel)
 //
 // Album page controller. Fetches album data, builds the lateral panel
 // environment, wires navigation, tracklist, cart, playlists.
-// Uses compact 2-column footer (no FooterQuadTree — that's for main site).
+// V8: PlayerIO replaces footer. Album palette overrides --pio-* vars.
 // ============================================================================
 
 // ── Extract catalogue from URL ────────────────────────────
@@ -28,11 +28,19 @@ const album = json.data;
 // ── Apply palette ─────────────────────────────────────────
 const root = document.documentElement;
 if (album.palette) {
+  // Album environment vars
   if (album.palette.bg)         root.style.setProperty('--c-bg', album.palette.bg);
   if (album.palette.text)       root.style.setProperty('--c-text', album.palette.text);
   if (album.palette.accent)     root.style.setProperty('--c-accent', album.palette.accent);
   if (album.palette.catalogue)  root.style.setProperty('--c-catalogue', album.palette.catalogue);
   if (album.palette.trackTitle) root.style.setProperty('--c-track', album.palette.trackTitle);
+
+  // PlayerIO panel inherits album palette — panel becomes part of the album world
+  if (album.palette.bg)         root.style.setProperty('--pio-bg', album.palette.bg);
+  if (album.palette.text)       root.style.setProperty('--pio-text', album.palette.text);
+  if (album.palette.accent)     root.style.setProperty('--pio-accent', album.palette.accent);
+  if (album.palette.catalogue)  root.style.setProperty('--pio-muted', album.palette.catalogue);
+  if (album.palette.trackTitle) root.style.setProperty('--pio-alt1', album.palette.trackTitle);
 }
 
 document.title = `${album.name} — ${album.artist_name} — Interstellar Packages`;
@@ -280,20 +288,9 @@ if (playlistsBtn) {
 }
 
 
-// ── Footer height sync (compact footer, no QuadTree) ──────────
-function syncFooterHeight() {
-  const fh = document.getElementById('artistControls')?.offsetHeight || 48;
-  root.style.setProperty('--footer-h', `${fh}px`);
-}
-
-syncFooterHeight();
-
-let resizeTimer;
-addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(syncFooterHeight, 80);
-});
+// ── V8: No footer — PlayerIO panel overlays. Footer height is 0. ──
+root.style.setProperty('--footer-h', '0px');
 
 document.body.classList.add('ready');
 
-console.log(`✅ Album environment: ${album.name} (${catalogue}) — ${totalPanels} panels`);
+console.log(`✅ Album environment: ${album.name} (${catalogue}) — ${totalPanels} panels (PlayerIO V8)`);

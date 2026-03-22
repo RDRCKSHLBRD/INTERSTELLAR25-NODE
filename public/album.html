@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Loading... — Interstellar Packages</title>
-  <link rel="stylesheet" href="/css/charlotta.css">
+  <link rel="stylesheet" href="/css/playerio.css">
   <style>
     /* ══════════════════════════════════════════════════════════
        CHARLOTTA — Lateral Album Environment
@@ -36,7 +36,7 @@
       --c-font: 'Futura PT', 'Avenir', 'Helvetica Neue', sans-serif;
 
       /* Layout */
-      --footer-h: 65px;
+      --footer-h: 0px;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -451,48 +451,6 @@
   <!-- Nav dots -->
   <div class="panel-nav" id="panelNav"></div>
 
-  <!-- Compact Album Footer — 2 column: transport+info | nav+actions -->
-  <footer id="artistControls">
-    <details class="footer-details" open>
-      <summary>PLAYER I/O</summary>
-      <div class="footer-bar">
-
-        <!-- LEFT: Transport 3×3 + Title + Seek -->
-        <div class="footer-left">
-          <div class="group-transport">
-            <!-- player.js builds transport-grid here -->
-          </div>
-          <div class="group-information">
-            <!-- player.js builds title, seek, time here -->
-          </div>
-        </div>
-
-        <!-- RIGHT: Nav + Actions stacked -->
-        <div class="footer-right">
-          <a href="/downloads">downloads</a>
-          <a href="/filmography">film</a>
-          <button id="playlistsBtn" class="nav-action-btn" data-action="playlists">playlists</button>
-          <button id="subscribeBtn" class="nav-action-btn" data-action="subscribe">subscribe</button>
-          <button id="loginBtn" class="nav-login-btn">log in</button>
-          <div id="userCell" class="user-cell">
-            <span id="userName" class="user-cell-name"></span>
-            <button id="logoutBtn" class="user-cell-logout">logout</button>
-          </div>
-          <button id="cartBtn" class="cart-button">
-            <img src="/images/IP-CART25-m1.svg" alt="Cart" class="cart-icon">
-            <span id="cartCount" class="cart-count hidden">0</span>
-          </button>
-        </div>
-
-        <!-- Hidden standard groups (player.js needs these selectors) -->
-        <div class="group-link" style="display:none"></div>
-        <div class="group-action" style="display:none"></div>
-        <div class="group-logo" style="display:none"></div>
-
-      </div>
-    </details>
-  </footer>
-
   <!-- RODUX System -->
   <script type="module" src="/js/InterstellarSystem.js"></script>
   <script src="/js/auth.js"></script>
@@ -500,7 +458,51 @@
   <script src="/js/playlists.js"></script>
   <script src="/js/player.js"></script>
 
+  <!-- V8: PlayerIO panel (replaces footer) -->
+  <script src="/js/playerIO.js"></script>
+
   <!-- Album controller (external module — no CSP hash needed) -->
   <script type="module" src="/js/album.js"></script>
+
+  <!-- Auth Modal -->
+  <div id="authModal" class="auth-modal">
+    <div class="auth-modal-content">
+      <span class="close"></span>
+      <div id="loginForm" class="auth-form-container">
+        <h2>Log In</h2>
+        <div id="loginError" class="auth-error form-hidden"></div>
+        <form class="auth-form" id="loginFormElement">
+          <input type="email" id="loginEmail" placeholder="Email" required>
+          <div class="password-input-container">
+            <input type="password" id="loginPassword" placeholder="Password" required>
+            <div class="password-toggle-icon" data-target="loginPassword"></div>
+          </div>
+          <button type="submit" id="loginSubmit">Log In</button>
+        </form>
+        <div class="form-toggle">
+          Don't have an account? <a id="showRegister">Create one</a>
+        </div>
+      </div>
+      <div id="registerForm" class="auth-form-container form-hidden">
+        <h2>Create Account</h2>
+        <div id="registerError" class="auth-error form-hidden"></div>
+        <div id="registerSuccess" class="auth-success form-hidden"></div>
+        <form class="auth-form" id="registerFormElement">
+          <input type="text" id="registerUsername" placeholder="Username" required>
+          <input type="text" id="registerFirstName" placeholder="First Name">
+          <input type="text" id="registerLastName" placeholder="Last Name">
+          <input type="email" id="registerEmail" placeholder="Email" required>
+          <div class="password-input-container">
+            <input type="password" id="registerPassword" placeholder="Password (min 6 characters)" required>
+            <div class="password-toggle-icon" data-target="registerPassword"></div>
+          </div>
+          <button type="submit" id="registerSubmit">Create Account</button>
+        </form>
+        <div class="form-toggle">
+          Already have an account? <a id="showLogin">Log in</a>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
