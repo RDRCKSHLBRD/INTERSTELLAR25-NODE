@@ -25,6 +25,26 @@ if (!res.ok) {
 const json = await res.json();
 const album = json.data;
 
+// ── Register apiClient for player.js ──────────────────────
+// player.js playSong() needs window.apiClient.getAlbum() to find songs.
+// On the album page we already have the data — serve it directly.
+window.apiClient = window.apiClient || {};
+window.apiClient.getAlbum = async (id) => {
+  // If requesting this album, return cached data
+  if (String(id) === String(album.id)) return album;
+  // Otherwise fetch from API
+  const r = await fetch(`/api/albums/${id}`);
+  if (!r.ok) return null;
+  const d = await r.json();
+  return d.data || d;
+};
+window.apiClient.getSong = async (id) => {
+  const r = await fetch(`/api/songs/${id}`);
+  if (!r.ok) return null;
+  const d = await r.json();
+  return d.data || d;
+};
+
 // ── Apply palette ─────────────────────────────────────────
 const root = document.documentElement;
 if (album.palette) {
