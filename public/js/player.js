@@ -108,14 +108,17 @@ class AudioPlayer {
     const vol = document.createElement('div');
     vol.className = 'player-volume';
 
-    const volIcon = document.createElement('span');
+    const volIcon = document.createElement('img');
     volIcon.className = 'player-volume-icon';
+    volIcon.src = '/images/IP-SOUND-candyFloss.svg';
+    volIcon.alt = 'Volume';
     vol.appendChild(volIcon);
 
     const volTrack = document.createElement('div');
     volTrack.className = 'player-volume-track';
     this.els.volFill = document.createElement('div');
     this.els.volFill.className = 'player-volume-fill';
+    this.els.volFill.style.width = `${this.volume * 100}%`;
     volTrack.appendChild(this.els.volFill);
     volTrack.addEventListener('click', (e) => this._setVolume(e, volTrack));
     vol.appendChild(volTrack);
