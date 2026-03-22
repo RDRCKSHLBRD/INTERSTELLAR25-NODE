@@ -2,18 +2,6 @@
 // public/js/playerIO.js — V8.0.0 (RODUX Stack)
 //
 // PLAYER I/O — Left-side panel. Replaces the horizontal footer.
-//
-// Architecture:
-//   - Panel slides in from the left edge
-//   - Minibar pinned bottom-left when panel is closed (play/pause + title)
-//   - Panel contains: title, transport 3×3, seek+time, volume, nav, actions
-//   - Config from /config/data/playerio.json
-//   - CSS in playerio.css — panel is a fixed-width column, no viewport math
-//
-// The QuadTree/Ratio system is NOT used here. The panel is a known-width
-// column — no packing problem to solve. CSS grid handles internal layout.
-// The QuadTree still runs the album grid in roderick.js.
-//
 // Exposes window.playerIO for global access.
 // ============================================================================
 
@@ -45,10 +33,9 @@ class PlayerIO {
       // Rebind cart button (cart.js bound before panel existed)
       this._rebindCart();
 
-      // Volume visibility: show on pointer devices
+      // Volume visibility: show on pointer devices (retry until DOM ready)
       this._setVolumeVisibility();
 
-      // Open by default?
       if (this.config.panel?.openByDefault) {
         this.open();
       }
@@ -59,9 +46,8 @@ class PlayerIO {
     }
   }
 
-
   // ══════════════════════════════════════════════════════════════
-  // BUILD — Panel DOM
+  // BUILD — Panel
   // ══════════════════════════════════════════════════════════════
 
   _buildPanel() {
@@ -72,26 +58,16 @@ class PlayerIO {
 
     this.panelEl.innerHTML = `
       <div class="pio-panel-inner">
-
-        <!-- Close button -->
         <button class="pio-close" aria-label="Close Player I/O">✕</button>
 
-        <!-- Title (above transport) -->
         <div class="pio-title-row">
           <span class="pio-title player-title">—</span>
         </div>
 
-        <!-- Main content: transport + nav side by side -->
         <div class="pio-body">
-
-          <!-- Left: Transport 3×3 -->
           <div class="pio-transport">
-            <div class="group-transport">
-              <!-- player.js V8 builds transport-grid here -->
-            </div>
+            <div class="group-transport"></div>
           </div>
-
-          <!-- Right: Nav + Actions stacked -->
           <div class="pio-nav-actions">
             <a href="/downloads" class="pio-nav-link">downloads</a>
             <a href="/filmography" class="pio-nav-link">film</a>
@@ -109,31 +85,24 @@ class PlayerIO {
               <span id="cartCount" class="cart-count hidden">0</span>
             </button>
           </div>
-
         </div>
 
-        <!-- Seek + Time (below transport) -->
         <div class="pio-seek-row">
-          <div class="group-information">
-            <!-- player.js V8 builds seek, time, volume here -->
-          </div>
+          <div class="group-information"></div>
         </div>
 
-        <!-- Logo (bottom of panel) -->
         <div class="pio-logo">
           <img src="/images/IP_TAG24.svg" alt="Interstellar Packages" class="pio-logo-img">
           <span class="pio-logo-tag">${this.config.logo?.tagText || 'rdxenv 24/25/26'}</span>
         </div>
-
       </div>
     `;
 
     document.body.appendChild(this.panelEl);
   }
 
-
   // ══════════════════════════════════════════════════════════════
-  // BUILD — Minibar (persistent when panel is closed)
+  // BUILD — Minibar
   // ══════════════════════════════════════════════════════════════
 
   _buildMinibar() {
@@ -151,29 +120,16 @@ class PlayerIO {
 
     document.body.appendChild(this.minibarEl);
 
-    // Minibar play/pause
     this.minibarEl.querySelector('.pio-minibar-play').addEventListener('click', (e) => {
       e.stopPropagation();
       if (window.audioPlayer) {
-        if (window.audioPlayer.audio?.paused) {
-          window.audioPlayer.play();
-        } else {
-          window.audioPlayer.pause();
-        }
+        window.audioPlayer.audio?.paused ? window.audioPlayer.play() : window.audioPlayer.pause();
       }
     });
 
-    // Minibar open
-    this.minibarEl.querySelector('.pio-minibar-open').addEventListener('click', () => {
-      this.toggle();
-    });
-
-    // Click anywhere on minibar to open
-    this.minibarEl.addEventListener('click', () => {
-      if (!this.isOpen) this.open();
-    });
+    this.minibarEl.querySelector('.pio-minibar-open').addEventListener('click', () => this.toggle());
+    this.minibarEl.addEventListener('click', () => { if (!this.isOpen) this.open(); });
   }
-
 
   // ══════════════════════════════════════════════════════════════
   // OPEN / CLOSE / TOGGLE
@@ -185,8 +141,6 @@ class PlayerIO {
     this.panelEl.classList.add('open');
     this.minibarEl?.classList.add('panel-open');
     document.body.classList.add('pio-open');
-
-    // Dispatch event so roderick.js can recalc grid
     window.dispatchEvent(new CustomEvent('playerIOToggle', { detail: { open: true } }));
   }
 
@@ -196,14 +150,10 @@ class PlayerIO {
     this.panelEl.classList.remove('open');
     this.minibarEl?.classList.remove('panel-open');
     document.body.classList.remove('pio-open');
-
     window.dispatchEvent(new CustomEvent('playerIOToggle', { detail: { open: false } }));
   }
 
-  toggle() {
-    this.isOpen ? this.close() : this.open();
-  }
-
+  toggle() { this.isOpen ? this.close() : this.open(); }
 
   // ══════════════════════════════════════════════════════════════
   // EVENTS
@@ -218,9 +168,8 @@ class PlayerIO {
       if (e.key === 'Escape' && this.isOpen) this.close();
     });
 
-    // Update panel title + minibar title when player.js changes the song
-    // player.js writes to .player-title inside .group-information
-    // We mirror it to .pio-title (above transport) and .player-title-mini (minibar)
+    // Title sync: player.js writes to .player-title inside .group-information
+    // Mirror to .pio-title (panel) and .player-title-mini (minibar)
     const checkTitle = setInterval(() => {
       const playerTitle = this.panelEl?.querySelector('.group-information .player-title');
       const pioTitle = this.panelEl?.querySelector('.pio-title');
@@ -241,20 +190,16 @@ class PlayerIO {
       }
     }, 300);
 
-    // Update minibar play icon when state changes
+    // Minibar play icon state
     if (window.audioPlayer?.audio) {
       this._watchPlayState();
     } else {
-      // Wait for audio element to exist
       const check = setInterval(() => {
-        if (window.audioPlayer?.audio) {
-          clearInterval(check);
-          this._watchPlayState();
-        }
+        if (window.audioPlayer?.audio) { clearInterval(check); this._watchPlayState(); }
       }, 200);
     }
 
-    // Playlists wiring
+    // Playlists
     const playlistsBtn = this.panelEl.querySelector('#playlistsBtn');
     if (playlistsBtn) {
       playlistsBtn.addEventListener('click', () => {
@@ -262,7 +207,7 @@ class PlayerIO {
       });
     }
 
-    // Login wiring
+    // Login
     const loginBtn = this.panelEl.querySelector('#loginBtn');
     if (loginBtn) {
       loginBtn.addEventListener('click', () => {
@@ -271,13 +216,10 @@ class PlayerIO {
       });
     }
 
-    // Subscribe wiring
+    // Subscribe
     const subscribeBtn = this.panelEl.querySelector('#subscribeBtn');
     if (subscribeBtn) {
-      subscribeBtn.addEventListener('click', () => {
-        // TODO: subscribe modal
-        console.log('💳 Subscribe clicked — modal TBD');
-      });
+      subscribeBtn.addEventListener('click', () => this._openSubscribeModal());
     }
   }
 
@@ -293,39 +235,100 @@ class PlayerIO {
     const hasCoarse = window.matchMedia('(pointer: coarse)').matches;
     const isTouch = hasTouch && hasCoarse;
 
-    const volRow = this.panelEl?.querySelector('.info-volume-row');
-    if (volRow) {
-      volRow.style.display = isTouch ? 'none' : 'flex';
-    }
+    const trySet = () => {
+      const volRow = document.querySelector('.pio-seek-row .info-volume-row');
+      if (volRow) {
+        volRow.style.display = isTouch ? 'none' : 'flex';
+      } else {
+        setTimeout(trySet, 300);
+      }
+    };
+    trySet();
   }
 
   _watchPlayState() {
     const audio = window.audioPlayer.audio;
     const icon = this.minibarEl?.querySelector('.pio-minibar-play-icon');
     if (!audio || !icon) return;
-
     const update = () => { icon.textContent = audio.paused ? '▶' : '❚❚'; };
     audio.addEventListener('play', update);
     audio.addEventListener('pause', update);
     audio.addEventListener('ended', update);
   }
 
-
   // ══════════════════════════════════════════════════════════════
-  // PUBLIC API
+  // SUBSCRIBE MODAL
   // ══════════════════════════════════════════════════════════════
 
-  getPanelWidth() {
-    return 0; // V8: overlay mode, content doesn't shift
+  _openSubscribeModal() {
+    if (document.getElementById('subscribeModal')) return;
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'subscribe-backdrop';
+    backdrop.addEventListener('click', () => closeModal());
+    document.body.appendChild(backdrop);
+
+    const modal = document.createElement('div');
+    modal.id = 'subscribeModal';
+    modal.className = 'subscribe-modal';
+    modal.innerHTML = `
+      <div class="subscribe-modal-inner">
+        <button class="subscribe-close" aria-label="Close">✕</button>
+        <h2>Subscribe</h2>
+        <p class="subscribe-desc">Support the music. Choose your tier.</p>
+        <div class="subscribe-tiers">
+          <div class="subscribe-tier" data-tier="fixed">
+            <h3>Monthly</h3>
+            <div class="subscribe-price">$5 / month</div>
+            <p>Access to all releases, playlists, and radio.</p>
+            <button class="subscribe-cta" data-tier="fixed">Subscribe</button>
+          </div>
+          <div class="subscribe-tier" data-tier="pwyw">
+            <h3>Pay What You Want</h3>
+            <div class="subscribe-price-input">
+              <span>$</span>
+              <input type="number" min="1" value="10" id="pwywAmount" />
+              <span>/ month</span>
+            </div>
+            <p>Same access. You decide what it's worth.</p>
+            <button class="subscribe-cta" data-tier="pwyw">Subscribe</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const closeModal = () => {
+      modal.classList.remove('open');
+      backdrop.classList.remove('visible');
+      setTimeout(() => { modal.remove(); backdrop.remove(); }, 300);
+    };
+
+    modal.querySelector('.subscribe-close').addEventListener('click', closeModal);
+    modal.querySelectorAll('.subscribe-cta').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tier = btn.dataset.tier;
+        const amount = tier === 'pwyw' ? document.getElementById('pwywAmount')?.value || 10 : 5;
+        console.log(`💳 Subscribe: tier=${tier}, amount=$${amount}`);
+        // TODO: window.location.href = `/api/subscribe/checkout?tier=${tier}&amount=${amount}`;
+      });
+    });
+
+    const escHandler = (e) => {
+      if (e.key === 'Escape') { closeModal(); document.removeEventListener('keydown', escHandler); }
+    };
+    document.addEventListener('keydown', escHandler);
+
+    requestAnimationFrame(() => { backdrop.classList.add('visible'); modal.classList.add('open'); });
   }
-}
 
+  getPanelWidth() { return 0; }
+}
 
 // ── Init ────────────────────────────────────────────────────
 const playerIO = new PlayerIO();
 window.playerIO = playerIO;
 
-// Init when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => playerIO.init());
 } else {
