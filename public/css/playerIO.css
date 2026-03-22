@@ -239,7 +239,12 @@
 }
 
 .pio-seek-row .info-title-row {
-  display: none; /* Title is in .pio-title-row instead */
+  display: none; /* Title shown in .pio-title-row above transport instead */
+}
+
+/* Also hide seek row title on its own since player.js nests it */
+.pio-seek-row .player-title {
+  display: none;
 }
 
 .pio-seek-row .player-seek {
@@ -292,7 +297,8 @@
 }
 
 .pio-seek-row .info-volume-row {
-  /* Show on pointer devices, hide on touch — controlled by JS */
+  display: flex;
+  /* JS hides this on touch devices via _setVolumeVisibility() */
 }
 
 
@@ -384,19 +390,11 @@
 
 
 /* ══════════════════════════════════════════════════════════════
-   BODY ADJUSTMENT — when panel is open, content shifts right
+   PANEL OVERLAY — sits on top of content, no push
    ══════════════════════════════════════════════════════════════ */
 
-body.pio-open #artistHeader,
-body.pio-open #artistMain {
-  margin-left: var(--pio-width);
-  transition: margin-left 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* Smooth return */
-#artistHeader,
-#artistMain {
-  transition: margin-left 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+.pio-panel {
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
 }
 
 

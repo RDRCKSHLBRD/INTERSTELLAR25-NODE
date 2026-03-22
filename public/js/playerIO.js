@@ -36,6 +36,18 @@ class PlayerIO {
       this._bindEvents();
       this._ready = true;
 
+      // Rebuild player.js into the new panel containers
+      if (window.audioPlayer) {
+        window.audioPlayer.built = false;
+        window.audioPlayer.build();
+      }
+
+      // Rebind cart button (cart.js bound before panel existed)
+      this._rebindCart();
+
+      // Volume visibility: show on pointer devices
+      this._setVolumeVisibility();
+
       // Open by default?
       if (this.config.panel?.openByDefault) {
         this.open();
@@ -206,19 +218,28 @@ class PlayerIO {
       if (e.key === 'Escape' && this.isOpen) this.close();
     });
 
-    // Update minibar title when song changes
-    const observer = new MutationObserver(() => {
-      const title = this.panelEl?.querySelector('.player-title');
+    // Update panel title + minibar title when player.js changes the song
+    // player.js writes to .player-title inside .group-information
+    // We mirror it to .pio-title (above transport) and .player-title-mini (minibar)
+    const checkTitle = setInterval(() => {
+      const playerTitle = this.panelEl?.querySelector('.group-information .player-title');
+      const pioTitle = this.panelEl?.querySelector('.pio-title');
       const miniTitle = this.minibarEl?.querySelector('.player-title-mini');
-      if (title && miniTitle && title.textContent !== '—') {
-        miniTitle.textContent = title.textContent;
-      }
-    });
 
-    const titleEl = this.panelEl?.querySelector('.player-title');
-    if (titleEl) {
-      observer.observe(titleEl, { childList: true, characterData: true, subtree: true });
-    }
+      if (playerTitle) {
+        clearInterval(checkTitle);
+        const sync = () => {
+          const text = playerTitle.textContent;
+          if (text && text !== '—') {
+            if (pioTitle) pioTitle.textContent = text;
+            if (miniTitle) miniTitle.textContent = text;
+          }
+        };
+        const observer = new MutationObserver(sync);
+        observer.observe(playerTitle, { childList: true, characterData: true, subtree: true });
+        sync();
+      }
+    }, 300);
 
     // Update minibar play icon when state changes
     if (window.audioPlayer?.audio) {
@@ -240,6 +261,42 @@ class PlayerIO {
         if (window.playlistManager) window.playlistManager.toggle();
       });
     }
+
+    // Login wiring
+    const loginBtn = this.panelEl.querySelector('#loginBtn');
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => {
+        const authModal = document.getElementById('authModal');
+        if (authModal) authModal.classList.add('active');
+      });
+    }
+
+    // Subscribe wiring
+    const subscribeBtn = this.panelEl.querySelector('#subscribeBtn');
+    if (subscribeBtn) {
+      subscribeBtn.addEventListener('click', () => {
+        // TODO: subscribe modal
+        console.log('💳 Subscribe clicked — modal TBD');
+      });
+    }
+  }
+
+  _rebindCart() {
+    const cartBtn = this.panelEl?.querySelector('#cartBtn');
+    if (cartBtn && window.cartManager) {
+      cartBtn.addEventListener('click', () => window.cartManager.toggleCartSidebar());
+    }
+  }
+
+  _setVolumeVisibility() {
+    const hasTouch = navigator.maxTouchPoints > 0;
+    const hasCoarse = window.matchMedia('(pointer: coarse)').matches;
+    const isTouch = hasTouch && hasCoarse;
+
+    const volRow = this.panelEl?.querySelector('.info-volume-row');
+    if (volRow) {
+      volRow.style.display = isTouch ? 'none' : 'flex';
+    }
   }
 
   _watchPlayState() {
@@ -259,7 +316,7 @@ class PlayerIO {
   // ══════════════════════════════════════════════════════════════
 
   getPanelWidth() {
-    return this.isOpen ? (this.config?.panel?.width || 280) : 0;
+    return 0; // V8: overlay mode, content doesn't shift
   }
 }
 
