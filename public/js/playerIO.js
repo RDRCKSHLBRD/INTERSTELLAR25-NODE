@@ -25,15 +25,12 @@ class PlayerIO {
       this._ready = true;
 
       // Rebuild player.js into the new panel containers
-      if (window.audioPlayer) {
-        window.audioPlayer.built = false;
-        window.audioPlayer.build();
-      }
+      this._initPlayer();
 
       // Rebind cart button (cart.js bound before panel existed)
       this._rebindCart();
 
-      // Volume visibility: show on pointer devices (retry until DOM ready)
+      // Volume visibility on desktop (after player build confirms)
       this._setVolumeVisibility();
 
       if (this.config.panel?.openByDefault) {
@@ -230,20 +227,60 @@ class PlayerIO {
     }
   }
 
+  // ══════════════════════════════════════════════════════════════
+  // PLAYER BUILD — ensure player.js builds into panel containers
+  // ══════════════════════════════════════════════════════════════
+
+  _initPlayer() {
+    const tryBuild = (attempt = 0) => {
+      if (!window.audioPlayer) {
+        if (attempt < 20) setTimeout(() => tryBuild(attempt + 1), 150);
+        else console.error('❌ PlayerIO: audioPlayer never appeared');
+        return;
+      }
+
+      // Force rebuild into panel containers
+      window.audioPlayer.built = false;
+      window.audioPlayer.build();
+
+      // Verify it worked — check for the volume row
+      const volRow = this.panelEl?.querySelector('.info-volume-row');
+      if (volRow) {
+        console.log('✅ PlayerIO: player.js build verified (volume row present)');
+      } else if (attempt < 20) {
+        // build() may have bailed — containers might not be in DOM yet
+        console.log(`⏳ PlayerIO: volume row not found, retry ${attempt + 1}`);
+        setTimeout(() => tryBuild(attempt + 1), 200);
+      } else {
+        console.error('❌ PlayerIO: player.js build failed after retries');
+      }
+    };
+
+    tryBuild();
+  }
+
   _setVolumeVisibility() {
     const hasTouch = navigator.maxTouchPoints > 0;
     const hasCoarse = window.matchMedia('(pointer: coarse)').matches;
     const isTouch = hasTouch && hasCoarse;
 
-    const trySet = () => {
-      const volRow = document.querySelector('.pio-seek-row .info-volume-row');
+    // On touch devices, hide volume. On desktop, CSS default (flex) handles it.
+    if (!isTouch) {
+      console.log('🔊 Desktop pointer detected — volume row visible (CSS default)');
+      return;
+    }
+
+    // Touch device: hide volume row once it exists
+    const tryHide = (attempt = 0) => {
+      const volRow = this.panelEl?.querySelector('.info-volume-row');
       if (volRow) {
-        volRow.style.display = isTouch ? 'none' : 'flex';
-      } else {
-        setTimeout(trySet, 300);
+        volRow.style.display = 'none';
+        console.log('🔇 Touch device — volume row hidden');
+      } else if (attempt < 30) {
+        setTimeout(() => tryHide(attempt + 1), 300);
       }
     };
-    trySet();
+    tryHide();
   }
 
   _watchPlayState() {
