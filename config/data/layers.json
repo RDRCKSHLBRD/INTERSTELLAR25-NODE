@@ -1,0 +1,121 @@
+{
+  "_meta": {
+    "description": "Per-album layer definitions for the parallax/breathing layer engine",
+    "version": "1.3.0",
+    "updated": "2026-03-22",
+    "notes": "Z-order matched to GIMP source file: bars(base) → hexagons → ground → blossoms → text"
+  },
+
+  "00040101": {
+    "name": "Charlotta",
+    "basePath": "Charlotta/LAYERS",
+    "dimensions": { "width": 1600, "height": 1600 },
+    "objectFit": "contain",
+    "timing": {
+      "cycleSec": 24,
+      "easing": "sine"
+    },
+    "layers": [
+      {
+        "id": "bars",
+        "file": "CHARCOV_1G_v2_L4.png",
+        "z": 0,
+        "drift": { "x": 0, "y": -2 },
+        "scale": { "min": 1.0, "max": 1.005 },
+        "opacity": { "min": 0.8, "max": 1.0 },
+        "phase": 0.3,
+        "cycleSec": 28,
+        "blendMode": "normal"
+      },
+      {
+        "id": "hex-a",
+        "file": "CHARCOV_1G_v2_L3.png",
+        "z": 1,
+        "drift": { "x": 6, "y": -4 },
+        "scale": { "min": 0.98, "max": 1.02 },
+        "opacity": { "min": 0.6, "max": 0.95 },
+        "phase": 0.0,
+        "cycleSec": 18,
+        "blendMode": "normal"
+      },
+      {
+        "id": "hex-b",
+        "file": "CHARCOV_1G_v2_L3B.png",
+        "z": 2,
+        "drift": { "x": -8, "y": 5 },
+        "scale": { "min": 0.97, "max": 1.03 },
+        "opacity": { "min": 0.5, "max": 0.9 },
+        "phase": 0.25,
+        "cycleSec": 22,
+        "blendMode": "normal"
+      },
+      {
+        "id": "hex-c",
+        "file": "CHARCOV_1G_v2_L3C.png",
+        "z": 3,
+        "drift": { "x": 4, "y": -6 },
+        "scale": { "min": 0.98, "max": 1.02 },
+        "opacity": { "min": 0.55, "max": 0.85 },
+        "phase": 0.5,
+        "cycleSec": 16,
+        "blendMode": "normal"
+      },
+      {
+        "id": "hex-d",
+        "file": "CHARCOV_1G_v2_L3D.png",
+        "z": 4,
+        "drift": { "x": -5, "y": -3 },
+        "scale": { "min": 0.97, "max": 1.03 },
+        "opacity": { "min": 0.5, "max": 0.9 },
+        "phase": 0.7,
+        "cycleSec": 26,
+        "blendMode": "normal"
+      },
+      {
+        "id": "hex-e",
+        "file": "CHARCOV_1G_v2_L3E.png",
+        "z": 5,
+        "drift": { "x": 9, "y": 2 },
+        "scale": { "min": 0.96, "max": 1.04 },
+        "opacity": { "min": 0.45, "max": 0.85 },
+        "phase": 0.4,
+        "cycleSec": 20,
+        "blendMode": "normal"
+      },
+      {
+        "id": "ground",
+        "file": "CHARCOV_1G_v2_L2.png",
+        "z": 7,
+        "drift": { "x": 2, "y": 1 },
+        "scale": { "min": 1.0, "max": 1.006 },
+        "opacity": { "min": 0.85, "max": 1.0 },
+        "phase": 0,
+        "cycleSec": 30,
+        "blendMode": "normal"
+      },
+      {
+        "id": "blossoms",
+        "file": "CHARCOV_1G_v2_L1.png",
+        "z": 8,
+        "drift": { "x": -4, "y": 3 },
+        "scale": { "min": 1.0, "max": 1.01 },
+        "opacity": { "min": 0.9, "max": 1.0 },
+        "phase": 0.15,
+        "cycleSec": 20,
+        "blendMode": "normal"
+      },
+      {
+        "id": "text",
+        "file": "CHARLOTTA_1600x1600_TX.svg",
+        "z": 9,
+        "drift": { "x": 0, "y": 0 },
+        "scale": { "min": 1.0, "max": 1.0 },
+        "opacity": { "min": 0.85, "max": 1.0 },
+        "phase": 0,
+        "cycleSec": 24,
+        "blendMode": "normal",
+        "isSVG": true
+      }
+    ]
+  }
+}

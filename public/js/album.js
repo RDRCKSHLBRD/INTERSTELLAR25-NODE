@@ -1,9 +1,10 @@
 // ============================================================================
-// public/js/album.js — V2.0 (PlayerIO V8 / Palette-Aware Panel)
+// public/js/album.js — V2.1 (PlayerIO V8 / Palette-Aware Panel / LayerEngine)
 //
 // Album page controller. Fetches album data, builds the lateral panel
 // environment, wires navigation, tracklist, cart, playlists.
 // V8: PlayerIO replaces footer. Album palette overrides --pio-* vars.
+// V2.1: LayerEngine integration — animated cover layers when available.
 // ============================================================================
 
 // ── Extract catalogue from URL ────────────────────────────
@@ -67,6 +68,20 @@ document.title = `${album.name} — ${album.artist_name} — Interstellar Packag
 
 const coverUrl = album.cover_url || `/api/image/${album.catalogue}/cover.jpg`;
 
+// ── Fetch layer config (non-blocking) ─────────────────────
+let layerConfig = null;
+try {
+  const layersRes = await fetch('/config/data/layers.json');
+  if (layersRes.ok) {
+    const allLayers = await layersRes.json();
+    layerConfig = allLayers[catalogue] || null;
+  }
+} catch (e) {
+  console.log('LayerEngine: no layer config available, using single image');
+}
+
+const hasLayers = !!(layerConfig && window.LayerEngine);
+
 // ── Duration formatter ────────────────────────────────────
 function fmtDur(d) {
   if (!d) return '';
@@ -84,14 +99,17 @@ const songs = album.songs || [];
 page.innerHTML = `
   <!-- PANEL 0: The Door -->
   <section class="panel panel-cover" id="panelCover">
-    <img class="cover-img" src="${coverUrl}" alt="${album.name}" />
+    ${hasLayers
+      ? `<div class="cover-layers" id="coverLayers"></div>`
+      : `<img class="cover-img" src="${coverUrl}" alt="${album.name}" />`
+    }
     <div class="cover-prompt">enter</div>
   </section>
 
   <!-- PANEL 1: Liner Notes Spread -->
   <section class="panel panel-liner" id="panelLiner">
-    <div class="liner-artwork">
-      <img src="${coverUrl}" alt="${album.name}" />
+    <div class="liner-artwork" id="linerArtwork">
+      ${hasLayers ? '' : `<img src="${coverUrl}" alt="${album.name}" />`}
     </div>
     <div class="liner-text">
       <div>
@@ -129,6 +147,43 @@ page.innerHTML = `
     </div>
   </section>
 `;
+
+
+// ══════════════════════════════════════════════════════════
+// LAYER ENGINE INIT
+// ══════════════════════════════════════════════════════════
+
+if (hasLayers) {
+  // Panel 1: Liner artwork layers
+  const artworkEl = document.getElementById('linerArtwork');
+  if (artworkEl) {
+    const linerEngine = new LayerEngine(artworkEl, layerConfig, catalogue);
+    artworkEl.addEventListener('layers-ready', () => linerEngine.start());
+
+    // Stop/start on visibility to save CPU
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) linerEngine.start();
+        else linerEngine.stop();
+      });
+    }, { threshold: 0.1 });
+    observer.observe(artworkEl);
+
+    window._linerLayerEngine = linerEngine;
+  }
+
+  // Panel 0: Door layers (same config, second instance)
+  const coverLayersEl = document.getElementById('coverLayers');
+  if (coverLayersEl) {
+    // Style the container to fill the panel
+    coverLayersEl.style.cssText = 'width:100%;height:100%;position:relative;overflow:hidden;';
+
+    const doorEngine = new LayerEngine(coverLayersEl, layerConfig, catalogue);
+    coverLayersEl.addEventListener('layers-ready', () => doorEngine.start());
+
+    window._doorLayerEngine = doorEngine;
+  }
+}
 
 
 // ══════════════════════════════════════════════════════════
@@ -182,13 +237,15 @@ panelCover.addEventListener('click', () => {
   }, 400);
 });
 
-// ── Cover image load ──────────────────────────────────────
-const coverImg = panelCover.querySelector('.cover-img');
-if (coverImg) {
-  if (coverImg.complete) {
-    coverImg.classList.add('loaded');
-  } else {
-    coverImg.addEventListener('load', () => coverImg.classList.add('loaded'));
+// ── Cover image load (non-layer fallback) ─────────────────
+if (!hasLayers) {
+  const coverImg = panelCover.querySelector('.cover-img');
+  if (coverImg) {
+    if (coverImg.complete) {
+      coverImg.classList.add('loaded');
+    } else {
+      coverImg.addEventListener('load', () => coverImg.classList.add('loaded'));
+    }
   }
 }
 
@@ -313,4 +370,4 @@ root.style.setProperty('--footer-h', '0px');
 
 document.body.classList.add('ready');
 
-console.log(`✅ Album environment: ${album.name} (${catalogue}) — ${totalPanels} panels (PlayerIO V8)`);
+console.log(`✅ Album environment: ${album.name} (${catalogue}) — ${totalPanels} panels (PlayerIO V8${hasLayers ? ' + LayerEngine' : ''})`);
