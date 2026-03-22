@@ -13,6 +13,7 @@
   --pio-text: #D8E8EA;
   --pio-accent: #5BB8C4;
   --pio-muted: #2B7F8C;
+  --pio-alt1: #367687;
   --pio-separator: rgba(43, 127, 140, 0.2);
   --pio-btn-size: 40px;
   --pio-btn-gap: 2px;
@@ -120,12 +121,38 @@
 .pio-seek-row .info-title-row { display: none; }
 .pio-seek-row .player-title { display: none; }
 .pio-seek-row .player-seek { flex: 1; height: 6px; background: rgba(255,255,255,0.08); position: relative; cursor: pointer; border-radius: 0px; }
-.pio-seek-row .player-seek-fill { height: 100%; background: var(--pio-accent); border-radius: 0px; transition: width 0.1s linear; }
+.pio-seek-row .player-seek-fill { height: 100%; background: var(--pio-accent); border-radius: 0px; transition: width 0.1s linear; position: relative; }
+.pio-seek-row .player-seek-fill::after {
+  content: '';
+  position: absolute;
+  right: -5px; top: 50%;
+  width: 13px; height: 18px;
+  background: var(--pio-alt1);
+  border-radius: 0%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+.pio-seek-row .player-seek:hover .player-seek-fill::after { opacity: 1; }
 .pio-seek-row .player-time { font-size: 12px; color: var(--pio-muted); white-space: nowrap; flex-shrink: 0; }
 .pio-seek-row .player-volume { display: flex; align-items: center; gap: 6px; width: 100%; }
 .pio-seek-row .player-volume-icon { width: 20px; height: 20px; opacity: 0.8; flex-shrink: 0; cursor: pointer; }
 .pio-seek-row .player-volume-track { flex: 1; height: 6px; background: rgba(255,255,255,0.08); position: relative; cursor: pointer; border-radius: 0px; }
-.pio-seek-row .player-volume-fill { height: 100%; background: var(--pio-muted); border-radius: 0px; }
+.pio-seek-row .player-volume-fill { height: 100%; background: var(--pio-muted); border-radius: 0px; position: relative; }
+.pio-seek-row .player-volume-fill::after {
+  content: '';
+  position: absolute;
+  right: -4px; top: 50%;
+  width: 12px; height: 18px;
+  background: var(--pio-alt1);
+  border-radius: 0%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+.pio-seek-row .player-volume:hover .player-volume-fill::after { opacity: 1; }
 .pio-seek-row .info-volume-row { display: flex; align-items: center; padding: 6px 0; min-height: 20px; }
 
 /* ── Logo ──────────────────────────────────────────────────── */

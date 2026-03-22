@@ -91,7 +91,10 @@ class AudioPlayer {
     this.els.seekFill = document.createElement('div');
     this.els.seekFill.className = 'player-seek-fill';
     seek.appendChild(this.els.seekFill);
-    seek.addEventListener('click', (e) => this._seekTo(e, seek));
+    this._makeDraggable(seek, (ratio) => {
+      if (!this.audio?.duration) return;
+      this.audio.currentTime = ratio * this.audio.duration;
+    });
     seekRow.appendChild(seek);
 
     this.els.time = document.createElement('span');
@@ -120,7 +123,11 @@ class AudioPlayer {
     this.els.volFill.className = 'player-volume-fill';
     this.els.volFill.style.width = `${this.volume * 100}%`;
     volTrack.appendChild(this.els.volFill);
-    volTrack.addEventListener('click', (e) => this._setVolume(e, volTrack));
+    this._makeDraggable(volTrack, (ratio) => {
+      this.volume = ratio;
+      this.audio.volume = ratio;
+      if (this.els.volFill) this.els.volFill.style.width = `${ratio * 100}%`;
+    });
     vol.appendChild(volTrack);
 
     volRow.appendChild(vol);
@@ -286,6 +293,40 @@ class AudioPlayer {
     this.volume = ratio;
     this.audio.volume = ratio;
     if (this.els.volFill) this.els.volFill.style.width = `${ratio * 100}%`;
+  }
+
+  /**
+   * Make a track bar click-and-draggable. Works with mouse + touch.
+   * @param {Element} track - the bar container element
+   * @param {Function} onUpdate - called with ratio (0-1) on every move
+   */
+  _makeDraggable(track, onUpdate) {
+    const getR = (clientX) => {
+      const rect = track.getBoundingClientRect();
+      return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    };
+
+    // Click
+    track.addEventListener('click', (e) => onUpdate(getR(e.clientX)));
+
+    // Mouse drag
+    track.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      onUpdate(getR(e.clientX));
+      const move = (ev) => onUpdate(getR(ev.clientX));
+      const up = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); };
+      document.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', up);
+    });
+
+    // Touch drag
+    track.addEventListener('touchstart', (e) => {
+      onUpdate(getR(e.touches[0].clientX));
+      const move = (ev) => { ev.preventDefault(); onUpdate(getR(ev.touches[0].clientX)); };
+      const end = () => { track.removeEventListener('touchmove', move); track.removeEventListener('touchend', end); };
+      track.addEventListener('touchmove', move, { passive: false });
+      track.addEventListener('touchend', end);
+    }, { passive: true });
   }
 
   _fmt(s) {
