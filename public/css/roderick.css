@@ -279,12 +279,13 @@ body.ready { opacity: 1; }
     height: 100dvh;
     z-index: 200;
     box-shadow: none;
-    padding-bottom: env(safe-area-inset-bottom, 100px);
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
   }
 
   #albumsRegion {
     width: 100% !important;
-    padding-bottom: env(safe-area-inset-bottom, 100px);
+    /* Badge is 76px + 12px bottom offset + safe area */
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
   }
 }
 

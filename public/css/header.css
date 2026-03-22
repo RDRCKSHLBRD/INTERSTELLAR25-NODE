@@ -55,9 +55,11 @@
   #artist-name-svg {
     height: 20px;
   }
+}
 
-  .artist-name {
-    font-size: 15px;
-    text-align: center;
+/* ── Mobile Landscape — header is short, SVG needs a floor ───── */
+@media (max-height: 500px) and (orientation: landscape) {
+  #artist-name-svg {
+    height: max(calc(var(--header-height, 44px) * 0.40), 18px);
   }
 }
