@@ -1,0 +1,48 @@
+{
+  "_component": "playerIO",
+  "_version": "8.0.0",
+  "_architecture": "Left-side panel. Title on top, transport 3×3, seek+time, volume below. Nav+actions as stacked column beside transport. Logo separate. One layout — no profiles, no viewport fighting.",
+
+  "panel": {
+    "width": 280,
+    "position": "left",
+    "openByDefault": false
+  },
+
+  "minibar": {
+    "position": "bottom-left",
+    "width": 200,
+    "height": 36,
+    "shows": ["playPause", "title"]
+  },
+
+  "transport": {
+    "columns": 3,
+    "buttons": ["prev", "play", "next", "skipBack", "stop", "skipFwd", "loop", "plist", "cart"],
+    "btnSize": 36,
+    "btnGap": 2
+  },
+
+  "info": {
+    "titlePosition": "above-transport",
+    "seekPosition": "below-transport",
+    "volumePosition": "below-seek",
+    "seekHeight": 4,
+    "volumeOnTouch": false
+  },
+
+  "nav": {
+    "items": ["downloads", "film", "contact"],
+    "direction": "column"
+  },
+
+  "actions": {
+    "items": ["playlists", "subscribe", "login", "cart"],
+    "direction": "column"
+  },
+
+  "logo": {
+    "separate": true,
+    "tagText": "rdxenv 24/25/26"
+  }
+}
